@@ -7,66 +7,10 @@ output: html_document
 
 In this Rmd we will be recreating Shelby Richins' results for John Day River Steelhead.
 
-This Rmd is organized by the workflow:
-1) Querying PTAGIS for the relevant data
+NOTE: PIT tag detectors were only installed in the two adult fish ladders at John Day Dam in 2017. So from 2005-2015 we last see them at the Dalles Dam, and then in the John Day River
 
-# PTAGIS Query - Attempt 1
-- Interrogation Detail
 
-Query Builder2:
-- 1 Attributes: Standard
-- 2 Metrics: Obs Count, Obs Time Max, Obs Time Min, Max Obs Time Per Site, Max Obs Time Over All Sites
-- 12 Release site: All rivers/creeks listed as tributaries to, mainstem of, or any fork of of the John Day River
-  - Searched for "John Day" in 12. Release Site, manually removed any entries that did not meet this criteria
-- 24 Species: Steelhead
-- 27 Migration Year: 2005-2015
-
--> Run report, then in Report Details:
-  - Tools -> View Filter; Add Condition
-  - Condition: Obs Time Max Equals Max Obs Time Per Site
-    - This gives us only the last observation of each individual at each site, so we don't have multiple PIT-tag detections
-    recorded at the same site.
-
-# PTAGIS Query - Attempt 2
-- Interrogation Summary
-
-Query Builder2:
-- 1 Attributes: Standard
-- 2 Metrics: Count, First Obs Date Max, First Obs Date Min, Last Obs Date Max, Last Obs Date Min, Mark Length Max, Mark Length Min, Release Date Max, Release Date Min
-- 14 Release Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, Lower John Day
-  - Searched "John Day" and selected all
-- 25 Species: Steelhead
-- 28 Migration Year: 2005-2015
-- 30 Mark Length: Less than or equal to 350
-
--> Run report, then in Report Details:
-  - Tools -> View Filter; Add Condition
-  - Condition: Obs Time Max Equals Max Obs Time Per Site
-    - This gives us only the last observation of each individual at each site, so we don't have multiple PIT-tag detections
-    recorded at the same site.
-
-So for some reason, this kept failing because too many records (over a million) were included. Not sure why this would have more records than a similar "interrogation detail" query?
-    
-# PTAGIS Query - Attempt 3
-- Interrogation Detail
-
-Query Builder2:
-- 1 Attributes: Standard
-- 2 Metrics: Obs Count, Obs Time Max, Obs Time Min, Max Obs Time Per Site, Max Obs Time Over All Sites
-- 14 Release Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, Lower John Day
-  - Searched "John Day" and selected all
-- 24 Species: Steelhead
-- 28 Migration Year: 2005-2015
-- 30 Mark Length: Less than or equal to 350
-
--> Run report, then in Report Details:
-  - Tools -> View Filter; Add Condition
-  - Condition: Obs Time Max Equals Max Obs Time Per Site
-    - This gives us only the last observation of each individual at each site, so we don't have multiple PIT-tag detections
-    recorded at the same site.
-    
-    
-# PTAGIS Query - Attempt 4
+# PTAGIS Query
 
 ## Query 1 - adult returns to BON
 - Interrogation Detail
@@ -74,7 +18,7 @@ Query Builder2:
 Query Builder2:
 - 1 Attributes: Standard
 - 2 Metrics: Obs Count, Obs Time Max, Obs Time Min
-- 14 Release Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, Lower John Day
+- 9 Mark Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, Lower John Day
   - Searched "John Day" and selected all
 - 16 Obs Time: Value between 6/1/2005 12:00:00 AM and 5/31/2015 11:59:59
 - 17 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots
@@ -82,244 +26,62 @@ Query Builder2:
 - 29 Mark Length: Less than or equal to 350
 
 
-# PTAGIS Query - Attempt 5
+### Examine data
 
-## Query 1 - adult returns to BON
-- Interrogation Detail
+#### Load libraries
+```{r load_libraries}
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+#### Import data
+```{r load_data}
+JDR_BON_adult_returns <- clean_names(read.csv(here("PTAGIS_queries", "intermediate_files",  "2022-01-06-john_day_river_bon_adult_returns_2005-2015.csv")))
+```
+
+#### Inspect data
+```{r}
+# Unique tags?
+length(unique(JDR_BON_adult_returns$tag_code))
+# 2,121 unique tags - and they're all wild (or unknown)! This matches Shelby's numbers for wild fish.
+
+# Count by year
+# Reformat dates
+JDR_BON_adult_returns %>% 
+  mutate(obs_time_value = mdy_hms(obs_time_value)) %>% 
+  mutate(year = year(obs_time_value)) -> JDR_BON_adult_returns
+```
+
+#### Export tags for querying PTAGIS
+```{r}
+as.data.frame(unique(JDR_BON_adult_returns$tag_code)) -> JDR_unique_tags
+
+write.table(JDR_unique_tags, file = here(here("PTAGIS_queries", "intermediate_files",  "2022-01-06-john_day_river_bon_adult_returns_2005-2015_TAGS.txt")), col.names = FALSE, row.names = FALSE, quote = FALSE)
+```
+
+## QUERY 2
+- Complete tag history
 
 Query Builder2:
 - 1 Attributes: Standard
-- 2 Metrics: Obs Count, Obs Time Max, Obs Time Min
-- 7 Mark Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, Lower John Day
-  - Searched "John Day" and selected all
-- 16 Obs Time: Value between 6/1/2005 12:00:00 AM and 5/31/2015 11:59:59
-- 17 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots
-- 24 Species: Steelhead
-- 29 Mark Length: Less than or equal to 350
+- 2 Metrics: Standard
+- 29 Tag Code: 2022-01-06-john_day_river_bon_adult_returns_2005-2015_TAGS.txt
 
-# Examine data
+# Analysis
 
-## Load libraries
-```{r load_libraries}
-library(tidyverse)
-library(here)
-library(janitor)
-```
-
-## Import data
-```{r load_data}
-JDR_raw <- clean_names(read.csv(here("PTAGIS_queries", "john_day_river_2021-01-05.csv")))
-```
-
-## Inspect data
+## Import and clean data
 ```{r}
-# Unique tags?
-length(unique(JDR_raw$tag_code))
-# 28,233 total unique tags
+JDR_CTH <- clean_names(read.csv(here("PTAGIS_queries", "complete_tag_histories", "2022-01-06-jdr_2005_2015_complete_tag_history.csv")))
+JDR_CTH %>% 
+  mutate(event_date = mdy(event_date_mmddyyyy)) %>% 
+  arrange(tag_code, event_date) %>% 
+  dplyr::select(tag_code, event_type_name, event_site_name, cth_count, event_date) -> JDR_CTH
 
-# Subset only steelhead tagged as juveniles
-JDR_raw %>% 
-  subset(., mark_length_max < 350) -> JDR
-
-# Unique tags?
-length(unique(JDR$tag_code))
-# 21,901 tagged as juveniles
-
-# where are these detections coming from
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(desc(Freq))
-
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(Var1)
-
-
-sort(unique(JDR$site_name))
-# "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots"
-
-# Get the tags IDs for fish that were detected at BON
-JDR %>% 
-  subset(site_name %in% c("BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots")) -> JDR_BON_detections
-
-unique(JDR_BON_detections$tag_code) -> JDR_adult_tag_codes
-
-# Okay, subset only individuals seen at the Bonneville adult fishway
-JDR %>% 
-  subset(tag_code %in% JDR_adult_tag_codes) -> JDR_adult_returns
-
-# How many adult returns to BON?
-length(unique(JDR_adult_returns$tag_code))
-
-# According to Shelby, from 05/06 to 14/15, there were 2,617 adult returns (2121 wild and 496 hatchery). So pretty close...
+JDR_CTH
 ```
 
-
-# Examine data - round 2
-
-## Load libraries
-```{r load_libraries}
-library(tidyverse)
-library(here)
-library(janitor)
-```
-
-## Import data
-```{r load_data}
-JDR_raw <- clean_names(read.csv(here("PTAGIS_queries", "john_day_river_2021-01-06.csv")))
-```
-
-## Inspect data
-```{r}
-# Unique tags?
-length(unique(JDR_raw$tag_code))
-# 27,901 unique tags - but these are only juveniles, since we filtered on mark length in PTAGIS
-
-JDR <- JDR_raw
-
-# where are these detections coming from
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(desc(Freq))
-
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(Var1)
-
-
-sort(unique(JDR$site_name))
-# "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots"
-
-# Get the tags IDs for fish that were detected at BON
-JDR %>% 
-  subset(site_name %in% c("BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots")) -> JDR_BON_detections
-
-unique(JDR_BON_detections$tag_code) -> JDR_adult_tag_codes
-
-# Okay, subset only individuals seen at the Bonneville adult fishway
-JDR %>% 
-  subset(tag_code %in% JDR_adult_tag_codes) -> JDR_adult_returns
-
-# How many adult returns to BON?
-length(unique(JDR_adult_returns$tag_code))
-
-# According to Shelby, from 05/06 to 14/15, there were 2,617 adult returns (2121 wild and 496 hatchery). So pretty close...
-```
-
-
-
-
-# Examine data - round 3
-
-## Load libraries
-```{r load_libraries}
-library(tidyverse)
-library(here)
-library(janitor)
-```
-
-## Import data
-```{r load_data}
-JDR_BON_adult_returns <- clean_names(read.csv(here("PTAGIS_queries", "2022-01-06-john_day_river_bon_adult_returns_2005-2015_v1.csv")))
-```
-
-## Inspect data
-```{r}
-# Unique tags?
-length(unique(JDR_BON_adult_returns$tag_code))
-# 2,119 unique tags
-
-
-
-JDR <- JDR_raw
-
-# where are these detections coming from
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(desc(Freq))
-
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(Var1)
-
-
-sort(unique(JDR$site_name))
-# "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots"
-
-# Get the tags IDs for fish that were detected at BON
-JDR %>% 
-  subset(site_name %in% c("BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots")) -> JDR_BON_detections
-
-unique(JDR_BON_detections$tag_code) -> JDR_adult_tag_codes
-
-# Okay, subset only individuals seen at the Bonneville adult fishway
-JDR %>% 
-  subset(tag_code %in% JDR_adult_tag_codes) -> JDR_adult_returns
-
-# How many adult returns to BON?
-length(unique(JDR_adult_returns$tag_code))
-
-# According to Shelby, from 05/06 to 14/15, there were 2,617 adult returns (2121 wild and 496 hatchery). So pretty close...
-```
-
-# Examine data - round 4
-
-## Load libraries
-```{r load_libraries}
-library(tidyverse)
-library(here)
-library(janitor)
-```
-
-## Import data
-```{r load_data}
-JDR_BON_adult_returns <- clean_names(read.csv(here("PTAGIS_queries", "2022-01-06-john_day_river_bon_adult_returns_2005-2015.csv")))
-```
-
-## Inspect data
-```{r}
-# Unique tags?
-length(unique(JDR_BON_adult_returns$tag_code))
-# 2,121 unique tags
-
-
-
-JDR <- JDR_raw
-
-# where are these detections coming from
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(desc(Freq))
-
-table(JDR$site_name) %>% 
-  as.data.frame %>% 
-  arrange(Var1)
-
-
-sort(unique(JDR$site_name))
-# "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots"
-
-# Get the tags IDs for fish that were detected at BON
-JDR %>% 
-  subset(site_name %in% c("BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",  "BO4 - Bonneville WA Ladder Slots")) -> JDR_BON_detections
-
-unique(JDR_BON_detections$tag_code) -> JDR_adult_tag_codes
-
-# Okay, subset only individuals seen at the Bonneville adult fishway
-JDR %>% 
-  subset(tag_code %in% JDR_adult_tag_codes) -> JDR_adult_returns
-
-# How many adult returns to BON?
-length(unique(JDR_adult_returns$tag_code))
-
-# According to Shelby, from 05/06 to 14/15, there were 2,617 adult returns (2121 wild and 496 hatchery). So pretty close...
-```
-
-# Prepare data for analysis
-Remove certain entries:
-- steelhead greater than 350 mm at release
-  - if length parameter not included, look at metadata of individual mark files
-- steelhead not detected at Bonneville fishway following release
 
 Determine run timing based on the date/time of first observation at:
 - Bonneville Dam
