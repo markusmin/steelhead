@@ -65,7 +65,7 @@ write.table(JDR_unique_tags, file = here(here("PTAGIS_queries", "intermediate_fi
 - Complete tag history
 
 Query Builder2:
-- 1 Attributes: Standard
+- 1 Attributes: Standard plus event site metadata fields: Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin, Event Site RKM
 - 2 Metrics: Standard
 - 29 Tag Code: 2022-01-06-john_day_river_bon_adult_returns_2005-2015_TAGS.txt
 
@@ -73,11 +73,11 @@ Query Builder2:
 
 ## Import and clean data
 ```{r}
-JDR_CTH <- clean_names(read.csv(here("PTAGIS_queries", "complete_tag_histories", "2022-01-06-jdr_2005_2015_complete_tag_history.csv")))
+JDR_CTH <- clean_names(read.csv(here("PTAGIS_queries", "complete_tag_histories", "2022-01-07-jdr_2005_2015_complete_tag_history.csv")))
 JDR_CTH %>% 
   mutate(event_date = mdy(event_date_mmddyyyy)) %>% 
   arrange(tag_code, event_date) %>% 
-  dplyr::select(tag_code, event_type_name, event_site_name, cth_count, event_date) -> JDR_CTH
+  dplyr::select(tag_code, event_type_name, event_site_name, event_site_basin_name, event_site_subbasin_name, event_site_rkm_value, cth_count, event_date) -> JDR_CTH
 
 JDR_CTH
 ```
@@ -91,6 +91,147 @@ Determine run timing based on the date/time of first observation at:
 
 Sort into run years by June 1
 
+## Turn each detection history into characterization of run timing
+
+### Make a df to sort by run year
+```{r}
+run_year <- c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15")
+run_year_start <- seq(ymd("2005-06-01"), ymd("2014-06-01"), by = "years")
+run_year_end <- seq(ymd("2006-05-31"), ymd("2015-05-31"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+subset(run_year_df, run_year_start < BON_arrival_date & run_year_end > BON_arrival_date)$run_year
+```
+
+
+
+### Determine tally-based overshoot, homing, fallback rates
+```{r detection_history_to_classification}
+# Get a vector of all unique tags
+unique_tags <- unique(JDR_CTH$tag_code)
+
+# Figure out all the places where fish were detected
+as.data.frame(table(JDR_CTH$event_site_name))
+
+# Make a dataframe of the sites and their metadata
+JDR_CTH[!duplicated(JDR_CTH$event_site_name),] %>% 
+  dplyr::select(-c(tag_code, event_type_name, cth_count, event_date)) -> site_metadata
+  
+  
+
+# Get the names of all Bonneville adult fishway detectors
+BON_adult_fishways <- c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")
+
+# Get the names of all in stream arrays in John Day River
+JDR_instream_arrays <- subset(site_metadata, event_site_basin_name == "John Day")$event_site_name
+
+# Get the names of all arrays that would indicate overshoot (primarily McNary dam, but also other upstream arrays)
+overshoot_arrays <- subset(site_metadata, event_site_basin_name %in% c("Lower Snake", "Clearwater", "Salmon", "Upper Columbia", "Yakima")  | event_site_subbasin_name %in% c("Middle Columbia-Lake Wallula", "Umatilla", "Walla Walla" ))$event_site_name
+
+# Make a dataframe to store the fish status
+overshoot_df <- data.frame(tag = unique_tags, run_year = NA, overshoot = NA, home = NA, fallback = NA)
+
+# For each of the unique tags
+for (i in 1:length(unique_tags)){
+  tag_ID <- unique_tags[i]
+  tag_hist <- subset(JDR_CTH, tag_code == tag_ID)
+  
+  # Get the date of arrival at BON - take min in case it fell back over Bonneville
+  BON_arrival_date <- min(subset(tag_hist, event_site_name %in% c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))$event_date)
+  
+  # Assign the fish to the correct run year
+  overshoot_df[i,2] <- subset(run_year_df, run_year_start < BON_arrival_date & run_year_end > BON_arrival_date)$run_year
+  
+  # Arrange by date
+  tag_hist %>% 
+    arrange(event_date) %>% 
+    # Remove all detections that occur before detection at Bonneville upstream
+    subset(., event_date >= BON_arrival_date) -> tag_hist_adult
+  
+  # Determine if overshot
+  tag_hist_adult$event_site_name %in% overshoot_arrays -> overshoot_TF
+  if (TRUE %in% overshoot_TF){
+    overshoot_df[i,3] <- TRUE
+  }
+  else{
+    overshoot_df[i,3] <- FALSE
+  }
+  
+  # If it made it home, home = TRUE
+  tag_hist_adult$event_site_name %in% JDR_instream_arrays -> instream_TF
+  if (TRUE %in% instream_TF){
+    overshoot_df[i,4] <- TRUE
+  }
+  else{
+    overshoot_df[i,4] <- FALSE
+  }
+}
+```
+## Examine rates
+
+### Total success rate
+```{r}
+table(overshoot_df$home)
+
+# Tally estimate suggests only 32.39% successfully homed. But that is a big underestimate because detection efficiency in the natal tributary is far from 100%.
+# According to Shelby's estimate, tally underestimates successful homing by about 8%
+# Table A.2 (PDF page 154) - detection efficiency at JD1 mean of 71%, but is around 99% from 08-09 to 10/11, then drops to 40ish% from 12/13 to 14/15.
+# Note in this table: “JD1” was washed out and replaced in 2011/2012
+
+# Look into the detection histories of those that failed to home
+failed_home_tags <- subset(overshoot_df, home == FALSE)$tag
+
+subset(JDR_CTH, tag_code %in% failed_home_tags) %>% 
+  dplyr::select(tag_code, event_site_name, event_site_subbasin_name, event_date) 
+
+
+table(overshoot_df$run_year)
+# The numbers are slightly different than Shelby's - I assume it's because of her manual editing of run years. From her thesis: 
+# "Next, observations were sorted into run years. Because most populations of interior Columbia River basin steelhead normally begin their upstream migration in summer and spawn the following spring (Robards and Quinn 2002), 1 June was used as the division between run years. No date would be a perfect division between runs for all fish in all tributaries. To account for this, I manually examined the individual capture histories of all fish that had observations in consecutive run years and assigned fish to the correct run year or years. Some fish had single migrations that overlapped run years, with either early detections at downstream sites, or late detections indicating downstream movement after the spawning season. Other fish made multiple consecutive upstream migrations (successful kelts that returned as repeat spawners) and were kept in both run years."
+
+# Look at the table of success rates by run year plus N
+overshoot_df %>% 
+  group_by(run_year) %>% 
+  summarise(home_rate = sum(home), n = n()) %>% 
+  mutate(home_rate = home_rate/n) -> total_success_tally_by_year
+
+total_success_tally_by_year
+# This looks very similar to Shelby's Figure A.3, for the years prior to 2012
+# 2011/2012 is a wash because the array was down
+```
+
+
+### Overshoot
+```{r}
+table(overshoot_df$overshoot)
+
+# Look at the table of success rates by run year plus N
+overshoot_df %>% 
+  group_by(run_year) %>% 
+  summarise(overshoot_rate = sum(overshoot), n = n()) %>% 
+  mutate(overshoot_rate = overshoot_rate/n) -> overshoot_tally_by_year
+
+overshoot_tally_by_year
+# These again look very similar to Shelby's results - Page 44, Fig 2.8
+```
+
+### Fallback to home
+```{r}
+overshoot_df %>% 
+  mutate(fallback = ifelse(overshoot == TRUE & home == TRUE, TRUE,
+                           ifelse(overshoot == TRUE & home == FALSE, FALSE, NA))) -> overshoot_df
+
+# Look at the table of success rates by run year plus N
+overshoot_df %>% 
+  subset(., !is.na(fallback)) %>% 
+  group_by(run_year) %>% 
+  summarise(fallback_rate = sum(fallback), n = n()) %>% 
+  mutate(fallback_rate = fallback_rate/n) -> fallback_tally_by_year
+
+fallback_tally_by_year
+# Looks similar to Shelby's Fig 2.11 (Page 38) - I think she only has estiamtes for 08/09, 09/10, 10/11, and then 12/13, 13/14, and 14/15 because of sample sizes
+```
 
 
 
