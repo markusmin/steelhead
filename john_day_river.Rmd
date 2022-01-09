@@ -230,13 +230,347 @@ overshoot_df %>%
   mutate(fallback_rate = fallback_rate/n) -> fallback_tally_by_year
 
 fallback_tally_by_year
-# Looks similar to Shelby's Fig 2.11 (Page 38) - I think she only has estiamtes for 08/09, 09/10, 10/11, and then 12/13, 13/14, and 14/15 because of sample sizes
+# Looks similar to Shelby's Fig 2.11 (Page 38) - I think she only has estimates for 08/09, 09/10, 10/11, and then 12/13, 13/14, and 14/15 because of sample sizes
 ```
 
 
 
 # Project Branch
+DOESN'T WORK ON MacOS! Time to manually code these models...
 
+
+# Multistate Release-Recapture Model
+
+Let's see if we can write it in a maximum likelihood framework prior to going into JAGS/Bayesian.
+
+For pre-2017 John Day River Steelhead:
+
+Probability of being seen overshooting at MCN (for fish seen at Bonneville):
+
+prob(moving from BON -> TDA) * prob(detection at TDA) * prob(moving from TDA -> MCN) * prob(detection at MCN)
+
+"Models of John Day and Umatilla populations did not include early migration success, because the first dam with adult detectors below the home tributary was Bonneville Dam." (Richins 2017)
+- So it sounds like we should ignore the Dalles, because apparently the adult detectors there didn't really work?
+
+See Table E.1 (page 198): conditional overshoot rates
+- Calculated for BON -> MCN, MCN -> ICH, ICH -> LGR, and MCN -> PRA
+- TDA isn't mentioned
+
+For other tables of conditional overshoot rates, it's the dam below the natal tributary to the dams upstream. So we're only looking at the first dam below natal tributary with adult detectors, which apparently doesn't include TDA.
+
+## Get data into format for multinomial likelihood
+```{r reformat_data}
+
+JDR_CTH[!duplicated(JDR_CTH$event_site_name),] %>% 
+  dplyr::select(-c(tag_code, event_type_name, cth_count, event_date)) -> site_metadata
+  
+
+# Get the names of all Bonneville adult fishway detectors
+BON_adult_fishways <- c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")
+
+# Get names of all The Dalles adult fishway detectors
+site_metadata$event_site_name[grep("Dalles", site_metadata$event_site_name)]
+TDA_adult_fishways <- c("TD1 - The Dalles East Fish Ladder", "TD2 - The Dalles North Fish Ladder")
+
+# Get names of all McNary adult fishway detectors
+site_metadata$event_site_name[grep("McNary", site_metadata$event_site_name)]
+MCN_adult_fishways <- c("MC1 - McNary Oregon Shore Ladder",  "MC2 - McNary Washington Shore Ladder")
+
+# Get names of all ICH adult fishway detectors
+site_metadata$event_site_name[grep("Ice", site_metadata$event_site_name)]
+ICH_adult_fishways <- c("ICH - Ice Harbor Dam (Combined)")
+
+# Get names of all LGR adult fishway detectors
+site_metadata$event_site_name[grep("Granite", site_metadata$event_site_name)]
+LGR_adult_fishways <- c("GRA - Lower Granite Dam Adult")
+
+# Get names of all PRA adult fishway detectors
+site_metadata$event_site_name[grep("Priest", site_metadata$event_site_name)]
+PRA_adult_fishways <- c("PRA - Priest Rapids Adult")
+
+# Get the names of all in stream arrays in John Day River
+JDR_instream_arrays <- subset(site_metadata, event_site_basin_name == "John Day")$event_site_name
+
+# Get the names of all arrays that would indicate overshoot (primarily McNary dam, but also other upstream arrays)
+overshoot_arrays <- subset(site_metadata, event_site_basin_name %in% c("Lower Snake", "Clearwater", "Salmon", "Upper Columbia", "Yakima")  | event_site_subbasin_name %in% c("Middle Columbia-Lake Wallula", "Umatilla", "Walla Walla" ))$event_site_name
+
+# Make a dataframe to store fish detection history
+detection_df <- data.frame(tag = unique_tags, run_year = NA, BON = NA, TDA = NA, MCN = NA, ICH = NA, LGR = NA, PRA = NA, natal = NA)
+
+# Record that they were seen at BON
+detection_df$BON <- TRUE
+
+# For each of the unique tags
+for (i in 1:length(unique_tags)){
+  tag_ID <- unique_tags[i]
+  tag_hist <- subset(JDR_CTH, tag_code == tag_ID)
+  
+  # Get the date of arrival at BON - take min in case it fell back over Bonneville
+  BON_arrival_date <- min(subset(tag_hist, event_site_name %in% c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))$event_date)
+  
+  # Assign the fish to the correct run year
+  detection_df[i,2] <- subset(run_year_df, run_year_start < BON_arrival_date & run_year_end > BON_arrival_date)$run_year
+  
+  # Arrange by date
+  tag_hist %>% 
+    arrange(event_date) %>% 
+    # Remove all detections that occur before detection at Bonneville upstream
+    subset(., event_date >= BON_arrival_date) -> tag_hist_adult
+  
+  
+  # Record if seen at TDA
+  tag_hist_adult$event_site_name %in% TDA_adult_fishways -> TDA_TF
+  if (TRUE %in% TDA_TF){
+    detection_df[i,4] <- TRUE
+  }
+  else{
+    detection_df[i,4] <- FALSE
+  }
+  
+  # Record if seen at MCN
+  tag_hist_adult$event_site_name %in% MCN_adult_fishways -> MCN_TF
+  if (TRUE %in% MCN_TF){
+    detection_df[i,5] <- TRUE
+  }
+  else{
+    detection_df[i,5] <- FALSE
+  }
+    
+  # Record if seen at ICH
+  tag_hist_adult$event_site_name %in% ICH_adult_fishways -> ICH_TF
+  if (TRUE %in% ICH_TF){
+    detection_df[i,6] <- TRUE
+  }
+  else{
+    detection_df[i,6] <- FALSE
+  }
+  
+  # Record if seen at LGR
+  tag_hist_adult$event_site_name %in% LGR_adult_fishways -> LGR_TF
+  if (TRUE %in% LGR_TF){
+    detection_df[i,7] <- TRUE
+  }
+  else{
+    detection_df[i,7] <- FALSE
+  }
+  
+  # Record if seen at PRA
+  tag_hist_adult$event_site_name %in% PRA_adult_fishways -> PRA_TF
+  if (TRUE %in% PRA_TF){
+    detection_df[i,8] <- TRUE
+  }
+  else{
+    detection_df[i,8] <- FALSE
+  }
+  
+  # If it made it home, natal = TRUE
+  tag_hist_adult$event_site_name %in% JDR_instream_arrays -> instream_TF
+  if (TRUE %in% instream_TF){
+    detection_df[i,9] <- TRUE
+  }
+  else{
+    detection_df[i,9] <- FALSE
+  }
+}
+
+detection_df
+
+# Summarise into counts by site
+detection_df %>% 
+  summarise_at(vars(BON:natal), sum) -> detection_counts_v1
+
+detection_counts_v1
+# Doesn't work - need transitions, not counts at each sites
+
+# as.data.frame(table(JDR_CTH$event_site_name)) %>% 
+#   arrange(desc(Freq))
+```
+
+## Get data into format for multinomial likelihood
+```{r reformat_data}
+
+JDR_CTH[!duplicated(JDR_CTH$event_site_name),] %>% 
+  dplyr::select(-c(tag_code, event_type_name, cth_count, event_date)) -> site_metadata
+  
+
+# Get the names of all Bonneville adult fishway detectors
+BON_adult_fishways <- c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")
+
+# Get names of all The Dalles adult fishway detectors
+site_metadata$event_site_name[grep("Dalles", site_metadata$event_site_name)]
+TDA_adult_fishways <- c("TD1 - The Dalles East Fish Ladder", "TD2 - The Dalles North Fish Ladder")
+
+# Get names of all McNary adult fishway detectors
+site_metadata$event_site_name[grep("McNary", site_metadata$event_site_name)]
+MCN_adult_fishways <- c("MC1 - McNary Oregon Shore Ladder",  "MC2 - McNary Washington Shore Ladder")
+
+# Get names of all ICH adult fishway detectors
+site_metadata$event_site_name[grep("Ice", site_metadata$event_site_name)]
+ICH_adult_fishways <- c("ICH - Ice Harbor Dam (Combined)")
+
+# Get names of all LGR adult fishway detectors
+site_metadata$event_site_name[grep("Granite", site_metadata$event_site_name)]
+LGR_adult_fishways <- c("GRA - Lower Granite Dam Adult")
+
+# Get names of all PRA adult fishway detectors
+site_metadata$event_site_name[grep("Priest", site_metadata$event_site_name)]
+PRA_adult_fishways <- c("PRA - Priest Rapids Adult")
+
+# Get the names of all in stream arrays in John Day River
+JDR_instream_arrays <- subset(site_metadata, event_site_basin_name == "John Day")$event_site_name
+
+# Get the names of all arrays that would indicate overshoot (primarily McNary dam, but also other upstream arrays)
+overshoot_arrays <- subset(site_metadata, event_site_basin_name %in% c("Lower Snake", "Clearwater", "Salmon", "Upper Columbia", "Yakima")  | event_site_subbasin_name %in% c("Middle Columbia-Lake Wallula", "Umatilla", "Walla Walla" ))$event_site_name
+
+# Make a dataframe to store fish detection history
+detection_df <- data.frame(tag = unique_tags, run_year = NA, BON = NA, BON_TDA = NA, BON_MCN = NA, MCN_ICH = NA, ICH_LGR = NA, MCN_PRA = NA, natal = NA)
+
+# Record that they were seen at BON
+detection_df$BON <- TRUE
+
+# For each of the unique tags
+for (i in 1:length(unique_tags)){
+  tag_ID <- unique_tags[i]
+  tag_hist <- subset(JDR_CTH, tag_code == tag_ID)
+  
+  # Get the date of arrival at BON - take min in case it fell back over Bonneville
+  BON_arrival_date <- min(subset(tag_hist, event_site_name %in% c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))$event_date)
+  
+  # Assign the fish to the correct run year
+  detection_df[i,2] <- subset(run_year_df, run_year_start < BON_arrival_date & run_year_end > BON_arrival_date)$run_year
+  
+  # Arrange by date
+  tag_hist %>% 
+    arrange(event_date) %>% 
+    # Remove all detections that occur before detection at Bonneville upstream
+    subset(., event_date >= BON_arrival_date) -> tag_hist_adult
+  
+  
+  # Record if seen at BON & TDA (BON -> TDA)
+  tag_hist_adult$event_site_name %in% TDA_adult_fishways -> TDA_TF
+  if (TRUE %in% TDA_TF & detection_df[i,3] == TRUE){
+    detection_df[i,4] <- TRUE
+  }
+  else{
+    detection_df[i,4] <- FALSE
+  }
+  
+  # Record if seen at BON & MCN (BON -> MCN)
+  tag_hist_adult$event_site_name %in% MCN_adult_fishways -> MCN_TF
+  if (TRUE %in% MCN_TF  & detection_df[i,3] == TRUE){
+    detection_df[i,5] <- TRUE
+  }
+  else{
+    detection_df[i,5] <- FALSE
+  }
+    
+  # Record if seen at ICH & MCN (MCN -> ICH)
+  tag_hist_adult$event_site_name %in% ICH_adult_fishways -> ICH_TF
+  if (TRUE %in% MCN_TF & TRUE %in% ICH_TF){
+    detection_df[i,6] <- TRUE
+  }
+  else{
+    detection_df[i,6] <- FALSE
+  }
+  
+  # Record if seen at ICH & LGR
+  tag_hist_adult$event_site_name %in% LGR_adult_fishways -> LGR_TF
+  if (TRUE %in% LGR_TF & TRUE %in% ICH_TF){
+    detection_df[i,7] <- TRUE
+  }
+  else{
+    detection_df[i,7] <- FALSE
+  }
+  
+  # Record if seen at MCN & PRA
+  tag_hist_adult$event_site_name %in% PRA_adult_fishways -> PRA_TF
+  if (TRUE %in% PRA_TF & TRUE %in% MCN_TF){
+    detection_df[i,8] <- TRUE
+  }
+  else{
+    detection_df[i,8] <- FALSE
+  }
+  
+  # If it made it home, natal = TRUE
+  tag_hist_adult$event_site_name %in% JDR_instream_arrays -> instream_TF
+  if (TRUE %in% instream_TF){
+    detection_df[i,9] <- TRUE
+  }
+  else{
+    detection_df[i,9] <- FALSE
+  }
+}
+
+detection_df
+
+# Summarise into counts by site
+detection_df %>% 
+  summarise_at(vars(BON:natal), sum) -> detection_counts
+
+detection_counts
+
+# Get rid of BON_TDA
+detection_counts %>% 
+  dplyr::select(-BON_TDA) -> detection_counts
+```
+
+
+### Writing the multinomial likelihood:
+
+The parameters that we are estimating:
+
+Migration successes (aka survival):
+- BON_MCN
+- MCN_ICH
+- ICH_LGR
+- MCN_PRA
+- BON_natal
+- overshoot_natal
+
+Detection efficiency:
+- MCN
+- ICH
+- LGR
+- PRA
+- natal
+
+Choice of movement direction (branching)
+- After Bonneville, they can either home directly (would be seen in natal tributary) OR they can overshoot MCN
+
+Need to calculate overshoot rates (conditional and unconditional).
+
+Richins 2017: Unconditional overshooting rates were calculated as the proportion of fish seen in the fish ladder of the overshot dam out of the number of fish seen at Bonneville, divided by the detection efficiency at the overshot dam in that run year (Eq. 2.2).
+
+This is a branching system (not linear).
+
+Let's do a simple system - just a linear system, looking at overshoot only at MCN.
+- parameters:
+  - survival BON -> MCN
+  - survival BON -> natal
+  - branch after BON; can overshoot (MCN) or home directly (natal)
+  - detection efficiency at MCN
+  - detection efficiency at natal
+
+But I think that you need the upstream detectors too in order to estimate detection efficiency?
+
+```{r multinomial_likelihood}
+x <- detection_counts[, c(1,2,3)]
+p <- c(1,0.53, 0.25)
+
+dmultinom(x, prob = p)
+
+p.MLE = function(n, y){
+  negLL = function(p) (-1)*dbinom(y, size = n, prob = p, log = TRUE)
+  fit = optim(0.2, negLL, method = 'L-BFGS-B', hessian = TRUE, lower = 0.0001, upper = 0.9999)
+  var = solve(fit$hessian)
+  list(logLik = fit$value, MLE = fit$par, var = var)
+}
+p.MLE(n = 20, y = 12)
+
+
+dmultinom()
+
+```
 
 
 
