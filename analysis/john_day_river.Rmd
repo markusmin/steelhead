@@ -1203,10 +1203,48 @@ detection_df
 # Keep concatenating numbers to detection history, instead of ifelse statements
 
 detection_df %>% 
-  mutate(det_hist = ifelse(MCN == TRUE, 1, 0)) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE, 1, 0))) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(LGR == TRUE, 1, 0))) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(PRA == TRUE, 1, 0))) -> detection_df
+  mutate(det_hist = ifelse(MCN == TRUE, "M", 0)) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE, "I", 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(LGR == TRUE, "L", 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(PRA == TRUE, "P", 0)))  -> detection_df
+  # mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE & LGR == TRUE, "IL",
+  #                                           ifelse(ICH == TRUE & LGR == FALSE, "I0",
+  #                                                  ifelse(ICH == FALSE & LGR == TRUE, "OL",
+  #                                                         ifelse(PRA == TRUE, "P", "0")))))) -> detection_df
+
+JDR_CTH %>% 
+  subset(event_site_name %in% c(MCN_adult_fishways, ICH_adult_fishways, LGR_adult_fishways, PRA_adult_fishways)) %>% 
+  mutate(tag_site = paste0(tag_code, event_site_name)) %>% 
+  group_by(tag_code) %>% 
+  subset(duplicated(tag_site)) -> intermediate_df
+
+as.data.frame(table(intermediate_df$tag_code)) %>% 
+  arrange(desc(Freq)) %>% 
+  subset(Freq > 1) -> repeat_fish
+
+repeat_fish_tag_codes <- repeat_fish$Var1
+
+length(repeat_fish_tag_codes)
+# 63/2121 fish seem to have ascended dams twice
+
+# How much time 
+
+subset(JDR_CTH, tag_code %in% repeat_fish_tag_codes) %>% 
+  dplyr::select(tag_code, event_site_name,event_date) %>% 
+  mutate(tag_site = paste0(tag_code, event_site_name)) %>% 
+  # Subset only obs at dams
+  subset(event_site_name %in% c(MCN_adult_fishways, ICH_adult_fishways, LGR_adult_fishways, PRA_adult_fishways)) %>% 
+  dplyr::select(-tag_site) -> repeat_fish_dam_obs
+
+subset(repeat_fish_dam_obs, tag_code == "3D9.1BF1CF04A0")
+subset(repeat_fish_dam_obs, tag_code == "3D9.1C2C31825B")
+
+length(unique(repeat_fish_dam_obs$tag_code))
+
+subset(JDR_CTH, tag_code ==  "3D9.1BF1CF04A0") %>% 
+  dplyr::select(tag_code, event_type_name, event_site_name, event_date)
+subset(JDR_CTH, tag_code ==  "3D9.1C2C31825B") %>% 
+  dplyr::select(tag_code, event_type_name, event_site_name, event_date)
 ```
 
 
@@ -1216,20 +1254,13 @@ detection_df %>%
 ```{r prep_data_for_model}
 # Get a vector of all possible detection histories
 det_hist_possibilities_generator <- function(sites){
-  l <- rep(list(c(0:1)), sites)
+  l <- list(c("M", 0), c("I", 0), c("L", 0), c("P", 0))
   det_hist_possibilities <- expand.grid(l)
   det_hist_possibilities %>% 
     mutate(det_hist = apply(., 1, paste, collapse="")) -> det_hist_possibilities
   det_hist_possibilities_vec <- det_hist_possibilities$det_hist
   return(det_hist_possibilities_vec)
 }
-
-# Generate a table of detection histories
-
-# First get all possible histories
-det_hist_options <- det_hist_possibilities_generator(sites = 4)
-# Figure out which histories are not represented in the data
-missing_hist <- setdiff(det_hist_options, unique(detection_df$det_hist))
 
 # Generate dfs for each run
 run_year_df_generation <- function(run_year_name, complete_data){
@@ -1264,6 +1295,14 @@ data_11_12 <- run_year_df_generation(run_year_name = "11/12", complete_data = de
 data_12_13 <- run_year_df_generation(run_year_name = "12/13", complete_data = detection_df)
 data_13_14 <- run_year_df_generation(run_year_name = "13/14", complete_data = detection_df)
 data_14_15 <- run_year_df_generation(run_year_name = "14/15", complete_data = detection_df)
+
+# Look into some weird tag histories
+subset(detection_df, det_hist == "MILP")$tag -> MILP_tags
+subset(detection_df, det_hist == "MI0P")$tag -> MI0P_tags
+
+subset(JDR_CTH, tag_code %in% c(MILP_tags, MI0P_tags)) -> funky_fish
+
+# Each time, they went PRA first, then turned around and went up the Snake
 ```
 
 
@@ -1273,89 +1312,90 @@ multistate_model <- function(data) {
   
   data <- data
 
-# params are in order: s1, p1, s2, p2, s3, p3, and lambda
+# params are in order: sM, pM, sI, pI, lambdaL, lambdaP, psiI
 negLL = function(params, data){
   # Calculate the probabilities of the 16 different detection histories from the 7 parameters above
 
   # Get parameters from params vector
-  s1 <- params[1]
-  p1 <- params[2]
-  s2 <- params[3]
-  p2 <- params[4]
-  s3 <- params[5]
-  p3 <- params[6]
-  lambda <- params[7]
+  sM <- params[1]
+  pM <- params[2]
+  sI <- params[3]
+  pI <- params[4]
+  lambdaL <- params[5]
+  lambdaP <- params[6]
+  psiI <- params[7]
 
-  # 1111
-  n1111 <- s1 * p1 * s2 * p2 * s3 * p3 * lambda
   
-  # 1110
-  n1110 <- s1 * p1 * s2 * p2 * s3 * p3 * (1 - lambda)
+  # Put in zeros for non-realistic detection histories
   
-  # 1101
-  n1101 <- s1 * p1 * s2 * p2 * s3 * (1 - p3) * lambda
+  # MILP
+  nMILP <- 0
   
-  # 1100
-  n1100 <- s1 * p1 * s2 * p2 * (1 - s3) + # died between 2 and 3
-    s1 * p1 * s2 * p2 * s3 *  (1 - p3) * (1 - lambda) # survived between 2 and 3 but not detected at 3, then didn't make it to 4
+  # MIL0
+  nMIL0 <- sM * pM * psiI * sI * pI * lambdaL
   
-  # 1011
-  n1011 <- s1 * p1 * s2 * (1 - p2) * s3 * p3 * lambda
+  # MI0P
+  nMI0P <- 0
   
-  # 1010
-  n1010 <- s1 * p1 * s2 * (1 - p2) * s3 * p3 * (1 - lambda)
+  # MI00
+  nMI00 <- sM * pM * psiI * sI * pI * (1 - lambdaL)
   
-  # 1001
-  n1001 <- s1 * p1 * s2 * (1 - p2) * s3 * (1 - p3) * lambda
+  # M0LP
+  nM0LP <- 0
   
-  # 1000
-  n1000 <- s1 * p1 * (1 - s2) + # died between 1 and 2
-    s1 * p1 * s2 * (1 - p2) * (1 - s3) + # made it to 2 undetected, died 2 -> 3
-    s1 * p1 * s2 * (1 - p2) * s3 * (1 - p3) * (1 - lambda) # Made it to 2 and 3 undetected, didn't make it to 4
+  # M0L0
+  nM0L0 <- sM * pM * sI * (1 - pI) * lambdaL
   
-  # 0111
-  n0111 <- s1 * (1 - p1) * s2 * p2 * s3 * p3 * lambda
+  # M00P
+  nM00P <- sM * pM * (1 - psiI) * lambdaP  
   
-  # 0110
-  n0110 <- s1 * (1 - p1) * s2 * p2 * s3 * p3 * (1 - lambda)
+  # M000 - here we can't estimate survival between McNary dam and the branch
+  nM000 <- sM * pM * psiI * (1 - sI) + # Chosen Ice Harbor route, died on way
+    sM * pM * psiI * sI * (1 - pI) * (1 - lambdaL) + # Chosen Ice Harbor route, made it undetected
+    sM * pM * (1 - psiI) * (1 - lambdaP) # Chose PRA route, not seen at PRA
   
-  # 0101
-  n0101 <- s1 * (1 - p1) * s2 * p2 * s3 * (1 - p3) * lambda
+  # 0ILP
+  n0ILP <- 0
   
-  # 0100
-  n0100 <- s1 * (1 - p1) * s2 * p2 * (1 - s3) + # died between 2 and 3
-    s1 * (1 - p1) * s2 * p2 * s3 *  (1 - p3) * (1 - lambda) # survived between 2 and 3 but not detected at 3, then didn't make it to 4
+  # 0IL0
+  n0IL0 <- sM * (1 - pM) * sI * pI * lambdaL
   
-  # 0011
-  n0011 <- s1 * (1 - p1) * s2 * (1 - p2) * s3 * p3 * lambda
+  # 0I0P
+  n0I0P <- 0
   
-  # 0010
-  n0010 <- s1 * (1 - p1) * s2 * (1 - p2) * s3 * p3 * (1 - lambda)
+  # 0I00
+  n0I00 <- sM * (1 - pM) * sI * pI * (1 - lambdaL)
   
-  # 0001
-  n0001 <- s1 * (1 - p1) * s2 * (1 - p2) * s3 * (1 - p3) * lambda
+  # 00LP
+  n00LP <- 0
+  
+  # 00L0
+  n00L0 <- sM * (1 - pM) * sI * (1 - pI) * lambdaL
+  
+  # 000P
+  n000P <- sM * (1 - pM) * lambdaP
   
   # 0000
-  n0000 <- (1 - s1) + # died before 1
-    (s1 * (1 - p1) * (1 - s2)) + # survived undetected to 1, died 1 -> 2
-    (s1 * (1 - p1) * s2 * (1 - p2) * (1 - s3)) + # survived undetected at 1 and 2, died 2 -> 3
-    (s1 * (1 - p1) * s2 * (1 - p2) * s3 * (1 - p3) * (1 - lambda)) # survived undetected at 1 and 2 and 3, not seen at 4
+  n0000 <- (1 - sM) + # died before MCN
+    (sM * (1 - pM) * psiI * (1 - sI)) + # survived undetected to MCN, chose ICH route, died on way 
+    (sM * (1 - pM) * psiI * sI * (1 - pI)) * (1 - lambdaL) + # survived undetected to MCN, chose ICH route, survived ICH undetected, not seen at LGR
+    (sM * (1 - pM) * (1 - psiI) * (1 - lambdaP)) # survived undetected to MCN, chosen PRA route, not seen at PRA
   
   
   # Then, input those into dmultinom
   # p here is a vector of probability
-  p <- c(n1111, n1110, n1101, n1100, n1011, n1010, n1001, n1000,
-         n0111, n0110, n0101, n0100, n0011, n0010, n0001, n0000)
+  p <- c(nMILP, nMIL0, nMI0P, nMI00, nM0LP, nM0L0, nM00P, nM000,
+         n0ILP, n0IL0, n0I0P, n0I00, n00LP, n00L0, n000P, n0000)
   # negLL = function(p) (-1)*dbinom(y, size = n, prob = p, log = TRUE)
   negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
 }
 
 # Use optim
 # Use optim to optimize parameters to minimize NLL
-# Order of parameters: s1, p1, s2, p2, s3, p3, lambda
+# Order of parameters: sM, pM, sI, pI, lambdaL, lambdaP, psiI
 # Hessian = TRUE crashes this
 # We have to have a non-zero lower  bound, but we can round this later
-optim_results <- optim(par = c(0.5, 0.99, 0.5, 0.99, 0.5, 0.99, 0.2), data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, lower = 0.0001, upper = 0.9999)
+optim_results <- optim(par = c(0.5, 0.99, 0.5, 0.99, 0.2, 0.2, 0.8), data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, lower = 0.0001, upper = 0.9999)
 # fit = optim(par = c(0.5, 0.99, 0.5, 0.99, 0.2), fn = negLL, method = "Nelder-Mead")
 # var = solve(fit$hessian)
 # list(logLik = fit$value, MLE = fit$par, var = var)
@@ -1369,12 +1409,15 @@ return(optim_results)
 results_05_06 <- multistate_model(data = data_05_06)
 results_06_07 <- multistate_model(data = data_06_07)
 results_07_08 <- multistate_model(data = data_07_08)
-results_08_09 <- multistate_model(data = data_08_09)
-results_09_10 <- multistate_model(data = data_09_10)
+# Doesn't work because we have fish exhibiting non-unidirectional movement - MILP
+# results_08_09 <- multistate_model(data = data_08_09)
+# Doesn't work because we have fish exhibiting non-unidirectional movement - MILP
+# results_09_10 <- multistate_model(data = data_09_10)
 results_10_11 <- multistate_model(data = data_10_11)
 results_11_12 <- multistate_model(data = data_11_12)
 results_12_13 <- multistate_model(data = data_12_13)
-results_13_14 <- multistate_model(data = data_13_14)
+# Doesn't work because we have fish exhibiting non-unidirectional movement - MI0P
+# results_13_14 <- multistate_model(data = data_13_14)
 results_14_15 <- multistate_model(data = data_14_15)
 
 # Concatenate all values in table, for comparison with Richins 2017 Table E.1 (Conditional overshooting rates)
@@ -1383,12 +1426,15 @@ results_14_15 <- multistate_model(data = data_14_15)
 as.data.frame(results_05_06$par) %>% 
   bind_cols(as.data.frame(results_06_07$par)) %>% 
   bind_cols(as.data.frame(results_07_08$par)) %>% 
-  bind_cols(as.data.frame(results_08_09$par)) %>% 
-  bind_cols(as.data.frame(results_09_10$par)) %>% 
+  # bind_cols(as.data.frame(results_08_09$par)) %>% 
+  bind_cols(data.frame(results_08_09 = c(NA, NA, NA, NA, NA, NA, NA))) %>% 
+  # bind_cols(as.data.frame(results_09_10$par)) %>% 
+  bind_cols(data.frame(results_09_10 = c(NA, NA, NA, NA, NA, NA, NA))) %>% 
   bind_cols(as.data.frame(results_10_11$par)) %>% 
   bind_cols(as.data.frame(results_11_12$par)) %>% 
   bind_cols(as.data.frame(results_12_13$par)) %>% 
-  bind_cols(as.data.frame(results_13_14$par)) %>% 
+  # bind_cols(as.data.frame(results_13_14$par)) %>% 
+  bind_cols(data.frame(results_13_14 = c(NA, NA, NA, NA, NA, NA, NA))) %>% 
   bind_cols(as.data.frame(results_14_15$par)) -> JDR_run_year_model_results
 
 # Change upper and lower bound values to 0 and 1
@@ -1396,12 +1442,13 @@ JDR_run_year_model_results[JDR_run_year_model_results == 0.0001] <- 0
 JDR_run_year_model_results[JDR_run_year_model_results == 0.9999] <- 1
   
 # Change row and column names
-rownames(JDR_run_year_model_results) <- c("BON -> MCN", "MCN p", "MCN -> ICH", "ICH p", "ICH -> LGR", "LGR p", "LGR -> PRA")
+rownames(JDR_run_year_model_results) <- c("BON -> MCN", "MCN p", "MCN -> ICH", "ICH p", "ICH -> LGR lambda", "MCN -> PRA lambda", "psiI")
 colnames(JDR_run_year_model_results) <- c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15")
+# colnames(JDR_run_year_model_results) <- c("05/06", "06/07", "07/08", "10/11", "11/12", "12/13", "14/15")
 
 JDR_run_year_model_results %>% 
   # Calculate the mean
-  rowMeans(.) %>% 
+  rowMeans(., na.rm = TRUE) %>% 
   as.data.frame() %>% 
   dplyr::rename("mean" = ".") -> value_means
 
@@ -1431,4 +1478,5 @@ colnames(Richins_Table_E1) <- colnames(JDR_run_year_model_results)
 dput(JDR_run_year_model_results)
 dput(Richins_Table_E1)
 dput(head(dplyr::select(detection_df, -natal)))
+dput(funky_fish)
 ```
