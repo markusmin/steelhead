@@ -131,7 +131,7 @@ FALSE), det_hist = c("0000", "0000", "0000", "0000", "M000",
 
 ## Workflow - John Day River Wild Steelhead - 05/06 to 14/15
 - Query PTAGIS
-  - Selected individuals marked/released in John day River
+  - Selected individuals marked/released in John Day River
   - All fish seen at BON adult ladders
   - Sorted into run years
 - Generate detection history
@@ -142,7 +142,7 @@ FALSE), det_hist = c("0000", "0000", "0000", "0000", "M000",
 ## Columbia River Basin
 ![](.//figures/map.png){width=100%}
 
-## Pseudocode for individual detection histories - MCN example
+## Pseudocode for individual detection histories - MCN example {.smaller}
 ```{r eval = FALSE}
 # Get names of all McNary adult fishway detectors
 site_metadata$event_site_name[grep("McNary", site_metadata$event_site_name)]
