@@ -1,45 +1,53 @@
 ---
-title: "steelhead_meeting_2021-01-13"
+title: "Steelhead Overshoot Update"
 author: "Markus Min"
 date: "1/13/2022"
 output: ioslides_presentation
 ---
-<style>
-code.r{ /* Code block */
-  font-size: 4px;
-}
-</style>
 
 ```{r load_libraries, echo = FALSE, message = FALSE}
 library(kableExtra)
 library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+```{r read_in_CTH, echo = FALSE, message = FALSE}
+JDR_CTH <- clean_names(read.csv(here("PTAGIS_queries", "complete_tag_histories", "2022-01-07-jdr_2005_2015_complete_tag_history.csv")))
+JDR_CTH %>% 
+  mutate(event_date = mdy(event_date_mmddyyyy)) %>% 
+  arrange(tag_code, event_date) %>% 
+  dplyr::select(tag_code, event_type_name, event_site_name, event_site_basin_name, event_site_subbasin_name, event_site_rkm_value, cth_count, event_date) -> JDR_CTH
+
+# JDR_CTH
 ```
 
 
 ```{r read_in_data, echo = FALSE, message = FALSE}
-JDR_results <- structure(list(`05/06` = c(0.58946132871341, 0.923073829845698, 
-0.324333245974075, 1, 0.692352840096924, 1, 0), `06/07` = c(0.550042238510495, 
-1, 0.227267144481779, 1, 0.539135131184582, 0.989201736507418, 
-0), `07/08` = c(0.623908402391222, 1, 1, 0.132349705734929, 0.0298739142016827, 
-0, 0.984820930144109), `08/09` = c(0.4575166838493, 1, 0.415930004424521, 
-1, 0.404269846508559, 1, 0.0526326534987749), `09/10` = c(0.615427426599488, 
-0.98435850760239, 0.3105296629223, 0.940394265972435, 1, 0.485403946573864, 
-0.0455191605611995), `10/11` = c(0.523670398246644, 1, 0.411458229463933, 
-0.725690616147872, 1, 0.354442425457585, 0.118149005784658), 
-    `11/12` = c(0.364939306607111, 1, 0.269218582733044, 1, 0.750055242240277, 
-    1, 0), `12/13` = c(0.523540208288108, 1, 0.0976487154585556, 
-    0.525138195805691, 1, 0.393864703530566, 0.262573451285669
-    ), `13/14` = c(0.597009464385081, 1, 0.167712765515777, 0.759504109677399, 
-    1, 0.227874380797734, 0.113939238684034), `14/15` = c(0.542349484438101, 
-    1, 0.324774755725777, 0.851596704608343, 1, 0.262049211919436, 
-    0.0436786479283584), mean = c(0.538786494202896, 0.990743233744809, 
-    0.354887310669976, 0.793467359794667, 0.741568697423202, 
-    0.57128364047866, 0.16213130878868)), row.names = c("BON -> MCN", 
-"MCN p", "MCN -> ICH", "ICH p", "ICH -> LGR", "LGR p", "LGR -> PRA"
-), class = "data.frame")
+JDR_results <- structure(list(`05/06` = c(0.589445154928813, 0.923104853141582, 
+0.324372058842092, 1, 0.692299361269454, 0, 1), `06/07` = c(0.550040400196401, 
+1, 0.227290135539176, 1, 0.533308008511141, 0, 1), `07/08` = c(0.623900406797537, 
+1, 0.186771605697936, 0.935346108716671, 0, 0.121272945118958, 
+0.757584132652592), `08/09` = c(NA, NA, NA, NA, NA, NA, NA), 
+    `09/10` = c(NA, NA, NA, NA, NA, NA, NA), `10/11` = c(0.523663228383548, 
+    1, 0.403502467381841, 1, 0.488337951334292, 0.18692131380984, 
+    0.740023065128805), `11/12` = c(0.364939780460627, 1, 0.269245512912109, 
+    1, 0.749982788598854, 0, 1), `12/13` = c(0.523538640388085, 
+    1, 0.084844945157317, 1, 0.749967415141731, 0.0647984577478793, 
+    0.604346307629726), `13/14` = c(NA, NA, NA, NA, NA, NA, NA
+    ), `14/15` = c(0.542341963441192, 1, 0.330706900218079, 1, 
+    0.307690395438101, 0.086650223963043, 0.836414567794304), 
+    mean = c(0.531124224942315, 0.989014979020226, 0.260961946535507, 
+    0.990763729816667, 0.503083702899082, 0.0656632772342458, 
+    0.848338296172204)), row.names = c("BON -> MCN", "MCN p", 
+"MCN -> ICH", "ICH p", "ICH -> LGR lambda", "MCN -> PRA lambda", 
+"psiI"), class = "data.frame")
 
 # Remove detection efficiencies
-JDR_results[c(1,3,5,7),] -> JDR_table
+JDR_results[c(1,3,5,6),] -> JDR_table
+
+# det_efficiencies
 
 # Round table
 JDR_table %>% 
@@ -56,6 +64,55 @@ Richins_table_E1 <- structure(list(`05/06` = c(0.536, 0.337, 0.692, 0), `06/07` 
     )), class = "data.frame", row.names = c("BON -> MCN", "MCN -> ICH", 
 "ICH -> LGR", "MCN -> PRA"))
 
+funky_fish <- structure(list(tag_code = c("3D9.1BF2584409", "3D9.1BF2584409", 
+"3D9.1BF2584409", "3D9.1BF2584409", "3D9.1BF2584409", "3D9.1BF2584409", 
+"3D9.1BF2584409", "3D9.1C2C84343A", "3D9.1C2C84343A", "3D9.1C2C84343A", 
+"3D9.1C2C84343A", "3D9.1C2C84343A", "3D9.1C2C84343A", "3D9.1C2C84343A", 
+"3D9.1C2C84343A", "3D9.1C2C84343A", "3D9.1C2D4AAFB8", "3D9.1C2D4AAFB8", 
+"3D9.1C2D4AAFB8", "3D9.1C2D4AAFB8", "3D9.1C2D4AAFB8", "3D9.1C2D4AAFB8", 
+"3D9.1C2D4AAFB8"), event_type_name = c("Mark", "Observation", 
+"Observation", "Observation", "Observation", "Observation", "Observation", 
+"Mark", "Observation", "Observation", "Observation", "Observation", 
+"Observation", "Observation", "Observation", "Observation", "Mark", 
+"Observation", "Observation", "Observation", "Observation", "Observation", 
+"Observation"), event_site_name = c("JDARMF - Middle Fork John Day River", 
+"BO3 - Bonneville WA Shore Ladder/AFF", "BO4 - Bonneville WA Ladder Slots", 
+"MC1 - McNary Oregon Shore Ladder", "PRA - Priest Rapids Adult", 
+"ICH - Ice Harbor Dam (Combined)", "GRA - Lower Granite Dam Adult", 
+"JDARMF - Middle Fork John Day River", "BO1 - Bonneville Bradford Is. Ladder", 
+"BO1 - Bonneville Bradford Is. Ladder", "MC1 - McNary Oregon Shore Ladder", 
+"PRA - Priest Rapids Adult", "PRA - Priest Rapids Adult", "RIA - Rock Island Adult", 
+"ICH - Ice Harbor Dam (Combined)", "GRA - Lower Granite Dam Adult", 
+"JDARSF - South Fork John Day River", "BO3 - Bonneville WA Shore Ladder/AFF", 
+"BO4 - Bonneville WA Ladder Slots", "TD1 - The Dalles East Fish Ladder", 
+"MC1 - McNary Oregon Shore Ladder", "PRA - Priest Rapids Adult", 
+"ICH - Ice Harbor Dam (Combined)"), event_site_basin_name = c("John Day", 
+"Lower Columbia", "Lower Columbia", "Middle Columbia", "Upper Columbia", 
+"Lower Snake", "Lower Snake", "John Day", "Lower Columbia", "Lower Columbia", 
+"Middle Columbia", "Upper Columbia", "Upper Columbia", "Upper Columbia", 
+"Lower Snake", "Lower Snake", "John Day", "Lower Columbia", "Lower Columbia", 
+"Middle Columbia", "Middle Columbia", "Upper Columbia", "Lower Snake"
+), event_site_subbasin_name = c("Middle Fork John Day", "Lower Columbia-Sandy", 
+"Lower Columbia-Sandy", "Middle Columbia-Lake Wallula", "Upper Columbia-Priest Rapids", 
+"Lower Snake", "Lower Snake-Tucannon", "Middle Fork John Day", 
+"Lower Columbia-Sandy", "Lower Columbia-Sandy", "Middle Columbia-Lake Wallula", 
+"Upper Columbia-Priest Rapids", "Upper Columbia-Priest Rapids", 
+"Upper Columbia-Entiat", "Lower Snake", "Lower Snake-Tucannon", 
+"Upper John Day", "Lower Columbia-Sandy", "Lower Columbia-Sandy", 
+"Middle Columbia-Hood", "Middle Columbia-Lake Wallula", "Upper Columbia-Priest Rapids", 
+"Lower Snake"), event_site_rkm_value = c("351.298.052", "234", 
+"234", "470", "639", "522.016", "522.173", "351.298.052", "234", 
+"234", "470", "639", "639", "730", "522.016", "522.173", "351.341", 
+"234", "234", "308", "470", "639", "522.016"), cth_count = c(1L, 
+19L, 8L, 13L, 2L, 9L, 10L, 1L, 11L, 5L, 11L, 3L, 2L, 9L, 17L, 
+16L, 1L, 20L, 5L, 5L, 14L, 2L, 7L), event_date = structure(c(13263, 
+14073, 14073, 14081, 14097, 14106, 14135, 13986, 14445, 14446, 
+14459, 14474, 14490, 14496, 14730, 14734, 15008, 15903, 15903, 
+15905, 15911, 15919, 16033), class = "Date")), row.names = c(1524L, 
+1525L, 1526L, 1527L, 1528L, 1529L, 1530L, 4795L, 4796L, 4797L, 
+4798L, 4799L, 4800L, 4801L, 4802L, 4803L, 7338L, 7339L, 7340L, 
+7341L, 7342L, 7343L, 7344L), class = "data.frame")
+
 ```
 
 ```{r read_in_info_for_workflow, echo = FALSE, message = FALSE}
@@ -66,13 +123,24 @@ TRUE, TRUE, TRUE, TRUE), TDA = c(TRUE, TRUE, TRUE, TRUE, TRUE,
 TRUE), MCN = c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE), ICH = c(FALSE, 
 FALSE, FALSE, FALSE, FALSE, FALSE), LGR = c(FALSE, FALSE, FALSE, 
 FALSE, FALSE, FALSE), PRA = c(FALSE, FALSE, FALSE, FALSE, FALSE, 
-FALSE), det_hist = c("0000", "0000", "0000", "0000", "1000", 
-"1000")), row.names = c(NA, 6L), class = "data.frame")
+FALSE), det_hist = c("0000", "0000", "0000", "0000", "M000", 
+"M000")), row.names = c(NA, 6L), class = "data.frame")
 
 ```
 
 
-## Workflow
+## Workflow - John Day River Wild Steelhead - 05/06 to 14/15
+- Query PTAGIS
+  - Selected individuals marked/released in John day River
+  - All fish seen at BON adult ladders
+  - Sorted into run years
+- Generate detection history
+- Fit multistate model
+  - Fit in R - did not use USER or Branch
+  - MLE 
+  
+## Columbia River Basin
+![](.//figures/map.png){width=100%}
 
 ## Pseudocode for individual detection histories - MCN example
 ```{r eval = FALSE}
@@ -81,6 +149,10 @@ site_metadata$event_site_name[grep("McNary", site_metadata$event_site_name)]
 MCN_adult_fishways <- c("MC1 - McNary Oregon Shore Ladder",  
                         "MC2 - McNary Washington Shore Ladder")
 
+# For each of the unique tags
+for (i in 1:length(unique_tags)){
+  tag_ID <- unique_tags[i]
+  tag_hist <- subset(JDR_CTH, tag_code == tag_ID)
 # Record if seen at MCN
   tag_hist_adult$event_site_name %in% MCN_adult_fishways -> MCN_TF
   if (TRUE %in% MCN_TF){
@@ -92,31 +164,85 @@ MCN_adult_fishways <- c("MC1 - McNary Oregon Shore Ladder",
 ```
 
 
-## Generating detection histories
-```{r eval = FALSE, .smaller}
-# Release at BON, final detection at PRA
+## Detection histories for model
+```{r eval = FALSE}
+# Release at BON
 detection_df %>% 
-  mutate(det_hist = ifelse(MCN == TRUE, 1, 0)) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE, 1, 0))) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(LGR == TRUE, 1, 0))) %>% 
-  mutate(det_hist = paste0(det_hist, ifelse(PRA == TRUE, 1, 0))) -> det_df
+  mutate(det_hist = ifelse(MCN == TRUE, "M", 0)) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE, "I", 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(LGR == TRUE, "L", 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(PRA == TRUE, "P", 0)))-> det_df
 ```
 
 ```{r}
 head(det_df)
 ```
 
+## Model structure
+![](.//figures/JDR_diagram.png){width=100%}
 
-## Fit model
+## Probabilities for multinomial likelihood
 ```{r eval = FALSE}
-p <- c(n111, n110, n101, n100, n011, n010, n001, n000)
-# negLL = function(p) (-1)*dbinom(y, size = n, prob = p, log = TRUE)
-negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
+  # Zero probability detection histories (in one-directional model):
+  # MILP, MI0P, M0LP, 0ILP, 0I0P, 00LP
+  
+  # MIL0
+  nMIL0 <- sM * pM * psiI * sI * pI * lambdaL
+  # MI00
+  nMI00 <- sM * pM * psiI * sI * pI * (1 - lambdaL)
+  # M0L0
+  nM0L0 <- sM * pM * sI * (1 - pI) * lambdaL
+  # M00P
+  nM00P <- sM * pM * (1 - psiI) * lambdaP  
+  # M000
+  nM000 <- sM * pM * psiI * (1 - sI) + # Chose ICH route, died on way
+    # Chose ICH route, made it undetected, not seen at LGR
+    sM * pM * psiI * sI * (1 - pI) * (1 - lambdaL)+ 
+     # Chose PRA route, not seen at PRA
+    sM * pM * (1 - psiI) * (1 - lambdaP)
+```
+
+## Probabilities for multinomial likelihood
+```{r eval = FALSE}
+  # 0IL0
+  n0IL0 <- sM * (1 - pM) * sI * pI * lambdaL
+  # 0I00
+  n0I00 <- sM * (1 - pM) * sI * pI * (1 - lambdaL)
+  # 00L0
+  n00L0 <- sM * (1 - pM) * sI * (1 - pI) * lambdaL
+  # 000P
+  n000P <- sM * (1 - pM) * lambdaP
+  
+  # 0000
+  n0000 <- (1 - sM) + # died before MCN
+    # survived undetected to MCN, chose ICH route, died on way 
+    (sM * (1 - pM) * psiI * (1 - sI)) +
+    # survived undetected to MCN, chose ICH route, survived ICH 
+    # undetected, not seen at LGR
+    (sM * (1 - pM) * psiI * sI * (1 - pI)) * (1 - lambdaL) +
+    # survived undetected to MCN, chose PRA route, not seen at PRA
+    (sM * (1 - pM) * (1 - psiI) * (1 - lambdaP))
+```
 
 
+
+## Fit model - maximum likelihood
+```{r eval = FALSE}
+negLL = function(params, data){
+  # Get parameters from params vector
+  sM <- params[1]; pM <- params[2]; sI <- params[3]; pI <- params[4]; 
+  lambdaL <- params[5]; lambdaP <- params[6]; psiI <- params[7]
+  
+  # Calculated the probabilities of the 16 different detection 
+  # histories from the 7 parameters above
+  
+  p <- c(nMILP, nMIL0, nMI0P, nMI00, nM0LP, nM0L0, nM00P, nM000,
+         n0ILP, n0IL0, n0I0P, n0I00, n00LP, n00L0, n000P, n0000)
+  negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
+}
 # Use optim
-# Order of parameters: s1, p1, s2, p2, lambda
-optim_results <- optim(par = c(0.5, 0.99, 0.5, 0.2), 
+# Order of parameters: sM, pM, sI, pI, lambdaL, lambdaP, psiI
+optim_results <- optim(par = c(0.5, 0.99, 0.5, 0.99, 0.2, 0.2, 0.8), 
                        data = data, fn = negLL, method = 'L-BFGS-B', 
                        hessian = FALSE, lower = 0.0001, upper = 0.9999)
 ```
@@ -133,4 +259,49 @@ kable(Richins_table_E1)
 
 </div>
 
-## Conditional Overshoot Rates
+# Issues with current model formulation
+
+## Model is set up to be unidirectional?
+![](.//figures/Richins_fig2.3.png){width=100%}
+
+## 3/2121 fish violated unidirectional assumptions
+```{r}
+subset(funky_fish, tag_code ==  "3D9.1C2C84343A") %>% 
+  remove_rownames() %>% 
+  dplyr::select(tag_code, event_site_name, event_date)
+```
+
+## 63/2121 ascended at least one dam multiple times
+```{r}
+subset(JDR_CTH, tag_code ==  "3D9.1BF1CF04A0") %>% 
+  remove_rownames() %>% 
+  dplyr::select(tag_code, event_site_name, event_date)
+```
+
+## 63/2121 ascended at least one dam multiple times
+```{r}
+subset(JDR_CTH, tag_code ==  "3D9.1C2C31825B") %>% 
+  remove_rownames() %>% 
+  dplyr::select(tag_code, event_site_name, event_date)
+```
+
+## Calculating detection efficiency
+![](.//figures/Richins_Table_A1.png){width=100%}
+
+## Expanding model formulation to more arrays
+
+- Mainstem instream arrays?
+  - Could be used for detection efficiencies at terminal dams
+- Getting information from steelhead from other rivers to get bigger sample sizes for detection efficiencies
+- Dual arrays?
+
+
+## Ideas for next steps
+- Higher resolution model
+  - Allow for movement in both directions?
+  - Incorporate more detection sites
+- Generalize workflow to work for any system (automate)
+  - Generate multistate estimates for key populations affected by recent improvements in detection ability
+- Bayesian? R/JAGS?
+
+https://github.com/markusmin/steelhead
