@@ -1,0 +1,136 @@
+---
+title: "steelhead_meeting_2021-01-13"
+author: "Markus Min"
+date: "1/13/2022"
+output: ioslides_presentation
+---
+<style>
+code.r{ /* Code block */
+  font-size: 4px;
+}
+</style>
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+```
+
+
+```{r read_in_data, echo = FALSE, message = FALSE}
+JDR_results <- structure(list(`05/06` = c(0.58946132871341, 0.923073829845698, 
+0.324333245974075, 1, 0.692352840096924, 1, 0), `06/07` = c(0.550042238510495, 
+1, 0.227267144481779, 1, 0.539135131184582, 0.989201736507418, 
+0), `07/08` = c(0.623908402391222, 1, 1, 0.132349705734929, 0.0298739142016827, 
+0, 0.984820930144109), `08/09` = c(0.4575166838493, 1, 0.415930004424521, 
+1, 0.404269846508559, 1, 0.0526326534987749), `09/10` = c(0.615427426599488, 
+0.98435850760239, 0.3105296629223, 0.940394265972435, 1, 0.485403946573864, 
+0.0455191605611995), `10/11` = c(0.523670398246644, 1, 0.411458229463933, 
+0.725690616147872, 1, 0.354442425457585, 0.118149005784658), 
+    `11/12` = c(0.364939306607111, 1, 0.269218582733044, 1, 0.750055242240277, 
+    1, 0), `12/13` = c(0.523540208288108, 1, 0.0976487154585556, 
+    0.525138195805691, 1, 0.393864703530566, 0.262573451285669
+    ), `13/14` = c(0.597009464385081, 1, 0.167712765515777, 0.759504109677399, 
+    1, 0.227874380797734, 0.113939238684034), `14/15` = c(0.542349484438101, 
+    1, 0.324774755725777, 0.851596704608343, 1, 0.262049211919436, 
+    0.0436786479283584), mean = c(0.538786494202896, 0.990743233744809, 
+    0.354887310669976, 0.793467359794667, 0.741568697423202, 
+    0.57128364047866, 0.16213130878868)), row.names = c("BON -> MCN", 
+"MCN p", "MCN -> ICH", "ICH p", "ICH -> LGR", "LGR p", "LGR -> PRA"
+), class = "data.frame")
+
+# Remove detection efficiencies
+JDR_results[c(1,3,5,7),] -> JDR_table
+
+# Round table
+JDR_table %>% 
+  mutate_all(round, 3) -> JDR_table
+
+
+Richins_table_E1 <- structure(list(`05/06` = c(0.536, 0.337, 0.692, 0), `06/07` = c(0.552, 
+0.227, 0.555, 0), `07/08` = c(0.603, 0.134, 0, 0.029), `08/09` = c(0.454, 
+0.416, 0.391, 0.09), `09/10` = c(0.611, 0.295, 0.525, 0.014), 
+    `10/11` = c(0.525, 0.296, 0.489, 0.048), `11/12` = c(0.364, 
+    0.271, 0.753, 0), `12/13` = c(0.532, 0.075, 0.833, 0.025), 
+    `13/14` = c(0.607, 0.129, 0.302, 0.019), `14/15` = c(0.543, 
+    0.261, 0.294, 0.015), mean = c(0.533, 0.244, 0.483, 0.016
+    )), class = "data.frame", row.names = c("BON -> MCN", "MCN -> ICH", 
+"ICH -> LGR", "MCN -> PRA"))
+
+```
+
+```{r read_in_info_for_workflow, echo = FALSE, message = FALSE}
+det_df <- structure(list(tag = c("384.3B23983360", "384.3B2399307E", "3D6.000AC9D32D", 
+"3D6.000AC9D33B", "3D6.000AC9D579", "3D6.000AC9EA4D"), run_year = c("14/15", 
+"14/15", "14/15", "14/15", "14/15", "13/14"), BON = c(TRUE, TRUE, 
+TRUE, TRUE, TRUE, TRUE), TDA = c(TRUE, TRUE, TRUE, TRUE, TRUE, 
+TRUE), MCN = c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE), ICH = c(FALSE, 
+FALSE, FALSE, FALSE, FALSE, FALSE), LGR = c(FALSE, FALSE, FALSE, 
+FALSE, FALSE, FALSE), PRA = c(FALSE, FALSE, FALSE, FALSE, FALSE, 
+FALSE), det_hist = c("0000", "0000", "0000", "0000", "1000", 
+"1000")), row.names = c(NA, 6L), class = "data.frame")
+
+```
+
+
+## Workflow
+
+## Pseudocode for individual detection histories - MCN example
+```{r eval = FALSE}
+# Get names of all McNary adult fishway detectors
+site_metadata$event_site_name[grep("McNary", site_metadata$event_site_name)]
+MCN_adult_fishways <- c("MC1 - McNary Oregon Shore Ladder",  
+                        "MC2 - McNary Washington Shore Ladder")
+
+# Record if seen at MCN
+  tag_hist_adult$event_site_name %in% MCN_adult_fishways -> MCN_TF
+  if (TRUE %in% MCN_TF){
+    detection_df[i,5] <- TRUE
+  }
+  else{
+    detection_df[i,5] <- FALSE
+  }
+```
+
+
+## Generating detection histories
+```{r eval = FALSE, .smaller}
+# Release at BON, final detection at PRA
+detection_df %>% 
+  mutate(det_hist = ifelse(MCN == TRUE, 1, 0)) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(ICH == TRUE, 1, 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(LGR == TRUE, 1, 0))) %>% 
+  mutate(det_hist = paste0(det_hist, ifelse(PRA == TRUE, 1, 0))) -> det_df
+```
+
+```{r}
+head(det_df)
+```
+
+
+## Fit model
+```{r eval = FALSE}
+p <- c(n111, n110, n101, n100, n011, n010, n001, n000)
+# negLL = function(p) (-1)*dbinom(y, size = n, prob = p, log = TRUE)
+negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
+
+
+# Use optim
+# Order of parameters: s1, p1, s2, p2, lambda
+optim_results <- optim(par = c(0.5, 0.99, 0.5, 0.2), 
+                       data = data, fn = negLL, method = 'L-BFGS-B', 
+                       hessian = FALSE, lower = 0.0001, upper = 0.9999)
+```
+
+
+
+## Comparison w/ Shelby's results for JDR
+<div style="font-size: 10pt;">
+```{r}
+kable(JDR_table)
+
+kable(Richins_table_E1)
+```
+
+</div>
+
+## Conditional Overshoot Rates
