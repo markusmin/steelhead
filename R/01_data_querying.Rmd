@@ -8,3 +8,129 @@ output: html_document
 ### Description
 This Rmd file will go through querying PTAGIS and cleaning this data in order to prepare it for analysis.
 
+
+# PTAGIS workflow
+PTAGIS querying has been set up to work in two steps:
+
+
+### Step 1 (in PTAGIS): Determine the tag codes of adult returns to Bonneville
+On the PTAGIS website once you have logged in, navigate to Advanced Reporting Home Page > Create Query Builder2 Report > Interrogation Summary
+
+Once in Query Builder2, select the following filters:
+- 1 Attributes: Standard
+- 2 Metrics: Count, First Obs Date Max
+- 9 Mark Site Subbasin == Your river of interest
+  - Example: If you were querying data for the John Day River, you could search for "John Day" and then select the subbasins. In this case, you would select Upper John Day, North Fork John Day, Middle Fork John Day, and Lower John Day.
+- 16 First Obs Date/Time: 
+  - From: Value 
+  - Is: Between
+  - Value: The first date in your query
+  - And: The last date in your query
+  - For example, if you wanted all fish from run years 05/06 to 14/15, using June 1 as the separating date, you would have:
+    - Value: 6/1/2005 12:00:00 AM
+    - And: 5/31/2015 11:59:59 PM
+- 18 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots, B2A - BONNEVILLE ADULT WA SHORE, BWL - Bonneville WA Shore Ladder
+  - These are all of the Bonneville adult fishways and there::herefore will allow you to identify all adult returns
+- 25 Species: Steelhead
+- 29 Mark Length: Less than or equal to 350 (to ensure you are only keeping individuals tagged as Juveniles)
+
+Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
+
+NOTE
+
+### Step 2 (in R): Get the tag codes of the adult returns
+
+We will write a function to extract all of the unique tags for adult returns and export this as a text file that you can then use to query PTAGIS to get complete tag histories.
+
+Note: PTAGIS seems to struggle with queries of over 2,000 tag codes (even though it says it can take up to 15,000). This code breaks up your tag files into chunks of 2,000 in the case of large queries, so you will have to concatenate them later.
+
+```{r identify_adult_return_tags}
+# NOTE: DO NOT INCLUDE ".csv" and ".txt" in input_CSV or output_txt
+
+ID_adult_returns <- function(input_CSV, output_txt, river_system){
+  # Load the libraries
+  library(tidyverse)
+  library(here)
+  library(janitor)
+  
+  BON_adult_returns <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", river_system,  paste0(input_CSV, ".csv"))))
+  
+  as.data.frame(unique(BON_adult_returns$tag_code)) -> unique_tags
+  
+  if (length(unique_tags > 2000)){
+    ntags <- length(unique_tags[,1])
+    nfiles <- ceiling(ntags/2000)
+    
+    # Make an empty list to store the different files
+    file_list <- list()
+    
+    # Split the tags into multiple files
+    for (i in 1:nfiles){
+      file_list[[i]] <- unique_tags[(1 + 2000 * (i - 1)):(2000 * i),1][!(is.na(unique_tags[(1 + 2000 * (i - 1)):(2000 * i),1]))]
+    }
+    
+    # export the files
+    for (i in 1:nfiles){
+      write.table(file_list[[i]], file = here::here("PTAGIS_queries", "intermediate_files", river_system, paste0(output_txt, "_", i, ".txt")), col.names = FALSE, row.names = FALSE, quote = FALSE) 
+    }
+  }
+  
+  else {
+   write.table(unique_tags, file = here::here("PTAGIS_queries", "intermediate_files", river_system, output_txt), col.names = FALSE, row.names = FALSE, quote = FALSE) 
+  }
+}
+```
+
+
+### Step 3 (in PTAGIS): Get complete tag histories for adult returns
+- On the PTAGIS website once you have logged in, navigate to Advanced Reporting Home Page > Home > Create Query Builder2 Report > Complete Tag History
+
+Query Builder2:
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin
+- 2 Metrics: Standard
+- 29 Tag Code: Import text file(s) that you exported from R
+  - NOTE: You may have to run multiple queries if you have more than 2,000 tag codes
+
+# Individual Queries
+
+
+## John Day River, Wild Steelhead
+
+
+### Query 1 - adult returns to BON
+Interrogation Summary
+
+Query Builder2 filters:
+- 1 Attributes: Standard
+- 2 Metrics: Count, First Obs Date Max
+- 9 Mark Site Subbasin == Upper John Day, North Fork John Day, Middle Fork John Day, and Lower John Day.
+- 16 First Obs Date/Time: 
+  - From: Value 
+  - Is: Between
+    - Value: 6/1/2005 12:00:00 AM
+    - And: 5/31/2015 11:59:59 PM
+- 18 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots, B2A - BONNEVILLE ADULT WA SHORE, BWL - Bonneville WA Shore Ladder
+- 25 Species: Steelhead
+- 29 Mark Length: Less than or equal to 350
+
+Export CSV file: 2022-01-14-john_day_river_bon_adult_returns_2005-2015.csv
+
+#### Get adult tag IDs
+```{r}
+ID_adult_returns(input_CSV = "2022-01-14-john_day_river_bon_adult_returns_2005-2015", output_txt = "2022-01-14-john_day_river_bon_adult_returns_2005-2015_TAGS",
+                 river_system = "john_day_river")
+```
+
+### Query 2 - complete tag histories
+Complete Tag History
+
+Query Builder2:
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin
+- 2 Metrics: Standard
+- 29 Tag Code: Import text file that you exported from R
+  - 2 files: 2022-01-14-john_day_river_bon_adult_returns_2005-2015_TAGS_1.txt AND 2022-01-14-john_day_river_bon_adult_returns_2005-2015_TAGS_1.txt
+    - These are separate queries
+
+Export CSV files, save in PTAGIS_queries -> complete_tag_histories-> john_day_river :
+2022-01-14-john_day_river_CTH_2005_2015_1.csv
+2022-01-14-john_day_river_CTH_2005_2015_2.csv
