@@ -1,0 +1,10 @@
+---
+title: "01_data_querying"
+author: "Markus Min"
+date: "1/14/2022"
+output: html_document
+---
+
+### Description
+This Rmd file will go through querying PTAGIS and cleaning this data in order to prepare it for analysis.
+
