@@ -40,6 +40,3 @@ vignettes/*.pdf
 
 # Mac OS
 .DS_Store
-
-# PTAGIS query files - too large
-/PTAGIS_queries/
