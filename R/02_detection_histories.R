@@ -73,10 +73,18 @@ for (i in 1:length(unique_tag_IDs)){
   }
   
   # Make a new dataframe to store the history for each fish
-  ind_det_hist <- data.frame(tag_code = character(), event_site_name = character(), 
-                             start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
+  ind_det_hist <- data.frame(tag_code = character(), event_site_name = character(),
+                             start_time = as.POSIXct(character()), end_time = as.POSIXct(character()),
                              event_site_basin_name = character(), event_site_subbasin_name = character(),
                              event_site_latitude = numeric(), event_site_longitude = numeric())
+  
+  # Make a new dataframe - we don't know how big it needs to be, but we can make it 
+  # # large and then cut it down at the end
+  # Didn't really help with speed
+  # ind_det_hist <- data.frame(tag_code = rep(NA, 40), event_site_name = rep(NA, 40), 
+  #                            start_time = as.POSIXct(rep(NA, 40)), end_time = as.POSIXct(rep(NA, 40)), 
+  #                            event_site_basin_name = rep(NA, 40), event_site_subbasin_name = rep(NA, 40),
+  #                            event_site_latitude = as.numeric(rep(NA, 40)), event_site_longitude = as.numeric(rep(NA, 40)))
   
   # subset the complete dataset to only this fish
   tag_hist <- subset(JDR_CTH_adult, tag_code == unique_tag_IDs[i])
@@ -206,6 +214,9 @@ for (i in 1:length(unique_tag_IDs)){
     }
   }
   
+  # Cut out extra rows
+  ind_det_hist <- ind_det_hist[!(is.na(ind_det_hist$tag_code)),]
+  
   # Append the individual tag history to the complete tag history
   JDR_det_hist %>% 
     bind_rows(., ind_det_hist) -> JDR_det_hist
@@ -221,3 +232,19 @@ for (i in 1:length(unique_tag_IDs)){
   
 }
  
+
+# Inspect sites - for mapping
+
+
+JDR_det_hist %>% 
+  group_by(event_site_name) %>% 
+  summarise(n()) %>% 
+  dplyr::rename(count = `n()`)-> JDR_event_det_counts
+
+# Get the metadata
+JDR_det_hist %>% 
+  dplyr::select(-c(tag_code, start_time, end_time)) %>% 
+  distinct(event_site_name, .keep_all = TRUE) -> JDR_event_site_metadata
+
+JDR_event_det_counts %>% 
+  left_join(., JDR_event_site_metadata, by = "event_site_name") -> JDR_event_det_counts
