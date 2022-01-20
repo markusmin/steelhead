@@ -86,7 +86,7 @@ ID_adult_returns <- function(input_CSV, output_txt, river_system){
 - On the PTAGIS website once you have logged in, navigate to Advanced Reporting Home Page > Home > Create Query Builder2 Report > Complete Tag History
 
 Query Builder2:
-- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin, Event Site Latitude, Event Site Longitude
 - 2 Metrics: Standard
 - 29 Tag Code: Import text file(s) that you exported from R
   - NOTE: You may have to run multiple queries if you have more than 2,000 tag codes
