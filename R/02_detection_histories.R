@@ -61,7 +61,8 @@ unique_tag_IDs <- unique(JDR_CTH_adult$tag_code)
 # Create a new dataframe that will store our new detection history
 JDR_det_hist <- data.frame(tag_code = character(), event_site_name = character(), 
                            start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
-                           event_site_basin_name = character(), event_site_subbasin_name = character())
+                           event_site_basin_name = character(), event_site_subbasin_name = character(),
+                           event_site_latitude = numeric(), event_site_longitude = numeric())
 
 # Loop through the unique tags
 for (i in 1:length(unique_tag_IDs)){
@@ -74,7 +75,8 @@ for (i in 1:length(unique_tag_IDs)){
   # Make a new dataframe to store the history for each fish
   ind_det_hist <- data.frame(tag_code = character(), event_site_name = character(), 
                              start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
-                             event_site_basin_name = character(), event_site_subbasin_name = character())
+                             event_site_basin_name = character(), event_site_subbasin_name = character(),
+                             event_site_latitude = numeric(), event_site_longitude = numeric())
   
   # subset the complete dataset to only this fish
   tag_hist <- subset(JDR_CTH_adult, tag_code == unique_tag_IDs[i])
@@ -93,6 +95,8 @@ for (i in 1:length(unique_tag_IDs)){
       ind_det_hist[1,'event_site_name'] <- tag_hist[j,'event_site_name']
       ind_det_hist[1,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
       ind_det_hist[1,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+      ind_det_hist[1,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+      ind_det_hist[1,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
       
       # store the start time
       ind_det_hist[1,'start_time'] <- tag_hist[[j,'event_date_time_value']]
@@ -119,6 +123,8 @@ for (i in 1:length(unique_tag_IDs)){
         ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
         ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
         ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+        ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+        ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
         
         # Store the start time
         ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
@@ -155,6 +161,8 @@ for (i in 1:length(unique_tag_IDs)){
           ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
           ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
           
           # Store the start time
           ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
@@ -181,6 +189,8 @@ for (i in 1:length(unique_tag_IDs)){
         ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
         ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
         ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+        ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+        ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
         
         # store the start time
         ind_det_hist[counter,'start_time'] <- tag_hist[[j,'event_date_time_value']]
