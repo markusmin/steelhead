@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # Mac OS
 .DS_Store
+
+# Map files (very large!)
+/map_files/
