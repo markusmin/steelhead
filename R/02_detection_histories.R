@@ -45,7 +45,11 @@ JDR_CTH_adult %>%
                                                         "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"),
                                   "Bonneville Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("MC1 - McNary Oregon Shore Ladder", "MC2 - McNary Washington Shore Ladder"),
-                                  "McNary Adult Fishways (combined)", event_site_name))-> JDR_CTH_adult
+                                  "McNary Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("TD1 - The Dalles East Fish Ladder", "TD2 - The Dalles North Fish Ladder"),
+                                  "The Dalles Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("LGRLDR - LGR - Release into the Adult Fish Ladder", "GRA - Lower Granite Dam Adult"),
+                                  "Lower Granite Dam Adult Fishways (combined)", event_site_name)) -> JDR_CTH_adult
 
 
 
@@ -248,3 +252,34 @@ JDR_det_hist %>%
 
 JDR_event_det_counts %>% 
   left_join(., JDR_event_site_metadata, by = "event_site_name") -> JDR_event_det_counts
+
+# Get another df for dams
+JDR_event_det_counts %>% 
+  mutate(dam = ifelse(event_site_name %in% c("Bonneville Adult Fishways (combined)",
+                                             "McNary Adult Fishways (combined)",
+                                             "PRA - Priest Rapids Adult",
+                                             "RIA - Rock Island Adult", 
+                                             "RRF - Rocky Reach Fishway", 
+                                             "WEA - Wells Dam, DCPUD Adult Ladders",
+                                             "ICH - Ice Harbor Dam (Combined)",  
+                                             "Lower Granite Dam Adult Fishways (combined)",
+                                             # Dams without consistent PIT tag detectors
+                                             # Missing John Day for this dataset (installed 2017)
+                                             "The Dalles Adult Fishways (combined)",
+                                             "LMA - Lower Monumental Adult Ladders",
+                                             "GOA - Little Goose Fish Ladder"), "dam",
+                      "in stream")) %>% 
+  # Get a field for dam abbreviations
+  mutate(dam_abbr = ifelse(event_site_name == "Bonneville Adult Fishways (combined)", "BON",
+                    ifelse(event_site_name == "McNary Adult Fishways (combined)", "MCN",
+                    ifelse(event_site_name == "PRA - Priest Rapids Adult", "PRA",
+                    ifelse(event_site_name == "RIA - Rock Island Adult", "RIS",
+                    ifelse(event_site_name == "RRF - Rocky Reach Fishway", "RRE",
+                    ifelse(event_site_name == "WEA - Wells Dam, DCPUD Adult Ladders", "WEL",
+                    ifelse(event_site_name == "ICH - Ice Harbor Dam (Combined)", "ICH",
+                    ifelse(event_site_name == "Lower Granite Dam Adult Fishways (combined)", "LGR",
+                           # Dams without consistent PIT tag detectors
+                           # Missing John Day for this dataset (installed 2017)
+                    ifelse(event_site_name == "The Dalles Adult Fishways (combined)", "TDA",
+                    ifelse(event_site_name == "LMA - Lower Monumental Adult Ladders", "LMO",
+                    ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO", NA)))))))))))) -> JDR_event_det_counts
