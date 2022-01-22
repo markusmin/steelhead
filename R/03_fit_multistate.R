@@ -10,22 +10,18 @@ library(tidyverse)
 library(lubridate)
 library(janitor)
 
-# Look at what sites
+# Look at counts by site
 JDR_site_count <- as.data.frame(table(JDR_det_hist$event_site_name))
 
-# Get unique
-JDR_event_site_metadata
+##### Assign detection sites to parts of river ####
 
-# Look at when fish were seen at what site
-# BON corner collector - looks like pretty much every year
-table(subset(JDR_det_hist, event_site_name == "BCC - BON PH2 Corner Collector")$start_time)
-
-# Dams in order - separate Columbia and Snake
-columbia_dams <- c("Bonneville Adult Fishways (combined)", "McNary Adult Fishways (Combined)", 
+##### Dams in order - separate Columbia and Snake #####
+columbia_dams <- c("Bonneville Adult Fishways (combined)", "McNary Adult Fishways (combined)", 
           "PRA - Priest Rapids Adult","RIA - Rock Island Adult", 
           "RRF - Rocky Reach Fishway", "WEA - Wells Dam, DCPUD Adult Ladders")
+snake_dams <- c("ICH - Ice Harbor Dam (Combined)",  "Lower Granite Dam Adult Fishways (combined)")
 
-snake_dams <- c("ICH - Ice Harbor Dam (Combined)",  "GRA - Lower Granite Dam Adult")
+##### Tributary detection sites
 
 # Natal tributary detection sites
 BON_MCN_natal_sites <- JDR_event_site_metadata$event_site_name[grep("John Day", JDR_event_site_metadata$event_site_basin_name)]
@@ -69,7 +65,6 @@ ICH_LGR_stray_sites <- c(JDR_event_site_metadata$event_site_name[grep("Tucannon"
 # river mouth array
 ICH_LGR_stray_sites <- ICH_LGR_stray_sites[!grepl("mouth|Mouth", ICH_LGR_stray_sites)]
 
-
 # Straying sites upstream of LGR:
 # Basins: Salmon
 # Subbasins: Upper Grande Ronde, Clearwater, Lower Grande Ronde
@@ -83,10 +78,413 @@ LGR_upstream_stray_sites <- c(JDR_event_site_metadata$event_site_name[grep("Salm
 # i.e., "LAP - Lapwai Creek, near its mouth" and "SWT - Sweetwater Cr. near its mouth"  
 # LGR_upstream_stray_sites <- LGR_upstream_stray_sites[!grepl("mouth|Mouth", LGR_upstream_stray_sites)]
 
+##### In-river detection sites #####
+# Figure out sites that are "in river" (in this I include river mouths), that 
+# can indicate fallback depending on the order
 
-# Let's see which sites aren't captured in our sites
-setdiff(JDR_event_site_metadata$event_site_name, c(LGR_upstream_stray_sites,
-                                                   ICH_LGR_stray_sites,
-                                                   MCN_PRA_ICH_stray_sites,
-                                                   BON_MCN_stray_sites,
-                                                   BON_MCN_natal_sites))
+pre_BON_inriver <- c("ESANIS - East Sand Island, Columbia River", "TWX - Estuary Towed Array (Exp.)")
+# This includes some dams that we are ignoring
+BON_MCN_inriver <- c("COLR4 - Columbia River - Bonneville Dam to John Day Dam (km 234-347)",
+                     "The Dalles Adult Fishways (combined)", "DRM - Deschutes River mouth",
+                     "HRM - Hood River Mouth", "JDJ - John Day Dam Juvenile")
+MCN_ICH_PRA_inriver <- c("BADGEI - Badger Island, Columbia River")
+# This includes dams (LMO and LGO) that we are ignoring
+# These are some fallback routes - but because we aren't looking at these
+# dams specifically, we can consider them in river detection sites
+ICH_LGR_inriver <- c("GRJ - Lower Granite Dam Juvenile", "GOJ - Little Goose Dam Juvenile",
+                     "LMJ - Lower Monumental Dam Juvenile",
+                     "LGRTAL - LGR - Release into the Tailrace within 0.5 km downstream of Dam",
+                     "LMA - Lower Monumental Adult Ladders", "GOA - Little Goose Fish Ladder")
+
+##### Sites that are confirmed fallback (only certain dams) ####
+BON_fallback_arrays <- c("BCC - BON PH2 Corner Collector", "B2J - Bonneville PH2 Juvenile")
+MCN_fallback_arrays <- c("MCJ - McNary Dam Juvenile")
+LGR_fallback_arrays <- c("GRJ - Lower Granite Dam Juvenile")
+
+
+# Confirm that all sites have been categorized
+setdiff(JDR_event_site_metadata$event_site_name, 
+        c(columbia_dams, snake_dams, # Adult fishways at dams
+          LGR_upstream_stray_sites, ICH_LGR_stray_sites,MCN_PRA_ICH_stray_sites, 
+          BON_MCN_stray_sites,BON_MCN_natal_sites, # Tributary sites
+          pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, #in river arrays
+          BON_fallback_arrays, MCN_fallback_arrays, LGR_fallback_arrays)) # fallback arrays
+
+# Turn this into a dataframe (this was a silly way to do this)
+JDR_site_classification <- data.frame(event_site_name = c(columbia_dams, snake_dams, # Adult fishways at dams
+                                                          LGR_upstream_stray_sites, ICH_LGR_stray_sites,MCN_PRA_ICH_stray_sites, 
+                                                          BON_MCN_stray_sites,BON_MCN_natal_sites, # Tributary sites
+                                                          pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, #in river arrays
+                                                          BON_fallback_arrays, MCN_fallback_arrays, LGR_fallback_arrays, "lost"),
+                                      site_class = c(c("BON (adult)", "MCN (adult)", "PRA (adult)", "RIS (adult)",
+                                                       "RRE (adult)", "WEL (adult)"),
+                                                     c("ICH (adult)", "LGR (adult)"), 
+                                                     rep("LGR_upstream_stray_sites", length(LGR_upstream_stray_sites)),
+                                                     rep("ICH_LGR_stray_sites", length(ICH_LGR_stray_sites)),
+                                                     rep("MCN_PRA_ICH_stray_sites", length(MCN_PRA_ICH_stray_sites)),
+                                                     rep("BON_MCN_stray_sites", length(BON_MCN_stray_sites)),
+                                                     rep("BON_MCN_natal_sites", length(BON_MCN_natal_sites)),
+                                                     rep("pre_BON_inriver", length(pre_BON_inriver)), 
+                                                     rep("BON_MCN_inriver", length(BON_MCN_inriver)),
+                                                     rep("MCN_ICH_PRA_inriver", length(MCN_ICH_PRA_inriver)),
+                                                     rep("ICH_LGR_inriver", length(ICH_LGR_inriver)), 
+                                                     rep("BON_fallback_arrays", length(BON_fallback_arrays)),
+                                                     rep("MCN_fallback_arrays", length(MCN_fallback_arrays)),
+                                                     rep("LGR_fallback_arrays", length(LGR_fallback_arrays)), "lost"))
+
+# Create a new dataframe for state (location in the system)
+JDR_site_classification %>%
+  mutate(
+    state = ifelse(
+      site_class == "BON (adult)", "mainstem, BON to MCN",
+      ifelse(
+        site_class == "MCN (adult)", "mainstem, MCN to ICH or PRA",
+        ifelse(
+          site_class == "PRA (adult)", "mainstem, PRA to RIS",
+          ifelse(
+            site_class == "RIS (adult)", "mainstem, RIS to RRE",
+            ifelse(
+              site_class == "RRE (adult)", "mainstem, RRE to WEL",
+              ifelse(
+                site_class == "WEL (adult)", "mainstem, upstream of WEL",
+                ifelse(
+                  site_class == "ICH (adult)", "mainstem, ICH to LGR",
+                  ifelse(
+                    site_class == "LGR (adult)", "mainstem, upstream of LGR",
+                    ifelse(
+                      site_class == "LGR_upstream_stray_sites", "Upstream LGR tributaries",
+                      ifelse(
+                        site_class == "ICH_LGR_stray_sites", "ICH to LGR tributaries",
+                        ifelse(
+                          site_class == "MCN_PRA_ICH_stray_sites", "MCN to PRA or ICH tributaries",
+                          ifelse(
+                            site_class == "BON_MCN_stray_sites", "BON to MCN tributaries",
+                            ifelse(
+                              site_class == "BON_MCN_natal_sites", "natal tributaries",
+                              ifelse(
+                                site_class == "pre_BON_inriver", "mainstem, mouth to BON",
+                                ifelse(
+                                  site_class == "BON_MCN_inriver", "mainstem, BON to MCN",
+                                  ifelse(
+                                    site_class == "MCN_ICH_PRA_inriver", "mainstem, MCN to ICH or PRA",
+                                    ifelse(
+                                      site_class == "ICH_LGR_inriver", "mainstem, ICH to LGR",
+                                      ifelse(
+                                        site_class == "BON_fallback_arrays", "mainstem, mouth to BON",
+                                        ifelse(
+                                          site_class == "MCN_fallback_arrays", "mainstem, BON to MCN",
+                                          ifelse(site_class == "LGR_fallback_arrays", "mainstem, ICH to LGR", 
+                                                 ifelse(site_class == "lost", "lost", NA)
+                                        ))))))))))))))))))))) -> JDR_site_classification
+                                        
+  
+# Add info to detection history
+JDR_det_hist %>% 
+  left_join(., JDR_site_classification, by = "event_site_name") -> JDR_det_hist
+
+# Turn this into state history, not detection history.
+# This needs to include that is implicit in the detection history; i.e., if
+# a fish was seen in the BON adult ladders in consecutive detection events,
+# it must have fallen back over and thus entered the pre BON mainstem state
+
+# So this code currently works to detect some implicit fallback, i.e., detection
+# at the same dam twice in a row. However, it isn't yet able to capture implicit
+# fallback when it is detected in a tributary. For example, if a fish is seen
+# at McNary, and then in the John Day, it doesn't register that it was in the
+# mainstem between BON and MCN between those times. But perhaps we can
+# change that after the fact?
+# Between two dams, it should always be BON -> mainstem -> (tributary) -> mainstem -> MCN
+# Don't have to go to tributary, but if they do they must go to mainstem before or after
+
+# Need a function that can insert rows into the DF for the implicit states
+
+# Order of sites (no tributaries), Columbia River
+site_order_notrib_columbia <- c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                                "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                                "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                                "mainstem, upstream of WEL")
+# Order of sites (including tributaries), Columbia River, straying tribs
+site_order_tribs_columbia_stray <- c("mainstem, mouth to BON", "mainstem, BON to MCN",
+                                     "BON to MCN tributaries", "mainstem, BON to MCN",
+                                     "mainstem, MCN to ICH or PRA", "MCN to PRA or ICH tributaries",
+                               "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                               "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                               "mainstem, upstream of WEL")
+
+site_order_tribs_columbia_natal <- c("mainstem, mouth to BON", "mainstem, BON to MCN",
+                                     "natal tributaries", "mainstem, BON to MCN",
+                                     "mainstem, MCN to ICH or PRA", "MCN to PRA or ICH tributaries",
+                                     "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                                     "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                                     "mainstem, upstream of WEL")
+
+# Order of sites (no tributaries), Snake
+site_order_notrib_snake <- c("mainstem, ICH to LGR", "mainstem, upstream of LGR")
+# Order of sites (includes tributaries), Snake
+site_order_tribs_snake <- c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                            "mainstem, MCN to ICH or PRA", "mainstem, ICH to LGR", 
+                             "ICH to LGR tributaries", "mainstem, ICH to LGR",
+                             "mainstem, upstream of LGR", "Upstream LGR tributaries",
+                             "mainstem, upstream of LGR")
+
+JDR_stepwise_states <- data.frame(tag_code = character(),
+                                      state = character(),
+                                      date_time = as.POSIXct(character()))
+
+for (i in 1:(nrow(JDR_det_hist)-1)){
+  
+  # If it's the first entry, store it
+  if (i == 1){
+    # Store the tag code
+    JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+    # Store the current state
+    JDR_stepwise_states[i,'state'] <- JDR_det_hist[i,'state']
+    # Store the time entering this state
+    JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+  }
+  
+  # For all other entries, look at the previous entry.
+  # If it's the same fish as the previous entry:
+  else if (JDR_det_hist[i,'tag_code'] == JDR_det_hist[i-1,'tag_code']){
+    # If it's in a different state than it was previously, record it
+    if (JDR_det_hist[i,'state'] != JDR_det_hist[i-1,'state']){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- JDR_det_hist[i,'state']
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+    }
+    # If it's next seen at the same dam, add a line to indicate it fell back
+    # I think we need a statement for each dam, because each is unique
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "BON (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, mouth to BON"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, mouth to BON"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "MCN (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, BON to MCN"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, BON to MCN"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "PRA (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, MCN to ICH or PRA"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, MCN to ICH or PRA"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "RIS (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, PRA to RIS"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, PRA to RIS"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "RRE (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, RIS to RRE"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, RIS to RRE"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "WEL (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "RRE to WEL"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "RRE to WEL"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "ICH (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, MCN to ICH or PRA"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, MCN to ICH or PRA"
+    }  
+    
+    else if (JDR_det_hist[i,'site_class'] == JDR_det_hist[i-1,'site_class'] &
+             JDR_det_hist[i,'site_class'] == "LGR (adult)"){
+      # Store the tag code
+      JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+      # Store the current state
+      JDR_stepwise_states[i,'state'] <- "mainstem, ICH to LGR"
+      # Store the time entering this state
+      JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+      
+      # Also, change the value in the original dataframe
+      JDR_det_hist[i,'state'] <- "mainstem, ICH to LGR"
+    }  
+
+    # If it's in the same state, don't record it
+    else {
+      # Nothing!
+    }
+  }
+  # If it's a different fish:
+  else {
+    # Start a new entry
+    # Store the tag code
+    JDR_stepwise_states[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+    # Store the current state
+    JDR_stepwise_states[i,'state'] <- JDR_det_hist[i,'state']
+    # Store the time entering this state
+    JDR_stepwise_states[i,'date_time'] <- JDR_det_hist[i,'end_time']
+  }
+}
+
+# Remove all NAs
+JDR_stepwise_states <- JDR_stepwise_states[!is.na(JDR_stepwise_states$tag),]
+
+##### Sort individuals into run years #####
+run_year <- c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15")
+run_year_start <- seq(ymd("2005-06-01"), ymsd("2014-06-01"), by = "years")
+run_year_end <- seq(ymd("2006-05-31"), ymd("2015-05-31"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+JDR_det_hist %>% 
+  group_by(tag_code) %>% 
+  filter(row_number() == 1) %>% 
+  mutate(run_year = subset(run_year_df, run_year_start < start_time & run_year_end > start_time)$run_year) %>% 
+  dplyr::select(tag_code, run_year) -> tag_codes_run_year
+
+JDR_det_hist %>% 
+  left_join(., tag_codes_run_year, by = "tag_code") -> JDR_det_hist
+
+##### Break up detection history into individual transitions #####
+JDR_tag_codes <- unique(JDR_det_hist$tag_code)
+# Loop through each fish
+# for (i in 1:length(unique(JDR_tag_codes))){
+# Make a df to store values
+JDR_stepwise_detections <- data.frame(tag_code = character(),
+                                      site_1 = character(),
+                                      site_2 = character(),
+                                      date_time_1 = as.POSIXct(character()),
+                                      date_time_2 = as.POSIXct(character()))
+
+for (i in 1:(nrow(JDR_det_hist)-1)){
+  
+  # If it's the same fish:
+  if (JDR_det_hist[i,'tag_code'] == JDR_det_hist[i+1,'tag_code']){
+    # Store the tag code
+    JDR_stepwise_detections[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+    # Store the current site, and the next site
+    JDR_stepwise_detections[i,'site_1'] <- JDR_det_hist[i,'event_site_name']
+    JDR_stepwise_detections[i,'site_2'] <- JDR_det_hist[i+1,'event_site_name']
+    # Store the time leaving this site, and the time entering the next site
+    JDR_stepwise_detections[i,'date_time_1'] <- JDR_det_hist[i,'end_time']
+    JDR_stepwise_detections[i,'date_time_2'] <- JDR_det_hist[i+1,'start_time']
+  }
+
+  # If it's a different fish, end the entry (note that it's lost from the detection history)
+  # This may be because a fish spawned, or it could be undetermined loss at the end
+  else {
+    # End the previous entry
+    # Store the tag code
+    JDR_stepwise_detections[i,'tag_code'] <- JDR_det_hist[i,'tag_code']
+    # Store the current site, and the next site
+    JDR_stepwise_detections[i,'site_1'] <- JDR_det_hist[i,'event_site_name']
+    JDR_stepwise_detections[i,'site_2'] <- "lost"
+    # Store the time leaving this site, and the time entering the next site
+    JDR_stepwise_detections[i,'date_time_1'] <- JDR_det_hist[i,'end_time']
+    JDR_stepwise_detections[i,'date_time_2'] <- NA
+  }
+
+}
+
+
+# Remove all of the NA rows
+# JDR_stepwise_detections <- JDR_stepwise_detections[!is.na(JDR_stepwise_detections$tag_code),]
+
+
+##### Multistate model #####
+
+# After detection in the adult fishways at each dam, there are four or five probabilities
+# that must sum to 1, for all of the options for a fish.
+# Let's use an individual detected at Bonneville as an example:
+# 1) Overshooting MCN
+# 2) Falling back over BON (can either be detected at a fallback array, or seen at the same dam)
+# 3) Straying to a tributary between BON and MCN
+# 4) Homing to the natal tributary (between BON and MCN)
+# 5) Undetermined loss (not seen again)
+
+# We can use a tally-based approach to count these
+JDR_stepwise_detections %>% 
+  subset(site_1 == "Bonneville Adult Fishways (combined)") %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_1 = event_site_name, 
+                          site_1_class = site_class), by = "site_1") %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_2 = event_site_name, 
+                        site_2_class = site_class), by = "site_2") -> JDR_BON_site_1
+
+table(JDR_BON_site_1$site_2_class)
+# Dealing with implicit site use - for example, if a fish is seen again 
+# at the same dam without any other sites in between, it means it 
+# fell back. OR if a fish is seen at the next dam but not at any of the in
+# river sites, it means it must have been in the river
+
+# What about those that are next detected at an upstream site?
+JDR_stepwise_detections %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_1 = event_site_name, 
+                          site_1_class = site_class), by = "site_1") %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_2 = event_site_name, 
+                          site_2_class = site_class), by = "site_2") %>% 
+  subset(site_1_class == "BON_MCN_inriver") -> JDR_BON_MCN_inriver_site_1
+
+table(JDR_BON_MCN_inriver_site_1$site_2_class)
+# Define parameters
+
+##### Update stepwise detection histories to indicate state transitions #####
+JDR_stepwise_detections %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_1 = event_site_name, 
+                          site_1_class = site_class), by = "site_1") %>% 
+  left_join(dplyr::rename(JDR_site_classification, site_2 = event_site_name, 
+                          site_2_class = site_class), by = "site_2") -> JDR_stepwise_detections
+
+
+
