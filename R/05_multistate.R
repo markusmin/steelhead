@@ -220,7 +220,7 @@ JDR_stepwise_detections %>%
 # missing probabilities
 subset(JDR_stepwise_detections, is.na(probability)) -> missing_prob
 
-# A bunch still need to be resolved.....
+# A bunch still need to be resolved..... Issues with the 03 script
 
 JDR_stepwise_detections %>% 
   dplyr::select(-c(probability.x, probability.y)) -> JDR_stepwise_detections
