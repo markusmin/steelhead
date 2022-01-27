@@ -19,25 +19,88 @@ JDR_det_hist_forpres <- read.csv(here("model_files", "JDR_det_hist.csv"), row.na
 JDR_det_hist_forpres %>% 
   remove_rownames() %>% 
   dplyr::select(tag_code, event_site_name, start_time, end_time) -> JDR_det_hist_forpres
+
+JDR_states <- read.csv(here("model_files", "JDR_states.csv"), row.names = 1)
+
+JDR_stepwise_probabilties <- read.csv(here("model_files", "JDR_stepwise_probabilities"), row.names = 1)
 ```
 
 
-## Overarching objective: Develop bidirectional model
+# Overarching objective: Develop multidirectional model
 
 
+## Focusing on river reaches rather than detection sites
+- PIT tag arrays are used to determine transitions between "states," where states are different reaches of the river, either in the mainstem of the Snake or Columbia Rivers, or in tributaries
+- Movements between states can either be explicitly contained within the detection history (PIT tag array detections), or *implied* by the other detections in the detection history
+  - This "implicit site usage" allows estimation of movement for the full, interpolated detection history, and thus multidirectional movement - more on this later
 
-## Bidirectional model structure
+## Parameters at each state
+![](.//figures/JDR_simple_example.png){width=100%}
 
-## Reformatting data for bidirectional model
+## Parameters overview
+- Options for an individual in the mainstem:
+  - Overshoot the upstream dam (***o***)
+  - Fallback over the downstream dam (***f***)
+  - Stray to a non-natal tributary (***s***)
+  - Undetermined loss (***l***), when the detection history ends
+  - Home to natal tributaries (***h***) - only for individuals in the reach that connects to the natal tributary
 
-## 1. Distinguishing detection events
+- Options for individuals in tributaries:
+  - Undetermined loss (***l***) - end of detection history, likely indicates spawning
+  - Return to mainstem (***r***)
+
+## Complete parameterization
+![](.//figures/JDR_bidirectional_diagram.png){width=100%}
+
+
+# Reformatting data for multidirectional model
+
+
+## Distinguishing detection events
+- Complete tag history (individual detections at arrays) queried from PTAGIS
 - 6 hour cutoff used for separating events
-- first time and last time 
+- Exported file containing detections at individual sites, plus times of first and last times at the site for that detection
 
-## 2. Determining "implicit site usage" {.smaller}
+## Filling in missing events
+### Rules for determining "implicit site usage":
+- No teleporting - if two consecutive detections are in non-adjacent sites, the intermediate sites must be used
+- For detections at dams, the individual must have been in the downstream section previously
+- For movement into/out of tributaries, the individual must have been in the corresponding section of the mainstem before/after
+- For consecutive detections at dams, the individual must fall back in between
 
-```{r example_history_1}
-subset(JDR_det_hist_forpres, tag_code == "3D9.1C2C31C103")
+
+## Determining "implicit site usage" {.smaller}
+```{r example_det_hist_1}
+### Original detection history
+subset(JDR_det_hist_forpres, tag_code == "3D9.1BF1989388") %>% 
+  remove_rownames() %>% dplyr::select(-c(tag_code, start_time))
+```
+
+```{r example_implicit}
+### With implicit site usage
+subset(JDR_states, tag_code == "3D9.1BF1989388") %>% 
+  remove_rownames() %>% 
+  dplyr::select(-c(tag_code, run_year))
+```
+
+## Turning this into model probabilities {.smaller}
+```{r model_probabilities}
+subset(JDR_stepwise_probabilties, tag_code == "3D9.1BF1989388") %>% 
+  dplyr::select(-c(tag_code,date_time_1,date_time_2, pathway))
+
+```
+For a multinomial likelihood, the likelihood of this detection history is:
+
+$$
+{p} = {o_{mcn}f_{mcn}o_{mcn}f_{mcn}h_{bonmcn}l_{nattrib}}
+$$
+
+## Iteroparous individuals "implicit site usage" {.smaller}
+
+```{r iteroparous_1}
+subset(JDR_det_hist_forpres, tag_code == "3D9.1C2C31C103") %>% 
+  remove_rownames() %>% 
+  dplyr::select(-c(tag_code, start_time))
 ```
 
 
