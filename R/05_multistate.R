@@ -200,7 +200,7 @@ JDR_state_model_probabilities <-
   bind_rows(., data.frame(state_1 = "BON to MCN tributaries", state_2 = "lost", probability = "l_bon_mcn_trib")) %>% # lost (likely spawned)
   
   # Fish in MCN to PRA or ICH tributaries (stray)
-  bind_rows(., data.frame(state_1 = "MCN to PRA or ICH tributaries", state_2 = "mainstem, MCN to PRA or ICH", probability = "r_mcn_pra_ich_trib")) %>% # fallback 
+  bind_rows(., data.frame(state_1 = "MCN to PRA or ICH tributaries", state_2 = "mainstem, MCN to ICH or PRA", probability = "r_mcn_pra_ich_trib")) %>% # fallback 
   bind_rows(., data.frame(state_1 = "MCN to PRA or ICH tributaries", state_2 = "lost", probability = "l_mcn_pra_ich_trib")) %>% # lost (likely spawned)
   
   # Fish in ICH to LGR tributaries (stray)
@@ -220,9 +220,9 @@ JDR_stepwise_detections %>%
 # missing probabilities
 subset(JDR_stepwise_detections, is.na(probability)) -> missing_prob
 
-# A bunch still need to be resolved..... Issues with the 03 script
+# doesn't work...
 
-JDR_stepwise_detections %>% 
-  dplyr::select(-c(probability.x, probability.y)) -> JDR_stepwise_detections
+# JDR_stepwise_detections %>% 
+#   dplyr::select(-c(probability.x, probability.y)) -> JDR_stepwise_detections
 unique(subset(JDR_stepwise_detections, is.na(probability))$state_1)
 unique(subset(JDR_stepwise_detections, is.na(probability))$state_2)
