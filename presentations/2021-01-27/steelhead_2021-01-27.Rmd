@@ -1,0 +1,43 @@
+---
+title: "Steelhead Overshoot Update"
+author: "Markus Min"
+date: "1/27/2022"
+output: ioslides_presentation
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+
+```{r load_data, echo = FALSE, message = FALSE}
+JDR_det_hist_forpres <- read.csv(here("model_files", "JDR_det_hist.csv"), row.names = 1)
+JDR_det_hist_forpres %>% 
+  remove_rownames() %>% 
+  dplyr::select(tag_code, event_site_name, start_time, end_time) -> JDR_det_hist_forpres
+```
+
+
+## Overarching objective: Develop bidirectional model
+
+
+
+## Bidirectional model structure
+
+## Reformatting data for bidirectional model
+
+## 1. Distinguishing detection events
+- 6 hour cutoff used for separating events
+- first time and last time 
+
+## 2. Determining "implicit site usage" {.smaller}
+
+```{r example_history_1}
+subset(JDR_det_hist_forpres, tag_code == "3D9.1C2C31C103")
+```
+
+
