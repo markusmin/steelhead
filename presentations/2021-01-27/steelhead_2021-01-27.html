@@ -257,7 +257,7 @@ slide:not(.current) .plotly.html-widget{
 <li>For consecutive detections at dams, the individual must fall back in between</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Determining &ldquo;implicit site usage&rdquo;</h2></hgroup><article  id="determining-implicit-site-usage" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Determining &ldquo;implicit site usage&rdquo;</h2></hgroup><article  class="smaller" id="determining-implicit-site-usage">
 
 <pre class = 'prettyprint lang-r'>### Original detection history
 subset(JDR_det_hist_forpres, tag_code == &quot;3D9.1BF1989388&quot;) %&gt;% 
@@ -282,7 +282,7 @@ subset(JDR_states, tag_code == &quot;3D9.1BF1989388&quot;) %&gt;%
 ## 5        mainstem, BON to MCN                &lt;NA&gt;            implicit
 ## 6           natal tributaries 2008-03-17 22:22:49 BON_MCN_natal_sites</pre>
 
-</article></slide><slide class=""><hgroup><h2>Turning this into model probabilities</h2></hgroup><article  id="turning-this-into-model-probabilities" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Turning this into model probabilities</h2></hgroup><article  class="smaller" id="turning-this-into-model-probabilities">
 
 <pre class = 'prettyprint lang-r'>subset(JDR_stepwise_probabilities, tag_code == &quot;3D9.1BF1989388&quot;) %&gt;% 
   dplyr::select(-c(tag_code,date_time_1,date_time_2, pathway))</pre>
@@ -453,7 +453,7 @@ length(subset(JDR_MCN_fallbacks, pathway ==
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Anomalous detection histories</h2></hgroup><article  id="anomalous-detection-histories">
 
-</article></slide><slide class=""><hgroup><h2>Iteroparous individuals</h2></hgroup><article  id="iteroparous-individuals" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Iteroparous individuals</h2></hgroup><article  class="smaller" id="iteroparous-individuals">
 
 <pre class = 'prettyprint lang-r'>subset(JDR_det_hist_forpres, tag_code == &quot;3D9.1C2C31C103&quot;) %&gt;% 
   remove_rownames() %&gt;% 
