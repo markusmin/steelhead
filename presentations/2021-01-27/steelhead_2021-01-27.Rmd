@@ -22,15 +22,66 @@ JDR_det_hist_forpres %>%
 
 JDR_states <- read.csv(here("model_files", "JDR_states.csv"), row.names = 1)
 
-JDR_stepwise_probabilties <- read.csv(here("model_files", "JDR_stepwise_probabilities"), row.names = 1)
+JDR_stepwise_probabilities <- read.csv(here("model_files", "JDR_stepwise_probabilities"), row.names = 1)
 ```
+
+
+```{r stats_for_pres, echo = FALSE, message = FALSE, warning = FALSE}
+### Dam ascensions
+JDR_stepwise_probabilities %>% 
+  subset(probability == "o_mcn") -> mcn_overshooting_individuals
+
+# length(unique(mcn_overshooting_individuals$tag_code))
+# 1,118 unique fish out of 2,121 overshot McNary
+
+as.data.frame(table(mcn_overshooting_individuals$tag_code)) -> mcn_overshoot_counts
+as.data.frame(table(mcn_overshoot_counts$Freq)) %>% 
+  dplyr::rename(MCN_ascensions = Var1, nIndividuals = Freq) -> mcn_ascension_counts
+
+### Fallback events
+JDR_stepwise_probabilities %>% 
+  subset(probability == "f_mcn") -> mcn_fallback_individuals
+
+unique(mcn_fallback_individuals$tag_code) -> mcn_fallback_tag_codes
+# length(mcn_fallback_tag_codes)
+
+# Get individuals who successfully fell back to natal tributary
+JDR_stepwise_probabilities %>% 
+  subset(probability == "h_bon_mcn") -> home_individuals
+
+unique(home_individuals$tag_code) -> home_tag_codes
+# length(home_tag_codes)
+
+# Figure out how many individuals fell back, but not to home
+JDR_stepwise_probabilities %>% 
+  subset(tag_code %in% mcn_fallback_tag_codes) %>% 
+  subset(!(tag_code %in% home_tag_codes)) -> mcn_fallback_no_home
+
+unique(mcn_fallback_no_home$tag_code) -> mcn_fallback_no_home_tag_codes
+# length(mcn_fallback_no_home_tag_codes)
+
+
+
+# Do this in a smarter way
+JDR_stepwise_probabilities %>% 
+  group_by(tag_code) %>% 
+  filter(any(probability == "f_mcn")) %>% 
+  filter(!(any(probability == "h_bon_mcn"))) -> mcn_fallback_no_home
+
+unique(mcn_fallback_no_home$tag_code) -> mcn_fallback_no_home_tag_codes
+# length(mcn_fallback_no_home_tag_codes)
+
+
+
+```
+
 
 
 # Overarching objective: Develop multidirectional model
 
 
 ## Focusing on river reaches rather than detection sites
-- PIT tag arrays are used to determine transitions between "states," where states are different reaches of the river, either in the mainstem of the Snake or Columbia Rivers, or in tributaries
+- PIT tag arrays are used to determine transitions between "states," where states are different river reaches, either in the mainstem of the Snake or Columbia Rivers, or in tributaries
 - Movements between states can either be explicitly contained within the detection history (PIT tag array detections), or *implied* by the other detections in the detection history
   - This "implicit site usage" allows estimation of movement for the full, interpolated detection history, and thus multidirectional movement - more on this later
 
@@ -38,19 +89,31 @@ JDR_stepwise_probabilties <- read.csv(here("model_files", "JDR_stepwise_probabil
 ![](.//figures/JDR_simple_example.png){width=100%}
 
 ## Parameters overview
-- Options for an individual in the mainstem:
+- Probabilties for an individual in the mainstem (sum to 1):
   - Overshoot the upstream dam (***o***)
   - Fallback over the downstream dam (***f***)
   - Stray to a non-natal tributary (***s***)
-  - Undetermined loss (***l***), when the detection history ends
   - Home to natal tributaries (***h***) - only for individuals in the reach that connects to the natal tributary
+  - Undetermined loss (***l***), when the detection history ends
 
-- Options for individuals in tributaries:
+- Probabilties for individuals in tributaries (sum to 1):
   - Undetermined loss (***l***) - end of detection history, likely indicates spawning
   - Return to mainstem (***r***)
 
 ## Complete parameterization
 ![](.//figures/JDR_bidirectional_diagram.png){width=100%}
+
+
+## Model structure
+
+### What subscripts for each parameter?
+- Run year
+- Natal origin
+- memory (of overshoot, fallback, tributary dip-ins)
+
+### Implementation: Bayesian hierarchical?
+- "Robin Hood" approach, where we can use information from more data-rich run years or natal origins to inform priors for data-poor run years or natal origins
+  - Hierarchical modeling informed by biology
 
 
 # Reformatting data for multidirectional model
@@ -61,10 +124,10 @@ JDR_stepwise_probabilties <- read.csv(here("model_files", "JDR_stepwise_probabil
 - 6 hour cutoff used for separating events
 - Exported file containing detections at individual sites, plus times of first and last times at the site for that detection
 
-## Filling in missing events
+## Filling in missing movements
 ### Rules for determining "implicit site usage":
 - No teleporting - if two consecutive detections are in non-adjacent sites, the intermediate sites must be used
-- For detections at dams, the individual must have been in the downstream section previously
+- For detections at adult fishways, the individual must have been in the downstream section previously
 - For movement into/out of tributaries, the individual must have been in the corresponding section of the mainstem before/after
 - For consecutive detections at dams, the individual must fall back in between
 
@@ -85,22 +148,78 @@ subset(JDR_states, tag_code == "3D9.1BF1989388") %>%
 
 ## Turning this into model probabilities {.smaller}
 ```{r model_probabilities}
-subset(JDR_stepwise_probabilties, tag_code == "3D9.1BF1989388") %>% 
+subset(JDR_stepwise_probabilities, tag_code == "3D9.1BF1989388") %>% 
   dplyr::select(-c(tag_code,date_time_1,date_time_2, pathway))
 
 ```
-For a multinomial likelihood, the likelihood of this detection history is:
+For writing out a multinomial likelihood statement, the probability of this detection history is:
 
 $$
 {p} = {o_{mcn}f_{mcn}o_{mcn}f_{mcn}h_{bonmcn}l_{nattrib}}
 $$
+Concern: Technically infinite possible combinations of parameters (though in the data a finite number are realized). Buchanon (2005) got around this by modeling each detection history as only upstream movement, with fallback/downstream movement events having an effect on upstream movement. 
 
-## Iteroparous individuals "implicit site usage" {.smaller}
+
+## Accounting for repeat dam ascensions
+1,118 of 2,121 John Day River wild steelhead overshot McNary Dam, and over a quarter of these individuals ascended McNary dam at least twice:
+```{r overshoot_table}
+kable(mcn_ascension_counts)
+```
+
+
+## Accounting for all fallback
+```{r}
+# Total individuals with known fallback over McNary
+JDR_stepwise_probabilities %>% group_by(tag_code) %>% 
+  filter(any(probability == "f_mcn"))  -> mcn_fallback
+
+length(unique(mcn_fallback$tag_code))
+```
+
+```{r}
+# Individuals that fell back, but did not home
+JDR_stepwise_probabilities %>% group_by(tag_code) %>% 
+  filter(any(probability == "f_mcn")) %>% 
+  filter(!(any(probability == "h_bon_mcn"))) -> mcn_fallback_no_home
+
+length(unique(mcn_fallback_no_home$tag_code))
+```
+
+## Detection probabilities
+Detection probabilities are no longer estimated in the model, since we have corrected for known missed detections. Instead, they can be calculated outside of the model as (detected + implicit) / total.
+
+NOTE: This is an overestimate of detection probability, because of unknown missed detections (undetermined loss).
+```{r}
+# Example: Detection probability of fallback routes at McNary
+JDR_stepwise_probabilities %>% 
+  subset(state_1 == "mainstem, MCN to ICH or PRA" & 
+           state_2 == "mainstem, BON to MCN") -> JDR_MCN_fallbacks
+# Detection probability of fallback
+length(subset(JDR_MCN_fallbacks, pathway == 
+                "MCN_fallback_arrays")$tag_code)/
+  length(JDR_MCN_fallbacks$tag_code)
+```
+
+
+# Anomalous detection histories
+
+## Iteroparous individuals {.smaller}
 
 ```{r iteroparous_1}
 subset(JDR_det_hist_forpres, tag_code == "3D9.1C2C31C103") %>% 
   remove_rownames() %>% 
   dplyr::select(-c(tag_code, start_time))
 ```
+
+## Tributary dip-ins at river mouths
+![](.//figures/DRM_PTAGIS.png){width=100%}
+
+## Confusing arrays
+- "LGRTAL - LGR - Release into the Tailrace within 0.5 km downstream of Dam"
+  - I took this to be a site just downstream of LGR
+- "LGRLDR - LGR - Release into the Adult Fish Ladder"
+  - I took this to be a detection site in the adult fish ladder for the dam
+  
+- The Dalles, Lower Monumental, and Lower Goose - adult fish ladder detections seen frequently in detection history, but in Richins and Skalski (2018) they said that no PIT tag arrays were present at these sites.
 
 
