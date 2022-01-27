@@ -140,7 +140,7 @@ JDR_state_model_probabilities <-
   bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "mainstem, MCN to ICH or PRA", probability = "o_mcn")) %>%  #overshoot
   bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "mainstem, mouth to BON", probability = "f_bon")) %>% # fallback
   bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "BON to MCN tributaries", probability = "s_bon_mcn")) %>% # stray
-  bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "natal tributaries", probability = "s_bon_mcn")) %>% # home to natal
+  bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "natal tributaries", probability = "h_bon_mcn")) %>% # home to natal
   bind_rows(., data.frame(state_1 = "mainstem, BON to MCN", state_2 = "lost", probability = "l_bon_mcn")) %>% # loss
   
   # Fish that are MCN to ICH or PRA
