@@ -215,7 +215,11 @@ JDR_state_model_probabilities <-
 
   # Add model probabilities to stepwise detections
 JDR_stepwise_detections %>% 
-  left_join(., JDR_state_model_probabilities, by = c("state_1", "state_2")) -> JDR_stepwise_detections
+  left_join(., JDR_state_model_probabilities, by = c("state_1", "state_2")) -> JDR_stepwise_probabilities
+
+# Export this
+write.csv(JDR_stepwise_probabilities, here("model_files", "JDR_stepwise_probabilities"))
+
 
 # missing probabilities
 subset(JDR_stepwise_detections, is.na(probability)) -> missing_prob
