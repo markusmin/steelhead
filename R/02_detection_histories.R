@@ -237,6 +237,9 @@ for (i in 1:length(unique_tag_IDs)){
 }
  
 
+# Export this detection history
+write.csv(JDR_det_hist, here("model_files", "JDR_det_hist.csv"))
+
 # Inspect sites - for mapping
 
 
