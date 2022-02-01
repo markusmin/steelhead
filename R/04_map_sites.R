@@ -18,24 +18,24 @@ library(ggrepel)
 # USA boundaries
 usa_spdf <- readOGR(dsn = here("map_files", "USA_adm0.shp"))
 usa_spdf_fort <- tidy(usa_spdf)
-# Remove shapefile to save space in workspace
-rm(usa_spdf)
 # 
 # # Major rivers
 rivers_spdf <- readOGR(dsn = here("map_files", "NA_Lakes_and_Rivers","hydrography_l_rivers_v2.shp"))
+summary(rivers_spdf)
+# proj4string(rivers_spdf)
+# # rivers_spdf_transform <- spTransform(rivers_spdf, CRS(usa_spdf))
 rivers_spdf_transform <- spTransform(rivers_spdf, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
+# # rivers_spdf_transform <- coordinates(spTransform(rivers_spdf, CRS("+proj=laea +datum=WGS84")))
+# # rivers_spdf_fort <- tidy(rivers_spdf)
 rivers_spdf_fort <- tidy(rivers_spdf_transform)
-# Remove shapefiles to save space in workspace
-rm(rivers_spdf, rivers_spdf_transform)
 
 # CRB streams
 # Data from here: https://www.fisheries.noaa.gov/resource/data/columbia-basin-historical-ecology-project-data
 CRB_streams_spdf <- readOGR(dsn = here("map_files", "crb_streams_over8m_100k","crb_streams_over8m_100k.shp"))
 CRB_streams_spdf_transform <- spTransform(CRB_streams_spdf, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
-# Remove shapefiles to save space in workspace
-rm(CRB_streams_spdf)
 
 # We have to subset this to the rivers we want
+CRB_streams_spdf_transform$y_coord
 CRB_stream_names <-  data.frame(unique(CRB_streams_spdf_transform$GNIS_NAME))
 colnames(CRB_stream_names) <- c("GNIS_NAME")
 # Streams we need: Columbia River, Hood River, Fifteenmile Creek, Deschutes River, 
@@ -63,18 +63,16 @@ subset_streams <- c(CRB_stream_names$GNIS_NAME[grep("Columbia", CRB_stream_names
                     CRB_stream_names$GNIS_NAME[grep("White Creek", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Catherine", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Looking", CRB_stream_names$GNIS_NAME)],
-                    CRB_stream_names$GNIS_NAME[grep("Lapwai", CRB_stream_names$GNIS_NAME)],
-                    CRB_stream_names$GNIS_NAME[grep("Klickitat", CRB_stream_names$GNIS_NAME)],
-                    CRB_stream_names$GNIS_NAME[grep("Trout", CRB_stream_names$GNIS_NAME)])
+                    CRB_stream_names$GNIS_NAME[grep("Lapwai", CRB_stream_names$GNIS_NAME)])
 
 
 # Remove the incorrectly selected ones
-incorrect_streams <- c("Hoodoo Creek", "Little Wenatchee River", 
+incorrect_streams <- c("Hoodoo Creek", "Little Deschutes River", "Little Wenatchee River", 
                        "Clearwater Creek", "Little Clearwater River", "Snake Creek", 
                        "No Snake Creek", "White Salmon River", "Salmon Falls Creek",
                        "Salmon Creek", "Little White Salmon River", "Little Salmon River",
                        "South Fork Salmon Falls Creek", "Little Salmon Creek",
-                       "Big Salmon Creek", "Salmon la Sac Creek", "Trout Lake Creek")
+                       "Big Salmon Creek", "Salmon la Sac Creek")
 
 subset_streams <- subset_streams[!(subset_streams %in% incorrect_streams)]
 
@@ -82,14 +80,11 @@ CRB_streams_spdf_transform_subset <- subset(CRB_streams_spdf_transform, GNIS_NAM
 
 # proj4string(CRB_streams_spdf)
 CRB_streams_fort <- tidy(CRB_streams_spdf_transform_subset)
-# Remove shapefiles to save space in workspace
-# rm(CRB_streams_spdf_transform_subset, CRB_streams_spdf_transform)
 
 ##### Intermediate maps/subsetting #####
 
 ## Figure out which of these rivers we need to subset
-# NOTE: Need to clip out the coastline.
-
+# subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123.15)
 subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123.35 |
          lat < 46 & lat > 45.95 & long < -122.72 & long > -122.9 |
          lat < 45.61 & lat > 45.5 & long < -122.16 & long > -122.31 |
@@ -138,6 +133,7 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
 CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   ylab("Latitude")+
   xlab("Longitude")+
+  # coord_fixed(ylim = c(44.3,48.45),  xlim = c(-125.15,-113.23), ratio = 1.3)+
   coord_fixed(ylim = c(44.3,48.45),  xlim = c(-125.15,-114), ratio = 1.3)+
   # Polygons for base map
   geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
@@ -145,24 +141,9 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   geom_polygon(data = CRB_streams_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.2, fill = "gray70") +
   # Lines for North American Rivers (includes Columbia and Snake)
   geom_path(data = rivers_subset, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.5, fill = "gray70") +
-  # ADD LABELS FOR RIVERS
-  # annotate("segment", x = -122.84, y = 47.68, xend = -123.18, yend = 47.68, size = 0.5, lty = 1) + # Columbia River
-  annotate("text", x = -122.65, y = 46.27, label = "Columbia River", size = 3, fontface = 'italic', hjust = 1) + # Columbia River
-  annotate("text", x = -121.7, y = 45.59, label = "Hood R.", size = 1.5, fontface = 'italic', hjust = 1) + # Hood River
-  annotate("text", x = -121.2, y = 45.38, label = "Fifteenmile Cr.", size = 1.5, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
-  annotate("text", x = -120.94, y = 45.01, label = "Deschutes R.", size = 1.5, fontface = 'italic', hjust = 1) + # Deschutes R.
-  annotate("text", x = -119.86, y = 44.92, label = "John Day R.", size = 1.5, fontface = 'italic', hjust = 1) + # John Day R.
-  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 1.5, fontface = 'italic', hjust = 1) + # Umatilla R.
-  annotate("text", x = -118.44, y = 46.15, label = "Walla Walla R.", size = 1.5, fontface = 'italic', hjust = 1) + # Walla Walla R.
-  annotate("text", x = -117.94, y = 46.396, label = "Tucannon R.", size = 1.5, fontface = 'italic', hjust = 1) + # Tucannon R.
-  annotate("text", x = -117.52, y = 45.70, label = "Grande Ronde R.", size = 1.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
-  annotate("text", x = -116.06, y = 46.475, label = "Clearwater R.", size = 1.5, fontface = 'italic', hjust = 1) + # Clearwater R.
-  annotate("text", x = -117.05, y = 45.52, label = "Imanha R.", size = 1.5, fontface = 'italic', hjust = 1) + # Imanha R.
-  annotate("text", x = -116.579, y = 44.897, label = "Snake R.", size = 2.5, fontface = 'italic', hjust = 1) + # Snake R.
-  annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 1.5, fontface = 'italic', hjust = 1) + # Salmon R.
-  annotate("text", x = -119.79, y = 46.60, label = "Yakima R.", size = 1.5, fontface = 'italic', hjust = 1) + # Yakima R.
-  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 1.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
-  annotate("text", x = -120.33, y = 47.88, label = "Entiat R.", size = 1.5, fontface = 'italic', hjust = 1) + # Entiat R.
+  # geom_path(data = CRB_streams_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "black", size = 0.3) +
+  # Polygon for mainstem
+  # geom_polygon(data = CRB_mainstem_spdf_transform_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.2, fill = "gray70") +
   theme(plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill="white", color = "black"),
         panel.border = element_rect(colour = "black", fill=NA, size=1),
@@ -189,19 +170,11 @@ ggsave(here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)
 
 ##### Plot JDR sites on top of base map #####
 JDR_site_map <- CRB_map +
-  # Add dams
-  geom_point(data = subset(JDR_event_det_counts, dam == "dam"), 
-             aes(x = event_site_longitude, y = event_site_latitude), 
-             shape = 73, size = 3, inherit.aes = FALSE) +
-  geom_text(data = subset(JDR_event_det_counts, dam == "dam"), 
-            aes(x = event_site_longitude, y = event_site_latitude+0.1, label = dam_abbr), 
-            size = 2, inherit.aes = FALSE) +
-  # Add detection sites
   geom_point(data = JDR_event_det_counts, aes(x = event_site_longitude, 
-                                              y = event_site_latitude), size = 0.5, inherit.aes = FALSE) +
+                                              y = event_site_latitude), size = 1, inherit.aes = FALSE) +
   geom_text_repel(data = JDR_event_det_counts, aes(x = event_site_longitude, 
-                                                   y = event_site_latitude+0.02, label = event_site_name), 
-                  max.overlaps = 100, size = 1, inherit.aes = FALSE)
+                                             y = event_site_latitude+0.02, label = event_site_name), 
+                  size = 1, inherit.aes = FALSE)
 
 ggsave(here("figures", "JDR_site_map.pdf"), JDR_site_map, height = 6, width  = 10)  
 
