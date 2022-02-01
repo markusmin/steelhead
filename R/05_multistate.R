@@ -221,12 +221,28 @@ JDR_stepwise_detections %>%
 write.csv(JDR_stepwise_probabilities, here("model_files", "JDR_stepwise_probabilities"))
 
 
-# missing probabilities
-subset(JDR_stepwise_detections, is.na(probability)) -> missing_prob
+# check for any missing probabilities
+subset(JDR_stepwise_probabilities, is.na(probability)) -> missing_prob
 
-# doesn't work...
 
-# JDR_stepwise_detections %>% 
-#   dplyr::select(-c(probability.x, probability.y)) -> JDR_stepwise_detections
-unique(subset(JDR_stepwise_detections, is.na(probability))$state_1)
-unique(subset(JDR_stepwise_detections, is.na(probability))$state_2)
+##### Convert into probabilities for each detection history
+
+# create a new df to store these
+JDR_complete_probs <- data.frame(tag_code = unique(JDR_stepwise_probabilities$tag_code), prob = rep(NA, length(unique(JDR_stepwise_probabilities$tag_code))))
+
+# Loop through tag codes
+for (i in 1:dim(JDR_complete_probs)[1]){
+  # Get the unique tag code
+  ind_tag_code <- unique(JDR_complete_probs$tag_code)[i]
+  
+  # Subset the stepwise probabilities for that tag code
+  ind_det_hist <- subset(JDR_stepwise_probabilities, tag_code == ind_tag_code)
+  
+  # Concatenate the stepwise probabilities
+  ind_prob <- paste(ind_det_hist$probability, collapse = " * ")
+  
+  JDR_complete_probs$prob[i] <- ind_prob
+  
+}
+
+
