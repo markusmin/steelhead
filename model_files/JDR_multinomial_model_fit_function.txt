@@ -50,7 +50,10 @@ negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
 }
 
 
-optim_results <- optim(par = optim_inits_vec, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, lower = 0.0001, upper = 0.9999)
+optim_results <- optim(par = optim_inits, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, lower = 0.0001, upper = 0.9999)
+
+
+return(optim_results)
 
 
 }
