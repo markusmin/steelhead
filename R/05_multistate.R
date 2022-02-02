@@ -189,7 +189,7 @@ JDR_state_model_probabilities <-
   # Fish that are upstream of LGR
   # nothing to overshoot
   bind_rows(., data.frame(state_1 = "mainstem, upstream of LGR", state_2 = "mainstem, ICH to LGR", probability = "f_lgr")) %>% # fallback 
-  bind_rows(., data.frame(state_1 = "mainstem, upstream of LGR", state_2 = "Upstream LGR tributaries", probability = "s_ich_lgr")) %>% # stray - no individuals strayed to these
+  bind_rows(., data.frame(state_1 = "mainstem, upstream of LGR", state_2 = "Upstream LGR tributaries", probability = "s_lgr")) %>% # stray - no individuals strayed to these
   bind_rows(., data.frame(state_1 = "mainstem, upstream of LGR", state_2 = "lost", probability = "l_lgr")) %>%  # loss
   
   # Fish that are in natal tributaries
@@ -291,14 +291,6 @@ n_vec_string <- paste(n_vec_final, collapse = ", ")
 # Remove commas after line breaks
 n_vec_string <- str_replace_all(n_vec_string, "\n,", "\n")
 prob_vec <- paste0("p <- c(",n_vec_string, ")")
-
-# Get inits for optim
-set.seed(123)
-optim_inits <- runif(length(unique(JDR_stepwise_probabilities$probability)), min = 0, max = 1)
-# Collapse to string
-optim_inits_string <- paste(optim_inits, collapse = ", ")
-optim_inits_vec <- paste0("c(", optim_inits_string, ")")
-
 
 # NLL - Write to file: start of function call, params (from optim), detection history probabilities, prob vector
 writeLines(c("negLL = function(params, data){", "\n", "# Get parameters from param vector",
@@ -920,8 +912,639 @@ multistate_model <- function(data) {
   return(optim_results)
 }
 
+
+
+
+##### Multinomial MLE function v2 - use convenience function, 1 - other params, to constrain optimization #####
+multistate_model <- function(data) {
+  
+  
+  data <- data
+  
+  
+  negLL = function(params, data){
+    
+    
+    # Get parameters from param vector
+    f_bon <- params[1]
+    f_ich <- params[2]
+    f_lgr <- params[3]
+    f_mcn <- params[4]
+    f_pra <- params[5]
+    f_ris <- params[6]
+    h_bon_mcn <- params[7]
+    # Solve for all of the loss parameters as 1 - sum of the other parameters
+    # l_bon <- params[8]
+    # l_bon_mcn <- params[9]
+    # l_bon_mcn_trib <- params[10]
+    # l_ich_lgr <- params[11]
+    # l_ich_lgr_trib <- params[12]
+    # l_lgr <- params[13]
+    # l_lgr_trib <- params[14]
+    # l_mcn_ich_pra <- params[15]
+    # l_mcn_pra_ich_trib <- params[16]
+    # l_nat_trib <- params[17]
+    # l_pra_ris <- params[18]
+    # l_ris_rre <- params[19]
+    # l_wel <- params[20]
+    
+    # We need to reorder these now
+    o_bon <- params[8]
+    o_ich <- params[9]
+    o_lgr <- params[10]
+    o_mcn <- params[11]
+    o_pra <- params[12]
+    o_ris <- params[13]
+    o_rre <- params[14]
+    o_wel <- params[15]
+    r_bon_mcn_trib <- params[16]
+    r_lgr_trib <- params[17]
+    r_mcn_pra_ich_trib <- params[18]
+    r_nat_trib <- params[19]
+    s_bon_mcn <- params[20]
+    s_ich_lgr <- params[21]
+    s_mcn_ich_pra <- params[22]
+    
+    # Solve for loss probabilities
+    l_bon <- 1 - o_bon
+    l_bon_mcn <- 1 - (o_mcn + s_bon_mcn + h_bon_mcn + f_bon)
+    l_bon_mcn_trib <- 1 - (r_bon_mcn_trib)
+    l_ich_lgr <- 1 - (o_lgr + f_ich + s_ich_lgr)
+    l_ich_lgr_trib <- 1 # Note: This would be - 1 r_ich_lgr_trib, but no fish returned after straying into these tributaries
+    l_lgr <- 1 - (f_lgr + s_lgr)
+    l_lgr_trib <- 1 - (r_lgr_trib)
+    l_mcn_ich_pra <- params[15]
+    l_mcn_pra_ich_trib <- params[16]
+    l_nat_trib <- 1 - r_nat_trib
+    l_pra_ris <- params[18]
+    l_ris_rre <- params[19]
+    l_wel <- params[20]
+    
+    
+    # Get probabilities for each movement history
+    # 1
+    n1 <- f_bon * l_bon
+    
+    # 2
+    n2 <- f_bon * o_bon * f_bon * l_bon
+    
+    # 3
+    n3 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+    
+    # 4
+    n4 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+    
+    # 5
+    n5 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * h_bon_mcn * l_nat_trib
+    
+    # 6
+    n6 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+    
+    # 7
+    n7 <- f_bon * o_bon * f_bon * o_bon * h_bon_mcn * l_nat_trib
+    
+    # 8
+    n8 <- f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+    
+    # 9
+    n9 <- f_bon * o_bon * f_bon * o_bon * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 10
+    n10 <- f_bon * o_bon * f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+    
+    # 11
+    n11 <- f_bon * o_bon * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+    
+    # 12
+    n12 <- f_bon * o_bon * h_bon_mcn * l_nat_trib
+    
+    # 13
+    n13 <- f_bon * o_bon * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 14
+    n14 <- f_bon * o_bon * h_bon_mcn * r_nat_trib * h_bon_mcn * l_nat_trib
+    
+    # 15
+    n15 <- f_bon * o_bon * l_bon_mcn
+    
+    # 16
+    n16 <- f_bon * o_bon * o_mcn * f_mcn * f_bon * l_bon
+    
+    # 17
+    n17 <- f_bon * o_bon * o_mcn * f_mcn * f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 18
+    n18 <- f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 19
+    n19 <- f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+    
+    # 20
+    n20 <- f_bon * o_bon * o_mcn * f_mcn * l_bon_mcn
+    
+    # 21
+    n21 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * f_bon * l_bon
+    
+    # 22
+    n22 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 23
+    n23 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * l_bon_mcn
+    
+    # 24
+    n24 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 25
+    n25 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 26
+    n26 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 27
+    n27 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 28
+    n28 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 29
+    n29 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 30
+    n30 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+    
+    # 31
+    n31 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+    
+    # 32
+    n32 <- f_bon * o_bon * o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 33
+    n33 <- f_bon * o_bon * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+    
+    # 34
+    n34 <- f_bon * o_bon * o_mcn * l_mcn_ich_pra
+    
+    # 35
+    n35 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * f_bon * l_bon
+    
+    # 36
+    n36 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 37
+    n37 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 38
+    n38 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 39
+    n39 <- f_bon * o_bon * o_mcn * o_ich * f_ich * l_mcn_ich_pra
+    
+    # 40
+    n40 <- f_bon * o_bon * o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 41
+    n41 <- f_bon * o_bon * o_mcn * o_ich * l_ich_lgr
+    
+    # 42
+    n42 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 43
+    n43 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * l_ich_lgr
+    
+    # 44
+    n44 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * f_mcn * f_bon * l_bon
+    
+    # 45
+    n45 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 46
+    n46 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+    
+    # 47
+    n47 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 48
+    n48 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 49
+    n49 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * l_ich_lgr
+    
+    # 50
+    n50 <- f_bon * o_bon * o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 51
+    n51 <- f_bon * o_bon * o_mcn * o_pra * f_pra * o_pra * o_ris * f_ris * f_pra * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 52
+    n52 <- f_bon * o_bon * o_mcn * o_pra * o_ris * l_ris_rre
+    
+    # 53
+    n53 <- f_bon * o_bon * o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+    
+    # 54
+    n54 <- f_bon * o_bon * s_bon_mcn * l_bon_mcn_trib
+    
+    # 55
+    n55 <- f_bon * o_bon * s_bon_mcn * r_bon_mcn_trib * o_mcn * l_mcn_ich_pra
+    
+    # 56
+    n56 <- h_bon_mcn * l_nat_trib
+    
+    # 57
+    n57 <- h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 58
+    n58 <- h_bon_mcn * r_nat_trib * l_bon_mcn
+    
+    # 59
+    n59 <- h_bon_mcn * r_nat_trib * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 60
+    n60 <- h_bon_mcn * r_nat_trib * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 61
+    n61 <- l_bon_mcn
+    
+    # 62
+    n62 <- o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 63
+    n63 <- o_mcn * f_mcn * f_bon * l_bon
+    
+    # 64
+    n64 <- o_mcn * f_mcn * f_bon * o_bon * h_bon_mcn * l_nat_trib
+    
+    # 65
+    n65 <- o_mcn * f_mcn * f_bon * o_bon * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 66
+    n66 <- o_mcn * f_mcn * f_bon * o_bon * l_bon_mcn
+    
+    # 67
+    n67 <- o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 68
+    n68 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 69
+    n69 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * h_bon_mcn * r_nat_trib * f_bon * o_bon * l_bon_mcn
+    
+    # 70
+    n70 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+    
+    # 71
+    n71 <- o_mcn * f_mcn * l_bon_mcn
+    
+    # 72
+    n72 <- o_mcn * f_mcn * o_mcn * f_mcn * f_bon * l_bon
+    
+    # 73
+    n73 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn
+    
+    # 74
+    n74 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 75
+    n75 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * h_bon_mcn * l_nat_trib
+    
+    # 76
+    n76 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+    
+    # 77
+    n77 <- o_mcn * f_mcn * o_mcn * f_mcn * l_bon_mcn
+    
+    # 78
+    n78 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 79
+    n79 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 80
+    n80 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 81
+    n81 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 82
+    n82 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 83
+    n83 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 84
+    n84 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 85
+    n85 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 86
+    n86 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 87
+    n87 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+    
+    # 88
+    n88 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 89
+    n89 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+    
+    # 90
+    n90 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 91
+    n91 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+    
+    # 92
+    n92 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 93
+    n93 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * f_bon * l_bon
+    
+    # 94
+    n94 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+    
+    # 95
+    n95 <- o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 96
+    n96 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 97
+    n97 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * l_bon_mcn
+    
+    # 98
+    n98 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 99
+    n99 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 100
+    n100 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+    
+    # 101
+    n101 <- o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+    
+    # 102
+    n102 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * l_bon_mcn
+    
+    # 103
+    n103 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 104
+    n104 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * l_ich_lgr
+    
+    # 105
+    n105 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 106
+    n106 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 107
+    n107 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 108
+    n108 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 109
+    n109 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * l_ich_lgr
+    
+    # 110
+    n110 <- o_mcn * f_mcn * o_mcn * o_ich * s_ich_lgr * r_lgr_trib * o_lgr * l_lgr
+    
+    # 111
+    n111 <- o_mcn * f_mcn * o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 112
+    n112 <- o_mcn * f_mcn * o_mcn * o_pra * o_ris * l_ris_rre
+    
+    # 113
+    n113 <- o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 114
+    n114 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+    
+    # 115
+    n115 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 116
+    n116 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * o_mcn * l_mcn_ich_pra
+    
+    # 117
+    n117 <- o_mcn * l_mcn_ich_pra
+    
+    # 118
+    n118 <- o_mcn * o_ich * f_ich * f_mcn * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+    
+    # 119
+    n119 <- o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 120
+    n120 <- o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 121
+    n121 <- o_mcn * o_ich * f_ich * f_mcn * l_bon_mcn
+    
+    # 122
+    n122 <- o_mcn * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 123
+    n123 <- o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 124
+    n124 <- o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 125
+    n125 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 126
+    n126 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * l_bon_mcn
+    
+    # 127
+    n127 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 128
+    n128 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+    
+    # 129
+    n129 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * f_bon * l_bon
+    
+    # 130
+    n130 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 131
+    n131 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * l_ich_lgr
+    
+    # 132
+    n132 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * o_lgr * l_lgr
+    
+    # 133
+    n133 <- o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+    
+    # 134
+    n134 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * f_lgr * l_ich_lgr
+    
+    # 135
+    n135 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 136
+    n136 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * l_lgr
+    
+    # 137
+    n137 <- o_mcn * o_ich * l_ich_lgr
+    
+    # 138
+    n138 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 139
+    n139 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * l_bon_mcn
+    
+    # 140
+    n140 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 141
+    n141 <- o_mcn * o_ich * o_lgr * f_lgr * l_ich_lgr
+    
+    # 142
+    n142 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * o_ich * o_lgr * l_lgr
+    
+    # 143
+    n143 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * s_mcn_ich_pra * l_mcn_pra_ich_trib
+    
+    # 144
+    n144 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * l_ich_lgr
+    
+    # 145
+    n145 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 146
+    n146 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * f_lgr * s_ich_lgr * r_lgr_trib * l_ich_lgr
+    
+    # 147
+    n147 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 148
+    n148 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+    
+    # 149
+    n149 <- o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+    
+    # 150
+    n150 <- o_mcn * o_ich * o_lgr * l_lgr
+    
+    # 151
+    n151 <- o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 152
+    n152 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * f_mcn * f_bon * o_bon * f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * o_ich * f_ich * f_mcn * f_bon * l_bon
+    
+    # 153
+    n153 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * f_mcn * f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+    
+    # 154
+    n154 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * s_ich_lgr * l_lgr_trib
+    
+    # 155
+    n155 <- o_mcn * o_ich * s_ich_lgr * l_ich_lgr_trib
+    
+    # 156
+    n156 <- o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 157
+    n157 <- o_mcn * o_pra * f_pra * o_ich * l_ich_lgr
+    
+    # 158
+    n158 <- o_mcn * o_pra * f_pra * o_ich * o_lgr * l_lgr
+    
+    # 159
+    n159 <- o_mcn * o_pra * f_pra * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 160
+    n160 <- o_mcn * o_pra * f_pra * o_pra * f_pra * o_pra * l_pra_ris
+    
+    # 161
+    n161 <- o_mcn * o_pra * l_pra_ris
+    
+    # 162
+    n162 <- o_mcn * o_pra * o_ris * f_ris * o_ris * f_ris * f_pra * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+    
+    # 163
+    n163 <- o_mcn * o_pra * o_ris * o_rre * o_wel * l_wel
+    
+    # 164
+    n164 <- o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+    
+    # 165
+    n165 <- o_mcn * s_mcn_ich_pra * r_mcn_pra_ich_trib * f_mcn * h_bon_mcn * l_nat_trib
+    
+    # 166
+    n166 <- o_mcn * s_mcn_ich_pra * r_mcn_pra_ich_trib * f_mcn * s_bon_mcn * l_bon_mcn_trib
+    
+    # 167
+    n167 <- s_bon_mcn * l_bon_mcn_trib
+    
+    # 168
+    n168 <- s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+    
+    # 169
+    n169 <- s_bon_mcn * r_bon_mcn_trib * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+    
+    
+    
+    # Get vector of probabilities for multinomial likelihood
+    p <- c(n1, n2, n3, n4, n5, n6, 
+           n7, n8, n9, n10, n11, n12, 
+           n13, n14, n15, n16, n17, n18, 
+           n19, n20, n21, n22, n23, n24, 
+           n25, n26, n27, n28, n29, n30, 
+           n31, n32, n33, n34, n35, n36, 
+           n37, n38, n39, n40, n41, n42, 
+           n43, n44, n45, n46, n47, n48, 
+           n49, n50, n51, n52, n53, n54, 
+           n55, n56, n57, n58, n59, n60, 
+           n61, n62, n63, n64, n65, n66, 
+           n67, n68, n69, n70, n71, n72, 
+           n73, n74, n75, n76, n77, n78, 
+           n79, n80, n81, n82, n83, n84, 
+           n85, n86, n87, n88, n89, n90, 
+           n91, n92, n93, n94, n95, n96, 
+           n97, n98, n99, n100, n101, n102, 
+           n103, n104, n105, n106, n107, n108, 
+           n109, n110, n111, n112, n113, n114, 
+           n115, n116, n117, n118, n119, n120, 
+           n121, n122, n123, n124, n125, n126, 
+           n127, n128, n129, n130, n131, n132, 
+           n133, n134, n135, n136, n137, n138, 
+           n139, n140, n141, n142, n143, n144, 
+           n145, n146, n147, n148, n149, n150, 
+           n151, n152, n153, n154, n155, n156, 
+           n157, n158, n159, n160, n161, n162, 
+           n163, n164, n165, n166, n167, n168, 
+           n169)
+    
+    
+    # dmultinom call
+    negLL <- -1* dmultinom(x = data$count, prob = p, log = TRUE)
+  }
+  
+  
+  optim_results <- optim(par = optim_inits, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, lower = 0.0001, upper = 0.9999)
+  
+  return(optim_results)
+}
+
+
+
+
+
+
 ##### Fit multinomial MLE function #####
 
+# Get inits for optim
+set.seed(123)
+optim_inits <- runif(length(unique(JDR_stepwise_probabilities$probability)), min = 0, max = 1)
+
+# Run model
 optim_output <- multistate_model(data = JDR_unique_probs)
 
 
@@ -932,6 +1555,576 @@ JDR_MLE_param_estimates <- data.frame(parameter = JDR_params$param, estimate = o
 
 # Double check that these results make sense
 # They don't!
+subset(JDR_unique_probs, grepl("f_ris", JDR_unique_probs$prob))
+
+# Let's calculate the multinomial likelihood probabilities to make sure that they sum to 1
+
+# Assign parameter estimates
+# Export to text
+JDR_MLE_param_estimates %>% 
+  mutate(to_text = paste0(parameter, " <- ", estimate)) -> JDR_MLE_param_estimates
+writeLines(c(JDR_MLE_param_estimates$to_text),
+           file(here::here("model_files", "JDR_MLE_param_estimates.txt")), sep = "\n")
+
+# Paste below - assign estimates to variables
+f_bon <- 0.462551457019219
+f_ich <- 0.749456283704595
+f_lgr <- 0.445657861309985
+f_mcn <- 0.28399606392555
+f_pra <- 0.7797733385339
+f_ris <- 0.9999
+h_bon_mcn <- 0.704805047295587
+l_bon <- 0.157288540596103
+l_bon_mcn <- 0.914494244849735
+l_bon_mcn_trib <- 0.108858301013792
+l_ich_lgr <- 0.519258715901049
+l_ich_lgr_trib <- 0.109714964408342
+l_lgr <- 0.536706283211393
+l_lgr_trib <- 0.31486541444472
+l_mcn_ich_pra <- 0.511578117360121
+l_mcn_pra_ich_trib <- 0.0413161661790775
+l_nat_trib <- 0.9999
+l_pra_ris <- 0.173309793071774
+l_ris_rre <- 0.191146605514927
+l_wel <- 0.389172742361292
+o_bon <- 0.36788328738298
+o_ich <- 0.180866640374003
+o_lgr <- 0.700706312968093
+o_mcn <- 0.9999
+o_pra <- 0.0759059206037153
+o_ris <- 0.9999
+o_rre <- 0.24796454082198
+o_wel <- 0.301864216357911
+r_bon_mcn_trib <- 0.0405006984232383
+r_lgr_trib <- 0.545762189385731
+r_mcn_pra_ich_trib <- 0.183526160571652
+r_nat_trib <- 0.0797411192896044
+s_bon_mcn <- 0.436981632676454
+s_ich_lgr <- 0.55753452020379
+s_mcn_ich_pra <- 0.168430578640892
+
+# Check probabilities for section from Bonneville to McNary
+sum(f_bon, o_mcn, l_bon_mcn, s_bon_mcn, h_bon_mcn)
+# 3.52.... that's not right
+
+
+###### Calculate the probabilities from MLE estimates #####
+# 1
+n1 <- f_bon * l_bon
+
+# 2
+n2 <- f_bon * o_bon * f_bon * l_bon
+
+# 3
+n3 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+
+# 4
+n4 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+
+# 5
+n5 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * h_bon_mcn * l_nat_trib
+
+# 6
+n6 <- f_bon * o_bon * f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+
+# 7
+n7 <- f_bon * o_bon * f_bon * o_bon * h_bon_mcn * l_nat_trib
+
+# 8
+n8 <- f_bon * o_bon * f_bon * o_bon * l_bon_mcn
+
+# 9
+n9 <- f_bon * o_bon * f_bon * o_bon * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 10
+n10 <- f_bon * o_bon * f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+
+# 11
+n11 <- f_bon * o_bon * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+
+# 12
+n12 <- f_bon * o_bon * h_bon_mcn * l_nat_trib
+
+# 13
+n13 <- f_bon * o_bon * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 14
+n14 <- f_bon * o_bon * h_bon_mcn * r_nat_trib * h_bon_mcn * l_nat_trib
+
+# 15
+n15 <- f_bon * o_bon * l_bon_mcn
+
+# 16
+n16 <- f_bon * o_bon * o_mcn * f_mcn * f_bon * l_bon
+
+# 17
+n17 <- f_bon * o_bon * o_mcn * f_mcn * f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 18
+n18 <- f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 19
+n19 <- f_bon * o_bon * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+
+# 20
+n20 <- f_bon * o_bon * o_mcn * f_mcn * l_bon_mcn
+
+# 21
+n21 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * f_bon * l_bon
+
+# 22
+n22 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 23
+n23 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * l_bon_mcn
+
+# 24
+n24 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 25
+n25 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 26
+n26 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 27
+n27 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 28
+n28 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 29
+n29 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 30
+n30 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+
+# 31
+n31 <- f_bon * o_bon * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+
+# 32
+n32 <- f_bon * o_bon * o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 33
+n33 <- f_bon * o_bon * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+
+# 34
+n34 <- f_bon * o_bon * o_mcn * l_mcn_ich_pra
+
+# 35
+n35 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * f_bon * l_bon
+
+# 36
+n36 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 37
+n37 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+
+# 38
+n38 <- f_bon * o_bon * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 39
+n39 <- f_bon * o_bon * o_mcn * o_ich * f_ich * l_mcn_ich_pra
+
+# 40
+n40 <- f_bon * o_bon * o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 41
+n41 <- f_bon * o_bon * o_mcn * o_ich * l_ich_lgr
+
+# 42
+n42 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 43
+n43 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * l_ich_lgr
+
+# 44
+n44 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * f_mcn * f_bon * l_bon
+
+# 45
+n45 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 46
+n46 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+
+# 47
+n47 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * l_lgr
+
+# 48
+n48 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 49
+n49 <- f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * l_ich_lgr
+
+# 50
+n50 <- f_bon * o_bon * o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+
+# 51
+n51 <- f_bon * o_bon * o_mcn * o_pra * f_pra * o_pra * o_ris * f_ris * f_pra * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 52
+n52 <- f_bon * o_bon * o_mcn * o_pra * o_ris * l_ris_rre
+
+# 53
+n53 <- f_bon * o_bon * o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+
+# 54
+n54 <- f_bon * o_bon * s_bon_mcn * l_bon_mcn_trib
+
+# 55
+n55 <- f_bon * o_bon * s_bon_mcn * r_bon_mcn_trib * o_mcn * l_mcn_ich_pra
+
+# 56
+n56 <- h_bon_mcn * l_nat_trib
+
+# 57
+n57 <- h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 58
+n58 <- h_bon_mcn * r_nat_trib * l_bon_mcn
+
+# 59
+n59 <- h_bon_mcn * r_nat_trib * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 60
+n60 <- h_bon_mcn * r_nat_trib * o_mcn * o_ich * o_lgr * l_lgr
+
+# 61
+n61 <- l_bon_mcn
+
+# 62
+n62 <- o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 63
+n63 <- o_mcn * f_mcn * f_bon * l_bon
+
+# 64
+n64 <- o_mcn * f_mcn * f_bon * o_bon * h_bon_mcn * l_nat_trib
+
+# 65
+n65 <- o_mcn * f_mcn * f_bon * o_bon * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 66
+n66 <- o_mcn * f_mcn * f_bon * o_bon * l_bon_mcn
+
+# 67
+n67 <- o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 68
+n68 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 69
+n69 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * h_bon_mcn * r_nat_trib * f_bon * o_bon * l_bon_mcn
+
+# 70
+n70 <- o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+
+# 71
+n71 <- o_mcn * f_mcn * l_bon_mcn
+
+# 72
+n72 <- o_mcn * f_mcn * o_mcn * f_mcn * f_bon * l_bon
+
+# 73
+n73 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn
+
+# 74
+n74 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 75
+n75 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * h_bon_mcn * l_nat_trib
+
+# 76
+n76 <- o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * l_bon_mcn
+
+# 77
+n77 <- o_mcn * f_mcn * o_mcn * f_mcn * l_bon_mcn
+
+# 78
+n78 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 79
+n79 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 80
+n80 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 81
+n81 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 82
+n82 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 83
+n83 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 84
+n84 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 85
+n85 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 86
+n86 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 87
+n87 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+
+# 88
+n88 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 89
+n89 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+
+# 90
+n90 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+
+# 91
+n91 <- o_mcn * f_mcn * o_mcn * f_mcn * o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+
+# 92
+n92 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 93
+n93 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * f_bon * l_bon
+
+# 94
+n94 <- o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+
+# 95
+n95 <- o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 96
+n96 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 97
+n97 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * l_bon_mcn
+
+# 98
+n98 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+
+# 99
+n99 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 100
+n100 <- o_mcn * f_mcn * o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+
+# 101
+n101 <- o_mcn * f_mcn * o_mcn * o_ich * l_ich_lgr
+
+# 102
+n102 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * l_bon_mcn
+
+# 103
+n103 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 104
+n104 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * l_ich_lgr
+
+# 105
+n105 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 106
+n106 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * f_lgr * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 107
+n107 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+
+# 108
+n108 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 109
+n109 <- o_mcn * f_mcn * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * l_ich_lgr
+
+# 110
+n110 <- o_mcn * f_mcn * o_mcn * o_ich * s_ich_lgr * r_lgr_trib * o_lgr * l_lgr
+
+# 111
+n111 <- o_mcn * f_mcn * o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+
+# 112
+n112 <- o_mcn * f_mcn * o_mcn * o_pra * o_ris * l_ris_rre
+
+# 113
+n113 <- o_mcn * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 114
+n114 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+
+# 115
+n115 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 116
+n116 <- o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * o_mcn * l_mcn_ich_pra
+
+# 117
+n117 <- o_mcn * l_mcn_ich_pra
+
+# 118
+n118 <- o_mcn * o_ich * f_ich * f_mcn * f_bon * o_bon * o_mcn * l_mcn_ich_pra
+
+# 119
+n119 <- o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 120
+n120 <- o_mcn * o_ich * f_ich * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 121
+n121 <- o_mcn * o_ich * f_ich * f_mcn * l_bon_mcn
+
+# 122
+n122 <- o_mcn * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 123
+n123 <- o_mcn * o_ich * f_ich * f_mcn * o_mcn * o_ich * o_lgr * l_lgr
+
+# 124
+n124 <- o_mcn * o_ich * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 125
+n125 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 126
+n126 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * l_bon_mcn
+
+# 127
+n127 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+# 128
+n128 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * h_bon_mcn * r_nat_trib * f_bon * l_bon
+
+# 129
+n129 <- o_mcn * o_ich * f_ich * o_ich * f_ich * f_mcn * o_mcn * f_mcn * o_mcn * f_mcn * s_bon_mcn * r_bon_mcn_trib * f_bon * l_bon
+
+# 130
+n130 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 131
+n131 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * l_ich_lgr
+
+# 132
+n132 <- o_mcn * o_ich * f_ich * o_ich * f_ich * o_ich * o_lgr * l_lgr
+
+# 133
+n133 <- o_mcn * o_ich * f_ich * o_ich * l_ich_lgr
+
+# 134
+n134 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * f_lgr * l_ich_lgr
+
+# 135
+n135 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 136
+n136 <- o_mcn * o_ich * f_ich * o_ich * o_lgr * l_lgr
+
+# 137
+n137 <- o_mcn * o_ich * l_ich_lgr
+
+# 138
+n138 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * h_bon_mcn * l_nat_trib
+
+# 139
+n139 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * l_bon_mcn
+
+# 140
+n140 <- o_mcn * o_ich * o_lgr * f_lgr * f_ich * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 141
+n141 <- o_mcn * o_ich * o_lgr * f_lgr * l_ich_lgr
+
+# 142
+n142 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * o_ich * o_lgr * l_lgr
+
+# 143
+n143 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * f_ich * s_mcn_ich_pra * l_mcn_pra_ich_trib
+
+# 144
+n144 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * l_ich_lgr
+
+# 145
+n145 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 146
+n146 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * f_lgr * s_ich_lgr * r_lgr_trib * l_ich_lgr
+
+# 147
+n147 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 148
+n148 <- o_mcn * o_ich * o_lgr * f_lgr * o_lgr * l_lgr
+
+# 149
+n149 <- o_mcn * o_ich * o_lgr * f_lgr * s_ich_lgr * l_ich_lgr_trib
+
+# 150
+n150 <- o_mcn * o_ich * o_lgr * l_lgr
+
+# 151
+n151 <- o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 152
+n152 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * f_mcn * f_bon * o_bon * f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * o_ich * f_ich * f_mcn * f_bon * l_bon
+
+# 153
+n153 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * f_lgr * f_ich * f_mcn * f_bon * o_bon * o_mcn * o_ich * o_lgr * s_ich_lgr * l_lgr_trib
+
+# 154
+n154 <- o_mcn * o_ich * o_lgr * s_ich_lgr * r_lgr_trib * s_ich_lgr * l_lgr_trib
+
+# 155
+n155 <- o_mcn * o_ich * s_ich_lgr * l_ich_lgr_trib
+
+# 156
+n156 <- o_mcn * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+
+# 157
+n157 <- o_mcn * o_pra * f_pra * o_ich * l_ich_lgr
+
+# 158
+n158 <- o_mcn * o_pra * f_pra * o_ich * o_lgr * l_lgr
+
+# 159
+n159 <- o_mcn * o_pra * f_pra * o_pra * f_pra * f_mcn * h_bon_mcn * l_nat_trib
+
+# 160
+n160 <- o_mcn * o_pra * f_pra * o_pra * f_pra * o_pra * l_pra_ris
+
+# 161
+n161 <- o_mcn * o_pra * l_pra_ris
+
+# 162
+n162 <- o_mcn * o_pra * o_ris * f_ris * o_ris * f_ris * f_pra * f_mcn * o_mcn * f_mcn * o_mcn * l_mcn_ich_pra
+
+# 163
+n163 <- o_mcn * o_pra * o_ris * o_rre * o_wel * l_wel
+
+# 164
+n164 <- o_mcn * s_mcn_ich_pra * l_mcn_pra_ich_trib
+
+# 165
+n165 <- o_mcn * s_mcn_ich_pra * r_mcn_pra_ich_trib * f_mcn * h_bon_mcn * l_nat_trib
+
+# 166
+n166 <- o_mcn * s_mcn_ich_pra * r_mcn_pra_ich_trib * f_mcn * s_bon_mcn * l_bon_mcn_trib
+
+# 167
+n167 <- s_bon_mcn * l_bon_mcn_trib
+
+# 168
+n168 <- s_bon_mcn * r_bon_mcn_trib * h_bon_mcn * l_nat_trib
+
+# 169
+n169 <- s_bon_mcn * r_bon_mcn_trib * o_mcn * f_mcn * h_bon_mcn * l_nat_trib
+
+estimate_vector <- rep(0, 169)
+for (i in 1:length(n_vec)){
+  estimate_vector[i] <- eval(parse(text = n_vec[i]))
+}
+
+sum(estimate_vector)
+
+
+
 
 
 
