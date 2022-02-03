@@ -1079,3 +1079,35 @@ sum(optim_par_est$f_mcn, optim_par_est$o_pra, optim_par_est$o_ich, optim_par_est
 # Check model code
 # I don't see anything obvious... could it be something to do with the branching?
 
+
+##### Map probabilities #####
+
+# Create a data frame with the coordinates for the probabilities (dams and reaches)
+locations <- c(unique(JDR_states$state))
+x_coord <- c(45.788, # "mainstem, BON to MCN"
+             45.302, # "natal tributaries"
+             45.534, # "mainstem, mouth to BON"
+             46.078, # "mainstem, MCN to ICH or PRA"
+             46.551, # "mainstem, ICH to LGR"
+             47.079, # "mainstem, PRA to RIS"
+             47.446, # "mainstem, RIS to RRE"
+             46.564, # "mainstem, upstream of LGR"
+             45.526, # "BON to MCN tributaries" 
+             46.502, # "ICH to LGR tributaries"  
+             46.127, # "Upstream LGR tributaries"
+             46.164, # "MCN to PRA or ICH tributaries"
+             47.909, # "mainstem, RRE to WEL"
+             48.146) # "mainstem, upstream of WEL"
+y_coord <- c(-120.166, -120.502, -122.253, -118.897, -118.027, -119.977, -120.288, -117.198,
+             -121.131, -118.062, -116.928, -119.868, -119.847, -119.026)
+
+JDR_states_coords <- data.frame(locations, x_coord, y_coord)
+
+
+
+
+
+
+
+
+
