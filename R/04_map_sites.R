@@ -16,11 +16,11 @@ library(ggrepel)
 ##### Load shapefiles ##### 
 
 # USA boundaries
-usa_spdf <- readOGR(dsn = here("map_files", "USA_adm0.shp"))
+usa_spdf <- readOGR(dsn = here::here("map_files", "USA_adm0.shp"))
 usa_spdf_fort <- tidy(usa_spdf)
 # 
 # # Major rivers
-rivers_spdf <- readOGR(dsn = here("map_files", "NA_Lakes_and_Rivers","hydrography_l_rivers_v2.shp"))
+rivers_spdf <- readOGR(dsn = here::here("map_files", "NA_Lakes_and_Rivers","hydrography_l_rivers_v2.shp"))
 summary(rivers_spdf)
 # proj4string(rivers_spdf)
 # # rivers_spdf_transform <- spTransform(rivers_spdf, CRS(usa_spdf))
@@ -31,7 +31,7 @@ rivers_spdf_fort <- tidy(rivers_spdf_transform)
 
 # CRB streams
 # Data from here: https://www.fisheries.noaa.gov/resource/data/columbia-basin-historical-ecology-project-data
-CRB_streams_spdf <- readOGR(dsn = here("map_files", "crb_streams_over8m_100k","crb_streams_over8m_100k.shp"))
+CRB_streams_spdf <- readOGR(dsn = here::here("map_files", "crb_streams_over8m_100k","crb_streams_over8m_100k.shp"))
 CRB_streams_spdf_transform <- spTransform(CRB_streams_spdf, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84"))
 
 # We have to subset this to the rivers we want
@@ -125,7 +125,7 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
         legend.text = element_text(size = 12))+
   guides(fill = guide_legend(title = "Legend"))
 
-# ggsave(here("figures", "CRB_subset_map.pdf"), CRB_map, height = 6, width  = 10)  
+# ggsave(here::here("figures", "CRB_subset_map.pdf"), CRB_map, height = 6, width  = 10)  
 
 
 
@@ -166,7 +166,7 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
 #                                                                       expression(paste(51*degree,"N"))))+
 
 
-ggsave(here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)  
+ggsave(here::here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)  
 
 ##### Plot JDR sites on top of base map #####
 JDR_site_map <- CRB_map +
@@ -176,5 +176,5 @@ JDR_site_map <- CRB_map +
                                              y = event_site_latitude+0.02, label = event_site_name), 
                   size = 1, inherit.aes = FALSE)
 
-ggsave(here("figures", "JDR_site_map.pdf"), JDR_site_map, height = 6, width  = 10)  
+ggsave(here::here("figures", "JDR_site_map.pdf"), JDR_site_map, height = 6, width  = 10)  
 
