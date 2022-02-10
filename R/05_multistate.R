@@ -1933,6 +1933,7 @@ print(mod)
 # call to jags - jagsUI
 out.jags = jags(data, inits, params, model.file= here::here("model_files", "JDR_model.txt"),
                 n.chains=3, n.iter=50000, n.burnin=10000, n.thin=10)
-out.jags$summary
+jags_params <- data.frame(out.jags$summary)
 
+dput(jags_params)
 
