@@ -9,14 +9,11 @@ model {
 # What should the SD be? Should be able to contain values that represent high ratios, like 10:1
 # log(10/1) = 2.3
 # log(1/10) = -2.3
-# So, perhaps we start with the SD around 1
-# Set the SD to 1
+# Set precision (1/var, or 1/sd^2) to 0.01 - makes for a vague prior
 
 ### 1: Mouth to BON
 # l_bon <- 1 - o_bon
-a1 ~ dnorm(0, 1)
-
-a1 <- log(o_bon/l_bon)
+a1 ~ dnorm(0, 0.01)
 
 o_bon <- exp(a1)/(1 + exp(a1))
 l_bon <- 1/(1 + exp(a1))
@@ -24,15 +21,10 @@ l_bon <- 1/(1 + exp(a1))
 
 ### 2: BON to MCN
 # l_bon_mcn <- 1 - (o_mcn + s_bon_mcn + h_bon_mcn + f_bon)
-a2 ~ dnorm(0, 1)
-b2 ~ dnorm(0, 1)
-c2 ~ dnorm(0, 1)
-d2 ~ dnorm(0, 1)
-
-a2 <- log(o_mcn/l_bon_mcn)
-b2 <- log(s_bon_mcn/l_bon_mcn)
-c2 <- log(h_bon_mcn/l_bon_mcn)
-d2 <- log(f_bon/l_bon_mcn)
+a2 ~ dnorm(0, 0.01)
+b2 ~ dnorm(0, 0.01)
+c2 ~ dnorm(0, 0.01)
+d2 ~ dnorm(0, 0.01)
 
 o_mcn <- exp(a2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
 s_bon_mcn <- exp(b2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
@@ -43,9 +35,7 @@ l_bon_mcn <- 1/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
 
 ### 3: BON to MCN tributaries
 # l_bon_mcn_trib <- 1 - (r_bon_mcn_trib)
-a3 ~ dnorm(0, 1)
-
-a3 <- log(r_bon_mcn_trib/l_bon_mcn_trib)
+a3 ~ dnorm(0, 0.01)
 
 r_bon_mcn_trib <- exp(a3)/(1 + exp(a3))
 l_bon_mcn_trib <- 1/(1 + exp(a3))
@@ -54,13 +44,9 @@ l_bon_mcn_trib <- 1/(1 + exp(a3))
 ### 4: ICH to LGR
 # l_ich_lgr <- 1 - (o_lgr + f_ich + s_ich_lgr)
 
-a4 ~ dnorm(0, 1)
-b4 ~ dnorm(0, 1)
-c4 ~ dnorm(0, 1)
-
-a4 <- log(o_lgr/l_ich_lgr)
-b4 <- log(f_ich/l_ich_lgr)
-c4 <- log(s_ich_lgr/l_ich_lgr)
+a4 ~ dnorm(0, 0.01)
+b4 ~ dnorm(0, 0.01)
+c4 ~ dnorm(0, 0.01)
 
 o_lgr <- exp(a4)/(1 + exp(a4) + exp(b4) + exp(c4))
 f_ich <- exp(b4)/(1 + exp(a4) + exp(b4) + exp(c4))
@@ -71,7 +57,7 @@ l_ich_lgr <- 1/(1 + exp(a4) + exp(b4) + exp(c4))
 
 ### 5: ICH to LGR tributaries
 # l_ich_lgr_trib <- 1 # Note: This would be 1 - r_ich_lgr_trib, but no fish returned after straying into these tributaries
-# Not a prior here
+# Not a prior here, just a fixed value
 l_ich_lgr_trib <- 1
 
 
@@ -79,11 +65,8 @@ l_ich_lgr_trib <- 1
 ### 6: Upstream of LGR
 # l_lgr <- 1 - (f_lgr + s_lgr)
 
-a6 ~ dnorm(0, 1)
-b6 ~ dnorm(0, 1)
-
-a6 <- log(f_lgr/l_lgr)
-b6 <- log(s_lgr/l_lgr)
+a6 ~ dnorm(0, 0.01)
+b6 ~ dnorm(0, 0.01)
 
 f_lgr <- exp(a6)/(1 + exp(a6) + exp(b6))
 s_lgr <- exp(b6)/(1 + exp(a6) + exp(b6))
@@ -94,27 +77,20 @@ l_lgr <- 1/(1 + exp(a6) + exp(b6))
 ### 7: Upstream of LGR tributaries
 # l_lgr_trib <- 1 - (r_lgr_trib)
 
-a7 ~ dnorm(0, 1)
+a7 ~ dnorm(0, 0.01)
 
-a7 <- log(r_lgr_trib/l_lgr_trib)
-
-l_lgr_trib <- exp(a7)/(1 + exp(l_lgr_trib))
-r_lgr_trib <- 1/(1 + exp(l_lgr_trib))
+l_lgr_trib <- exp(a7)/(1 + exp(a7))
+r_lgr_trib <- 1/(1 + exp(a7))
 
 
 
 ### 8: MCN to ICH or PRA
 # l_mcn_ich_pra <- 1 - (f_mcn + o_pra + o_ich + s_mcn_ich_pra)
 
-a8 ~ dnorm(0, 1)
-b8 ~ dnorm(0, 1)
-c8 ~ dnorm(0, 1)
-d8 ~ dnorm(0, 1)
-
-a8 <- log(f_mcn/l_mcn_ich_pra)
-b8 <- log(o_pra/l_mcn_ich_pra)
-c8 <- log(o_ich/l_mcn_ich_pra)
-d8 <- log(s_mcn_ich_pra/l_mcn_ich_pra)
+a8 ~ dnorm(0, 0.01)
+b8 ~ dnorm(0, 0.01)
+c8 ~ dnorm(0, 0.01)
+d8 ~ dnorm(0, 0.01)
 
 f_mcn <- exp(a8)/(1 + exp(a8) + exp(b8) + exp(c8) + exp(d8))
 o_pra <- exp(b8)/(1 + exp(a8) + exp(b8) + exp(c8) + exp(d8))
@@ -127,9 +103,7 @@ l_mcn_ich_pra <- 1/(1 + exp(a8) + exp(b8) + exp(c8) + exp(d8))
 ### 9: MCN to ICH or PRA tributaries
 # l_mcn_pra_ich_trib <- 1 - (r_mcn_pra_ich_trib)
 
-a9 ~ dnorm(0, 1)
-
-a9 <- log(r_mcn_pra_ich_trib/l_mcn_pra_ich_trib)
+a9 ~ dnorm(0, 0.01)
 
 r_mcn_pra_ich_trib <- exp(a9)/(1 + exp(a9))
 l_mcn_pra_ich_trib <- 1/(1 + exp(a9))
@@ -139,9 +113,7 @@ l_mcn_pra_ich_trib <- 1/(1 + exp(a9))
 ### 10: Natal tributaries
 # l_nat_trib <- 1 - r_nat_trib
 
-a10 ~ dnorm(0, 1)
-
-a10 <- log(r_nat_trib/l_nat_trib)
+a10 ~ dnorm(0, 0.01)
 
 r_nat_trib <- exp(a10)/(1 + exp(a10))
 l_nat_trib <- 1/(1 + exp(a10))
@@ -151,11 +123,8 @@ l_nat_trib <- 1/(1 + exp(a10))
 ### 11: PRA to RIS
 # l_pra_ris <- 1 - (f_pra + o_ris)
 
-a11 ~ dnorm(0, 1)
-b11 ~ dnorm(0, 1)
-
-a11 <- log(f_pra/l_pra_ris)
-b11 <- log(o_ris/l_pra_ris)
+a11 ~ dnorm(0, 0.01)
+b11 ~ dnorm(0, 0.01)
 
 f_pra <- exp(a11)/(1 + exp(a11) + exp(b11))
 o_ris <- exp(b11)/(1 + exp(a11) + exp(b11))
@@ -166,11 +135,8 @@ l_pra_ris <- 1/(1 + exp(a11) + exp(b11))
 ### 12: RIS to RRE
 # l_ris_rre <- 1 - (o_rre + f_ris)
 
-a12 ~ dnorm(0, 1)
-b12 ~ dnorm(0, 1)
-
-a12 <- log(o_rre/l_ris_rre)
-b12 <- log(f_ris/l_ris_rre)
+a12 ~ dnorm(0, 0.01)
+b12 ~ dnorm(0, 0.01)
 
 o_rre <- exp(a12)/(1 + exp(a12) + exp(b12))
 f_ris <- exp(b12)/(1 + exp(a12) + exp(b12))
@@ -181,19 +147,9 @@ l_ris_rre <- 1/(1 + exp(a12) + exp(b12))
 ### 13: RRE to WEL
 # l_rre_wel <- 1 - (o_wel + f_rre)
 
-# a13 ~ dnorm(0, 1)
-# b13 ~ dnorm(0, 1)
-# 
-# a13 <- log(o_wel/l_rre_wel)
-# b13 <- log(f_rre/l_rre_wel)
-# 
-# o_wel <- exp(a13)/(1 + exp(a13) + exp(b13))
-# f_rre <- exp(b13)/(1 + exp(a13) + exp(b13))
-# l_rre_wel <- 1/(1 + exp(a13) + exp(b13))
-
 # No individuals ever fell back over RRE. So we will tweak this to remove it
 
-a13 ~ dnorm(0, 1)
+a13 ~ dnorm(0, 0.01)
 
 o_wel <- exp(a13)/(1 + exp(a13))
 l_rre_wel <- 1/(1 + exp(a13))
@@ -201,7 +157,7 @@ l_rre_wel <- 1/(1 + exp(a13))
 
 ### 14: Upstream of WEL
 # l_wel <- 1 # Note: This would be 1 - f_wel, but no fish fell back over Well's dam
-# Not a prior
+# Not a prior, just a fixed value
 l_wel <- 1
     
     
@@ -747,7 +703,7 @@ p <- c(n1, n2, n3, n4, n5, n6,
     
 
     # Evaluate the multinomial likelihood for the counts of detection probabilities
-    y[1:N] ~ dmulti(p[1:N], 1)
+    y[1:N] ~ dmulti(p[1:N], 2121)
 
 
 }
