@@ -112,38 +112,94 @@ NaN, 1.00030972167303), n.eff = c(12000, 6708, 12000, 9998, 12000,
 # Model setup
 
 
-## Model dataset
+## Modeling overview
 - Data still John Day River wild Steelhead, 2005-2015
 - MLE form, implemented in optim()
 - **Bayesian form, implemented in JAGS**
 
+## Model setup
+![](.//figures/JDR_bidirectional_diagram.png){width=100%}
 
-## Constraining parameters to sum to 1
+## Constraining movement probablities in each state to sum to 1
 Two options:
 
-1. Dirichlet prior (e.g., Waterhouse et al. 2020)
-2. Additive log-ratio (what I have implemented so far):
+1) Dirichlet prior (e.g., Waterhouse et al. 2020)
+    ```{r eval = FALSE}
+p <- 1 - q - r
+c(p, q, r) ~ ddirch(c(1, 1, 1))
+    ```
+
+
+2) Additive log-ratio (what I chose to implement):
+ - Used to transform (redefine) parameters that lie on the interval [0,1] to the interval [-Inf, Inf]
+ - Choose one parameter to serve as reference (denominator)
+
+
+## Additive log-ratio: Example
+![](.//figures/JDR_simple_example.png){width=100%}
+
+
+## Additive log-ratio: Example
+$$
+\begin{aligned}
+ \small a_{2} = log(o_{mcn}/l_{bon\_mcn}) \\
+ \small b_{2} = log(s_{bon\_mcn}/l_{bon\_mcn}) \\
+ \small c_{2} = log(h_{bon\_mcn}/l_{bon\_mcn}) \\
+ \small d_{2} = log(f_{bon}/l_{bon\_mcn}) \\
+\end{aligned}
+$$
 
 $$
 \begin{aligned}
-o_{mcn}= \exp(a_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
-s_{bon_mcn} = \exp(b_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
-h_{bon_mcn} = \exp(c_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
-f_{bon} = \exp(d_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
-l_{bon_mcn} = 1/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2}))
+ \small o_{mcn}= \exp(a_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
+ \small s_{bon\_mcn} = \exp(b_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
+ \small h_{bon\_mcn} = \exp(c_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
+ \small f_{bon} = \exp(d_{2})/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2})) \\
+ \small l_{bon\_mcn} = 1/(1 + \exp(a_{2}) + \exp(b_{2}) + \exp(c_{2}) + \exp(d_{2}))
 \end{aligned}
 $$
 
 
 ## Priors
 - Vague priors - normal with precision of 0.01 (equals SD of 10)
-```{r}
+```{r eval = FALSE}
 a2 ~ dnorm(0, 0.01)
 b2 ~ dnorm(0, 0.01)
 c2 ~ dnorm(0, 0.01)
 d2 ~ dnorm(0, 0.01)
 ```
-All parameters received these priors
+- All parameters received these priors
+- Currently 14 states in the model, so we have a1 - a14, and b, c, and/or d for the states that have more than two possible movements
+
+## Multinomial likelihood
+- Get a vector of probabilities *p* with length *K*, where *K* is the number of unique observed detection histories
+- In this dataset, *K* = 169 (169 unique detection histories)
+- Example:
+
+$$
+\begin{aligned}
+n_{7} = f_{bon} * o_{bon} * f_{bon} * o_{bon} * h_{bon\_mcn} * l_{nat\_trib} \\
+p[7] = n_{7}
+\end{aligned}
+$$
+
+## Evaluate multinomial likelihood
+```{r eval = FALSE}
+p <- c(n1, n2, n3, ... n169)
+
+# Evaluate counts, where y are the counts of 
+# the number of times each of the unique detection 
+# histories was observed
+
+# 2121 are the number of fish
+y[1:N] ~ dmulti(p[1:N], 2121)
+```
+
+- 36 parameters monitored
+
+## Example plots
+![](.//figures/f_bon_trace.png){width=70%}
+![](.//figures/f_bon_density.png){width=70%}
 
 
 ## Example model outputs
@@ -164,22 +220,26 @@ param_est %>%
 ```
 ![](.//figures/JDR_BON_MCN_bayesian_estimates.png){width=100%}
 
-## Example plots
-![](.//figures/f_bon_trace.png){width=70%}
-![](.//figures/f_bon_density.png){width=70%}
 
 
 # Next steps
 
-## Adding covariates
-1. Temperature
-2. Spill
-3. Juvenile history
-4. Harvest (loss parameter?) - use WDFW data, summarize by river reach/state to align with model
-5. Memory (overshoot?)
+## Expanding dataset
+- 14 (?) natal tributaries
+- 2005 onwards
+- Would have to build a new model for each new arrangement of operational PIT tag arrays - i.e., would have to build a new model for 2018 onwards, when the John Day adult fishway PIT tag detectors came online
+
+## Adding complexity (via covariates, or different parameters)
+1. Run year
+2. Natal origin
+3. Temperature
+4. Spill
+5. Juvenile history
+6. Harvest (loss parameter?) - use WDFW data, summarize by river reach/state to align with model
+7. Memory (overshoot?)
 
 ## Detection probability
-- Implicit movements considered not detected
+- Implicit movements could be considered not detected
 - For example, an individual with consecutive detections in the McNary adult fishways:
 $$
 o_{mcn} * p_{o_{mcn}} * f_{mcn} * (1 - p_{f_{mcn}}) * o_{mcn} * p_{o_{mcn}}
