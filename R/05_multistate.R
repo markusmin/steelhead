@@ -12,10 +12,11 @@ library(tidyverse)
 library(lubridate)
 library(janitor)
 library(rjags)
+library(jagsUI)
 
 
 # Load data
-JDR_states <- read.csv(here("model_files", "JDR_states.csv"), row.names = 1)
+JDR_states <- read.csv(here::here("model_files", "JDR_states.csv"), row.names = 1)
 
 # Break up state history into individual detections
 JDR_tag_codes <- unique(JDR_states$tag_code)
@@ -220,7 +221,7 @@ JDR_stepwise_detections %>%
   left_join(., JDR_state_model_probabilities, by = c("state_1", "state_2")) -> JDR_stepwise_probabilities
 
 # Export this
-write.csv(JDR_stepwise_probabilities, here("model_files", "JDR_stepwise_probabilities"))
+write.csv(JDR_stepwise_probabilities, here::here("model_files", "JDR_stepwise_probabilities"))
 
 
 # check for any missing probabilities
@@ -1935,5 +1936,13 @@ out.jags = jags(data, inits, params, model.file= here::here("model_files", "JDR_
                 n.chains=3, n.iter=50000, n.burnin=10000, n.thin=10)
 jags_params <- data.frame(out.jags$summary)
 
-dput(jags_params)
+jags_params %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Param") %>% 
+  dplyr::select(-c(mean, sd, X25., X75., Rhat, n.eff, overlap0, f)) %>% 
+  dplyr::rename(lower2.5 = X2.5., 
+                upper97.5 = X97.5.,
+                median = X50.) -> jags_param_table
+  
+write.csv(file = here::here("model_files", "JDR_param_estimates.csv"), jags_param_table)
 
