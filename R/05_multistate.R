@@ -1942,7 +1942,8 @@ jags_params %>%
   dplyr::select(-c(mean, sd, X25., X75., Rhat, n.eff, overlap0, f)) %>% 
   dplyr::rename(lower2.5 = X2.5., 
                 upper97.5 = X97.5.,
-                median = X50.) -> jags_param_table
+                median = X50.) %>% 
+  subset(., Param != "deviance") -> jags_param_table
   
 write.csv(file = here::here("model_files", "JDR_param_estimates.csv"), jags_param_table)
 
