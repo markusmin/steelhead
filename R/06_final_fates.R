@@ -407,5 +407,18 @@ msm_est %>%
   mutate(model_v_tally = model_prop - tally_prop) -> state_comp
 state_comp
 
+# See which ones are more than 1% off
+subset(state_comp, abs(model_v_tally) > 0.01)
+
+
+##### Troubleshoot differences #####
+
+# Load state data
+JDR_stepwise_probabilities <- read.csv(here::here("model_files", "JDR_stepwise_probabilities.csv"), row.names = 1)
+
+# Group by state 1 and see where individuals moved
+
+
+
 
 
