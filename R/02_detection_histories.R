@@ -242,7 +242,7 @@ write.csv(JDR_det_hist, here("model_files", "JDR_det_hist.csv"))
 
 # Inspect sites - for mapping
 
-
+# JDR_det_hist <- read.csv(file = here::here("model_files", "JDR_det_hist.csv"))
 JDR_det_hist %>% 
   group_by(event_site_name) %>% 
   summarise(n()) %>% 
@@ -286,3 +286,5 @@ JDR_event_det_counts %>%
                     ifelse(event_site_name == "The Dalles Adult Fishways (combined)", "TDA",
                     ifelse(event_site_name == "LMA - Lower Monumental Adult Ladders", "LMO",
                     ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO", NA)))))))))))) -> JDR_event_det_counts
+
+write.csv(JDR_event_det_counts, here::here("model_files", "JDR_event_det_counts.csv"), row.names = FALSE)
