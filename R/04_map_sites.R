@@ -138,7 +138,7 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
 CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   ylab("Latitude")+
   xlab("Longitude")+
-  coord_fixed(ylim = c(44.3,48.45),  xlim = c(-125.15,-114), ratio = 1.3)+
+  coord_fixed(ylim = c(44.3,48.45),  xlim = c(-124.5,-114), ratio = 1.3)+
   # Polygons for base map
   geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
   # Polygons for CRB streams
@@ -147,22 +147,22 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   geom_path(data = rivers_subset, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.5, fill = "gray70") +
   # ADD LABELS FOR RIVERS
   # annotate("segment", x = -122.84, y = 47.68, xend = -123.18, yend = 47.68, size = 0.5, lty = 1) + # Columbia River
-  annotate("text", x = -123.33, y = 46.27, label = "Columbia River", size = 3, fontface = 'italic', hjust = 0) + # Columbia River
-  annotate("text", x = -121.7, y = 45.57, label = "Hood R.", size = 2, fontface = 'italic', hjust = 1) + # Hood River
-  annotate("text", x = -121.2, y = 45.38, label = "Fifteenmile Cr.", size = 2, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
-  annotate("text", x = -120.94, y = 45.01, label = "Deschutes R.", size = 2, fontface = 'italic', hjust = 1) + # Deschutes R.
-  annotate("text", x = -119.86, y = 44.92, label = "John Day R.", size = 2, fontface = 'italic', hjust = 1) + # John Day R.
-  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 2, fontface = 'italic', hjust = 1) + # Umatilla R.
-  annotate("text", x = -118.34, y = 46.15, label = "Walla Walla R.", size = 2, fontface = 'italic', hjust = 1) + # Walla Walla R.
-  annotate("text", x = -117.94, y = 46.396, label = "Tucannon R.", size = 2, fontface = 'italic', hjust = 1) + # Tucannon R.
-  annotate("text", x = -117.52, y = 45.70, label = "Grande Ronde R.", size = 2, fontface = 'italic', hjust = 1) + # Grande Ronde R.
-  annotate("text", x = -116.06, y = 46.475, label = "Clearwater R.", size = 2, fontface = 'italic', hjust = 1) + # Clearwater R.
-  annotate("text", x = -116.95, y = 45.52, label = "Imanha R.", size = 2, fontface = 'italic', hjust = 1) + # Imanha R.
-  annotate("text", x = -116.579, y = 44.997, label = "Snake R.", size = 2.5, fontface = 'italic', hjust = 1) + # Snake R.
-  annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 2, fontface = 'italic', hjust = 1) + # Salmon R.
-  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 2, fontface = 'italic', hjust = 1) + # Yakima R.
-  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 2, fontface = 'italic', hjust = 1) + # Wenatchee R.
-  annotate("text", x = -120.33, y = 47.88, label = "Entiat R.", size = 2, fontface = 'italic', hjust = 1) + # Entiat R.
+  annotate("text", x = -123.33, y = 46.27, label = "Columbia River", size = 3.5, fontface = 'italic', hjust = 0) + # Columbia River
+  annotate("text", x = -121.7, y = 45.5, label = "Hood R.", size = 2.5, fontface = 'italic', hjust = 1) + # Hood River
+  annotate("text", x = -121.2, y = 45.44, label = "Fifteenmile Cr.", size = 2.5, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
+  annotate("text", x = -120.94, y = 44.8, label = "Deschutes R.", size = 2.5, fontface = 'italic', hjust = 1) + # Deschutes R.
+  annotate("text", x = -119.8, y = 44.92, label = "John Day R.", size = 2.5, fontface = 'italic', hjust = 1) + # John Day R.
+  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 2.5, fontface = 'italic', hjust = 1) + # Umatilla R.
+  annotate("text", x = -118, y = 46.15, label = "Walla Walla R.", size = 2.5, fontface = 'italic', hjust = 1) + # Walla Walla R.
+  annotate("text", x = -117.94, y = 46.396, label = "Tucannon R.", size = 2.5, fontface = 'italic', hjust = 1) + # Tucannon R.
+  annotate("text", x = -117.3, y = 45.70, label = "Grande Ronde R.", size = 2.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
+  annotate("text", x = -115.4, y = 46.475, label = "Clearwater R.", size = 2.5, fontface = 'italic', hjust = 1) + # Clearwater R.
+  annotate("text", x = -116.95, y = 45.52, label = "Imanha R.", size = 2.5, fontface = 'italic', hjust = 1) + # Imanha R.
+  annotate("text", x = -116.579, y = 44.997, label = "Snake R.", size = 3, fontface = 'italic', hjust = 1) + # Snake R.
+  annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 2.5, fontface = 'italic', hjust = 1) + # Salmon R.
+  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 2.5, fontface = 'italic', hjust = 1) + # Yakima R.
+  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 2.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
+  annotate("text", x = -120.33, y = 47.88, label = "Entiat R.", size = 2.5, fontface = 'italic', hjust = 1) + # Entiat R.
   theme(plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill="white", color = "black"),
         panel.border = element_rect(colour = "black", fill=NA, size=1),
@@ -188,17 +188,20 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
 ggsave(here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)  
 
 ##### Plot JDR sites on top of base map #####
+JDR_event_det_counts <- read.csv(here::here("model_files", "JDR_event_det_counts.csv"))
+
+
 JDR_site_map <- CRB_map +
   # Add dams
   geom_point(data = subset(JDR_event_det_counts, dam == "dam"), 
              aes(x = event_site_longitude, y = event_site_latitude), 
-             shape = 73, size = 3, inherit.aes = FALSE) +
+             shape = 73, size = 4, inherit.aes = FALSE) +
   geom_text(data = subset(JDR_event_det_counts, dam == "dam"), 
-            aes(x = event_site_longitude, y = event_site_latitude+0.1, label = dam_abbr), 
-            size = 2, inherit.aes = FALSE) +
+            aes(x = event_site_longitude, y = event_site_latitude+0.2, label = dam_abbr), 
+            size = 3, inherit.aes = FALSE) +
   # Add detection sites
   geom_point(data = JDR_event_det_counts, aes(x = event_site_longitude, 
-                                              y = event_site_latitude), size = 0.5, inherit.aes = FALSE)
+                                              y = event_site_latitude), size = 1, inherit.aes = FALSE)
   # geom_text_repel(data = JDR_event_det_counts, aes(x = event_site_longitude,
   #                                                  y = event_site_latitude+0.02, label = event_site_name), 
   #                 max.overlaps = 100, size = 1, inherit.aes = FALSE)
