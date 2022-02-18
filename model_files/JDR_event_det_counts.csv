@@ -1,0 +1,66 @@
+"event_site_name","count","X","event_site_basin_name","event_site_subbasin_name","event_site_latitude","event_site_longitude","dam","dam_abbr"
+"B2J - Bonneville PH2 Juvenile",5,128,"Lower Columbia","Lower Columbia-Sandy",45.636816,-121.9653,"in stream",NA
+"BADGEI - Badger Island, Columbia River",1,7059,"Middle Columbia","Middle Columbia-Lake Wallula",46.109392,-118.937853,"in stream",NA
+"BCC - BON PH2 Corner Collector",65,63,"Lower Columbia","Lower Columbia-Sandy",45.64814,-121.942544,"in stream",NA
+"Bonneville Adult Fishways (combined)",2516,1,"Lower Columbia","Lower Columbia-Sandy",45.641509,-121.943902,"dam","BON"
+"BR0 - Bridge Creek Gauge",331,2987,"John Day","Lower John Day",44.72723,-120.3022,"in stream",NA
+"BR1 - Bridge Creek Kiosk",74,2993,"John Day","Lower John Day",44.654323,-120.251131,"in stream",NA
+"BR2 - Bridge Creek Gable",140,1390,"John Day","Lower John Day",44.59243,-120.2081,"in stream",NA
+"BR3 - Bridge Creek Ranch",32,3028,"John Day","Lower John Day",44.58517,-120.1837,"in stream",NA
+"BRIDGC - Bridge Creek, John Day River Basin",21,945,"John Day","Lower John Day",44.592045,-120.20546,"in stream",NA
+"CATHEC - Catherine Creek",7,1341,"Lower Snake","Upper Grande Ronde",45.209666,-117.88785,"in stream",NA
+"CATHEW - Catherine Creek Weir",13,584,"Lower Snake","Upper Grande Ronde",45.190964,-117.828617,"in stream",NA
+"COLR4 - Columbia River - Bonneville Dam to John Day Dam (km 234-347)",10,1746,"Middle Columbia","Middle Columbia-Hood",45.683965,-121.280668,"in stream",NA
+"CRC - Carmen Creek, Salmon R. Basin",2,5934,"Salmon","Middle Salmon-Panther",45.246485,-113.893466,"in stream",NA
+"DRM - Deschutes River mouth",214,7,"Deschutes","Lower Deschutes",45.631808,-120.912483,"in stream",NA
+"ESANIS - East Sand Island, Columbia River",1,2123,"Lower Columbia","Lower Columbia",46.262709,-123.972575,"in stream",NA
+"FDD - Feed Diversion Dam",12,883,"Middle Columbia","Umatilla",45.720695,-119.176819,"in stream",NA
+"GOA - Little Goose Fish Ladder",26,3060,"Lower Snake","Lower Snake-Tucannon",46.582668,-118.027794,"dam","LGO"
+"GOJ - Little Goose Dam Juvenile",14,199,"Lower Snake","Lower Snake-Tucannon",46.582381,-118.031607,"in stream",NA
+"GRAND2 - Grande Ronde River - Wallowa River to headwaters (km 131-325)",3,3723,"Lower Snake","Upper Grande Ronde",45.325636,-117.920526,"in stream",NA
+"GRJ - Lower Granite Dam Juvenile",10,141,"Lower Snake","Lower Snake-Tucannon",46.660394,-117.436261,"in stream",NA
+"HRM - Hood River Mouth",1,6900,"Middle Columbia","Middle Columbia-Hood",45.713986,-121.508462,"in stream",NA
+"ICH - Ice Harbor Dam (Combined)",317,52,"Lower Snake","Lower Snake",46.249527,-118.879964,"dam","ICH"
+"JD1 - John Day River, McDonald Ferry",561,3,"John Day","Lower John Day",45.59574,-120.410928,"in stream",NA
+"JDARSF - South Fork John Day River",2,1315,"John Day","Upper John Day",44.158842,-119.512655,"in stream",NA
+"JDJ - John Day Dam Juvenile",60,28,"Middle Columbia","Middle Columbia-Hood",45.710014,-120.692581,"in stream",NA
+"JOC - Joseph Creek ISA @ km 3",2,4716,"Lower Snake","Lower Grande Ronde",46.030237,-117.016408,"in stream",NA
+"LAP - Lapwai Creek, near its mouth",2,1431,"Clearwater","Clearwater",46.443273,-116.812535,"in stream",NA
+"LAPC - Lapwai Creek",1,1888,"Clearwater","Clearwater",46.349988,-116.621868,"in stream",NA
+"LGRTAL - LGR - Release into the Tailrace within 0.5 km downstream of Dam",1,1108,"Lower Snake","Lower Snake-Tucannon",46.6605,-117.4283,"in stream",NA
+"LMA - Lower Monumental Adult Ladders",38,3059,"Lower Snake","Lower Snake",46.562564,-118.538249,"dam","LMO"
+"LMJ - Lower Monumental Dam Juvenile",21,999,"Lower Snake","Lower Snake",46.562954,-118.543164,"in stream",NA
+"LOOKGC - Lookingglass Creek",1,2956,"Lower Snake","Upper Grande Ronde",45.757199,-117.960012,"in stream",NA
+"Lower Granite Dam Adult Fishways (combined)",166,85,"Lower Snake","Lower Snake-Tucannon",46.65776,-117.433225,"dam","LGR"
+"LTR - Lower Tucannon River",13,133,"Lower Snake","Lower Snake-Tucannon",46.544192,-118.162901,"in stream",NA
+"MCJ - McNary Dam Juvenile",111,25,"Middle Columbia","Middle Columbia-Lake Wallula",45.932293,-119.2999,"in stream",NA
+"McNary Adult Fishways (combined)",1492,19,"Middle Columbia","Middle Columbia-Lake Wallula",45.928565,-119.296606,"dam","MCN"
+"MJ1 - Middle Fork John Day Array",79,4,"John Day","Middle Fork John Day",44.741933,-118.851057,"in stream",NA
+"MTR - Middle Tucannon River",2,4289,"Lower Snake","Lower Snake-Tucannon",46.505239,-118.016274,"in stream",NA
+"MWC - Maxwell Canal",2,113,"Middle Columbia","Umatilla",45.799487,-119.341847,"in stream",NA
+"MXWLCN - Maxwell Diversion Canal - headgate to diversion screen (km 000-002)",1,299,"Middle Columbia","Umatilla",45.799623,-119.341995,"in stream",NA
+"ORB - Oasis Road Bridge",10,2348,"Middle Columbia","Walla Walla",46.072797,-118.816734,"in stream",NA
+"PAHH - Pahsimeroi Hatchery",1,3504,"Salmon","Pahsimeroi",44.684139,-114.039471,"in stream",NA
+"PRA - Priest Rapids Adult",24,76,"Upper Columbia","Upper Columbia-Priest Rapids",46.644339,-119.910442,"dam","PRA"
+"PRO - Prosser Diversion Dam Combined",1,1033,"Yakima","Lower Yakima",46.212539,-119.772663,"in stream",NA
+"PRV - Walla Walla R at Pierce RV Prk",14,4428,"Middle Columbia","Walla Walla",46.068014,-118.825796,"in stream",NA
+"RCJ - Rock Creek John Day Basin",2,7156,"John Day","Lower John Day",45.57559,-120.37988,"in stream",NA
+"RIA - Rock Island Adult",7,77,"Upper Columbia","Upper Columbia-Entiat",47.343278,-120.0933,"dam","RIS"
+"RRF - Rocky Reach Fishway",1,5616,"Upper Columbia","Upper Columbia-Entiat",47.531519,-120.300387,"dam","RRE"
+"SHERFT - Sherars Falls Fishway Trap, Deschutes River",3,924,"Deschutes","Lower Deschutes",45.2567,-121.0396,"in stream",NA
+"SJ1 - SF John Day (Mid)",82,3102,"John Day","Upper John Day",44.422105,-119.540665,"in stream",NA
+"SJ2 - SF John Day (Murderer's)",130,3009,"John Day","Upper John Day",44.314517,-119.539748,"in stream",NA
+"SWT - Sweetwater Cr. near its mouth",2,1432,"Clearwater","Clearwater",46.369217,-116.795757,"in stream",NA
+"TFH - Tucannon Fish Hatchery",1,7028,"Lower Snake","Lower Snake-Tucannon",46.309627,-117.657161,"in stream",NA
+"The Dalles Adult Fishways (combined)",455,2,"Middle Columbia","Middle Columbia-Hood",45.619099,-121.119685,"dam","TDA"
+"TMA - 3-Mile Falls Dam Adult Fishway",2,223,"Middle Columbia","Umatilla",45.882124,-119.323066,"in stream",NA
+"TMF - Three Mile Falls Dam Combined",42,112,"Middle Columbia","Umatilla",45.882018,-119.32442,"in stream",NA
+"TMJ - 3-Mile Falls Dam Smolt Bypass",1,222,"Middle Columbia","Umatilla",45.882307,-119.325853,"in stream",NA
+"TROU2C - Trout Creek, Deschutes River Watershed",1,3852,"Deschutes","Trout",44.776698,-120.762428,"in stream",NA
+"TUCR - Tucannon River",1,7027,"Lower Snake","Lower Snake-Tucannon",46.395717,-117.711201,"in stream",NA
+"TWX - Estuary Towed Array (Exp.)",5,176,"Lower Columbia","Lower Columbia-Clatskanie",46.142688,-123.335061,"in stream",NA
+"UGR - Upper Grande Ronde at rkm 155",9,1340,"Lower Snake","Upper Grande Ronde",45.59352,-117.903379,"in stream",NA
+"UM2 - Umatilla River Instream Array",1,884,"Middle Columbia","Umatilla",45.712494,-118.345278,"in stream",NA
+"USI - Upper Salmon River at rkm 460",2,3509,"Salmon","Middle Salmon-Panther",44.889763,-113.964145,"in stream",NA
+"WEA - Wells Dam, DCPUD Adult Ladders",1,5617,"Upper Columbia","Chief Joseph",47.947302,-119.864549,"dam","WEL"
+"WHITEC - White Creek, Klickitat River Basin",1,2548,"Middle Columbia","Klickitat",46.123692,-121.072428,"in stream",NA
