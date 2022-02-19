@@ -8,6 +8,67 @@ output: html_document
 ### Description
 This Rmd file will go through querying PTAGIS and cleaning this data in order to prepare it for analysis.
 
+# Determine datasets to query
+To determine which datasets (natal origins) to include in our analysis, we are going to begin by examining all adult returns (detections in the adult fishway at BON) since 2005.
+
+This first query will take the following attributes:
+
+Advanced Reporting Home Page > Create Query Builder2 Report > Interrogation Summary
+
+Once in Query Builder2, select the following filters:
+- 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin
+- 2 Metrics: Count, First Obs Date Max
+- 16 First Obs Date/Time: 
+  - From: Value 
+  - Is: Greater than or equal to
+    - Value: 6/1/2005 12:00:00 AM
+- 18 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots, B2A - BONNEVILLE ADULT WA SHORE, BWL - Bonneville WA Shore Ladder
+  - These are all of the Bonneville adult fishways and there::herefore will allow you to identify all adult returns
+- 25 Species: Steelhead
+- 29 Mark Length: Less than or equal to 350 (to ensure you are only keeping individuals tagged as Juveniles)
+
+Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
+
+## Inspect distribution of natal origins and run years
+```{r load_libraries}
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+```{r import_reformat_data}
+adult_returns <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", "all_adult_returns.csv")))
+
+# Keep only certain columns
+adult_returns %>% 
+  distinct(tag_code, .keep_all = TRUE) %>% 
+  dplyr::select(tag_code, first_time_value, rear_type_code, release_site_name, release_site_basin_name, release_site_subbasin_name) %>% 
+  mutate(time = mdy_hms(first_time_value)) %>% 
+  mutate(date = date(time)) %>% 
+  dplyr::select(-c(first_time_value, time))-> adult_returns
+
+# Sort into run years
+run_year <- c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21")
+run_year_start <- seq(ymd("2005-06-01"), ymd("2020-06-01"), by = "years")
+run_year_end <- seq(ymd("2006-05-31"), ymd("2021-05-31"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+adult_returns %>% 
+  mutate(run_year = subset(run_year_df, run_year_start < time & run_year_end > time)$run_year) -> adult_returns
+```
+
+### Inspect distributions by run years and origins
+```{r}
+# basin name is not specific enough
+origin_table <- as.data.frame(table(adult_returns$release_site_basin_name))
+origin_table <- as.data.frame(table(adult_returns$release_site_subbasin_name))
+origin_table
+```
+
+
+
 
 # PTAGIS workflow
 PTAGIS querying has been set up to work in two steps:
