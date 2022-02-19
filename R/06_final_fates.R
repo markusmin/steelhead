@@ -180,19 +180,31 @@ JDR_transition_simulation <- function(nsim, transition_matrix){
     dplyr::rename(count = colSums.JDR_final_fate_matrix...1.14..) %>% 
     mutate(prop = count/nsim)-> final_fates
   
-  return(final_fates)
+  outputs <- list(JDR_state_matrix, final_fates)
+  # return(final_fates)
+  return(outputs)
   
 }
 
 
 # run simulation with 1 million fish
 set.seed(123)
-msm_est <- JDR_transition_simulation(nsim = 1000000, transition_matrix = JDR_transition_matrix)
+msm_est <- JDR_transition_simulation(nsim = 10000000, transition_matrix = JDR_transition_matrix)
 
+# Eigenvectors - analytical solution
+# transpose it
+JDR_transition_matrix <- t(JDR_transition_matrix)
 
+final_matrix <- JDR_transition_matrix^100
+init_vector <- c(0, 1000000, rep(0, 13))
+final_matrix * init_vector
 
-
-
+eigenvalues <- eigen(JDR_transition_matrix)$values
+eigenvectors <- eigen(JDR_transition_matrix)$vectors
+abs(eigenvalues)
+max(abs(eigenvalues))
+max(Re(eigenvalues))
+Re(eigenvectors[,1])
 
 
 ##### Compare results to tallies from detection history #####
@@ -417,7 +429,8 @@ subset(state_comp, abs(model_v_tally) > 0.01)
 JDR_stepwise_probabilities <- read.csv(here::here("model_files", "JDR_stepwise_probabilities.csv"), row.names = 1)
 
 # Group by state 1 and see where individuals moved
-
+# JDR_stepwise_probabilities %>% 
+#   group_by(state_1) 
 
 
 
