@@ -197,7 +197,7 @@ JDR_site_map <- CRB_map +
              aes(x = event_site_longitude, y = event_site_latitude), 
              shape = 73, size = 4, inherit.aes = FALSE) +
   geom_text(data = subset(JDR_event_det_counts, dam == "dam"), 
-            aes(x = event_site_longitude, y = event_site_latitude+0.2, label = dam_abbr), 
+            aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
             size = 3, inherit.aes = FALSE) +
   # Add detection sites
   geom_point(data = JDR_event_det_counts, aes(x = event_site_longitude, 
@@ -207,3 +207,4 @@ JDR_site_map <- CRB_map +
   #                 max.overlaps = 100, size = 1, inherit.aes = FALSE)
 
 ggsave(here("figures", "JDR_site_map2.pdf"), JDR_site_map, height = 6, width  = 10)  
+ggsave(here("figures", "JDR_site_map2.png"), JDR_site_map, height = 6, width  = 10)  
