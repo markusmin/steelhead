@@ -531,3 +531,26 @@ Query Builder2:
 Export CSV files, save in PTAGIS_queries -> complete_tag_histories-> john_day_river :
 2022-01-14-john_day_river_CTH_2005_2015_1.csv
 2022-01-14-john_day_river_CTH_2005_2015_2.csv
+
+
+
+# Covariate queries
+In addition to the PIT tag detection histories for fish, we also need to query the covariate data from CBR DART.
+
+What Shelby did:
+
+"Water temperature, flow, and spill data were downloaded on 5 January, 2017. Daily water temperatures in the forebay outflow of McNary, Ice Harbor, Lower Granite, Priest Rapids, Rocky Reach, and Wells dams from 2005 to 2015 were downloaded from Columbia River DART (www.cbr.washington.edu/dart). Records of spill and outflow during the months of January, February, and March were also downloaded from Columbia River DART for the same dams. Stream temperature data for each tributary were queried from the U.S. Geological Survey, U.S. Department of the Interior Bureau of Reclamation, and Washington Department of Ecology. Natal stream temperature data were obtained for the mainstem Umatilla, Walla Walla, and Tucannon rivers. Multiple years of stream temperature data from a mainstem site within 75 rkm of the river mouth were not available for the remaining four tributaries. Umatilla data were obtained from the U.S. Department of the Interior Bureau of Reclamation (https://www.usbr.gov). "
+
+To navigate to the appropriate page on CBR DART:
+
+Homepage > Basin conditions > Project all years
+
+We then need to query each dam separately.
+
+1. Select the dam
+2. Select the data
+  - Here, we would be interested in "Outflow KCFS, Daily Average", "Spill KCFS, Daily Average", "Temperature C, Daily Average", and maybe "Temperature C, Tailrace, Daily Average"
+    - Need to clarify some of the differences
+
+
+
