@@ -552,5 +552,20 @@ We then need to query each dam separately.
   - Here, we would be interested in "Outflow KCFS, Daily Average", "Spill KCFS, Daily Average", "Temperature C, Daily Average", and maybe "Temperature C, Tailrace, Daily Average"
     - Need to clarify some of the differences
 
+Dams: 
+- BON-Bonneville
+- DWR-Dworshak
+- IHR-Ice Harbor
+- JDA-John Day
+- LGS-Little Goose
+- LWG-Lower Granite
+- LMN-Lower Monumental
+- MCN-McNary
+- PRD-Priest Rapids
+- RIS-Rock Island
+- RRH-Rocky Reach
+- TDA-The Dalles
+- WAN-Wanapum
+- WEL-Wells
 
 
