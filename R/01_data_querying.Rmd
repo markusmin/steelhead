@@ -17,7 +17,7 @@ Advanced Reporting Home Page > Create Query Builder2 Report > Interrogation Summ
 
 Once in Query Builder2, select the following filters:
 - 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin, release site longitude, release site latitude, mark site
-- 2 Metrics: Count, First Obs Date Max
+- 2 Metrics: Count, First Obs Date Max, Hatchery
 - 16 First Obs Date/Time: 
   - From: Value 
   - Is: Greater than or equal to
