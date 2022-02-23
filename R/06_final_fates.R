@@ -191,7 +191,7 @@ JDR_transition_simulation <- function(nsim, transition_matrix){
 set.seed(123)
 msm_est <- JDR_transition_simulation(nsim = 10000000, transition_matrix = JDR_transition_matrix)
 
-# Eigenvectors - analytical solution
+##### Eigenvectors - analytical solution #####
 # transpose it
 JDR_transition_matrix <- t(JDR_transition_matrix)
 
@@ -205,6 +205,14 @@ abs(eigenvalues)
 max(abs(eigenvalues))
 max(Re(eigenvalues))
 Re(eigenvectors[,1])
+
+# Try again with popbio library
+library(popbio)
+JDR_mat1 <- eigen.analysis(JDR_transition_matrix)
+JDR_mat1$stable.stage
+# This just gives that all individuals end up in the loss - not useful!
+# How do you do eigen analysis with an absorbing state?
+
 
 
 ##### Compare results to tallies from detection history #####
