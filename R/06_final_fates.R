@@ -189,7 +189,9 @@ JDR_transition_simulation <- function(nsim, transition_matrix){
 
 # run simulation with 1 million fish
 set.seed(123)
-msm_est <- JDR_transition_simulation(nsim = 10000000, transition_matrix = JDR_transition_matrix)
+msm_model_outputs <- JDR_transition_simulation(nsim = 10000000, transition_matrix = JDR_transition_matrix)
+msm_final_states <- msm_model_outputs[[1]]
+msm_est <- msm_model_outputs[[2]]
 
 ##### Eigenvectors - analytical solution #####
 # transpose it
