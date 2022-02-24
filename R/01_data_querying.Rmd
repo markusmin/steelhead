@@ -25,7 +25,7 @@ Once in Query Builder2, select the following filters:
 - 18 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots, B2A - BONNEVILLE ADULT WA SHORE, BWL - Bonneville WA Shore Ladder
   - These are all of the Bonneville adult fishways and there::herefore will allow you to identify all adult returns
 - 25 Species: Steelhead
-- 29 Mark Length: Less than or equal to 350 (to ensure you are only keeping individuals tagged as Juveniles)
+- 29 Mark Length: Less than or equal to 350 mm (to ensure you are only keeping individuals tagged as Juveniles)
 
 Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
 
@@ -228,6 +228,7 @@ wallawalla_fish <-  subset(adult_returns_subset, release_site_name %in% wallawal
 wallawalla_fish <- subset(adult_returns_subset, release_site_subbasin_name =="Walla Walla")
 table(wallawalla_fish$release_site_name)
 table(wallawalla_fish$rear_type_code)
+subset(wallawalla_fish, rear_type_code == "H")
 # 94 hatchery (way short), 531 wild (pretty close!)
 
 # what about by mark site
@@ -299,7 +300,6 @@ tucannon_sites <- release_sites[grep("Tucannon", release_sites)]
 tucannon_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")
 table(tucannon_fish$rear_type_code)
 # WAY too many fish - subbasin is not fine enough resolution
-
 # what about mark site
 tucannon_fish <- subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon")
 unique(tucannon_fish$mark_site_name)
@@ -309,14 +309,13 @@ subset(adult_returns_subset, mark_site_name == "TUCH - Tucannon River Hatchery")
 
 # Look at the other mark sites
 table(subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon")$mark_site_name)
+table(subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon" & rear_type_code == "H")$mark_site_name) # mark sites, hatchery only
 # Vast majority seem to be released at Lower Granite - some of these are Tucannon? But how to know which ones?
 subset(adult_returns_subset, mark_site_name == "LGR - Lower Granite Dam")
 
 # Look at the individual sites
 unique(subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")$release_site_name)
 sort(release_sites)
-
-
 
 tucannon_fish <-  subset(adult_returns_subset, release_site_name %in% tucannon_sites)
 table(tucannon_fish$rear_type_code)
@@ -417,6 +416,7 @@ as.data.frame(table(adult_returns_subset$release_site_subbasin_name))
 
 klickitat_fish <- subset(adult_returns, release_site_subbasin_name == "Klickitat")
 table(klickitat_fish$rear_type_code) 
+table(subset(klickitat_fish, rear_type_code == "H")$run_year)
 table(klickitat_fish$run_year)
 
 lochsa_fish <- subset(adult_returns, release_site_subbasin_name == "Lochsa")
