@@ -406,6 +406,39 @@ table(subset(adult_returns_subset, release_site_basin_name == "Lower Snake")$rel
 
 
 
+
+### Other sites
+```{r}
+# compare full dataset to Shelby's
+as.data.frame(table(adult_returns$release_site_subbasin_name)) # full dataset
+as.data.frame(table(adult_returns_subset$release_site_subbasin_name))
+
+# New candidates for inclusion: Klickitat, Lochsa, Methow, Okanogan, Trout (or is this part of another river system?)
+
+klickitat_fish <- subset(adult_returns, release_site_subbasin_name == "Klickitat")
+table(klickitat_fish$rear_type_code) 
+table(klickitat_fish$run_year)
+
+lochsa_fish <- subset(adult_returns, release_site_subbasin_name == "Lochsa")
+table(lochsa_fish$rear_type_code) 
+table(lochsa_fish$run_year)
+
+methow_fish <- subset(adult_returns, release_site_subbasin_name == "Methow")
+table(methow_fish$rear_type_code) 
+table(methow_fish$run_year)
+table(subset(methow_fish, rear_type_code == "W")$run_year)
+
+okanogan_fish <- subset(adult_returns, release_site_subbasin_name == "Okanogan")
+table(okanogan_fish$rear_type_code) 
+table(okanogan_fish$run_year)
+
+trout_fish <- subset(adult_returns, release_site_subbasin_name == "Trout")
+table(trout_fish$rear_type_code) 
+table(trout_fish$run_year)
+```
+
+
+
 # PTAGIS workflow
 PTAGIS querying has been set up to work in two steps:
 
@@ -540,6 +573,12 @@ In addition to the PIT tag detection histories for fish, we also need to query t
 What Shelby did:
 
 "Water temperature, flow, and spill data were downloaded on 5 January, 2017. Daily water temperatures in the forebay outflow of McNary, Ice Harbor, Lower Granite, Priest Rapids, Rocky Reach, and Wells dams from 2005 to 2015 were downloaded from Columbia River DART (www.cbr.washington.edu/dart). Records of spill and outflow during the months of January, February, and March were also downloaded from Columbia River DART for the same dams. Stream temperature data for each tributary were queried from the U.S. Geological Survey, U.S. Department of the Interior Bureau of Reclamation, and Washington Department of Ecology. Natal stream temperature data were obtained for the mainstem Umatilla, Walla Walla, and Tucannon rivers. Multiple years of stream temperature data from a mainstem site within 75 rkm of the river mouth were not available for the remaining four tributaries. Umatilla data were obtained from the U.S. Department of the Interior Bureau of Reclamation (https://www.usbr.gov). "
+
+Regarding how to calculate mean temps:
+"I calculated mean water temperature during the week each steelhead neared and potentially passed its home tributary. To do this, I first predicted when each steelhead approached home. PIT arrays were primarily located at dams on the Columbia and Snake Rivers, and not located in the immediate vicinity of tributary mouths. Therefore, for each tributary, I found the median number of days it took overshooting steelhead to move from the lower dam prior to their home tributary to the overshoot dam. Travel times were estimated between the lower dam and the overshoot dam because many steelhead appeared to overwinter in the mainstem river prior to entering and being detected in the natal stream. Median travel times to home stream detectors were much greater than to overshoot dams, and therefore did not reflect the time steelhead arrived near their tributary mouth. Travel times varied throughout the year, therefore median travel times were estimated on a month-by-month basis. Steelhead moved slower during the summer period of peak water temperatures, consistent with the findings of Keefer et al. (2009).
+
+Next, I estimated mean water temperatures in the period steelhead likely neared their home tributary. By adding the monthly median travel time to the date each steelhead passed the dam prior to the home tributary. To account for variation in travel time, I created a week-long window, centered around the median monthly travel time, during which each steelhead was likely arrive near their home tributary. I found the average water temperature in the outflow of the upstream dam within the one-week window. For steelhead from the Umatilla, Walla Walla, and Tucannon rivers, I estimated the average water temperature in the home stream, and also found the average natal-mainstem water temperature difference by subtracting the mean temperature at the upstream dam from the mean temperature at the tributary monitoring station.
+
 
 To navigate to the appropriate page on CBR DART:
 
