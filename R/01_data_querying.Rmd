@@ -16,8 +16,9 @@ This first query will take the following attributes:
 Advanced Reporting Home Page > Create Query Builder2 Report > Interrogation Summary
 
 Once in Query Builder2, select the following filters:
-- 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin, release site longitude, release site latitude, mark site
-- 2 Metrics: Count, First Obs Date Max, Hatchery
+- 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin, release site longitude, release site latitude, mark site,
+hatchery, stock name, mark capture method, 
+- 2 Metrics: Count, First Obs Date Max
 - 16 First Obs Date/Time: 
   - From: Value 
   - Is: Greater than or equal to
@@ -28,6 +29,20 @@ Once in Query Builder2, select the following filters:
 - 29 Mark Length: Less than or equal to 350 mm (to ensure you are only keeping individuals tagged as Juveniles)
 
 Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
+
+## Initial query - v2
+instead of an interrogation summary, let's run a tag detail query
+
+Advanced Reporting Home Page > Create Query Builder2 Report > Tag Detail
+
+- 1 Attributes: Standard + Hatchery, Mark Site Basin, Mark Site Subbasin, Release Site Basin, Release Site Subbasin, Stock, capture method
+- 2 Metrics: Count, First Obs Date Max, Hatchery
+- 16 Species: Steelhead
+- 21 Mark Length: Less than or equal to 350 mm (to ensure you are only keeping individuals tagged as Juveniles)
+
+These filters are too big for PTAGIS to handle. Split into multiple queries by release year
+- even five years is too much; so try one year
+
 
 ## Inspect distribution of natal origins and run years
 ```{r load_libraries}
@@ -40,11 +55,14 @@ library(lubridate)
 ```{r import_reformat_data}
 adult_returns <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", "all_adult_returns.csv")))
 
+# Load table from Susannah on site info
+relsites <- read.csv(file = here::here("covariate_data", "relsites.txt"), sep = "|", header = TRUE)
+
 # Keep only certain columns
 adult_returns %>% 
   distinct(tag_code, .keep_all = TRUE) %>% 
   dplyr::select(tag_code, first_time_value, rear_type_code, release_site_name, release_site_basin_name, release_site_subbasin_name,
-                mark_site_basin_name, mark_site_subbasin_name, mark_site_name) %>% 
+                mark_site_basin_name, mark_site_subbasin_name, mark_site_name, hatchery_name, stock_name) %>% 
   mutate(time = mdy_hms(first_time_value)) %>% 
   mutate(date = date(time)) %>% 
   dplyr::select(-c(first_time_value, time))-> adult_returns
@@ -320,6 +338,21 @@ sort(release_sites)
 tucannon_fish <-  subset(adult_returns_subset, release_site_name %in% tucannon_sites)
 table(tucannon_fish$rear_type_code)
 # 380 hatchery, 414 wild. Wild are quite close, hatchery not so much
+
+lwrsnk_tuc_release_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")
+table(adult_returns_subset$release_site_subbasin_name)
+
+# Export this as tag codes to use to query PTAGIS
+write.table(as.data.frame(unique(lwrsnk_tuc_release_fish$tag_code)), file = here::here("PTAGIS_queries", "intermediate_files", "lower_snake_tucannon_release_tags_0506_1415.txt"), col.names = FALSE, row.names = FALSE, quote = FALSE) 
+
+# Okay, so this query only has 221 fish. It would appear that most individuals don't have the detailed tagging information
+
+# Keep looking in the PTAGIS data
+table(lwrsnk_tuc_release_fish$release_site_name)
+
+table(lwrsnk_tuc_release_fish$hatchery_name)
+table(lwrsnk_tuc_release_fish$stock_name)
+
 ```
 
 ### Clearwater River
