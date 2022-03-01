@@ -167,5 +167,22 @@ ggplot(data = JDR_nat_trib_final, aes(x = DayMonth)) +
   ggtitle("Arrival at natal tributary, JDR steelhead 05/06-14/15")
 
 ##### Window of time for in-stream covariates #####
-# 
+
+# Step 1: Find median travel time between previous dam and next dam
+# Import the shortened detection history
+JDR_det_hist <- read.csv(here::here("model_files", "JDR_det_hist.csv"), row.names = 1)
+
+# Create a function for this
+median_travel_time_calc <- function(prev_dam, next_dam, data){
+  # Keep only the parts of the df where the detections are prev_dam, then next dam
+  data %>% 
+    filter()
+}
+
+# Step 2: For each individual fish, create a weeklong window center around the median travel time, i.e. +/- 3 days
+
+
+
+
+
 
