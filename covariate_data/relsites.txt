@@ -1,0 +1,1280 @@
+mrr_code|mrr_rkm|mrr_name|mrr_type|mrr_typedesc|mrr_huc8|mrr_huc8name|mrr_huc6|mrr_huc6name
+POTHOL|___|Potholes Reservoir, Grant County, Washington|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020015|Lower Crab|170200|Upper Columbia
+SPRAGL|___|Sprague Lake, Washington|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060108|Palouse|170601|Lower Snake
+BANKSL|___|Banks Lake, Grant County, Washington|Other|Other physical or geographical feature.|17020014|Banks Lake|170200|Upper Columbia
+LENLKE|___|Lenore Lake, WA|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020014|Banks Lake|170200|Upper Columbia
+CASC|*|Cascade Hatchery (ODFW) near Cascade Locks|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+IRRI|*|Irrigon Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+BO2|*|Bonneville Dam PH2 (Archaic - replaced with generic BON designation)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+CLWH|*|Clearwater Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060308|Lower North Fork Clearwater|170603|Clearwater
+DWOR|*|Dworshak National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060306|Clearwater|170603|Clearwater
+MDSH|*|Marion Drain Sturgeon Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17030003|Lower Yakima|170300|Yakima
+CHEL|*|Chelan PUD Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020005|Chief Joseph|170200|Upper Columbia
+HAGE|*|Hagerman NFH|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17040212|Upper Snake-Rock|170402|Upper Snake
+MCCA|*|McCall Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17050123|North Fork Payette|170501|Middle Snake-Boise
+MAVA|*|Magic Valley Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17040212|Upper Snake-Rock|170402|Upper Snake
+SPRF|*|Springfield Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17040206|American Falls|170402|Upper Snake
+BO1|*|Bonneville Dam PH1 (Archaic - replaced with generic BON designation)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+OXBH|*|Oxbox Hatchery, Cascade Locks, OR (ODFW)|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+AHSH|*|Astoria High School Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080006|Lower Columbia|170800|Lower Columbia
+SWSP|*|Sweetwater Springs Rearing Facility|Acclimation Pond|Acclimation pond or facility.|17060306|Clearwater|170603|Clearwater
+WHSH|*|Warrenton (OR) High School Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080006|Lower Columbia|170800|Lower Columbia
+ROBU|*|Round Butte Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070306|Lower Deschutes|170703|Deschutes
+EAGL|*|Eagle Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17050114|Lower Boise|170501|Middle Snake-Boise
+EBNK|*|East Bank Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+NISP|*|Niagara Springs Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17040212|Upper Snake-Rock|170402|Upper Snake
+UMAH|*|Umatilla Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+OASP|*|Oak Springs Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070306|Lower Deschutes|170703|Deschutes
+CASS|*|Cassimer Bar Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020006|Okanogan|170200|Upper Columbia
+OXBO|*|Oxbow Hatchery (IDFG)|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17050201|Brownlee Reservoir|170502|Middle Snake-Powder
+WILH|*|Willamette Hatchery (ODFW) at Oakridge|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090001|Middle Fork Willamette|170900|Willamette
+MERH|*|Merwin Hatchery (WDFW)|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080002|Lewis|170800|Lower Columbia
+COLR2|000|Columbia River - Three Tree Point, WA to Lewis River (km 49-140)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+COLR9|000|Columbia River - Grand Coulee Dam to East Arrow Park, CAN (km 960-1359)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+COLR10|000|Columbia River - East Arrow Park to Revelstoke (km 1359 - 1476)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17020021|Upper Arrow Lake-Columbia River|170200|Upper Columbia
+COLR6|000|Columbia River - Snake River to Lower Crab Creek (km 522-661)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+COLR4|000|Columbia River - Bonneville Dam to John Day Dam (km 234-347)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+COLR5|000|Columbia River - John Day Dam to Snake River (km 347-522)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+COLR8|000|Columbia River - Chelan Falls, WA to Grand Coulee Dam (km 809-960)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17020005|Chief Joseph|170200|Upper Columbia
+COLR7|000|Columbia River - Lower Crab Creek to Chelan Falls, WA (km 661-809)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+COLR1|000|Columbia River - mouth to Three Tree Point, WA (km 0-49)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17080006|Lower Columbia|170800|Lower Columbia
+COLR3|000|Columbia River - Lewis River to Bonneville Dam (km 140-234)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+WLCHIS|000.050|Welch Island, Lower Columbia|Other|Other physical or geographical feature.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+CHINOR|006|Chinook River, Washington (Columbia River Estuary)|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+SERH|006.006|Sea Resources Hatchery (Chinook River, Washington)|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080006|Lower Columbia|170800|Lower Columbia
+ESANIS|008|East Sand Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17080006|Lower Columbia|170800|Lower Columbia
+YOUNGB|008|Youngs Bay, tributary to the Columbia River|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+LEWCLK|008.003|Lewis and Clark River, tributary to Youngs Bay|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+ASMEBR|012|Astoria-Megler Bridge |Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17080006|Lower Columbia|170800|Lower Columbia
+MEGC|013|Megler Creek, tributary to Columbia River|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+SKIPAW|013|Skipanon Waterway|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+SKIPAR|013.003|Skipanon River|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+GRAYSR|032|Grays River, Washington, lower Columbia River|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+BEAR3C|033|Bear Creek, Columbia River Estuary, Oregon|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+RICEIS|034|Rice Island|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17080006|Lower Columbia|170800|Lower Columbia
+DEEPR|035|Deep River, tributary to Columbia River|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+DRNP|035.002|Deep River Net Pens (Deep River, Washington)|Acclimation Pond|Acclimation pond or facility.|17080006|Lower Columbia|170800|Lower Columbia
+RSSNIS|036|Russian Island, Columbia River Estuary|Other|Other physical or geographical feature.|17080006|Lower Columbia|170800|Lower Columbia
+MLRSNI|038|Miller Sands Island, Columbia River Estuary|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17080006|Lower Columbia|170800|Lower Columbia
+BIG1C|043|Big Creek, lower Columbia River near Knappa, OR|River|Entire river or stream.|17080006|Lower Columbia|170800|Lower Columbia
+BIGC|043.006|Big Creek Hatchery (ODFW) near Knappa|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080006|Lower Columbia|170800|Lower Columbia
+WOODIS|047|Woody Island, Columbia River Estuary|Other|Other physical or geographical feature.|17080006|Lower Columbia|170800|Lower Columbia
+BLNDSL|047|Blind Slough Net Pens (Oregon side of Columbia River Estuary)|Acclimation Pond|Acclimation pond or facility.|17080006|Lower Columbia|170800|Lower Columbia
+SBSLMA|055|Steamboat Slough Marsh, Lower Columbia|Other|Other physical or geographical feature.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+ELRH|058.019|Elochoman River Hatchery (Elochoman River, Washington)|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+TENNAI|060|Tenasillahe Island, lower Columbia River|Other|Other physical or geographical feature.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+WALLIS|080|Wallace Island, lower Columbia River near Clatskanie, OR|Other|Other physical or geographical feature.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+ABERC|087|Abernathy Creek, Lower Columbia River, Washington|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+MILL4C|087|Mill Creek, Lower Columbia River, Washington|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+ABEH|087.005|Abernathy SCTC|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+GERMC|090|Germany Creek, Lower Columbia River, Washington|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+COWLR2|111|Cowlitz River - Cispus River to Clear Fork (km 135-202)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17080004|Upper Cowlitz|170800|Lower Columbia
+COWLR1|111|Cowlitz River - mouth to Cispus River (km 0-135)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17080005|Lower Cowlitz|170800|Lower Columbia
+COWEER|111.002|Coweeman River, tributary to Cowlitz River|River|Entire river or stream.|17080005|Lower Cowlitz|170800|Lower Columbia
+TURNCR|111.002.015|Turner Creek, tributary to Coweeman River|River|Entire river or stream.|17080005|Lower Cowlitz|170800|Lower Columbia
+COWEAP|111.002.021|Coweeman Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17080005|Lower Cowlitz|170800|Lower Columbia
+TOUTLR|111.032|Toutle River|River|Entire river or stream.|17080005|Lower Cowlitz|170800|Lower Columbia
+TOUTNF|111.032.028|North Fork Toutle River|River|Entire river or stream.|17080005|Lower Cowlitz|170800|Lower Columbia
+GREENR|111.032.028.018|Green River, trib. to NF Toutle River|River|Entire river or stream.|17080005|Lower Cowlitz|170800|Lower Columbia
+TOUT|111.032.028.018.001|North Toutle Hatchery, WDFW|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080005|Lower Cowlitz|170800|Lower Columbia
+COWT|111.071|Cowlitz Trout Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080005|Lower Cowlitz|170800|Lower Columbia
+BAD|111.080|Barrier Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080005|Lower Cowlitz|170800|Lower Columbia
+COWS|111.080|Cowlitz Salmon Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080005|Lower Cowlitz|170800|Lower Columbia
+MFDLBN|111.085|Mayfield Dam North Louver Bay|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+MFDLBS|111.085|Mayfield Dam South Louver Bay|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+MFDFTF|111.085|Mayfield Dam Entrance to Counting House Raceways|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+MFD|111.085|Mayfield Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080005|Lower Cowlitz|170800|Lower Columbia
+MFDSEP|111.085|Mayfield Dam Secondary Separator Downwell|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+CFDTAL|111.133|CFD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+CFDSF2|111.133|CFD - Release directly into spillway flume 2|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+CFDSF3|111.133|CFD - Release directly into spillway flume 3|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+CFDNSC|111.133|CFD - Release into North Shore Collector Flume|Intra-Dam Release Site|Specific release site within a dam location.|17080005|Lower Cowlitz|170800|Lower Columbia
+CFD|111.133|Cowlitz Falls Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080005|Lower Cowlitz|170800|Lower Columbia
+CISPUR|111.135|Cispus River - tributary to Cowlitz River|River|Entire river or stream.|17080004|Upper Cowlitz|170800|Lower Columbia
+KALAMR|118|Kalama River|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+KALA|118.017|Kalama Falls Hatchery, WDFW|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+MULTCH|139|Multnomah Channel, Columbia River|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+LILYSL|139.000|Lily Slough, Lower Columbia|Other|Other physical or geographical feature.|17090012|Lower Willamette|170900|Willamette
+CUNNSL|139.000|Cunningham Slough|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+SCAPPB|139.003|Scappoose Bay, Oregon|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+SCAPPC|139.003.004|Scappoose Creek|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+NSCAPC|139.003.004.009|North Scappoose Creek|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+MULTMA|139.125|Multnomah Channel Marsh, Lower Wilamette|Other|Other physical or geographical feature.|17090012|Lower Willamette|170900|Willamette
+GEECR|140|Gee Creek, Washington, lower Columbia River|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+LEWISR|140|Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+LEWIEF|140.006|East Fork Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+MASON|140.006.009|Mason Creek, tributary to East Fork Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+TSUGCR|140.006.009.005|Tusgawa Creek, tributary to Mason Creek|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+ROCKC|140.006.042|Rock Creek, tributary to East Fork Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+LEWISP|140.014|Lewis River Release Pond|Acclimation Pond|Acclimation pond or facility.|17080002|Lewis|170800|Lower Columbia
+LEWH|140.025|Lewis River Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080002|Lewis|170800|Lower Columbia
+CEDARC|140.025|Cedar Creek, tributary to Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+MHPTAL|140.031|MHP - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17080002|Lewis|170800|Lower Columbia
+MHP|140.031|Merwin Hydroelectric Project|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080002|Lewis|170800|Lower Columbia
+MHPFBY|140.031|MHP - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17080002|Lewis|170800|Lower Columbia
+SHPTAL|140.070|SHP - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17080002|Lewis|170800|Lower Columbia
+SHPFBY|140.070|SHP - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17080002|Lewis|170800|Lower Columbia
+SHP|140.070|Swift Hydroelectric Project|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080002|Lewis|170800|Lower Columbia
+DRIFTC|140.079|Drift Creek - tributary to Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+MUDDYR|140.087|Muddy River - tributary to Lewis River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+CLEA3C|140.087.007|Clear Creek - tributary to Muddy River|River|Entire river or stream.|17080002|Lewis|170800|Lower Columbia
+CLEARP|140.087.007.002|Clear Creek Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17080002|Lewis|170800|Lower Columbia
+MUDDYP|140.087.008|Muddy River Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17080002|Lewis|170800|Lower Columbia
+CRABP|140.104|Crab Creek Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17080002|Lewis|170800|Lower Columbia
+CAMPSL|148|Campbell Slough, Lower Columbia|River|Entire river or stream.|17080003|Lower Columbia-Clatskanie|170800|Lower Columbia
+WILLR3|163|Willamette River - Santiam River to the confluence of the Middle and Coast forks of the Willamette River (km 175-301)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17090003|Upper Willamette|170900|Willamette
+WILLR1|163|Willamette River - mouth to Willamette Falls (km 0-43)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17090012|Lower Willamette|170900|Willamette
+WILLR2|163|Willamette River - Willamette Falls to Santiam River (km 43-175)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17090007|Middle Willamette|170900|Willamette
+TRYOC|163.032|Tryon Creek, tributary to Willamette River|River|Entire river or stream.|17090012|Lower Willamette|170900|Willamette
+CLCKMS|163.040|Clackamas River|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+EAGL2C|163.040.026|Eagle Creek, Clackamas River Basin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+EAG2NF|163.040.026.010|North Fork Eagle Creek, Clackamas River Basin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+EAGH|163.040.026.016|Eagle Creek National Fish Hatchery, Clackamas River Basin|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090011|Clackamas|170900|Willamette
+PINHC|163.040.109|Pinhead Creek - Clackamas Subbasin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+LASTC|163.040.109.002|Last Creek - Clackamas Subbasin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+CUBC|163.040.120|Cub Creek - Clackamas Subbasin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+BERRYC|163.040.120.006|Berry Creek - Clackamas Subbasin|River|Entire river or stream.|17090011|Clackamas|170900|Willamette
+SULSEP|163.043|SUL - Release into the Flume downsteam of the Collection/Bypass Gate or into the Separator|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+SULFDS|163.043|SUL - Release above the Fish Diversion Screen|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+SULBPS|163.043|SUL - Release into the PIT-Tag Diversion System between the Diversion Gate and the furthest downstream PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+SULBYP|163.043|SUL - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+SULFBY|163.043|SUL - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+SUL|163.043|Sullivan Hydroelectric Plant, Willamette Falls|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090007|Middle Willamette|170900|Willamette
+SULTRB|163.043|SUL - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17090007|Middle Willamette|170900|Willamette
+MOLALR|163.057|Molalla River|River|Entire river or stream.|17090009|Molalla-Pudding|170900|Willamette
+MOLRNF|163.057.041|North Fork Molalla River|River|Entire river or stream.|17090009|Molalla-Pudding|170900|Willamette
+TBRKFK|163.057.061|Table Rock Fork, tributary to Molalla River|River|Entire river or stream.|17090009|Molalla-Pudding|170900|Willamette
+SANTIR|163.174|Santiam River, Oregon|River|Entire river or stream.|17090005|North Santiam|170900|Willamette
+SSANTR|163.174.019|South Santiam River, Oregon|River|Entire river or stream.|17090006|South Santiam|170900|Willamette
+NSANTR|163.174.019|North Santiam River, Oregon|River|Entire river or stream.|17090005|North Santiam|170900|Willamette
+LEBFBY|163.174.019.032|LEB - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090006|South Santiam|170900|Willamette
+LEBLDS|163.174.019.032|LEB - Release into the south ladder trap.|Intra-Dam Release Site|Specific release site within a dam location.|17090006|South Santiam|170900|Willamette
+LEB|163.174.019.032|Lebanon Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090006|South Santiam|170900|Willamette
+LNSANR|163.174.019.044|Little North Santiam River|River|Entire river or stream.|17090005|North Santiam|170900|Willamette
+FOS|163.174.019.060|Foster Dam, South Santiam River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090006|South Santiam|170900|Willamette
+FOSTAL|163.174.019.060|FOS - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090006|South Santiam|170900|Willamette
+FOSFBY|163.174.019.060|FOS - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090006|South Santiam|170900|Willamette
+MSANTR|163.174.019.064|Middle Santiam River, Oregon|River|Entire river or stream.|17090006|South Santiam|170900|Willamette
+MINTO|163.174.019.069|Minto Fish Facility|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090005|North Santiam|170900|Willamette
+BCLTAL|163.174.019.073|BCL - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090005|North Santiam|170900|Willamette
+BCLFBY|163.174.019.073|BCL - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090005|North Santiam|170900|Willamette
+BCL|163.174.019.073|Big Cliff Dam - North Santiam River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090005|North Santiam|170900|Willamette
+DET|163.174.019.078|Detroit Dam (USACE), North Santiam River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090005|North Santiam|170900|Willamette
+DETTAL|163.174.019.078|DET - Release into the Tailrace within 0.5km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090005|North Santiam|170900|Willamette
+DETFBY|163.174.019.078|DET - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090005|North Santiam|170900|Willamette
+BREITR|163.174.019.088|Breitenbush River, North Santiam River Basin|River|Entire river or stream.|17090005|North Santiam|170900|Willamette
+MARIOC|163.174.019.115|Marion Creek, tributary to North Santiam River|River|Entire river or stream.|17090005|North Santiam|170900|Willamette
+MARI|163.174.019.115.001|Marion Forks Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090005|North Santiam|170900|Willamette
+CALAPR|163.192|Calapooia River|River|Entire river or stream.|17090003|Upper Willamette|170900|Willamette
+MCKER|163.282|McKenzie River|River|Entire river or stream.|17090004|Mckenzie|170900|Willamette
+MCKE|163.282.053|McKenzie Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090004|Mckenzie|170900|Willamette
+LEATAL|163.282.056|LEA - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090004|Mckenzie|170900|Willamette
+LEA|163.282.056|Leaburg Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090004|Mckenzie|170900|Willamette
+LEABYP|163.282.056|LEA - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17090004|Mckenzie|170900|Willamette
+LEAFBY|163.282.056|LEA - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090004|Mckenzie|170900|Willamette
+LEAB|163.282.056|Leaburg Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17090004|Mckenzie|170900|Willamette
+MCKESF|163.282.090|South Fork McKenzie River|River|Entire river or stream.|17090004|Mckenzie|170900|Willamette
+CGR|163.282.090.007|Cougar Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090004|Mckenzie|170900|Willamette
+CGRTAL|163.282.090.007|CGR - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090004|Mckenzie|170900|Willamette
+EFHORC|163.282.101|East Fork Horse Creek, McKenzie River Basin|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17090004|Mckenzie|170900|Willamette
+HORS2C|163.282.101|Horse Creek, upper McKenzie River Basin|River|Entire river or stream.|17090004|Mckenzie|170900|Willamette
+WILRMF|163.301|Middle Fork Willamette River|River|Entire river or stream.|17090001|Middle Fork Willamette|170900|Willamette
+FALTAL|163.301.013|FAL - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+FAL|163.301.013|Fall Creek Dam (USACE), MF Willamette River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090001|Middle Fork Willamette|170900|Willamette
+FALL2C|163.301.017|Fall Creek, MF Willamette River Basin|River|Entire river or stream.|17090001|Middle Fork Willamette|170900|Willamette
+DEX|163.301.027|Dexter Dam (USACE), Middle Fork Willamette River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090001|Middle Fork Willamette|170900|Willamette
+DEXTAL|163.301.027|DEX - Release into the Tailrace within 0.5km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+LOP|163.301.032|Lookout Point Dam (USACE), MF Willamette River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090001|Middle Fork Willamette|170900|Willamette
+LOPTAL|163.301.032|LOP - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+WRNFMF|163.301.058|North Fork, Middle Fork Willamette River|River|Entire river or stream.|17090001|Middle Fork Willamette|170900|Willamette
+HCRTUR|163.301.073|HCR - Release into the Turbine Channel of the Tailrace within 0.5 km of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+HCR|163.301.073|Hills Creek Dam, Middle Fork Willamette River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17090001|Middle Fork Willamette|170900|Willamette
+HCRREG|163.301.073|HCR - Release into the Regulating Channel of the Tailrace within 0.5 km of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+HCRFBY|163.301.073|HCR - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17090001|Middle Fork Willamette|170900|Willamette
+WASHOR|193|Washougal River|River|Entire river or stream.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+WASHWF|193.024|West Fork Washougal River|River|Entire river or stream.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+SKAM|193.024.001|Skamania Hatchery, WDFW|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+WAHA|193.032|Washougal Hatchery, WDFW|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+ONTAC|222|Oneonta Creek, Lower Columbia|River|Entire river or stream.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+TANNEC|232|Tanner Creek, Columbia River below Bonneville Dam|River|Entire river or stream.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONH|232.001|Bonneville Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2ORI|234|BON - Release into PH2 Orifice(s)|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONMRT|234|BON - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2BCC|234|BON - Release into the PH2 Bypass Corner Collector|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONLD2|234|BON - Release into the Cascades Island Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONLD1|234|BON - Release into the Bradford Island Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2RRR|234|BON - Release below the PH2 Juvenile Facility PIT-Tag Diversion System Gate with subsequent Return to the River|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2BYP|234|BON - Release into the PH2 Juvenile Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO1GWL|234|BON - Release into PH1 Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO1BYP|234|BON - Release into PH1 Juvenile Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONLD3|234|BON - Release into the Washington Shore Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BON|234|Bonneville Dam Complex|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2GWL|234|BON - Release into PH2 Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BONAFF|234|BON - Adult Fish Facility|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+BO2GAT|234|BON - Release into the PH2 Juvenile Facility Flume between the Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17080001|Lower Columbia-Sandy|170800|Lower Columbia
+HERMAC|243|Herman Creek, Columbia River Gorge (OR)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+WIND2R|251|Wind River, Washington|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+PANT2C|251.007|Panther Creek (trib. to Wind River, Wash.)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TROUTC|251.017|Trout Creek (trib. to Wind River, Wash.)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HLK|251.017.002|Hemlock Dam, Wind River (WA) watershed|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HLKTAL|251.017.002|HLK - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+CARS|251.028|Carson National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+VIENTC|258|Viento Creek, Columbia River Gorge (OR)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+DRANOL|261|Drano Lake|Other|Other physical or geographical feature.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+LWSALR|261|Little White Salmon River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+LWSH|261.002|Little White Salmon National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+WILL|261.009|Willard National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+SPRC|269|Spring Creek National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+WHITSR|271|White Salmon River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+BIGWSP|271.002|Big White Salmon Ponds|Acclimation Pond|Acclimation pond or facility.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+BUCK3C|271.008|Buck Creek, White Salmon River Basin (WA)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+RATTLC|271.012|Rattlesnake Creek|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HOODR|273|Hood River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+PWD|273.007|Powerdale Dam, Hood River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070105|Middle Columbia-Hood|170701|Middle Columbia
+PWDFBY|273.007|PWD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+NEALC|273.007|Neal Creek, tributary to Hood River (OR)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HOODWF|273.020|West Fork Hood River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+GREEPC|273.020.002|Green Point Creek (tributary to West Fork Hood River)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+MVFLAP|273.020.004|Moving Falls Acc. Ponds, WF Hood River|Acclimation Pond|Acclimation pond or facility.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+LAKEBR|273.020.009|Lake Branch (tributary to West Fork Hood River)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+BLKBAS|273.020.014|Blackberry Acc. Site, WF Hood River|Acclimation Pond|Acclimation pond or facility.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JNSCAS|273.020.041|Jones Creek Acc. Site, WF Hood River|Acclimation Pond|Acclimation pond or facility.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HOODEF|273.023|East Fork Hood River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+HOODMF|273.023|Middle Fork Hood River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+RGRSPC|273.023.005|Roger's Spring Creek, Middle Fork Hood River|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+PARK|273.023.005.000|Parkdale Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+SNDTAP|273.023.010|Sandtrap Acc. Ponds, EF Hood River|Acclimation Pond|Acclimation pond or facility.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+CLRBR|273.023.015|Clear Branch, Middle Fork Hood River Watershed|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+CBDFBY|273.023.015.001|CBD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+CBD|273.023.015.001|Clear Branch Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070105|Middle Columbia-Hood|170701|Middle Columbia
+LAURLK|273.023.015.002|Laurance Lake Reservoir|Other|Other physical or geographical feature.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+DOGRVR|273.023.016|Dog River, tributary to EF Hood River (OR)|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+KLICKR|290|Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+LYLFAT|290.004|Lyle Falls Adult Fish Trap, Klickitat River|Trap or Weir|Juvenile or adult fish trap or weir.|17070106|Klickitat|170701|Middle Columbia
+DILACC|290.009|Dillacort Creek, Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+LOGCC|290.015|Logging Camp Creek, Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+WHEELC|290.018|Wheeler Canyon, tributary to Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+SNYDEC|290.023|Snyder Creek, Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+SWALEC|290.028|Swale Creek - tributary to Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+LKLICR|290.033|Little Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+BOWMNC|290.033.002|Bowman Creek, tributary to Little Klickitat River|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+SUMI3C|290.060|Summit Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+WHITEC|290.063|White Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+SCHAFC|290.063.003|Schafer Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+BRUS2C|290.063.008|Brush Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+BLUEC|290.063.008.004|Blue Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+TEPEEC|290.063.016|Tepee Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+TEPEEF|290.063.016.005|East Fork Tepee Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+WHITWF|290.063.017|West Fork White Creek, Klickitat River Basin|River|Entire river or stream.|17070106|Klickitat|170701|Middle Columbia
+KLIH|290.069|Klickitat Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070106|Klickitat|170701|Middle Columbia
+CHENC|300|Chenoweth Creek, The Dalles|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+MILL3C|304|Mill Creek, Columbia River at The Dalles, OR|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+3MIL2C|307|Threemile Creek, The Dalles|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDLPI|307|Lone Pine Island and associated unnamed islands near The Dalles Dam|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDTMI|307|Three Mile Island group near The Dalles Dam|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDASPF|308|TDA - Release into the Forebay within 0.5 km upstream of Spillway|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDASPT|308|TDA - Release into the Tailrace within 0.5 km downstream of Spillway|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDATAL|308|TDA - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDASPL|308|TDA - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDAMRT|308|TDA - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDAICE|308|TDA - Release into the Ice/Trash Sluiceway|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDA|308|The Dalles Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070105|Middle Columbia-Hood|170701|Middle Columbia
+TDATRB|308|TDA - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+15MILC|309|Fifteen Mile Creek, near The Dalles, Oregon|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+EIGH2C|309.004|Eightmile Creek, Fifteenmile Creek Watershed|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+FIVE2C|309.004.002|Fivemile Creek, Fifteen Mile Creek Watershed|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+DRYC|309.038|Dry Creek, tributary to Fifteenmile Creek|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+RAMSYC|309.056|Ramsey Creek, Fifteen Mile Creek Watershed|River|Entire river or stream.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+LMEMIS|314|Little Memaloose Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+DESCH2|328|Deschutes River - Round Butte Dam to headwaters (177-393 km)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070301|Upper Deschutes|170703|Deschutes
+DESCH1|328|Deschutes River - mouth to Round Butte Dam (0-177 km)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070306|Lower Deschutes|170703|Deschutes
+BUCKHC|328.069|Buckhollow Creek, Deschutes River Basin|River|Entire river or stream.|17070306|Lower Deschutes|170703|Deschutes
+SHERFT|328.071|Sherars Falls Fishway Trap, Deschutes River|Trap or Weir|Juvenile or adult fish trap or weir.|17070306|Lower Deschutes|170703|Deschutes
+BAKEOC|328.083|Bakeoven Creek, Deschutes River Basin|River|Entire river or stream.|17070306|Lower Deschutes|170703|Deschutes
+WARMSR|328.135|Warm Springs River, Deschutes River Watershed|River|Entire river or stream.|17070306|Lower Deschutes|170703|Deschutes
+WSPH|328.135.016|Warm Springs National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070306|Lower Deschutes|170703|Deschutes
+TROU2C|328.140|Trout Creek, Deschutes River Watershed|River|Entire river or stream.|17070307|Trout|170703|Deschutes
+ANTELC|328.140.021|Antelope Creek - tributary to Trout Creek (TROU2C) in the Deschutes River basin|River|Entire river or stream.|17070307|Trout|170703|Deschutes
+SHTIKC|328.155|Shitike Creek, Deschutes River Basin|River|Entire river or stream.|17070306|Lower Deschutes|170703|Deschutes
+PELTON|328.161|Pelton Ladder (Deschutes River) Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070306|Lower Deschutes|170703|Deschutes
+PERTAL|328.161|PER - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070306|Lower Deschutes|170703|Deschutes
+PER|328.161|Pelton Reregulating Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070306|Lower Deschutes|170703|Deschutes
+PERAFT|328.161|PER - Adult Fish Trap|Intra-Dam Release Site|Specific release site within a dam location.|17070306|Lower Deschutes|170703|Deschutes
+ROU|328.177|Round Butte Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070306|Lower Deschutes|170703|Deschutes
+ROUTAL|328.177|ROU - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070306|Lower Deschutes|170703|Deschutes
+BCHINL|328.177|Lake Billy Chinook|Other|Other physical or geographical feature.|17070301|Upper Deschutes|170703|Deschutes
+METOLR|328.177|Metolius River|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+CROOK1|328.177|Crooked River - Lake Billy Chinook to Prineville Reservoir (km 0-113)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070305|Lower Crooked|170703|Deschutes
+ROUFTF|328.177|ROU - Release into the Fish Transfer Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070306|Lower Deschutes|170703|Deschutes
+CANDLC|328.177.044|Candle Creek, tributary to the Metolius River|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+WZDF|328.177.053|Wizard Falls Hatchery, ODFW|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070301|Upper Deschutes|170703|Deschutes
+CANY3C|328.177.055|Canyon Creek, tributary to the Metolius River|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+MSLA2C|328.177.061|Middle Fk South Fk Lake Creek, Metolius River watershed|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+MLAK2C|328.177.061.003|Middle Fork Lake Creek, Metolius River watershed|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+LAKE2C|328.177.061.007|Lake Creek, Metolius River watershed|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+MCKA2C|328.177.072|McKay Creek, Crooked River|River|Entire river or stream.|17070305|Lower Crooked|170703|Deschutes
+OCHOCC|328.177.072|Ochoco Creek, Crooked River|River|Entire river or stream.|17070305|Lower Crooked|170703|Deschutes
+WYCHUC|328.198|Wychus Creek, Upper Deschutes River Basin|River|Entire river or stream.|17070301|Upper Deschutes|170703|Deschutes
+FRFH|328.324.011|Fall River Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17070301|Upper Deschutes|170703|Deschutes
+LMILIS|331|Little Miller Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDPI|345|Preacher's Island downstream of John Day Dam|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDALD1|347|JDA - Release into south fish ladder|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDARRR|347|JDA - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDATAL|347|JDA - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDABYP|347|JDA - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDALD2|347|JDA - Release into north fish ladder|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDA|347|John Day Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDACOL|347|JDA - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDAMRT|347|JDA - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDAGAT|347|JDA - Release into Flume between Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDAGWL|347|JDA - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDAFBY|347|JDA - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070105|Middle Columbia-Hood|170701|Middle Columbia
+JDAR2|351|John Day River - North Fork John Day River to headwaters (km 298-454)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070201|Upper John Day|170702|John Day
+JDAR1|351|John Day River - mouth to North Fork John Day River (km 0-298)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17070204|Lower John Day|170702|John Day
+ROCK4C|351.034|Rock Creek, tributary to John Day River|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+LONERC|351.034.076|Lone Rock Creek, Lower Mainstem John Day River|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+30ML2C|351.134|Thirtymile Creek - tributary to John Day River|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+BRIDGC|351.218|Bridge Creek, John Day River Basin|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+BEAR2C|351.218.009|Bear Creek, John Day River Basin|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+BRIDWB|351.218.020|West Branch Bridge Creek, John Day River Basin|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+GABLEC|351.218.022|Gable Creek, John Day River Basin|River|Entire river or stream.|17070204|Lower John Day|170702|John Day
+JDARNF|351.298|North Fork John Day River|River|Entire river or stream.|17070202|North Fork John Day|170702|John Day
+COTN2C|351.298.025|Cottonwood Creek, North Fork John Day River|River|Entire river or stream.|17070202|North Fork John Day|170702|John Day
+FOXC|351.298.025.036|Fox Creek, North Fork John Day River|River|Entire river or stream.|17070202|North Fork John Day|170702|John Day
+JDARMF|351.298.052|Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+BEAR5C|351.298.052.070|Bear Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+CAMP2C|351.298.052.076|Camp Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+LICK3C|351.298.052.076.004|Lick Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+COYO2C|351.298.052.081|Coyote Creek, tributary to Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+BBOUC|351.298.052.084|Big Boulder Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+BEAV5C|351.298.052.088|Beaver Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+GRBLDC|351.298.052.090|Granite Boulder Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+LEMONC|351.298.052.090.006|Lemon Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+BUTTEC|351.298.052.091|Butte Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+DHORNC|351.298.052.098|Deerhorn Creek, tributary to Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+DCOWG|351.298.052.102|Dead Cow Gulch, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+VNGRC|351.298.052.103|Vinegar Creek, tributary to Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+DAVISC|351.298.052.104|Davis Creek - Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+BRDG2C|351.298.052.106|Bridge Creek, Middle Fork John Day River|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+CLEA2C|351.298.052.106|Clear Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+DRYFCC|351.298.052.106.003|Dry Fork Clear Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+SUMI2C|351.298.052.114|Summit Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+SQAW4C|351.298.052.114|Squaw Creek, Middle Fork John Day River Basin|River|Entire river or stream.|17070203|Middle Fork John Day|170702|John Day
+CABLNF|351.298.089.027.011|North Fork Cable Creek, North Fork John Day River basin|River|Entire river or stream.|17070202|North Fork John Day|170702|John Day
+DESOC|351.298.097|Desolation Creek, tributary to North Fork John Day River|River|Entire river or stream.|17070202|North Fork John Day|170702|John Day
+JDARSF|351.341|South Fork John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+JSFBC|351.341.023|Black Canyon Creek, South Fork John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+JSFMC|351.341.027|Murderers Creek, South Fork John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+DUNCAN|351.341.027.010|Duncan Creek, South Fork John Day River Basin|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+MURDSF|351.341.027.012|South Fork Murderers Creek, South Fork John Day River Basin|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+TEXC|351.341.027.025|Tex Creek, South Fork John Day River Basin|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+JSFDC|351.341.028|Deer Creek, South Fork John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+JSFWC|351.341.033|Wind Creek, South Fork John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+WIDOWC|351.354|Widows Creek, John Day River Basin|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+BEECHC|351.378|Beech Creek - tributary to John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+BEECEF|351.378.018|East Fork Beech Creek, upper John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+CANY4C|351.392|Canyon Creek - tributary to John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+REYNOC|351.430|Reynolds Creek, tributary to John Day River|River|Entire river or stream.|17070201|Upper John Day|170702|John Day
+ROCK2C|368|Rock Creek, Columbia River (WA)|River|Entire river or stream.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+SQAW3C|368.014|Squaw Creek, Rock Creek (WA) watershed, Columbia River|River|Entire river or stream.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+3MILIS|412|Three Mile Canyon Island (Col. R. below Blalock Island)|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+CBLAIS|440|Central Blalock Island, Columbia River near Boardman, OR|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+ROCKIS|441|Rock Island, Columbia River near Boardman, OR.|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+UMAR|465|Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+TMFTAL|465.005|TMF - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070103|Umatilla|170701|Middle Columbia
+TMF|465.005|Three Mile Falls Dam (Umatilla River)|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070103|Umatilla|170701|Middle Columbia
+TMFFBY|465.005|TMF - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070103|Umatilla|170701|Middle Columbia
+MXWLCN|465.024|Maxwell Diversion Canal - headgate to diversion screen (km 000-002)|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+FDD|465.045|Feed Diversion Dam, Umatilla River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070103|Umatilla|170701|Middle Columbia
+FDDTAL|465.045|FDD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070103|Umatilla|170701|Middle Columbia
+FDDFBY|465.045|FDD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070103|Umatilla|170701|Middle Columbia
+FEEDCN|465.047|Feed Diversion Canal - headgate to diversion screen (km 000-001)|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BIRCHC|465.077|Birch Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BIRCHW|465.077.026|West Fork Birch Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BIRCHE|465.077.026|East Fork Birch Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+PEARSC|465.077.026.018|Pearson Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MCKAYC|465.082|McKay Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+TUTUIC|465.084|Tutuilla Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+PENP|465.090|Pendleton Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070103|Umatilla|170701|Middle Columbia
+MISSNC|465.098|Mission Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+COTTWC|465.105|Cottonwood Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MOONSC|465.108|Moonshine Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MINP|465.109|Minthorn Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070103|Umatilla|170701|Middle Columbia
+COONSC|465.109|Coonskin Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+THOP|465.113|Thornhollow Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070103|Umatilla|170701|Middle Columbia
+BCKROC|465.117|Buckaroo Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+SQAWC|465.124|Squaw Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MEACHC|465.127|Meacham Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BONP|465.127.003|Bonifer Springs Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070103|Umatilla|170701|Middle Columbia
+BOSTCC|465.127.003|Boston Canyon Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+LINEC|465.127.008|Line Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+CAMPC|465.127.018|Camp Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MEACHN|465.127.024|North Fork Meacham Creek|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MEACHE|465.127.031|East Fork Meacham Creek|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BUTCHC|465.127.034|Butcher Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+IMQP|465.128|Imeques Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070103|Umatilla|170701|Middle Columbia
+RYANC|465.132|Ryan Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+UMATSF|465.145|South Fork Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+UMATNF|465.145|North Fork Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+BUCKC|465.145.002|Buck Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+THOMC|465.145.005|Thomas Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+COYOTC|465.145.005|Coyote Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+SHIMC|465.145.008|Shimmihorn Creek, Umatilla River|River|Entire river or stream.|17070103|Umatilla|170701|Middle Columbia
+MCNRXR|470|MCN - Release below the PIT-Tag Diversion System Gate with subsequent Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNTRB|470|MCN - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNGAT|470|MCN - Release into Flume between Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNSEP|470|MCN - Release into the Flume downsteam of the Collection/Bypass Gate or into the Separator|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNDTG|470|MCN - Release into the Collection Flume/Pipe between the Dewatering Facility and the Collection/Bypass Gate|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNCOL|470|MCN - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNRRR|470|MCN - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNICE|470|MCN - Release into the Ice/Trash Sluiceway|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNRTR|470|MCN - Release below the PIT-Tag Diversion System Gate with subsequent Truck Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNRBR|470|MCN - Release below the PIT-Tag Diversion System Gate with subsequent Barge Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCN|470|McNary Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNSTS|470|MCN - Release onto the Submerged Traveling Screen|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNBPS|470|MCN - Release into the PIT-Tag Diversion System between the Diversion Gate and the furthest downstream PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNSRR|470|MCN - Release into the Separator Return Flume/Pipe with Direct Return to the River|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNBYP|470|MCN - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNOFL|470|MCN - Release into the PIT-Tag Diversion System downstream of the Last PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNDWT|470|MCN - Release into the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNGWL|470|MCN - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNORI|470|MCN - Release into Orifice(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNSPL|470|MCN - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNFBY|470|MCN - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNMRT|470|MCN - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNTAL|470|MCN - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+MCNLD1|470|MCN - Release into the Left Bank (Oregon) Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+HATRCK|480|Hat Rock State Park (Oregon)|Other|Other physical or geographical feature.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+WALLAR|509|Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+TOUCHR|509.035|Touchet River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+COPPEC|509.035.082|Coppei Creek - tributary to Touchet River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+DAYP|509.035.087|Dayton Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17070102|Walla Walla|170701|Middle Columbia
+PATITC|509.035.101|Patit Creek - tributary to Touchet River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+PINEC|509.038|Pine Creek, Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+LWD|509.051|Lowden Diversion Dam II, Walla Walla River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070102|Walla Walla|170701|Middle Columbia
+LWDTAL|509.051|LWD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070102|Walla Walla|170701|Middle Columbia
+MILLC|509.054|Mill Creek, Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+MCD|509.054.019|Mill Creek Diversion Dam (aka Bennington Dam)|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070102|Walla Walla|170701|Middle Columbia
+BGMTAL|509.059|BGM - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070102|Walla Walla|170701|Middle Columbia
+BGM|509.059|Burlingame Diversion Dam, Walla Walla River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070102|Walla Walla|170701|Middle Columbia
+YELHKC|509.070|Yellowhawk Creek, Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+NBG|509.072|Nursery Bridge Diversion Dam, Walla Walla River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17070102|Walla Walla|170701|Middle Columbia
+NBGFBY|509.072|NBG - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070102|Walla Walla|170701|Middle Columbia
+NBGTAL|509.072|NBG - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17070102|Walla Walla|170701|Middle Columbia
+WALLNF|509.081|North Fork Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+WALLSF|509.081|South Fork Walla Walla River|River|Entire river or stream.|17070102|Walla Walla|170701|Middle Columbia
+CRESIS|510|Crescent Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+BADGEI|512|Badger Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+FOUNDI|518|Foundation Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17070101|Middle Columbia-Lake Wallula|170701|Middle Columbia
+SNAKE4|522|Snake River - Salmon River to Hells Canyon Dam (km 303-397)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060101|Hells Canyon|170601|Lower Snake
+SNAKE1|522|Snake River - mouth to Palouse River (km 0-96)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060110|Lower Snake|170601|Lower Snake
+SNAKE3|522|Snake River - Clearwater River to Salmon River (km 224-303)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060103|Lower Snake-Asotin|170601|Lower Snake
+SNAKE2|522|Snake River - Palouse River to Clearwater River (km 96-224)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+GOOSEI|522.014|Goose Island, lower Snake River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060110|Lower Snake|170601|Lower Snake
+IHRCOL|522.016|IHR - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHRTAL|522.016|IHR - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHRBYP|522.016|IHR - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHRSPL|522.016|IHR - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHRTRB|522.016|IHR - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHRSPF|522.016|IHR - Release into the Forebay within 0.5 km upstream of Spillway|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+IHR|522.016|Ice Harbor Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17060110|Lower Snake|170601|Lower Snake
+LMONIS|522.064|Lower Monumental Island, Snake River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060110|Lower Snake|170601|Lower Snake
+LMNRBR|522.067|LMN - Release below the PIT-Tag Diversion System Gate with subsequent Barge Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNSEP|522.067|LMN - Release into the Flume downsteam of the Collection/Bypass Gate or into the Separator|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNDWT|522.067|LMN - Release into the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNRTR|522.067|LMN - Release below the PIT-Tag Diversion System Gate with subsequent Truck Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNTAL|522.067|LMN - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNTRB|522.067|LMN - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNOFL|522.067|LMN - Release into the PIT-Tag Diversion System downstream of the Last PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNFBY|522.067|LMN - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNICE|522.067|LMN - Release into the Ice/Trash Sluiceway|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNGAT|522.067|LMN - Release into Flume between Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNBYP|522.067|LMN - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNRXR|522.067|LMN - Release below the PIT-Tag Diversion System Gate with subsequent Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNSTS|522.067|LMN - Release onto the Submerged Traveling Screen|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNGWL|522.067|LMN - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNRRR|522.067|LMN - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNBPS|522.067|LMN - Release into the PIT-Tag Diversion System between the Diversion Gate and the furthest downstream PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNSPL|522.067|LMN - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNCOL|522.067|LMN - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNMRT|522.067|LMN - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNORI|522.067|LMN - Release into Orifice(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMNDTG|522.067|LMN - Release into the Collection Flume/Pipe between the Dewatering Facility and the Collection/Bypass Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060110|Lower Snake|170601|Lower Snake
+LMN|522.067|Lower Monumental Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17060110|Lower Snake|170601|Lower Snake
+LYFE|522.095|Lyons Ferry Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060110|Lower Snake|170601|Lower Snake
+TUCR|522.100|Tucannon River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+PATAHC|522.100.019|Patah Creek - tributary to Tucannon River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+TUCH|522.100.058|Tucannon River Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+CURP|522.100.066|Curl Lake Rearing Pond|Acclimation Pond|Acclimation pond or facility.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSORI|522.113|LGS - Release into Orifice(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSTRB|522.113|LGS - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSOFL|522.113|LGS - Release into the PIT-Tag Diversion System downstream of the Last PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSDWT|522.113|LGS - Release into the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSRRR|522.113|LGS - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSMRT|522.113|LGS - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSSTS|522.113|LGS - Release onto the Submerged Traveling Screen|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSGAT|522.113|LGS - Release into Flume between Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSFBY|522.113|LGS - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSGWL|522.113|LGS - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSRBR|522.113|LGS - Release below the PIT-Tag Diversion System Gate with subsequent Barge Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSRXR|522.113|LGS - Release below the PIT-Tag Diversion System Gate with subsequent Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSDTG|522.113|LGS - Release into the Collection Flume/Pipe between the Dewatering Facility and the Collection/Bypass Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSRTR|522.113|LGS - Release below the PIT-Tag Diversion System Gate with subsequent Truck Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSSPL|522.113|LGS - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSCOL|522.113|LGS - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSICE|522.113|LGS - Release into the Ice/Trash Sluiceway|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSTAL|522.113|LGS - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSSEP|522.113|LGS - Release into the Flume downsteam of the Collection/Bypass Gate or into the Separator|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSBYP|522.113|LGS - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGSBPS|522.113|LGS - Release into the PIT-Tag Diversion System between the Diversion Gate and the furthest downstream PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGS|522.113|Little Goose Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17060107|Lower Snake-Tucannon|170601|Lower Snake
+DEAD2C|522.131|Deadman Creek - tributary to Snake River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+PENAWC|522.145|Penawawa Creek - tributary to Snake River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+ALMOTC|522.164|Almota Creek - tributary to Snake River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRMRT|522.173|LGR - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRICE|522.173|LGR - Release into the Ice/Trash Sluiceway|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRGAT|522.173|LGR - Release into Flume between Separator Exit and the Primary PIT-Tag Diversion Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRSEP|522.173|LGR - Release into the Flume downsteam of the Collection/Bypass Gate or into the Separator|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGR|522.173|Lower Granite Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRORI|522.173|LGR - Release into Orifice(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRRTR|522.173|LGR - Release below the PIT-Tag Diversion System Gate with subsequent Truck Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRTRB|522.173|LGR - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRBPS|522.173|LGR - Release into the PIT-Tag Diversion System between the Diversion Gate and the furthest downstream PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRFBY|522.173|LGR - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRRXR|522.173|LGR - Release below the PIT-Tag Diversion System Gate with subsequent Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRCOL|522.173|LGR - Release into the Collection Channel upstream of the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRBYP|522.173|LGR - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRSTS|522.173|LGR - Release onto the Submerged Traveling Screen|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRDWT|522.173|LGR - Release into the Dewatering Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGROFL|522.173|LGR - Release into the PIT-Tag Diversion System downstream of the Last PIT-Tag Detector|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRSPL|522.173|LGR - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRRRR|522.173|LGR - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRGWL|522.173|LGR - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRLDR|522.173|LGR - Release into the Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRTAL|522.173|LGR - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRDTG|522.173|LGR - Release into the Collection Flume/Pipe between the Dewatering Facility and the Collection/Bypass Gate|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+LGRRBR|522.173|LGR - Release below the PIT-Tag Diversion System Gate with subsequent Barge Transportation from the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+ALPOWC|522.205|Alpowa Creek, lower Snake River|River|Entire river or stream.|17060107|Lower Snake-Tucannon|170601|Lower Snake
+CLWR|522.224|Clearwater River|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+CLWTRP|522.224.010|Clearwater Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060306|Clearwater|170603|Clearwater
+LHOGIS|522.224.013|Lower Hog Island, Clearwater River at km 13|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060306|Clearwater|170603|Clearwater
+HOGIS|522.224.014|Hog Island, Clearwater River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060306|Clearwater|170603|Clearwater
+SPALD|522.224.018|Spalding, Clearwater River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060306|Clearwater|170603|Clearwater
+LAPC|522.224.019|Lapwai Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+NLVP|522.224.019.001|North Lapwai Valley Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17060306|Clearwater|170603|Clearwater
+SWEETC|522.224.019.010|Sweetwater Creek, Lapwai Creek watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+WEBBC|522.224.019.010.006|Webb Creek, Lapwai Creek watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+MISSC|522.224.019.016|Mission Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+POTR|522.224.024|Potlatch River|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+MPOTLC|522.224.024.016|Middle Potlatch Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+BIGBEC|522.224.024.023|Big Bear Creek, Potlatch River|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+BBCTRP|522.224.024.023.001|Big Bear Creek Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060306|Clearwater|170603|Clearwater
+LBEARC|522.224.024.023.002|Little Bear Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LBCWF|522.224.024.023.002.008|West Fork Little Bear Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+PINE2C|522.224.024.028|Pine Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+CEDA2C|522.224.024.033|Cedar Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LEOPOC|522.224.024.033.008|Leopold Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+BOUL3C|522.224.024.041|Boulder Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+CORRAC|522.224.024.052|Corral Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LBOULC|522.224.024.059|Little Boulder Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+POTREF|522.224.024.065|East Fork Potlatch River|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+EFPTRP|522.224.024.065.001|East Fork Potlatch River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060306|Clearwater|170603|Clearwater
+EFPW|522.224.024.065.001|East Fork Potlatch River weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060306|Clearwater|170603|Clearwater
+BOBSC|522.224.024.065.019|Bobs Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+PIVASC|522.224.024.065.022|Pivash Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+MOOS3C|522.224.024.076|Moose Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+PURDUC|522.224.024.080|Purdue Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+POTRWF|522.224.024.083|West Fork Potlatch River|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+FEATHC|522.224.024.083.001|Feather Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+COUG2C|522.224.024.083.005|Cougar Creek, Potlatch River watershed|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+COTNWC|522.224.031|Cottonwood Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+NPTH|522.224.038|Nez Perce Tribal Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060306|Clearwater|170603|Clearwater
+BEDRKC|522.224.042|Bedrock Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+JACKSC|522.224.047|Jacks Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+BCCAP|522.224.057|Big Canyon Creek Acclimation Facility (Clearwater River)|Acclimation Pond|Acclimation pond or facility.|17060306|Clearwater|170603|Clearwater
+BIGCAC|522.224.057|Big Canyon Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LITCAC|522.224.057.005|Little Canyon Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+CLWRNF|522.224.065|North Fork Clearwater River|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060308|Lower North Fork Clearwater|170603|Clearwater
+DWORMS|522.224.065|Dworshak NFH, release into mainstem Clearwater River|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060306|Clearwater|170603|Clearwater
+DWORNF|522.224.065.000|Dworshak NFH, release into North Fork Clearwater River|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060308|Lower North Fork Clearwater|170603|Clearwater
+CLWHNF|522.224.065.000|Clearwater Hatchery release into North Fork Clearwater River|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060308|Lower North Fork Clearwater|170603|Clearwater
+OROFC|522.224.072|Orofino Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LOLOC|522.224.087|Lolo Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+LOLTRP|522.224.087.022|Lolo Creek Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060306|Clearwater|170603|Clearwater
+ELDORC|522.224.087.041|Eldorado Creek|River|Entire river or stream.|17060306|Clearwater|170603|Clearwater
+CLWRSF|522.224.120|South Fork Clearwater River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+CLWRMF|522.224.120|Middle Fork Clearwater River|River|Entire river or stream.|17060304|Middle Fork Clearwater|170603|Clearwater
+CLEARC|522.224.120.004|Clear Creek|River|Entire river or stream.|17060304|Middle Fork Clearwater|170603|Clearwater
+KOOS|522.224.120.004.001|Kooskia National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060304|Middle Fork Clearwater|170603|Clearwater
+SFCTRP|522.224.120.009|South Fork Clearwater River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060305|South Fork Clearwater|170603|Clearwater
+LUGUAF|522.224.120.014|Lukes Gulch Acclimation Facility, SF Clearwater River|Acclimation Pond|Acclimation pond or facility.|17060305|South Fork Clearwater|170603|Clearwater
+SELWY2|522.224.120.037|Selway River - Moose Creek to headwaters (km 65-147)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060301|Upper Selway|170603|Clearwater
+SELWY1|522.224.120.037|Selway River - mouth to Moose Creek (km 0-65)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060302|Lower Selway|170603|Clearwater
+LOCHSA|522.224.120.037|Lochsa River|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+LOCTRP|522.224.120.037.000|Lochsa River Screw Trap at Selway Rd Bridge|Trap or Weir|Juvenile or adult fish trap or weir.|17060303|Lochsa|170603|Clearwater
+PETEKC|522.224.120.037.003|Pete King Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+CEFLAF|522.224.120.037.008|Cedar Flats Acclimation Facility, Selway River|Acclimation Pond|Acclimation pond or facility.|17060302|Lower Selway|170603|Clearwater
+OHARAC|522.224.120.037.012|O'Hara Creek|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+CANYOC|522.224.120.037.012|Canyon Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+DEADMC|522.224.120.037.016|Deadman Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+OLDMAC|522.224.120.037.028|Old Man Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+GEDNEC|522.224.120.037.029|Gedney Creek|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+GEDCWF|522.224.120.037.029.005|West Fork Gedney Creek|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+MEADOC|522.224.120.037.031|Meadow Creek, Selway River|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+FISHC|522.224.120.037.039|Fish Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+FISTRP|522.224.120.037.039.002|Fish Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060303|Lochsa|170603|Clearwater
+HUNGC|522.224.120.037.039.007|Hungery Creek (Lochsa River Basin)|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+BOULDC|522.224.120.037.042|Boulder Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+BOUTRP|522.224.120.037.042.001|Boulder Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060303|Lochsa|170603|Clearwater
+MINKC|522.224.120.037.051|Mink Creek|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+3LINKC|522.224.120.037.051|Three Links Creek|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+MOOS2C|522.224.120.037.065|Moose Creek (Selway River)|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+MOOS2N|522.224.120.037.065.006|North Fork Moose Creek, Selway River|River|Entire river or stream.|17060302|Lower Selway|170603|Clearwater
+BEARC|522.224.120.037.081|Bear Creek|River|Entire river or stream.|17060301|Upper Selway|170603|Clearwater
+POSTOC|522.224.120.037.082|Post Office Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+WARMSC|522.224.120.037.092|Warm Springs Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+SQUAWC|522.224.120.037.096|Squaw Creek, Lochsa River|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+PAPOOC|522.224.120.037.105|Papoose Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+COLTKC|522.224.120.037.113|Colt Kill Creek - Replaces WHITSC|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+WHITSC|522.224.120.037.113|White Sand Creek - replaced by COLTKC|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060303|Lochsa|170603|Clearwater
+CROOKC|522.224.120.037.113|Crooked Fork Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+POWP|522.224.120.037.113|Powell Rearing Pond|Acclimation Pond|Acclimation pond or facility.|17060303|Lochsa|170603|Clearwater
+CFCTRP|522.224.120.037.113.003|Crooked Fork Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060303|Lochsa|170603|Clearwater
+BRUSHC|522.224.120.037.113.011|Brushy Fork Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+STORMC|522.224.120.037.113.016|Storm Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+COLTC|522.224.120.037.113.020|Colt Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+BIGFLC|522.224.120.037.113.026|Big Flat Creek|River|Entire river or stream.|17060303|Lochsa|170603|Clearwater
+RUNNIC|522.224.120.037.253|Running Creek|River|Entire river or stream.|17060301|Upper Selway|170603|Clearwater
+EAGLEC|522.224.120.037.253.003|Eagle Creek|River|Entire river or stream.|17060301|Upper Selway|170603|Clearwater
+WHITCC|522.224.120.037.264|White Cap Creek|River|Entire river or stream.|17060301|Upper Selway|170603|Clearwater
+MILL2C|522.224.120.052|Mill Creek, SF Clearwater River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+MEAD2C|522.224.120.053|Meadow Creek, South Fork Clearwater|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+JOHNC|522.224.120.056|Johns Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+TWNMIC|522.224.120.069|Twentymile Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+TWNMIT|522.224.120.069.003|Twentymile Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060305|South Fork Clearwater|170603|Clearwater
+TENMIC|522.224.120.076|Tenmile Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+NEWSOC|522.224.120.084|Newsome Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+CROOKR|522.224.120.094|Crooked River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+CROW|522.224.120.094.001|Crooked River weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060305|South Fork Clearwater|170603|Clearwater
+CROTRP|522.224.120.094.001|Crooked River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060305|South Fork Clearwater|170603|Clearwater
+RELIEC|522.224.120.094.013|Relief Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+CROOKP|522.224.120.094.015|Crooked River Pond|Acclimation Pond|Acclimation pond or facility.|17060305|South Fork Clearwater|170603|Clearwater
+CROP|522.224.120.094.015|Crooked River Pond (Archaic - use CROOKP)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060305|South Fork Clearwater|170603|Clearwater
+FIVEMC|522.224.120.094.018|Five Mile Creek|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+AMERR|522.224.120.101|American River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+REDR|522.224.120.101|Red River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+REDTRP|522.224.120.101.006|Red River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060305|South Fork Clearwater|170603|Clearwater
+REDP|522.224.120.101.027|Red River Rearing Pond|Acclimation Pond|Acclimation pond or facility.|17060305|South Fork Clearwater|170603|Clearwater
+REDRSF|522.224.120.101.028|South Fork Red River|River|Entire river or stream.|17060305|South Fork Clearwater|170603|Clearwater
+SNKTRP|522.225|Snake Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060103|Lower Snake-Asotin|170601|Lower Snake
+SWLWPK|522.229|Swallows Park, Snake River at Clarkston, WA.|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060103|Lower Snake-Asotin|170601|Lower Snake
+ASOTIC|522.234|Asotin Creek, Snake River above Clarkston, WA|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+GEORGC|522.234.005|George Creek, Asotin Creek watershed|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+CHARLC|522.234.022|Charley Creek, Asotin Creek watershed|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+ASOTSF|522.234.024|South Fork Asotin Creek|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+ASOTNF|522.234.024|North Fork Asotin Creek|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+TENMC2|522.237|Tenmile Creek, tributary to Snake River|River|Entire river or stream.|17060103|Lower Snake-Asotin|170601|Lower Snake
+CJRAP|522.263|Captain John Rapids Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17060103|Lower Snake-Asotin|170601|Lower Snake
+GRAND2|522.271|Grande Ronde River - Wallowa River to headwaters (km 131-325)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060104|Upper Grande Ronde|170601|Lower Snake
+GRAND1|522.271|Grande Ronde River - mouth to Wallowa River (km 0-131)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060106|Lower Grande Ronde|170601|Lower Snake
+GRNTRP|522.271.002|Grande Ronde River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060106|Lower Grande Ronde|170601|Lower Snake
+JOSEPC|522.271.007|Joseph Creek, Grande Ronde River Basin|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+CTWD3C|522.271.045|Cottonwood Creek, Grande Ronde River Basin|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+COTP|522.271.046|Cottonwood Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17060106|Lower Grande Ronde|170601|Lower Snake
+COUGRC|522.271.049|Cougar Creek, Grande Ronde Basin|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+WENR|522.271.073|Wenaha River|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+WENRNF|522.271.073.035|North Fork Wenaha River|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+WENRSF|522.271.073.035|South Fork Wenaha River|River|Entire river or stream.|17060106|Lower Grande Ronde|170601|Lower Snake
+WALLOR|522.271.131|Wallowa River|River|Entire river or stream.|17060105|Wallowa|170601|Lower Snake
+MINAMR|522.271.131.016|Minam River|River|Entire river or stream.|17060105|Wallowa|170601|Lower Snake
+BCANF|522.271.131.018.001|Big Canyon Facility|Acclimation Pond|Acclimation pond or facility.|17060105|Wallowa|170601|Lower Snake
+LOSTIR|522.271.131.042|Lostine River|River|Entire river or stream.|17060105|Wallowa|170601|Lower Snake
+LOSTIW|522.271.131.042.001|Lostine River Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060105|Wallowa|170601|Lower Snake
+LOSTIP|522.271.131.042.021|Lostine River Pond|Acclimation Pond|Acclimation pond or facility.|17060105|Wallowa|170601|Lower Snake
+WALH|522.271.131.063.001|Wallowa Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060105|Wallowa|170601|Lower Snake
+WRROOK|522.271.131.068|Wallowa River Heron Rookery|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17060105|Wallowa|170601|Lower Snake
+LOOKGC|522.271.137|Lookingglass Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+LOOH|522.271.137.003|Lookingglass Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATHEC|522.271.232|Catherine Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATHEW|522.271.232.032|Catherine Creek Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060104|Upper Grande Ronde|170601|Lower Snake
+LCATHC|522.271.232.044|Little Catherine Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATHEP|522.271.232.048|Catherine Creek Pond|Acclimation Pond|Acclimation pond or facility.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATCSF|522.271.232.052|South Fork Catherine Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATCNF|522.271.232.052|North Fork Catherine Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+CATCMF|522.271.232.052.005|Middle Fork Catherine Creek|River|Entire river or stream.|17060104|Upper Grande Ronde|170601|Lower Snake
+GRANDW|522.271.307|Grande Ronde River Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060104|Upper Grande Ronde|170601|Lower Snake
+GRANDP|522.271.320|Grande Ronde River Pond|Acclimation Pond|Acclimation pond or facility.|17060104|Upper Grande Ronde|170601|Lower Snake
+SALR1|522.303|Salmon River - mouth to above French Creek (km 0-171)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060209|Lower Salmon|170602|Salmon
+SALR4|522.303|Salmon River - Pahsimeroi River to headwaters (km 489-650)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060201|Upper Salmon|170602|Salmon
+SALR3|522.303|Salmon River - Middle Fork Salmon River to Pahsimeroi River (km 319-489)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060203|Middle Salmon-Panther|170602|Salmon
+SALR2|522.303|Salmon River - above French Creek to Middle Fork Salmon River (km 171-319)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+WBIRDC|522.303.086|Whitebird Creek|River|Entire river or stream.|17060209|Lower Salmon|170602|Salmon
+SALTRP|522.303.103|Salmon Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060209|Lower Salmon|170602|Salmon
+SLATEC|522.303.106|Slate Creek, lower Salmon River|River|Entire river or stream.|17060209|Lower Salmon|170602|Salmon
+LSALR|522.303.140|Little Salmon River|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+RAPIDR|522.303.140.007|Rapid River, Little Salmon River|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+RPDTRP|522.303.140.007.006|Rapid River Smolt Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060210|Little Salmon|170602|Salmon
+RAPH|522.303.140.007.006|Rapid River Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060210|Little Salmon|170602|Salmon
+RAPIWF|522.303.140.007.012|West Fork Rapid River|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+BOUL2C|522.303.140.029|Boulder Creek, Little Salmon River watershed|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+HAZARC|522.303.140.031|Hazard Creek|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+HARDC|522.303.140.031.002|Hard Creek|River|Entire river or stream.|17060210|Little Salmon|170602|Salmon
+PARTRC|522.303.160|Partridge Creek|River|Entire river or stream.|17060209|Lower Salmon|170602|Salmon
+FRENCH|522.303.169|French Creek|River|Entire river or stream.|17060209|Lower Salmon|170602|Salmon
+WINDR|522.303.177|Wind River|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+SHEEPC|522.303.188|Sheep Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+CROOC|522.303.200|Crooked Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+SALRSF|522.303.215|South Fork Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+ELK2C|522.303.215.034|Elk Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SECESR|522.303.215.059|Secesh River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+ZENAC|522.303.215.059.005|Zena Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+ZENAWF|522.303.215.059.005.003|West Fork Zena Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SECTRP|522.303.215.059.007|Secesh River Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060208|South Fork Salmon|170602|Salmon
+LICKC|522.303.215.059.008|Lick Creek|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+ALEXC|522.303.215.059.033|Alex Creek, Secesh River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+PIAHC|522.303.215.059.038|Piah Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+GROUSC|522.303.215.059.039|Grouse Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+FLATC|522.303.215.059.039.001|Flat Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SUMITC|522.303.215.059.045|Summit Creek, Secesh River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+LAKEC|522.303.215.059.045|Lake Creek|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+RUBYC|522.303.215.059.048|Ruby Creek, Secesh River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SAEFSF|522.303.215.060|East Fork South Fork Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+JOHNSC|522.303.215.060.024|Johnson Creek|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+JOHTRP|522.303.215.060.024.007|Johnson Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060208|South Fork Salmon|170602|Salmon
+BURNLC|522.303.215.060.024.024|Burnt Log Creek|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+YPPL|522.303.215.060.042|Yellow Pine Pit Lake, East Fork South Fork Salmon River|Other|Other physical or geographical feature.|17060208|South Fork Salmon|170602|Salmon
+SUGARC|522.303.215.060.043|Sugar Creek, SF Salmon River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+LSFTRP|522.303.215.061|Lower SF Salmon River Trap at rkm 61|Trap or Weir|Juvenile or adult fish trap or weir.|17060208|South Fork Salmon|170602|Salmon
+FITSUC|522.303.215.062|Fitsum Creek, SF Salmon River Basin|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SFSRKT|522.303.215.063|South Fork Salmon Trap at Krassel|Trap or Weir|Juvenile or adult fish trap or weir.|17060208|South Fork Salmon|170602|Salmon
+BCKHRC|522.303.215.072|Buckhorn Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+PHOEBC|522.303.215.076|Phoebe Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+CAMP3C|522.303.215.076|Camp Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+GOATC|522.303.215.099|Goat Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+SALSFW|522.303.215.115|South Fork Salmon River Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060208|South Fork Salmon|170602|Salmon
+SFSTRP|522.303.215.118|SF Salmon River Trap (Archaic - replaced with SALRSF or KNOXB)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060208|South Fork Salmon|170602|Salmon
+KNOXB|522.303.215.118|Knox Bridge, SF Salmon River|Other|Other physical or geographical feature.|17060208|South Fork Salmon|170602|Salmon
+BEAR4C|522.303.215.120|Bear Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+STOLP|522.303.215.125|Stolle Pond|Acclimation Pond|Acclimation pond or facility.|17060208|South Fork Salmon|170602|Salmon
+RICEC|522.303.215.129|Rice Creek, SF Salmon River|River|Entire river or stream.|17060208|South Fork Salmon|170602|Salmon
+JERSEC|522.303.223|Jersey Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+BIGMAC|522.303.247|Big Mallard Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+BARGAC|522.303.255|Bargamin Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+SABEC|522.303.272|Sabe Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+CHAMBC|522.303.282|Chamberlain Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+CHAMWF|522.303.282.024|West Fork Chamberlain Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+FLOSSC|522.303.282.027|Flossie Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+MOOSEC|522.303.282.031|Moose Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+HORSEC|522.303.301|Horse Creek|River|Entire river or stream.|17060207|Middle Salmon-Chamberlain|170602|Salmon
+SALRMF|522.303.319|Middle Fork Salmon River (Archaic - replaced with reach-specific definitions)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060206|Lower Middle Fork Salmon|170602|Salmon
+SALMF1|522.303.319|Middle Fork Salmon River - mouth to Loon Creek (km 0-73)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060206|Lower Middle Fork Salmon|170602|Salmon
+SALMF2|522.303.319|Middle Fork Salmon River - Loon Creek to headwaters (km 73-170)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17060205|Upper Middle Fork Salmon|170602|Salmon
+BIG2C|522.303.319.029|Big Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+BIG2CT|522.303.319.029.011|Big Creek Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060206|Lower Middle Fork Salmon|170602|Salmon
+RUSHC|522.303.319.029.011|Rush Creek, tributary of Big Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+RUSHWF|522.303.319.029.011.013|West Fork Rush Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+CABINC|522.303.319.029.019|Cabin Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+CAVEC|522.303.319.029.022|Cave Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+BUCK2C|522.303.319.029.026|Buck Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+CROO2C|522.303.319.029.038|Crooked Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+MONUMC|522.303.319.029.038|Monumental Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+SNOSLC|522.303.319.029.038.009|Snowslide Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+MONCWF|522.303.319.029.038.024|West Fork Monumental Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+BRAMYC|522.303.319.029.042|Big Ramey Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+BEAV4C|522.303.319.029.049|Beaver Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+SMITHC|522.303.319.029.054|Smith Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+LOGANC|522.303.319.029.058|Logan Creek, Big Creek watershed, MF Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+WILSOC|522.303.319.037|Wilson Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+SHEPC|522.303.319.049|Sheep Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+CAMASC|522.303.319.057|Camas Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+YELLJC|522.303.319.057.007|Yellowjacket Creek, tributary of Camas Creek, Middle Fork Salmon River|River|Entire river or stream.|17060206|Lower Middle Fork Salmon|170602|Salmon
+LOONC|522.303.319.073|Loon Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+INDIAC|522.303.319.110|Indian Creek, Middle Fork Salmon River|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+PISTOC|522.303.319.118|Pistol Creek, Middle Fork Salmon River|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+RAPR|522.303.319.124|Rapid River, Middle Fork Salmon River|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+SULFUC|522.303.319.150|Sulphur Creek, Middle Fork Salmon River|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+BOUNDC|522.303.319.154|Boundary Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+DAGGEC|522.303.319.155|Dagger Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+FALLC|522.303.319.163|Fall Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+BEARVC|522.303.319.170|Bear Valley Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+MARSHC|522.303.319.170|Marsh Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+MARTR2|522.303.319.170.008|Lower Marsh Creek Trap at rkm 8|Trap or Weir|Juvenile or adult fish trap or weir.|17060205|Upper Middle Fork Salmon|170602|Salmon
+BEAVC|522.303.319.170.009|Beaver Creek, tributary to Marsh Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+CAPEHC|522.303.319.170.010|Capehorn Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+MARTRP|522.303.319.170.011|Marsh Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060205|Upper Middle Fork Salmon|170602|Salmon
+ELKC|522.303.319.170.014|Elk Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+KNAPPC|522.303.319.170.015|Knapp Creek|River|Entire river or stream.|17060205|Upper Middle Fork Salmon|170602|Salmon
+PANTHC|522.303.338|Panther Creek (Salmon River)|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+MUSCRC|522.303.338.047|Musgrove Creek, trib. to Panther Creek, Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+MOYERC|522.303.338.047|Moyer Creek, trib. to Panther Creek, Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+SALRNF|522.303.381|North Fork Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+NFSTRP|522.303.381.001|North Fork Salmon River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060203|Middle Salmon-Panther|170602|Salmon
+4JUL2C|522.303.385|Fourth Of July Creek - tributary to Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+TOWERC|522.303.394|Tower Creek - tributary to Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+CARMEC|522.303.408|Carmen Creek - tributary to Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+LEMHIR|522.303.416|Lemhi River|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LLRTP|522.303.416.007|Lower Lemhi River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060204|Lemhi|170602|Salmon
+BOHANC|522.303.416.017|Bohannon Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BOHEFC|522.303.416.017.007|East Fork Bohannon Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+WIMPYC|522.303.416.020|Wimpey Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+WITHGC|522.303.416.021|Withington Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+PRATTC|522.303.416.023|Pratt Creek - tributary to Lemhi River|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+HAYNSC|522.303.416.026|Haynes Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+KENYC|522.303.416.029|Kenney Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+PATTEC|522.303.416.037|Pattee Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+AGNCYC|522.303.416.039|Agency Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+COW2C|522.303.416.039.008|Cow Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+FLUMEC|522.303.416.039.014|Flume Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+MCDEVC|522.303.416.042|McDevitt Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LEMTRP|522.303.416.049|Upper Lemhi River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060204|Lemhi|170602|Salmon
+LEMHIW|522.303.416.049|Lemhi River Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060204|Lemhi|170602|Salmon
+HAYDNC|522.303.416.049|Hayden Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+HYDTRP|522.303.416.049.001|Hayden Creek Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060204|Lemhi|170602|Salmon
+BASINC|522.303.416.049.006|Basin Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+TRAILC|522.303.416.049.006.007|Trail Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BVAL2C|522.303.416.049.014|Bear Valley Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BUCK4C|522.303.416.049.014.003|Buck Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+WRIGTC|522.303.416.049.014.004|Wright Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+HAYDEF|522.303.416.049.015|East Fork Hayden Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+YRIANC|522.303.416.057|Yearian Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LLSPRC|522.303.416.066|Lemhi Little Springs Creek|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+MILL5C|522.303.416.066|Mill Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BIG8MC|522.303.416.073|Big Eightmile Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LIT8MC|522.303.416.073|Little Eightmile Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BIGSPC|522.303.416.077|Big Springs Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LEEC|522.303.416.079|Lee Creek - tributary to Lemhi River|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BTIMBC|522.303.416.089|Big Timber Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+LTIMBC|522.303.416.089.007|Little Timber Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BASN2C|522.303.416.089.012|Basin Creek, upper Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+CANY2C|522.303.416.090|Canyon Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+CRUIKS|522.303.416.090.014|Cruikshank Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+WILDCC|522.303.416.090.014.003|Wildcat Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+18MILC|522.303.416.092|Eighteenmile Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+TEXASC|522.303.416.092|Texas Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+HAWLYC|522.303.416.092.004|Hawley Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+RESVRC|522.303.416.092.019|Reservoir Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+BIGB2C|522.303.416.092.019|Big Bear Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+QKASPC|522.303.416.092.021|Quaking Asp Creek, Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+DEERC|522.303.416.092.022|Deer Creek, upper Lemhi River Basin|River|Entire river or stream.|17060204|Lemhi|170602|Salmon
+IRONC|522.303.461|Iron Creek - tributary to Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+POISNC|522.303.462|Poison Creek, tributary to Salmon River|River|Entire river or stream.|17060203|Middle Salmon-Panther|170602|Salmon
+PAHSIR|522.303.489|Pahsimeroi River|River|Entire river or stream.|17060202|Pahsimeroi|170602|Salmon
+PAHTRP|522.303.489.002|Pahsimeroi River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060202|Pahsimeroi|170602|Salmon
+PAHSIW|522.303.489.002|Pahsimeroi Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060202|Pahsimeroi|170602|Salmon
+PAHP|522.303.489.011|Pahsimeroi Pond|Acclimation Pond|Acclimation pond or facility.|17060202|Pahsimeroi|170602|Salmon
+PAHH|522.303.489.011|Pahsimeroi Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060202|Pahsimeroi|170602|Salmon
+CHALLC|522.303.510|Challis Creek - tributary to Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+SALREF|522.303.552|East Fork Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+HERDC|522.303.552.014|Herd Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+SALEFT|522.303.552.029|East Fork Salmon River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060201|Upper Salmon|170602|Salmon
+SALEFW|522.303.552.030|East Fork Salmon River Weir (Archaic - use SALEFT)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060201|Upper Salmon|170602|Salmon
+SQAW2C|522.303.564|Squaw Creek, Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+SQUAWP|522.303.564.001|Squaw Creek Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17060201|Upper Salmon|170602|Salmon
+SLAT2C|522.303.576|Slate Creek, upper Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+YANKFK|522.303.591|Yankee Fork Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+YANKWF|522.303.591.011|West Fork Yankee Fork Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+BASN3C|522.303.604|Basin Creek, Salmon River Basin|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+VALEYC|522.303.609|Valley Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+STANLE|522.303.609|Stanley; Gage 2945 (Archaic - use SALR4)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17060201|Upper Salmon|170602|Salmon
+STANLC|522.303.609.009|Stanley Lake Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+ELK3C|522.303.609.017|Elk Creek, trib. to Valley Creek, Salmon River|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+REDFLC|522.303.615|Redfish Lake Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+RLCTRP|522.303.615.003|Redfish Lake Creek Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060201|Upper Salmon|170602|Salmon
+REDFL|522.303.615.005|Redfish Lake|Other|Other physical or geographical feature.|17060201|Upper Salmon|170602|Salmon
+SAWTRP|522.303.617|Sawtooth Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060201|Upper Salmon|170602|Salmon
+SAWT|522.303.617|Sawtooth Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17060201|Upper Salmon|170602|Salmon
+GOLDC|522.303.621|Gold Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+WILLIC|522.303.622|Williams Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+HUCKLC|522.303.624|Huckleberry Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+DECKEC|522.303.624.001|Decker Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+FISHEC|522.303.628|Fisher Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+4JULYC|522.303.630|Fourth of July Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+CHAMPC|522.303.631|Champion Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+HELLRC|522.303.631|Hell Roaring Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+ALTULC|522.303.633|Alturas Lake Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+YELLLC|522.303.633.001|Yellowbelly Lake Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+PETTLC|522.303.633.002|Pettit Lake Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+PETTL|522.303.633.002.002|Pettit Lake|Other|Other physical or geographical feature.|17060201|Upper Salmon|170602|Salmon
+VATC|522.303.633.003|Vat Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+ALTURL|522.303.633.011|Alturas Lake|Other|Other physical or geographical feature.|17060201|Upper Salmon|170602|Salmon
+BEAVEC|522.303.642|Beaver Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+POLEC|522.303.642|Pole Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+SMILEC|522.303.644|Smiley Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+FRENCC|522.303.647|Frenchman Creek|River|Entire river or stream.|17060201|Upper Salmon|170602|Salmon
+IMNAHR|522.308|Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+COWCR|522.308.006|Cow Creek, Imnaha River Basin|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+IMNTRP|522.308.007|Imnaha Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17060102|Imnaha|170601|Lower Snake
+LITNGC|522.308.008|Lightning Creek, Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+HORS3C|522.308.018|Horse Creek, Imnaha River Basin|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+BSHEEC|522.308.032|Big Sheep Creek|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+CAMP4C|522.308.032.002|Camp Creek, tributary to Big Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+LSHEEC|522.308.032.005|Little Sheep Creek, tributary to Big Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+LSHEEF|522.308.032.005.008|Little Sheep Facility|Acclimation Pond|Acclimation pond or facility.|17060102|Imnaha|170601|Lower Snake
+MCCULC|522.308.032.005.033|McCully Creek, tributary to Little Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+CANALC|522.308.032.005.039|Canal Creek, tributary to Little Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+REDMOC|522.308.032.005.040|Redmont Creek, tributary to Little Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+LICK2C|522.308.032.051|Lick Creek, tributary to Big Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+SALTC|522.308.032.053|Salt Creek, tributary to Big Sheep Creek, Imnaha drainage|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+FREEZC|522.308.059|Freezeout Creek - tributary to Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+GROS2C|522.308.066|Grouse Creek, tributary to Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+CRAZYC|522.308.080|Crazyman Creek - tributary to Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+MAHOGC|522.308.083|Mahogany Creek, Imnaha River Basin|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+IMNAHW|522.308.084|Imnaha River Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17060102|Imnaha|170601|Lower Snake
+GUMBTC|522.308.086|Gumboot Creek, Imnaha River Basin|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+DRY2C|522.308.090|Dry Creek - tributary to Imnaha River|River|Entire river or stream.|17060102|Imnaha|170601|Lower Snake
+PLAP|522.346|Pittsburg Landing Acclimation Facility|Acclimation Pond|Acclimation pond or facility.|17060101|Hells Canyon|170601|Lower Snake
+HCDTAL|522.397|HCD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17060101|Hells Canyon|170601|Lower Snake
+HCD|522.397|Hells Canyon Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17060101|Hells Canyon|170601|Lower Snake
+YAKIM1|539|Yakima River - mouth to Naches River (km 0-187)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17030003|Lower Yakima|170300|Yakima
+YAKIM2|539|Yakima River - Naches River to headwaters (km 187-345)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17030001|Upper Yakima|170300|Yakima
+VGISNB|539.014|Van Giesen Road Bridge, Yakima River|Other|Other physical or geographical feature.|17030003|Lower Yakima|170300|Yakima
+PROH|539.075|Prosser Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17030003|Lower Yakima|170300|Yakima
+PROTRP|539.076|Prosser Trap (Archaic)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030003|Lower Yakima|170300|Yakima
+PROTAL|539.076|PRO - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+PROFBY|539.076|PRO - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+PROSRD|539.076|Prosser Dam (Archaic - replaced with PRO)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030003|Lower Yakima|170300|Yakima
+PROSRR|539.076|PRO - Release into the Separator Return Flume/Pipe with Direct Return to the River|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+PRO|539.076|Prosser Diversion Dam, Yakima River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030003|Lower Yakima|170300|Yakima
+CHANDL|539.076|Chandler Canal (Prosser Dam) - headgate to diversion screen (km 000-002)|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+SATUSC|539.112|Satus Creek, Yakima River|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+DRY3C|539.112.031|Dry Creek, tributary to Satus Creek|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+LOGYC|539.112.041|Logy Creek, tributary to Satus Creek|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+TOPPEC|539.130|Toppenish Creek|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+SIMCOC|539.130.053|Simcoe Creek, Toppenish Creek drainage|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+SIMCNF|539.130.053.030|North Fork Simcoe Creek, Toppenish Creek drainage|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+MARION|539.136|Marion Drain|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+SSIDEC|539.167|Sunnyside Canal - headgate to diversion screen (km 000-001)|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+SSD|539.167|Sunnyside Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030003|Lower Yakima|170300|Yakima
+SSDTAL|539.167|SSD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+SSDSRR|539.167|SSD - Release into the Separator Return Flume/Pipe with Direct Return to the River|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+SSIDES|539.167.001|Sunnyside Screen (Archaic - use SSIDEC)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030003|Lower Yakima|170300|Yakima
+WAPSRR|539.172|WAP - Release into the Separator Return Flume/Pipe with Direct Return to the River|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+WAP|539.172|Wapato Diversion Dam, Yakima River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030003|Lower Yakima|170300|Yakima
+WAPATC|539.172|Wapato Canal - headgate to diversion screen (km 000-001)|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+AHTANC|539.172|Ahtanum Creek, Yakima River|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+WAPTAL|539.172|WAP - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030003|Lower Yakima|170300|Yakima
+WAPATD|539.172|Wapato Dam (Archaic - replaced with WAP)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030003|Lower Yakima|170300|Yakima
+WAPATS|539.172.001|Wapato Screen (Archaic)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030003|Lower Yakima|170300|Yakima
+AHTASF|539.172.037|South Fork Ahtanum Creek, tributary to Ahtanum Creek|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+AHTANF|539.172.037|North Fork Ahtanum Creek - Tributary to Ahtanum Creek|River|Entire river or stream.|17030003|Lower Yakima|170300|Yakima
+NATCHR|539.187|Natches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+COWICC|539.187.004|Cowiche Creek- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+COWISF|539.187.004.012|South Fork Cowiche Creek - Tributary to Cowiche Creek|River|Entire river or stream.|17030002|Naches|170300|Yakima
+BUCKSL|539.187.005|Buckskin Slough, tributary to Naches RIver|River|Entire river or stream.|17030002|Naches|170300|Yakima
+BUCKAP|539.187.005.005|Buckskin Slough Acclimation Site|Acclimation Pond|Acclimation pond or facility.|17030002|Naches|170300|Yakima
+TIETNR|539.187.028|Tieton River- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+WPX|539.187.028|Wapatox Diversion Dam, Naches River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030002|Naches|170300|Yakima
+WPXTAL|539.187.028|WPX - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030002|Naches|170300|Yakima
+WOPTXD|539.187.028|Wapatox Dam (Archaic - replaced with WPX)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030002|Naches|170300|Yakima
+OAKC|539.187.028.003|Oak Creek, Tributary to Tieton River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+WILD2C|539.187.028.033|Wildcat Creek - Tributary to Tieton River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+TID|539.187.028.034|Tieton Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030002|Naches|170300|Yakima
+TIETNF|539.187.028.037|North Fork Tieton River, Naches Basin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+TIETSF|539.187.028.037|South Fork Tieton River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+CCD|539.187.028.037.012|Clear Creek Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030002|Naches|170300|Yakima
+CCDFBY|539.187.028.037.012|CCD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030002|Naches|170300|Yakima
+CCDTAL|539.187.028.037.012|CCD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030002|Naches|170300|Yakima
+NFTRAP|539.187.028.037.023|North Fork Tieton River Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17030002|Naches|170300|Yakima
+RSNAKC|539.187.045|Rattlesnake Creek- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+LRSNKC|539.187.045.002|Little Rattlesnake Creek - Tributary to Rattlesnake Creek|River|Entire river or stream.|17030002|Naches|170300|Yakima
+RSNANF|539.187.045.012|North Fork Rattlesnake Creek - Tributary to Rattlesnake Creek|River|Entire river or stream.|17030002|Naches|170300|Yakima
+HINDOC|539.187.045.021|Hindoo Creek - Tributary to Rattlesnake Creek|River|Entire river or stream.|17030002|Naches|170300|Yakima
+NILEC|539.187.047|Nile Creek, tributary to Naches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+ROCK5C|539.187.054|Rock Creek, Tributary to Naches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+RCK5RF|539.187.054.002|Righthand Fork Rock Creek - Tributary to Rock Creek|River|Entire river or stream.|17030002|Naches|170300|Yakima
+LTNACR|539.187.072|Little Naches River- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+BUMPR|539.187.072|Bumping River- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+CROWC|539.187.072.005|Crow Creek - Tributary to Little Naches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+QRTZC|539.187.072.005|Quartz Creek - Tributary to Little Naches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+AMERIR|539.187.072.006|American River- Naches Subbasin|River|Entire river or stream.|17030002|Naches|170300|Yakima
+LTNANF|539.187.072.021|North Fork Little Naches River - Tributary to Little Naches River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+BUD|539.187.072.026|Bumping Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030002|Naches|170300|Yakima
+DEEP2C|539.187.072.029|Deep Creek, tributary to Bumping River|River|Entire river or stream.|17030002|Naches|170300|Yakima
+WENASC|539.197|Wenas Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+ROZFBY|539.206|ROZ - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+ROZBYP|539.206|ROZ - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+ROZ|539.206|Roza Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030001|Upper Yakima|170300|Yakima
+ROZLDR|539.206|ROZ - Release into the Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+ROZTAL|539.206|ROZ - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+ROSAD|539.206|Roza Dam (Archaic - replaced with ROZ)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030001|Upper Yakima|170300|Yakima
+UMTANC|539.225|Umtanum Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+WILSNC|539.237|Wilson Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+REECEC|539.248|Reecer Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+MANASC|539.253|Manastash Creek - tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+CLARFP|539.270|Clark Flat Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17030001|Upper Yakima|170300|Yakima
+TANEUC|539.271|Taneum Creek, Yakima River Basin|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+TANESF|539.271.020|South Fork Taneum Creek - Tributary to Taneum Creek|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+SWAUKC|539.274|Swauk Creek, tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+FIRSTC|539.274.013|First Creek - Tributary to Swauk Creek|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+WILL2C|539.274.018|Williams Creek - Tributary to Swauk Creek|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+TEANAR|539.284|Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+NFTEAN|539.284.017|North Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+INDINC|539.284.017.007|Indian Creek - Tributary to North Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+JACKCP|539.284.017.009|Jack Creek Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17030001|Upper Yakima|170300|Yakima
+JACKC|539.284.017.010|Jack Creek - Tributary to North Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+JUNGLC|539.284.017.011|Jungle Creek - Tributary to North Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+STAFFC|539.284.017.013|Stafford Creek - Tributary to North Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+TEANMF|539.284.020|Middle Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+TEANWF|539.284.020|West Fork Teanaway River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+CLEE|539.293|Cle Elum Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17030001|Upper Yakima|170300|Yakima
+TILLMC|539.295|Tillman Creek, tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+CLELMR|539.299|Cle Elum River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+CLEBYP|539.299.013|CLE - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+CLELMD|539.299.013|Cle Elum Dam (Archaic - replaced with CLE)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17030001|Upper Yakima|170300|Yakima
+CLETAL|539.299.013|CLE - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+CLE|539.299.013|Cle Elum Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030001|Upper Yakima|170300|Yakima
+CLEFBY|539.299.013|CLE - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+COOPR|539.299.030|Cooper River, tributary to Cle Elum River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+WAPTR|539.299.034|Waptus River, tributary to Cle Elum River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+LITTLC|539.313|Little Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+BIG3C|539.315|Big Creek, Tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+TUCKEC|539.321|Tucker Creek, tributary to Yakima River|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+EASTOP|539.325|Easton Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17030001|Upper Yakima|170300|Yakima
+KACHR|539.330|Kachess River, Upper Yakima Basin|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+KADTAL|539.330.003|KAD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+KAD|539.330.003|Kachess Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030001|Upper Yakima|170300|Yakima
+KADFBY|539.330.003|KAD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+BOXCNC|539.330.014|Box Canyon Creek, Upper Yakima Basin|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+KEDFBY|539.347|KED - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+KEDTAL|539.347|KED - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17030001|Upper Yakima|170300|Yakima
+KED|539.347|Keechelus Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17030001|Upper Yakima|170300|Yakima
+GOLD5C|539.356|Gold Creek, Upper Yakima Basin|River|Entire river or stream.|17030001|Upper Yakima|170300|Yakima
+RICHIS|545|Richland Island, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+IS18|549|Island 18, Columbia River|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+RINH|567|Ringold Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+HANTWN|576|Hanford town site boat ramp|Other|Other physical or geographical feature.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+HANWTB|587|Hanford White Bluffs boat ramp|Other|Other physical or geographical feature.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDH|639|Priest Rapids Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDLD1|639|PRD - Release into the Left Bank (facing downstream) Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDTAL|639|PRD - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRD|639|Priest Rapids Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDFBY|639|PRD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDGWL|639|PRD - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+PRDMRT|639|PRD - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+GOOS2I|641|Goose Island, Columbia River above Priest Rapids Dam|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+BVRLYI|666|Beverly Islands, Columbia River below Wanapum Dam|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020016|Upper Columbia-Priest Rapids|170200|Upper Columbia
+WANLD1|669|WAN - Release into the Left Bank (East Shore) Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANLD2|669|WAN - Release into the Right Bank (West Shore) Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANSPL|669|WAN - Release directly into Spill Bay(s)|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANGWL|669|WAN - Release into Gatewell(s)|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANBYP|669|WAN - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WAN|669|Wanapum Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANFBY|669|WAN - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANTAL|669|WAN - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANTRB|669|WAN - Release into Turbine(s)|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WANMRT|669|WAN - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+I-90B|677|I-90 bridge over Columbia River upstream of Wanapum Dam|Other|Other physical or geographical feature.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+CRESCB|711|Crescent Bar Road Bridge|Other|Other physical or geographical feature.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RISMRT|730|RIS - Mortality Recovery|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RISTAL|730|RIS - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RI2BYP|730|RIS - Release into the PH2 Juvenile Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RISFWC|730|Rock Island Forebay Waterbird Colony|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RIS|730|Rock Island Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+APROOK|746|Appleyard Rookery|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+WENATR|754|Wenatchee River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+WENATT|754.010|Wenatchee River trap at West Monitor Bridge|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+WENA4T|754.013|Lower Wenatchee trap, 2.8km below Mission Creek|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+MISS2C|754.017|Mission Creek, Wenatchee River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+MIS2EF|754.017.017|East Fork Mission Creek, Wenatchee Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+WHITPC|754.025|Whitepine Creek, Wenatchee River Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+DRYP|754.026|Dryden Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+DRYFBY|754.028|DRY - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020011|Wenatchee|170200|Upper Columbia
+DRYTAL|754.028|DRY - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020011|Wenatchee|170200|Upper Columbia
+DRY|754.028|Dryden Diversion Dam, Wenatchee River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020011|Wenatchee|170200|Upper Columbia
+PESHAR|754.029|Peshastin River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+ETIENC|754.029.017|Etienne (formerly Negro) Creek, tributary to Peshastin Creek|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+TRONC|754.029.023|Tronsen Creek, tributary of Peshastin Creek|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+CHUMSC|754.037|Chumstick Creek, Wenatchee Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+ICICLC|754.041|Icicle Creek|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+LEAV|754.041.005|Leavenworth National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020011|Wenatchee|170200|Upper Columbia
+JACK2C|754.041.027|Jack Creek, tributary of Icicle Creek, Wenatchee River Watershed|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+TUMFBY|754.044|TUM - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020011|Wenatchee|170200|Upper Columbia
+TUM|754.044|Tumwater Dam, Wenatchee River|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020011|Wenatchee|170200|Upper Columbia
+CHIWAC|754.057|Chiwaukum Creek, tributary to Wenatchee River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+BEAV3C|754.075|Beaver Creek, Wenatchee River Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+BEAV3P|754.075.001|Beaver Creek Acclimation Pond, Wenatchee River Basin|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+CHIWAR|754.077|Chiwawa River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+CHIWAT|754.077.002|Chiwawa River Trap, 0.5 km below CHIP acclimation pond|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+CHIW|754.077.002|Chiwawa Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+CHIP|754.077.002|Chiwawa Rearing Pond|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+BIGMEC|754.077.014|Big Meadow Creek, Wenatchee River Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+GATEC|754.077.020|Gate Creek, Tributary to Chiwawa River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+CHIKAC|754.077.023|Chikamin Creek, tributary to Chiwawa River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+ROCK3C|754.077.035|Rock Creek, tributary to Chiwawa River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+WENA3T|754.081|Upper Wenatchee trap, 4km above Chiwawa River|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+WENA2T|754.086|Upper Wenatchee smolt trap just below Lake Wenatchee|Trap or Weir|Juvenile or adult fish trap or weir.|17020011|Wenatchee|170200|Upper Columbia
+NASONC|754.089|Nason Creek (tributary to Wenatchee River)|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+BUTCHP|754.089.013|Butcher Creek Acclimation Pond, Wenatchee River Basin|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+COULTC|754.089.014|Coulter Creek, Wenatchee River Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+NAF|754.089.014|Nason Acclimation Facility|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+COULTP|754.089.014.001|Coulter Creek Acclimation Pond, Wenatchee River Basin|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+ROLFIP|754.089.021|Rolfing Acclimation Pond, Wenatchee River Basin|Acclimation Pond|Acclimation pond or facility.|17020011|Wenatchee|170200|Upper Columbia
+WHITER|754.090|White River, Wenatchee River Basin|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+WENATL|754.090|Lake Wenatchee|Other|Other physical or geographical feature.|17020011|Wenatchee|170200|Upper Columbia
+LWENAT|754.090.008|Little Wenatchee River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+NAPEEC|754.090.028|Napeequa River, tributary to White River|River|Entire river or stream.|17020011|Wenatchee|170200|Upper Columbia
+RRE|763|Rocky Reach Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RRETAL|763|RRE - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RRERRR|763|RRE - Release below the PIT-Tag Diversion System Gate with subsequent Return to the River at the Facility|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+RREBYP|763|RRE - Release into the Facility Bypass Flume/Pipe|Intra-Dam Release Site|Specific release site within a dam location.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+TURO|765|Turtle Rock Pond|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+ENTIAR|778|Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+ENTRTP|778.002|Entiat River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+ROARC|778.010|Roaring Creek, Entiat River Basin|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+ENTH|778.011|Entiat NFH|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+MADRVR|778.017|Mad River (Entiat River watershed)|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+TILLIC|778.017.003|Tillicum Creek, tributary to Mad River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+INDI2C|778.017.003.004|Indian Creek, tributary to Tillicum Creek|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+POTATC|778.025|Potato Creek, tributary to Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+STOR2C|778.031|Stormy Creek, tributary to Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+BRENNC|778.040|Brennegan Creek, tributary to Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+LAKE3C|778.049|Lake Creek, tributary to Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+SILVEC|778.053|Silver Creek, tributary to Entiat River|River|Entire river or stream.|17020010|Upper Columbia-Entiat|170200|Upper Columbia
+CHELAR|810|Chelan River|River|Entire river or stream.|17020009|Lake Chelan|170200|Upper Columbia
+CFCT|810.001|Chelan Falls Canal Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020009|Lake Chelan|170200|Upper Columbia
+CHFARF|810.001|Chelan Falls Rearing Facillity|Acclimation Pond|Acclimation pond or facility.|17020009|Lake Chelan|170200|Upper Columbia
+WELTAL|830|WEL - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+WELH|830|Wells Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020005|Chief Joseph|170200|Upper Columbia
+WELFBY|830|WEL - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+WELLD2|830|WEL - Release into the West Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+WELLD1|830|WEL - Release into the East Adult Fish Ladder|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+WEL|830|Wells Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020005|Chief Joseph|170200|Upper Columbia
+WELSBR|835|Starr Boat Ramp on west shore 5 km upstream of Wells Dam|Other|Other physical or geographical feature.|17020005|Chief Joseph|170200|Upper Columbia
+METHR|843|Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+METTRP|843.030|Methow Smolt Trap at McFarland Creek Road Bridge|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+GOLD2C|843.035|Gold Creek, Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+SGOLDC|843.035.002|South Fork Gold Creek, Methow River watershed|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+FOGDEW|843.035.009|Foggy Dew Creek, Methow River watershed|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+LIBBYC|843.042|Libby Creek, Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+BEAV2C|843.057|Beaver Creek, Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+CARP|843.058|Carlton Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+TWISPR|843.066|Twisp River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+TWITRP|843.066.002|Twisp River rotary smolt trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+TWIS2P|843.066.002|Twisp Acclimation Pond (Methow Salmon Recovery Foundation)|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+TWISPW|843.066.013|Twisp River Weir (WDFW)|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+TWISPP|843.066.013|Twisp Acclimation Pond (WDFW)|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+LBRIC|843.066.014|Little Bridge Creek,tributary to Twisp River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+1890SC|843.067|1890s Side Channel Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+CHEWUR|843.080|Chewuch River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+CHERBT|843.080.001|Chewuch River Bridge Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+CHEWUP|843.080.010|Chewuch Acclimation Pond (WDFW)|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+EIGHTP|843.080.017|Eightmile Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+EIGHTC|843.080.018|Eightmile Creek, Chewuch River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+SPRCKT|843.081|Spring Creek Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+METRWT|843.081|Upper Methow River Rotary Screw Trap|Trap or Weir|Juvenile or adult fish trap or weir.|17020008|Methow|170200|Upper Columbia
+WINT|843.081|Winthrop National Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020008|Methow|170200|Upper Columbia
+SPRNGC|843.081|Spring Creek tributary to Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+WINTBC|843.081|Rearing Pond in the back channel to Winthrop National Fish Hatchery|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+MSKF|843.081|Methow Steelhead Kelt Facility|Other|Other physical or geographical feature.|17020008|Methow|170200|Upper Columbia
+WOLFC|843.085|Wolf Creek, Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+METH|843.085|Methow Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020008|Methow|170200|Upper Columbia
+BIDDLP|843.085.002|Biddle Acclimation Pond on Wolf Creek, Methow River Basin|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+MDVAP|843.088|Mid-Valley Acclimation Pond, Methow River Watershed|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+HANSPC|843.097|Hancock Springs Creek, tributary to Methow River|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+EARLWC|843.113|Early Winters Creek, Methow River Basin|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+EARLWP|843.113.001|Early Winters Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+GOATWP|843.116|Goat Wall Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020008|Methow|170200|Upper Columbia
+LOSTR|843.122|Lost River, Methow River Basin|River|Entire river or stream.|17020008|Methow|170200|Upper Columbia
+OKANR|858|Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+OKRCRY|858.001|Cormorant Rookery on Cassimer Bar|Avian Colony|A large congegration or known nesting location of birds that prey on salmonids.|17020006|Okanogan|170200|Upper Columbia
+LOUPLC|858.028|Loup Loup Creek, Okanogan River Basin|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+SALMOC|858.041|Salmon Creek (tributary to Okanogan River)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+OMAKC|858.052|Omak Creek (tributary to Okanogan River)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+OMAKP|858.052|Omak Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020006|Okanogan|170200|Upper Columbia
+STMARP|858.052.010|St Marys Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020006|Okanogan|170200|Upper Columbia
+STAPAC|858.052.022|Stapaloop Creek, in Okanogan River basin|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+WANACC|858.057|Wanacut Creek - tributary to Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+RIVERP|858.064|Riverside Acclimation Pond|Acclimation Pond|Acclimation pond or facility.|17020006|Okanogan|170200|Upper Columbia
+JOHN2C|858.066|Johnson Creek - tributary to Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+TUNKC|858.073|Tunk Creek, Okanogan River Basin|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+AENEAC|858.086|Aeneas Creek - tributary to Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+BONAPC|858.092|Bonaparte Creek, Okanogan River Basin|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+ANTOIC|858.099|Antoine Creek (tributary to Okanogan River)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+WILDSC|858.114|Wildhorse Spring Creek - tributary to Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+SIMILR|858.119|Similkameen River|River|Entire river or stream.|17020007|Similkameen|170200|Upper Columbia
+SIMILP|858.119.008|Similkameen Acclimation Pond (replaces archaic SIMP)|Acclimation Pond|Acclimation pond or facility.|17020007|Similkameen|170200|Upper Columbia
+OSOYOL|858.130|Osoyoos Lake|Other|Other physical or geographical feature.|17020006|Okanogan|170200|Upper Columbia
+TONASC|858.133|Tonasket Creek - tributary to Okanogan River|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+9MILEC|858.134|Ninemile Creek (tributary to Okanogan River)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+OSOYHA|858.134|Osoyoos Lake at Haynes Point Campground|Other|Other physical or geographical feature.|17020006|Okanogan|170200|Upper Columbia
+OSOYBR|858.135|Osoyoos Lake Narrows Hwy 3 Bridge|Trap or Weir|Juvenile or adult fish trap or weir.|17020006|Okanogan|170200|Upper Columbia
+INKANC|858.139|Inkaneep Creek - tributary to Okanagan River (Canada)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+VDS3|858.149|Within 100m upstream of Vertical Drop Structure 3, Okanagan River|Other|Other physical or geographical feature.|17020006|Okanogan|170200|Upper Columbia
+VASEUX|858.164|Vaseux Creek, tributary to Okanagan River (Canada)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+MCI|858.166|McIntyre Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020006|Okanogan|170200|Upper Columbia
+MCITAL|858.166|MCI - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020006|Okanogan|170200|Upper Columbia
+SHUTTC|858.175|Shuttleworth Creek - tributary to Okanagan River (Canada)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+SKATAL|858.177|SKA - Release into the Tailrace within 0.5 km downstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020006|Okanogan|170200|Upper Columbia
+SKA|858.177|Skaha Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020006|Okanogan|170200|Upper Columbia
+SKAHAL|858.180|Skaha Lake|Other|Other physical or geographical feature.|17020006|Okanogan|170200|Upper Columbia
+SHINGC|858.195|Shingle Creek - tributary to Okanagan River (Canada)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+ONAF|858.195.001|Okanagan Nation Alliance k? cp?lk stim Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020006|Okanogan|170200|Upper Columbia
+SHATFD|858.195.009|Shatford Creek, tributary to Shingle Creek (Canada)|River|Entire river or stream.|17020006|Okanogan|170200|Upper Columbia
+CRFH|863|Colville Tribes Resident Fish Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020005|Chief Joseph|170200|Upper Columbia
+FOSTC|868|Foster Creek - tributary to Columbia River|River|Entire river or stream.|17020005|Chief Joseph|170200|Upper Columbia
+CHJO|868|Chief Joseph Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17020005|Chief Joseph|170200|Upper Columbia
+CJDFBY|869|CJD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+CJD|869|Chief Joseph Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020005|Chief Joseph|170200|Upper Columbia
+RWNPBL|924|Rufus Woods Net Pens RV Park/Boat Launch|Other|Other physical or geographical feature.|17020005|Chief Joseph|170200|Upper Columbia
+COYBL|925|Coyote Creek Boat Launch|Other|Other physical or geographical feature.|17020005|Chief Joseph|170200|Upper Columbia
+NESPR|928|Nespelem River, tributary to Columbia River|River|Entire river or stream.|17020005|Chief Joseph|170200|Upper Columbia
+SEGRBL|940|Seatons Grove Boat Launch|Other|Other physical or geographical feature.|17020005|Chief Joseph|170200|Upper Columbia
+SIMP|941.121.008|Similkameen Pond (Archaic - replaced by SIMILP)|Archaic|Site codes that were in use at one time, but have been retired and replaced by one or more new site codes.|17020007|Similkameen|170200|Upper Columbia
+GCD|951|Grand Coulee Dam|Dam|A hydroelectric, diversion or other type of dam; generally used as mark ro event locations only - Intra Dam Release Sites should be used to specify th|17020005|Chief Joseph|170200|Upper Columbia
+GCDFBY|951|GCD - Release into the Forebay within 0.5 km upstream of Dam|Intra-Dam Release Site|Specific release site within a dam location.|17020005|Chief Joseph|170200|Upper Columbia
+BSPBL|972|Bridgeport State Park Boat Launch|Other|Other physical or geographical feature.|17020005|Chief Joseph|170200|Upper Columbia
+SANPR|981|Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+IRON2C|981.026|Iron Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+LOUIEC|981.034|Louie Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+BRDG3C|981.040|Bridge Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+30MILC|981.045|Thirtymile Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+SNANAC|981.053|South Nanamkin Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+NNANAC|981.055|North Nanamkin Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+21MILC|981.065|Twentyone Mile Creek - tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+SANPWF|981.076|West Fork Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+GOLD3C|981.076.005|Gold Creek - tributary to West Fork Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+LOSTC|981.076.022|Lost Creek - tributary to West Fork Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+LOONYC|981.076.022.015|Loony Creek - tributary to Lost Creek|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+HADENC|981.076.022.019|Haden Creek - tributary to Lost Creek|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+HADESF|981.076.022.019.003|South Fork Haden Creek|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+MOSESC|981.076.022.019.003.000|Moses Creek - tributary to South Fork Haden Creek|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+GRANC|981.102|Granite Creek tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+GRANWF|981.102.012|West Fork Granite Creek, Sanpoil Basin|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+OBRIEC|981.107|O Brien Creek, tributary to Sanpoil River|River|Entire river or stream.|17020004|Sanpoil|170200|Upper Columbia
+SPOKR1|1020|Spokane River - mouth to Hangman Creek (km 0-121)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17010307|Lower Spokane|170103|Spokane
+SPOKR2|1020|Spokane River - Hangman Creek to Coeur d'Alene Lake (km 121-183)|River Segment|Rivers that extend through multiple 4th level HUCs are dvidied into segments at HUC boundaries.|17010305|Upper Spokane|170103|Spokane
+BLUE2C|1020.023|Blue Creek, tributary to Spokane River|River|Entire river or stream.|17010307|Lower Spokane|170103|Spokane
+BLUEW|1020.023.001|Blue Creek Weir|Trap or Weir|Juvenile or adult fish trap or weir.|17010307|Lower Spokane|170103|Spokane
+SPRN2C|1020.050|Spring Creek, tributary to Spokane River|River|Entire river or stream.|17010307|Lower Spokane|170103|Spokane
+LFAF|1020.051|Little Falls Acclimation Facility|Acclimation Pond|Acclimation pond or facility.|17010307|Lower Spokane|170103|Spokane
+TSHIMC|1020.057|Tshimakain (Chamokane) Creek|River|Entire river or stream.|17010307|Lower Spokane|170103|Spokane
+STFH|1020.057.007.001|Spokane Tribal Hatchery|Hatchery|Code representing the hatchery at which fish was reared, for entry into the Hatchery field.|17010307|Lower Spokane|170103|Spokane
+HANGC|1020.121|Hangman Creek - tributary to Spokane River|River|Entire river or stream.|17010306|Hangman|170103|Spokane
+3MILC|1025|Threemile Creek - Upper Columbia|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+DEADNF|1031.005.011|North Fork Deadman Creek - Upper Columbia Basin|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+BLDRSF|1031.027.004|South Fork Boulder Creek|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+BLDRNF|1031.027.004|North Fork Boulder Creek|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+NFLBC|1031.039.006|North Fork Little Boulder Creek|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+SFLBC|1031.039.008|South Fork Little Boulder Creek|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+MFLBC|1031.039.008|Middle Fork Little Boulder Creek|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+WILMOC|1046|Wilmont Creek - tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+HUNT2C|1058|Hunter Creek, tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+HALLC|1086|Hall Creek - tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+BARNAC|1101|Barnaby Creek - tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+COLVLE|1121|Colville River, tributary to Columbia River|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+GOLD4C|1121.019|Gold Creek, tributary to Colville River|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+CHEWEC|1121.073|Chewelah Creek, tributary to Colville River|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+SFCHEW|1121.073.003|South Fork Chewelah Creek|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+NFCHEW|1121.073.003.000|North Fork Chewelah Creek|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+WILSN2|1121.073.003.015|Wilson Creek, tributary to South Fork Chewelah Creek|River|Entire river or stream.|17020003|Colville|170200|Upper Columbia
+KETFAL|1127|Kettle Falls|Other|Other physical or geographical feature.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+KETTLR|1131|Kettle River - Upper Columbia Basin|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+DEAD3C|1131.005|Deadman Creek - Upper Columbia Basin|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+TOULOU|1131.018|Toulou Creek, tributary to Kettle River|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+BLDRCK|1131.027|Boulder Creek, tributary to Kettle River|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+EDEERC|1131.029|East Deer Creek, tributary to Kettle River|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+LBLDRC|1131.039|Little Boulder Creek, tributary to Kettle River|River|Entire river or stream.|17020002|Kettle|170200|Upper Columbia
+ONIONC|1171|Onion Creek - Upper Columbia Basin|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+NRPTBL|1179|Northport Boat Launch|Other|Other physical or geographical feature.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+BSHPCK|1180|Big Sheep Creek, tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
+DEEPCK|1181|Deep Creek, tributary to Columbia River|River|Entire river or stream.|17020001|Franklin D. Roosevelt Lake|170200|Upper Columbia
