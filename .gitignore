@@ -43,3 +43,6 @@ vignettes/*.pdf
 
 # Map files (very large!)
 /map_files/
+
+# All adult returns - very large, only used for querying PTAGIS
+/PTAGIS_queries/intermediate_files/all_adult_returns.csv
