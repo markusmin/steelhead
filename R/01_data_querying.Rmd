@@ -16,17 +16,15 @@ This first query will take the following attributes:
 Advanced Reporting Home Page > Create Query Builder2 Report > Interrogation Summary
 
 Once in Query Builder2, select the following filters:
-- 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin, release site longitude, release site latitude, mark site,
-hatchery, stock name, mark capture method, 
+- 1 Attributes: Standard + Release Site Basin, Release Site Subbasin, mark site basin, mark site subbasin, release site longitude, release site latitude, mark site, hatchery, stock name, mark capture method, release site code, mark site code, mark length, mark comment, mark conditional comment, mark data prjoect, mark data project name, mark session message
 - 2 Metrics: Count, First Obs Date Max
 - 16 First Obs Date/Time: 
   - From: Value 
   - Is: Greater than or equal to
     - Value: 6/1/2005 12:00:00 AM
 - 18 Obs Site: BO1 - Bonneville Bradford Is. Ladder, BO2 - Bonneville Cascades Is. Ladder, BO3 - Bonneville WA Shore Ladder/AFF, BO4 - Bonneville WA Ladder Slots, B2A - BONNEVILLE ADULT WA SHORE, BWL - Bonneville WA Shore Ladder
-  - These are all of the Bonneville adult fishways and there::herefore will allow you to identify all adult returns
+  - These are all of the Bonneville adult fishways and therefore will allow you to identify all adult returns
 - 25 Species: Steelhead
-- 29 Mark Length: Less than or equal to 350 mm (to ensure you are only keeping individuals tagged as Juveniles)
 
 Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
 
@@ -52,17 +50,63 @@ library(janitor)
 library(lubridate)
 ```
 
-```{r import_reformat_data}
-adult_returns <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", "all_adult_returns.csv")))
-
-# Load table from Susannah on site info
+```{r}
+# Load table from Susannah on site info - investigate
 relsites <- read.csv(file = here::here("covariate_data", "relsites.txt"), sep = "|", header = TRUE)
+
+sort(unique(relsites$mrr_huc8name))
+unique(relsites$mrr_huc6name)
+
+subset(relsites, mrr_huc8name == "Lower Snake-Tucannon")
+
+table(relsites$mrr_type)
+```
+
+
+
+```{r import_reformat_data}
+adult_returns_complete <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", "all_adult_returns.csv")))
+
+# Remove all individuals where the mark length is greater than 350 mm, but make sure to keep NAs
+subset(adult_returns_complete, mark_length_mm <= 350 | is.na(mark_length_mm)) -> adult_returns
+
+# Also remove all individuals with comments that indicate they were captured as adults
+table(adult_returns$mark_capture_method_name)
+as.data.frame(table(subset(adult_returns, is.na(mark_length_mm))$mark_conditional_comment_name)) %>% 
+  arrange(desc(Freq))
+
+# Keywords to identify individuals tagged as adults: mature, adult, returning
+
+# Look at mark_session_message_value
+as.data.frame(table(subset(adult_returns, is.na(mark_length_mm))$mark_session_message_value)) %>% 
+  arrange(desc(Freq))
+# Here you might also be able to ID based on words like "adult" and "reproduction" in the project description, but these are less reliable
+
+# Find all mark conditional comments that contain the words "mature", "adult", or "returning"
+unique_comments <- unique(adult_returns$mark_conditional_comment_name)
+adult_comments <- unique_comments[grep("mature|Mature|adult|Adult|returning|Returning", unique_comments)]
+# Take out the word immature
+adult_comments <- adult_comments[!(adult_comments %in% c("Immature", "Caudal Fin Damage, Immature"))]
+
+# Remove all fish with comments indicating that they were tagged as adults
+adult_returns_complete %>% 
+  subset(., mark_length_mm <= 350 | is.na(mark_length_mm)) %>%  # keep those with NA mark lengths or mark lengths <= 350 mm
+  subset(., !(mark_conditional_comment_name %in% adult_comments)) -> adult_returns # remove individuals known to have been tagged as adults
+
+
+nrow(subset(adult_returns, rear_type_code == "H" & is.na(mark_length_mm)))
+nrow(subset(adult_returns, rear_type_code == "H" & !(is.na(mark_length_mm))))
+# Approx 50% of hatchery hatchery individuals are missing a mark length
+
 
 # Keep only certain columns
 adult_returns %>% 
   distinct(tag_code, .keep_all = TRUE) %>% 
-  dplyr::select(tag_code, first_time_value, rear_type_code, release_site_name, release_site_basin_name, release_site_subbasin_name,
-                mark_site_basin_name, mark_site_subbasin_name, mark_site_name, hatchery_name, stock_name) %>% 
+  dplyr::rename(mark_site_code = mark_site_code_value, release_site_code = release_site_code_value,
+                mark_comment = mark_comment_name) %>% 
+  # dplyr::select(tag_code, first_time_value, rear_type_code, release_site_name, release_site_basin_name, release_site_subbasin_name,
+  #               mark_site_basin_name, mark_site_subbasin_name, mark_site_name, hatchery_name, stock_name, mark_site_code, release_site_code,
+  #               mark_comment, mark_length_mm) %>% 
   mutate(time = mdy_hms(first_time_value)) %>% 
   mutate(date = date(time)) %>% 
   dplyr::select(-c(first_time_value, time))-> adult_returns
@@ -80,6 +124,16 @@ adult_returns %>%
   filter(run_year_start <= date, run_year_end >= date) %>% 
   select(-c(dummy, run_year_start, run_year_end)) -> adult_returns
 
+adult_returns %>% 
+  dplyr::select(tag_code, mark_file_name, last_time_value) -> test
+
+test <- test[1:100,]
+
+# test <- seq(data.frame(lat = seq(1, 10), long = seq(1,10), r.sq = seq(1,100)))
+
+pivot_wider(test, names_from = mark_file_name, values_from = last_time_value) %>% 
+  column_to_rownames("tag_code") %>% 
+  as.matrix()
 
 ```
 
@@ -114,6 +168,8 @@ mark_sites <- unique(adult_returns$mark_site_name)
 ```
 
 ### Hood River
+Shelby: 1,828 hatchery, 278 wild
+Me: 1,818 hatchery, 276 wild
 ```{r}
 # Hood River
 subset(adult_returns_subset, release_site_subbasin_name == "Middle Columbia-Hood")
@@ -137,34 +193,20 @@ hood_sites <- c(release_sites[grep("Hood", release_sites)], "PARK - Parkdale Hat
 # Tons of these fish came from the Oak Springs Hatchery on the Deschutes
 
 hood_fish <-  subset(adult_returns_subset, release_site_name %in% hood_sites)
-table(hood_fish$run_year)
 table(hood_fish$rear_type_code)
-# way short on fish - should have over 2000, not 1340
-# it looks like we have all but 2 wild fish, but are missing 800 hatchery fish. Were they released somewhere else? Should we be looking at the mark site, not release site
-
-# could the wind river and white salmon river account for these differences?
-hood_sites <- c(release_sites[grep("Hood", release_sites)], "PARK - Parkdale Hatchery", "TROUTC - Trout Creek (trib. to Wind River, Wash.)", "WIND2R - Wind River, Washington")
-
-hood_fish <-  subset(adult_returns_subset, release_site_name %in% hood_sites)
-table(hood_fish$rear_type_code)
-# doesn't seem like it - it looks like a lot of missing hatchery fish
-
-### Inspect mark sites
-hood_mark_sites <- c(mark_sites[grep("Hood", mark_sites)], "PARK - Parkdale Hatchery")
-hood_fish <-  subset(adult_returns_subset, mark_site_name %in% hood_mark_sites)
+# 1,818 hatchery and 276 wild. Very close
 
 ```
 
 ### Fifteenmile Creek
-343 vs 352
+Shelby: 352
+Me: 344
 - pretty close!
 ```{r}
 fifteenmile_sites <- release_sites[grep("Fifteen", release_sites)]
 
 fifteenmile_fish <-  subset(adult_returns_subset, release_site_name %in% fifteenmile_sites)
 table(fifteenmile_fish$run_year)
-# these numbers are close, but just a bit off - even to the point where we have one fish too many in 09/10
-subset(fifteenmile_fish, run_year == "09/10")
 ```
 
 ### Deschutes River
@@ -187,13 +229,16 @@ deschutes_fish <-  subset(adult_returns_subset, mark_site_basin_name == "Deschut
 
 # what about by release basin? Since Deschutes is a basin
 deschutes_fish <-  subset(adult_returns_subset, release_site_basin_name == "Deschutes")
-# 804 wild
+# 804 wild, 2 hatchery
 
+# Keep only the wild
+deschutes_fish <-  subset(adult_returns_subset, release_site_basin_name == "Deschutes" & rear_type_code == "W")
 ```
 
 ### John Day River
 2119 wild fish vs 2121 fish from Shelby
 I also had 2121 fish in my analysis - where did those fish go?
+these 2 fish have an unknown release site, but were marked in the John Day. Manually added
 ```{r}
 jdr_fish <- subset(adult_returns_subset, release_site_subbasin_name %in% c("Upper John Day", "North Fork John Day", "Middle Fork John Day", "Lower John Day"))
 
@@ -212,12 +257,14 @@ subset(JDR_CTH, tag_code %in% c("3D9.1C2D814B91", "3D9.1C2D84C4F9"))
 
 subset(adult_returns_subset, tag_code %in% c("3D9.1C2D814B91", "3D9.1C2D84C4F9"))
 
+jdr_fish <- subset(adult_returns_subset, release_site_subbasin_name %in% c("Upper John Day", "North Fork John Day", "Middle Fork John Day", "Lower John Day") | tag_code %in% c("3D9.1C2D814B91", "3D9.1C2D84C4F9") )
+
 # Release site name is "- Unknown"? What the heck? But we would find these if used mark site... but we also known that that's not super reliable.
 ```
 
 ### Umatilla River
 Shelby: 496 hatchery, 470 wild
-Me: 430 hatchery, 462 wild
+Me: 496 hatchery, 467 wild, 1 unknown
 ```{r}
 # by release site name
 umatilla_sites <- release_sites[grep("Umatilla", release_sites)]
@@ -227,14 +274,14 @@ umatilla_fish <-  subset(adult_returns_subset, release_site_name %in% umatilla_s
 # by release site subbasin
 umatilla_fish <- subset(adult_returns_subset, release_site_subbasin_name =="Umatilla")
 table(umatilla_fish$rear_type_code)
-table(subset(umatilla_fish, rear_type_code == "W")$run_year)
-table(subset(umatilla_fish, rear_type_code == "H")$run_year)
-# missing a bunch of hatchery fish especially in the last few run years (13/14 and 14/15 especially)
 
+subset(umatilla_fish, rear_type_code == "U")
+# This unknown reartype code fish sure looks like a hatchery fish
 ```
 
 ### Walla Walla River
 Shelby: 1,692 hatchery, 535 wild
+Me: 1,685 hatchery, 531 wild
 ```{r}
 # by release site name
 wallawalla_sites <- release_sites[grep("Walla Walla", release_sites)]
@@ -247,12 +294,7 @@ wallawalla_fish <- subset(adult_returns_subset, release_site_subbasin_name =="Wa
 table(wallawalla_fish$release_site_name)
 table(wallawalla_fish$rear_type_code)
 subset(wallawalla_fish, rear_type_code == "H")
-# 94 hatchery (way short), 531 wild (pretty close!)
-
-# what about by mark site
-wallawalla_fish <- subset(adult_returns_subset, mark_site_subbasin_name =="Walla Walla")
-table(wallawalla_fish$rear_type_code)
-# even worse!
+# 1.685 hatchery and 531 wild (pretty close!)
 
 ```
 
@@ -274,7 +316,7 @@ yakima_fish <- subset(adult_returns_subset, release_site_basin_name =="Yakima")
 
 ### Wenatchee River
 Shelby: 4,147 hatchery, 310 wild
-Me: 2986 hatchery,  307 wild
+Me: 4,137 hatchery, 307 wild - pretty close
 ```{r}
 # by release site name
 wenatchee_sites <- release_sites[grep("Wenatchee", release_sites)]
@@ -283,9 +325,19 @@ wenatchee_fish <-  subset(adult_returns_subset, release_site_name %in% wenatchee
 
 
 # By release site subbasin
-wenatchee_fish <- subset(adult_returns_subset, release_site_subbasin_name =="Wenatchee")
+wenatchee_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Wenatchee")
 table(wenatchee_fish$rear_type_code)
-# Missing >1000 hatchery fish, only 3 wild
+
+# Can we see the acclimation variable?
+table(subset(wenatchee_fish, rear_type_code == "H")$release_site_name)
+table(wenatchee_fish$release_site_name)
+table(subset(wenatchee_fish, rear_type_code == "H")$stock_name)
+table(subset(wenatchee_fish, rear_type_code == "H")$hatchery_name)
+
+table(subset(wenatchee_fish, rear_type_code == "H")$mark_conditional_comment_name)
+table(subset(wenatchee_fish, rear_type_code == "H")$mark_comment)
+
+subset(wenatchee_fish, rear_type_code == "H" & stock_name == "")
 ```
 
 
@@ -296,7 +348,7 @@ Me: 357 wild
 # by release site name
 entiat_sites <- release_sites[grep("Entiat", release_sites)]
 
-# By release site subbasin
+# By release site subbasin - this is too broad
 entiat_fish <- subset(adult_returns_subset, release_site_subbasin_name =="Upper Columbia-Entiat")
 table(entiat_fish$rear_type_code)
 # way too many fish, including some hatchery fish
@@ -309,55 +361,31 @@ entiat_fish <-  subset(adult_returns_subset, release_site_name %in% entiat_sites
 
 ### Tucannon River
 Shelby: 2,533 hatchery, 419 wild
-Me: 380 hatchery, 414 wild
+Me: 2,525 hatchery, 415 wild
 ```{r}
-# by release site name
-tucannon_sites <- release_sites[grep("Tucannon", release_sites)]
-
 # By release site subbasin
 tucannon_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")
 table(tucannon_fish$rear_type_code)
 # WAY too many fish - subbasin is not fine enough resolution
-# what about mark site
-tucannon_fish <- subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon")
-unique(tucannon_fish$mark_site_name)
-# Okay, so this include TUCH - Tucannon River Hatchery
-subset(adult_returns_subset, mark_site_name == "TUCH - Tucannon River Hatchery")
-# only 138 - already accounted for in TUCR release site
+# Most are being released at Lower Granite
 
-# Look at the other mark sites
-table(subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon")$mark_site_name)
-table(subset(adult_returns_subset, mark_site_subbasin_name == "Lower Snake-Tucannon" & rear_type_code == "H")$mark_site_name) # mark sites, hatchery only
-# Vast majority seem to be released at Lower Granite - some of these are Tucannon? But how to know which ones?
-subset(adult_returns_subset, mark_site_name == "LGR - Lower Granite Dam")
+as.data.frame(table(tucannon_fish$release_site_name))
+# I think we just want the Tucannon River itself
 
-# Look at the individual sites
-unique(subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")$release_site_name)
-sort(release_sites)
+# by release site name
+tucannon_sites <- release_sites[grep("Tucannon", release_sites)]
 
 tucannon_fish <-  subset(adult_returns_subset, release_site_name %in% tucannon_sites)
 table(tucannon_fish$rear_type_code)
-# 380 hatchery, 414 wild. Wild are quite close, hatchery not so much
+# 2,525 hatchery, 415 wild. Very close!
 
-lwrsnk_tuc_release_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Lower Snake-Tucannon")
-table(adult_returns_subset$release_site_subbasin_name)
-
-# Export this as tag codes to use to query PTAGIS
-write.table(as.data.frame(unique(lwrsnk_tuc_release_fish$tag_code)), file = here::here("PTAGIS_queries", "intermediate_files", "lower_snake_tucannon_release_tags_0506_1415.txt"), col.names = FALSE, row.names = FALSE, quote = FALSE) 
-
-# Okay, so this query only has 221 fish. It would appear that most individuals don't have the detailed tagging information
-
-# Keep looking in the PTAGIS data
-table(lwrsnk_tuc_release_fish$release_site_name)
-
-table(lwrsnk_tuc_release_fish$hatchery_name)
-table(lwrsnk_tuc_release_fish$stock_name)
+table(subset(tucannon_fish, rear_type_code == "H")$hatchery_name)
 
 ```
 
 ### Clearwater River
 Shelby: 3,175 hatchery, 1,163 wild
-Me : 373 hatchery, 1158 wild
+Me : 3175 hatchery, 1157 wild
 ```{r}
 # by release site name
 clearwater_sites <- release_sites[grep("Clearwater", release_sites)]
@@ -369,34 +397,30 @@ table(clearwater_fish$rear_type_code)
 # By release site basin
 clearwater_fish <- subset(adult_returns_subset, release_site_basin_name == "Clearwater")
 table(clearwater_fish$rear_type_code)
-# 1,158 wild fish - very close. But only 373 hatchery fish, not even close
-
-table(adult_returns_subset$release_site_basin_name)
+# 3,175 hatchery fish, 1,157 wild
 ```
 
 ### Grande Ronde River
 Shelby: 4,239 hatchery, 549 wild
-Me: 850 hatchery (way short), 545 wild (very close)
+Me: 4,236 hatchery, 545 wild
 ```{r}
 # by release site name
 granderonde_sites <- release_sites[grep("Grande Ronde", release_sites)]
 
 granderonde_fish <-  subset(adult_returns_subset, release_site_name %in% granderonde_sites)
 table(granderonde_fish$rear_type_code)
+table(granderonde_fish$release_site_subbasin_name)
 # Way short on all fish
 
 # By release site basin
 granderonde_fish <- subset(adult_returns_subset, release_site_subbasin_name %in% c("Lower Grande Ronde", "Upper Grande Ronde", "Wallowa"))
 table(granderonde_fish$rear_type_code)
-# 850 hatchery (way short), 545 wild (very close)
-
-table(adult_returns_subset$release_site_subbasin_name)
-table(subset(adult_returns_subset, release_site_basin_name == "Lower Snake")$release_site_subbasin_name)
+# 4,236 hatchery and 545 wild
 ```
 
 ### Salmon River
 Shelby: 7,661 hatchery, 831 wild
-Me: 226 hatchery, 827 wild
+Me: 7,655 hatchery, 827 wild
 ```{r}
 # by release site name
 salmon_sites <- release_sites[grep("Salmon", release_sites)]
@@ -408,16 +432,16 @@ table(salmon_fish$rear_type_code)
 # By release site basin
 salmon_fish <- subset(adult_returns_subset, release_site_basin_name == "Salmon")
 table(salmon_fish$rear_type_code)
-# 226 hatchery (way short), 827 wild (very close)
+# 7655 hatchery, 827 wild, 8 unknown
 
-table(adult_returns_subset$release_site_subbasin_name)
-table(adult_returns_subset$release_site_basin_name)
-table(subset(adult_returns_subset, release_site_basin_name == "Lower Snake")$release_site_subbasin_name)
+# look into unknown origin fish
+subset(salmon_fish, rear_type_code == "U")
+# Nothing in here to indicate whether they were hatchery or wild
 ```
 
 ### Imnaha River
 Shelby: 2,613 hatchery, 925 wild
-Me: 379 hatchery, 918 wild
+Me: 2,610 hatchery, 921 wild
 ```{r}
 # by release site name
 imnaha_sites <- release_sites[grep("Imnaha", release_sites)]
@@ -429,11 +453,7 @@ table(imnaha_fish$rear_type_code)
 # By release site subbasin
 imnaha_fish <- subset(adult_returns_subset, release_site_subbasin_name == "Imnaha")
 table(imnaha_fish$rear_type_code)
-# 379 hatchery (way short), 918 wild (very close)
-
-table(adult_returns_subset$release_site_subbasin_name)
-table(adult_returns_subset$release_site_basin_name)
-table(subset(adult_returns_subset, release_site_basin_name == "Lower Snake")$release_site_subbasin_name)
+# 2610 hatchery, 921 wild
 ```
 
 
@@ -443,36 +463,242 @@ table(subset(adult_returns_subset, release_site_basin_name == "Lower Snake")$rel
 ```{r}
 # compare full dataset to Shelby's
 as.data.frame(table(adult_returns$release_site_subbasin_name)) # full dataset
-as.data.frame(table(adult_returns_subset$release_site_subbasin_name))
+as.data.frame(table(adult_returns_subset$release_site_subbasin_name)) %>% 
+  arrange(desc(Freq))
 
 # New candidates for inclusion: Klickitat, Lochsa, Methow, Okanogan, Trout (or is this part of another river system?)
 
+# Klickitat
 klickitat_fish <- subset(adult_returns, release_site_subbasin_name == "Klickitat")
 table(klickitat_fish$rear_type_code) 
 table(subset(klickitat_fish, rear_type_code == "H")$run_year)
 table(klickitat_fish$run_year)
 
+# Lochsa
 lochsa_fish <- subset(adult_returns, release_site_subbasin_name == "Lochsa")
 table(lochsa_fish$rear_type_code) 
 table(lochsa_fish$run_year)
 
+# Methow
 methow_fish <- subset(adult_returns, release_site_subbasin_name == "Methow")
 table(methow_fish$rear_type_code) 
+table(methow_fish$release_site_name)
 table(methow_fish$run_year)
 table(subset(methow_fish, rear_type_code == "W")$run_year)
 
+# Okanogan
 okanogan_fish <- subset(adult_returns, release_site_subbasin_name == "Okanogan")
 table(okanogan_fish$rear_type_code) 
 table(okanogan_fish$run_year)
 
+# Trout
 trout_fish <- subset(adult_returns, release_site_subbasin_name == "Trout")
 table(trout_fish$rear_type_code) 
 table(trout_fish$run_year)
+
+deschutes_fish
+
+# Upper columbia, Priest rapids
+UCPA_fish <- subset(adult_returns, release_site_subbasin_name == "Upper Columbia-Priest Rapids")
+as.data.frame(table(UCPA_fish$release_site_name))
+# Ringold hatchery, right on the mainstem. Not a tributary
+
+# Upper Salmon and Little salmon are part of the Salmon
+
+# Middle Columbia - Hood
+MCH_fish <- subset(adult_returns, release_site_subbasin_name == "Middle Columbia-Hood")
+as.data.frame(table(MCH_fish$release_site_name))
+# Mostly Hood, also Fifteenmile (already covered). But Wind River and Trout Creek (trib to Wind River) might be a pop?
+
+wind_fish <- subset(adult_returns, release_site_name %in% c("WIND2R - Wind River, Washington", "TROUTC - Trout Creek (trib. to Wind River, Wash.)"))
+table(wind_fish$rear_type_code) # 1070 wild
+table(wind_fish$run_year)
+
+# Hells Canyon
+HC_fish <- subset(adult_returns, release_site_subbasin_name == "Hells Canyon")
+table(HC_fish$rear_type_code) 
+table(HC_fish$run_year)
+as.data.frame(table(HC_fish$release_site_name))
+
+# Lower Snake
+LS_fish <- subset(adult_returns, release_site_subbasin_name == "Lower Snake")
+table(LS_fish$rear_type_code) 
+table(LS_fish$run_year)
+as.data.frame(table(LS_fish$release_site_name))
+# No, all in mainstem of Snake
+
+# Lower Snake - Asotin
+LS_fish <- subset(adult_returns, release_site_subbasin_name == "Lower Snake-Asotin")
+table(LS_fish$rear_type_code) 
+table(LS_fish$run_year)
+as.data.frame(table(LS_fish$release_site_name))
+as.data.frame(table(subset(LS_fish, rear_type_code == "H")$release_site_name))
+as.data.frame(table(subset(LS_fish, rear_type_code == "W")$release_site_name))
+
+table(subset(LS_fish, rear_type_code == "W")$run_year)
+
+# Chief Joseph
+CJ_fish <- subset(adult_returns, release_site_subbasin_name == "Chief Joseph")
+table(CJ_fish$release_site_name)
+# All from Well's Hatchery, mainstem Columbia. 
+
+# Similkameen
+SK_fish <- subset(adult_returns, release_site_subbasin_name == "Similkameen")
+table(SK_fish$rear_type_code)  # Just hatchery
+table(SK_fish$run_year) # Not enough run years (only 8) - ignore
+
+# Middle Columbia-Lake Wallula
+wallula_fish <- subset(adult_returns, release_site_subbasin_name == "Middle Columbia-Lake Wallula")
+table(wallula_fish$run_year)
+table(wallula_fish$rear_type_code)
+table(wallula_fish$release_site_name)
+# Nope, mostly released in the mainstem
+```
+Here we need to check these counts against when the arrays were active: http://cbr.washington.edu/dart/pit_basin_years_all
+
+*Methow River* - LMR (Lower Methot River) array came online March 2009 - so we can use 09/10 run year onwards. Wouldn't have been enough to fit Shelby's criteria, but we have plenty of fish now - over 2,000 hatchery, and around 300 wild fish.
+
+*Klickitat River* - there are lots of hatchery fish, starting in 11/12. The first interrogation site came online in 2010, at White creek (tributary to Klickitat River). More promising though is the Lyle Falls Fishway (LFF) site, which came online in 2011. This is very close to the mouth, and might see all fish returning to the Klickitat. We would have over 2,000 hatchery fish starting in 12/13.
+
+Lochsa River - part of the Clearwater. So ignore those since they're already part of another group.
+
+*Okanogan River* - Over 1,000 hatchery fish. The site on the river closest to the mouth has only been active since 2013. There are some other interrogation sites in the basin that have been active since 2009. This one is borderline, might not have 8 years of reliable data, unless array was active by mid-2013. Array start date was 10/8/2013, so iffy
+
+Trout River - part of Deschutes, so ignore.
+
+*Wind River* - we do have over 1,000 wild fish here, from the Wind River and Trout Creek (trib to Wind River). There's an array at rkm 30 on the Wind River (active since 2012), and one on Trout Creek (active since 2007). Enough or no?
+
+Hells Canyon - over 1000 hatchery fish, released at SNAKE4 (Snake River befre HCD). But I'm not seeing any interrogation sites there, so I guess we should ignore
+
+*Lower Snake - Asotin* - Ignore the fish from SNKTRP, that's a dipper trap in the Snake. But there are about 540 wild fish from Asotin Creek, and there are interrogation sites available since 2009 (2011 is when the one at the mouth started). Would be enough fish.
+
+Chief Joseph - ignore these, they're all released at Wells Hatchery, which is on the mainstem Columbia
+
+# PTAGIS - query all data
+
+### Get tag codes for all fish of interest
+
+The tributary systems that we want to query are:
+
+From Shelby:
+1. Hood River
+2. Fifteenmile Creek
+3. Deschutes River
+4. John Day River
+5. Umatilla River
+6. Walla Walla River
+7. Yakima River
+8. Wenatchee River
+9. Entiat River
+10. Tucannon River
+11. Clearwater River
+12. Grande Ronde River
+13. Salmon River
+14. Imnaha river
+
+New tributaries:
+15. Methow River
+16. Klickitat River
+17. Okanogan River
+18. Wind River
+19. Asotin Creek
+
+#### Determine release site names for each tributary
+```{r}
+# Get name of all unique release sites
+release_sites <- unique(adult_returns$release_site_name)
+
+# Get release sites that correspond to each tributary
+
+# Hood River
+hood_river_sites <- c(release_sites[grep("Hood", release_sites)], "PARK - Parkdale Hatchery")
+
+#  Fifteenmile Creek
+fifteenmile_creek_sites <- release_sites[grep("Fifteen", release_sites)]
+
+# Deschutes River
+deschutes_river_sites <- unique(subset(adult_returns, release_site_basin_name == "Deschutes")$release_site_name)
+
+# John Day River
+john_day_river_sites <- unique(subset(adult_returns, release_site_subbasin_name %in% c("Upper John Day", "North Fork John Day", "Middle Fork John Day", "Lower John Day"))$release_site_name)
+
+# Umatilla River
+umatilla_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Umatilla")$release_site_name)
+
+# Walla Walla River
+walla_walla_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Walla Walla")$release_site_name)
+
+# Yakima River
+yakima_river_sites <- unique(subset(adult_returns, release_site_basin_name == "Yakima")$release_site_name)
+
+# Wenatchee River
+wenatchee_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Wenatchee")$release_site_name)
+
+# Entiat River
+entiat_river_sites <- release_sites[grep("Entiat", release_sites)]
+
+# Tucannon River
+tucannon_river_sites <- release_sites[grep("Tucannon", release_sites)]
+
+# Clearwater River
+clearwater_river_sites <- unique(subset(adult_returns, release_site_basin_name == "Clearwater")$release_site_name)
+
+# Grande Ronde River
+grande_ronde_river_sites <- unique(subset(adult_returns, release_site_subbasin_name %in% c("Lower Grande Ronde", "Upper Grande Ronde", "Wallowa"))$release_site_name)
+
+# Salmon River
+salmon_river_sites <- unique(subset(adult_returns, release_site_basin_name == "Salmon")$release_site_name)
+
+# Imnaha river
+imnaha_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Imnaha")$release_site_name)
+
+# Methow River
+methow_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Methow")$release_site_name)
+
+# Klickitat River
+klickitat_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Klickitat")$release_site_name)
+
+# Okanogan River
+okanogan_river_sites <- unique(subset(adult_returns, release_site_subbasin_name == "Okanogan")$release_site_name)
+
+# Wind River
+wind_river_sites <- c("WIND2R - Wind River, Washington", "TROUTC - Trout Creek (trib. to Wind River, Wash.)")
+
+# Asotin Creek
+asotin_creek_sites <- release_sites[grep("Asotin", release_sites)]
+```
+
+
+#### Get tag codes for all fish in river systems
+Here we will break these tag codes into files containing 5,000 unique tags. This will keep the complete tag history files under 100 MB so that they can be uploaded to GitHub, and should make PTAGIS smoother.
+```{r}
+adult_returns %>% 
+  subset(., release_site_name %in% c(hood_river_sites, fifteenmile_creek_sites, deschutes_river_sites, john_day_river_sites, umatilla_river_sites, walla_walla_river_sites, yakima_river_sites, wenatchee_river_sites, entiat_river_sites, tucannon_river_sites, clearwater_river_sites, grande_ronde_river_sites, salmon_river_sites, imnaha_river_sites, methow_river_sites, klickitat_river_sites, okanogan_river_sites, wind_river_sites, asotin_creek_sites)) -> adult_returns_for_analysis
+
+# Write tag codes to multiple text files
+as.data.frame(unique(adult_returns_for_analysis$tag_code)) -> unique_tags
+  
+    ntags <- length(unique_tags[,1])
+    nfiles <- ceiling(ntags/5000)
+    
+    # Make an empty list to store the different files
+    file_list <- list()
+    
+    # Split the tags into multiple files
+    for (i in 1:nfiles){
+      file_list[[i]] <- unique_tags[(1 + 5000 * (i - 1)):(5000 * i),1][!(is.na(unique_tags[(1 + 5000 * (i - 1)):(5000 * i),1]))]
+    }
+    
+    # export the files
+    for (i in 1:nfiles){
+      write.table(file_list[[i]], file = here::here("PTAGIS_queries", "intermediate_files", "tag_codes", paste0("tag_codes_", i, ".txt")), col.names = FALSE, row.names = FALSE, quote = FALSE) 
+    }
 ```
 
 
 
-# PTAGIS workflow
+
+# PTAGIS workflow - single tributary
 PTAGIS querying has been set up to work in two steps:
 
 
@@ -544,6 +770,11 @@ ID_adult_returns <- function(input_CSV, output_txt, river_system){
 }
 ```
 
+For each of these, the reports "CTH_tag_codes_1/2/3/4/5/6/7" were run. Those reports have the following settings:
+Query Builder2:
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin, Event Site Latitude, Event Site Longitude, Event Site Info
+- 2 Metrics: Standard
+- 29 Tag Code: Import text file that you exported from R
 
 ### Step 3 (in PTAGIS): Get complete tag histories for adult returns
 - On the PTAGIS website once you have logged in, navigate to Advanced Reporting Home Page > Home > Create Query Builder2 Report > Complete Tag History
