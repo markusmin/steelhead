@@ -124,17 +124,8 @@ adult_returns %>%
   filter(run_year_start <= date, run_year_end >= date) %>% 
   select(-c(dummy, run_year_start, run_year_end)) -> adult_returns
 
-adult_returns %>% 
-  dplyr::select(tag_code, mark_file_name, last_time_value) -> test
-
-test <- test[1:100,]
-
-# test <- seq(data.frame(lat = seq(1, 10), long = seq(1,10), r.sq = seq(1,100)))
-
-pivot_wider(test, names_from = mark_file_name, values_from = last_time_value) %>% 
-  column_to_rownames("tag_code") %>% 
-  as.matrix()
-
+# Export this file as metadata
+write.csv(adult_returns, here::here("covariate_data", "tag_code_metadata.csv"), row.names = FALSE)
 ```
 
 ### Inspect distributions by run years and origins
@@ -667,6 +658,56 @@ wind_river_sites <- c("WIND2R - Wind River, Washington", "TROUTC - Trout Creek (
 # Asotin Creek
 asotin_creek_sites <- release_sites[grep("Asotin", release_sites)]
 ```
+
+#### Export table of release sites + natal origin
+
+```{r}
+data.frame(natal_origin = c(
+  rep("Hood_River", length(hood_river_sites)),
+  rep("Fifteenmile_Creek", length(fifteenmile_creek_sites)),
+  rep("Deschutes_River", length(deschutes_river_sites)),
+  rep("John_Day_River", length(john_day_river_sites)),
+  rep("Umatilla_River", length(umatilla_river_sites)),
+  rep("Walla_Walla_River", length(walla_walla_river_sites)),
+  rep("Yakima_River", length(yakima_river_sites)),
+  rep("Wenatchee_River", length(wenatchee_river_sites)),
+  rep("Entiat_River", length(entiat_river_sites)),
+  rep("Tucannon_River", length(tucannon_river_sites)),
+  rep("Clearwater_River", length(clearwater_river_sites)),
+  rep("Grande_Ronde_River", length(grande_ronde_river_sites)),
+  rep("Salmon_River", length(salmon_river_sites)),
+  rep("Imnaha_River", length(imnaha_river_sites)),
+  rep("Methow_River", length(methow_river_sites)),
+  rep("Klickitat_River", length(klickitat_river_sites)),
+  rep("Okanogan_River", length(okanogan_river_sites)),
+  rep("Wind_River", length(wind_river_sites)),
+  rep("Asotin_Creek", length(asotin_creek_sites))
+),
+release_site_name = c(hood_river_sites,
+                 fifteenmile_creek_sites, 
+                 deschutes_river_sites,
+                 john_day_river_sites,
+                 umatilla_river_sites,
+                 walla_walla_river_sites,
+                 yakima_river_sites,
+                 wenatchee_river_sites,
+                 entiat_river_sites,
+                 tucannon_river_sites,
+                 clearwater_river_sites,
+                 grande_ronde_river_sites,
+                 salmon_river_sites,
+                 imnaha_river_sites,
+                 methow_river_sites,
+                 klickitat_river_sites,
+                 okanogan_river_sites,
+                 wind_river_sites,
+                 asotin_creek_sites
+                 )) -> origin_table
+
+# Export the origin table
+write.csv(origin_table, here::here("covariate_data", "natal_origin_table.csv"), row.names = FALSE)
+```
+
 
 
 #### Get tag codes for all fish in river systems
