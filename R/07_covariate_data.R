@@ -174,9 +174,11 @@ JDR_det_hist <- read.csv(here::here("model_files", "JDR_det_hist.csv"), row.name
 
 # Create a function for this
 median_travel_time_calc <- function(prev_dam, next_dam, data){
-  # Keep only the parts of the df where the detections are prev_dam, then next dam
+  # Keep only the parts of the df where the detection ns are prev_dam, then next dam
   data %>% 
-    filter()
+    mutate(prev_site = lag(event_site_name),
+           prev_time = lag(end_time)) %>% 
+    filter(., event_site_name == next_dam & prev_site == prev_dam) -> test
 }
 
 # Step 2: For each individual fish, create a weeklong window center around the median travel time, i.e. +/- 3 days
