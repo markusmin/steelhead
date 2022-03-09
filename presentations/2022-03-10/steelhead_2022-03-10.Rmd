@@ -1,0 +1,131 @@
+---
+title: "Steelhead Overshoot Update"
+author: "Markus Min"
+date: "3/10/2022"
+output: ioslides_presentation
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+```{r load_reformat_data, echo = FALSE, message = FALSE}
+##### Investigate data distributions #####
+BON_arrival <- read.csv(here::here("covariate_data", "complete_BON_arrival.csv"))
+
+origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
+
+# Read in the metadata
+tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
+
+tag_code_metadata %>% 
+  left_join(., origin_table, by = "release_site_name") %>% 
+  dplyr::select(tag_code, run_year, natal_origin, rear_type_code) %>% 
+  subset(., tag_code %in% BON_arrival$tag_code) -> origin_metadata
+
+# Remove individuals from run years where arrays were not active
+origin_metadata %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
+  mutate(array_active = ifelse(natal_origin == "Methow_River" & year_numeric < 9, "inactive",
+                               ifelse(natal_origin == "Klickitat_River" & year_numeric < 12, "inactive",
+                                      ifelse(natal_origin == "Okanogan_River" & year_numeric < 14, "inactive",
+                                             ifelse(natal_origin == "Wind_River" & year_numeric < 13, "inactive",
+                                                    ifelse(natal_origin == "Asotin_Creek" & year_numeric < 12, "inactive", "active")))))) -> origin_metadata
+
+# remove individuals
+origin_metadata %>% 
+  subset(., array_active == "active") %>% 
+  dplyr::select(-array_active)-> origin_metadata
+
+# convert into a long table: origin, rear type, run year, count
+origin_metadata %>% 
+  count(natal_origin, rear_type_code, run_year) %>% 
+  # let's remove the unknowns for now
+  subset(., rear_type_code %in% c("W", "H")) %>% 
+  dplyr::rename(total = n)-> rear_origin_year_counts
+
+# add a numeric component to run year, so we can plot it on an axis
+rear_origin_year_counts %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))) -> rear_origin_year_counts
+
+# count by origin and rear code (sum across run years)
+origin_metadata %>% 
+  count(natal_origin, rear_type_code) %>% 
+  dplyr::rename(total = n) %>% 
+  # let's remove the unknowns for now
+  subset(., rear_type_code %in% c("W", "H")) -> rear_origin_counts
+
+# Keep only those populations with >= 250 individuals; add zeros for rear type code for missing
+rear_origin_counts %>% 
+  subset(., total >= 250) %>% 
+  complete(natal_origin, rear_type_code) %>% 
+  mutate(total = ifelse(is.na(total), 0, total)) %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) -> rear_origin_counts
+
+# count by origin, rear code, run year
+origin_metadata %>% 
+  count(natal_origin, rear_type_code, run_year) %>% 
+  dplyr::rename(total = n) %>% 
+  subset(., rear_type_code %in% c("W", "H")) %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
+  mutate(trib_rear = paste0(natal_origin," - ", rear_type_code)) %>% 
+  dplyr::select(-c(natal_origin, rear_type_code)) %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
+  arrange(year_numeric) %>% 
+  dplyr::select(-year_numeric) %>% 
+  pivot_wider(names_from = run_year, values_from = total) %>% 
+  mutate(trib_rear = gsub("River", "R.", trib_rear)) %>% 
+  mutate(Total = rowSums(.[2:18], na.rm = T)) %>% 
+  subset(., Total >= 250) %>% 
+  dplyr::rename(`Tributary/Origin` = trib_rear) -> trib_origin_year_table
+
+trib_origin_year_table[is.na(trib_origin_year_table)] <- 0
+
+write.csv(trib_origin_year_table, here::here("figures", "tributary_origin_year_table.csv"), row.names = FALSE)
+```
+
+
+# Preparing complete dataset for model
+
+
+## Natal origins
+```{r plot_total_individuals, echo = FALSE, message = FALSE}
+# plot only those with > 250 individuals
+ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_code)) +
+  geom_bar(stat = "identity", position = "dodge2") +
+  scale_fill_manual(values = c("#1f78b4", "#ff7f00"), labels = c("Hatchery", "Wild")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5)) +
+  labs(fill = "Rear Type",
+       x = "Natal Origin",
+       y = "Total")
+  
+```
+
+
+## Candidates for inclusion
+
+### Methow River
+- Lower Methot River (LMR) site came online in March 2009; run years 09/10 and onwards have 2,202 hatchery fish and 358 wild fish
+
+### Klickitat River
+- Lyle Falls Fishway (LFF) site came online August 2011; run years 12/13 and onwards have 2,197 hatchery fish
+
+### Asotin Creek
+- Three arrays have been active since 2009, but these are farther from the mouth. The one at the creek mouth has been active since August 2011. Run years 12/13 and onwards have 415 wild fish
+
+## Okanogan River
+- Various arrays have been active since 2009; the array closest to the river mouth (OKL, Lower Okanogan Instream Array) has only been active since October 2013
+  - What to do when detection capabilities have been changing based on number and location of active arrays?
+  - Keeping only fish starting in run year 14/15 would leave you with only 7 years of data (not enough based on Shelby's cutoff of 8 years), but 522 hatchery fish
+
+## Wind River
+![](.//figures/wind_river.png){width=100%}
+- TRC (Trout Creek) array has been active since September 2007; WRA (Wind River RKM 30) has been active since October 2012. Starting in run year 13/14, there are 474 wild fish
+
+
+
+
