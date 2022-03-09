@@ -171,7 +171,7 @@ ggplot(data = JDR_nat_trib_final, aes(x = DayMonth)) +
 
 # Step 1: Find median travel time between previous dam and next dam
 # Import the shortened detection history
-JDR_det_hist <- read.csv(here::here("model_files", "JDR_det_hist.csv"), row.names = 1)
+det_hist <- read.csv(here::here("model_files", "complete_det_hist.csv"), row.names = 1)
 
 # Create a function for this
 median_travel_time_calc <- function(prev_dam, next_dam, data){
@@ -179,8 +179,23 @@ median_travel_time_calc <- function(prev_dam, next_dam, data){
   data %>% 
     mutate(prev_site = lag(event_site_name),
            prev_time = lag(end_time)) %>% 
+    mutate(prev_time = ymd_hms(prev_time),
+           end_time = ymd_hms(end_time)) %>% 
     filter(., event_site_name == next_dam & prev_site == prev_dam) -> test
+  
+  # New calculate the travel times and get the median
+  test %>% 
+    mutate(travel_time = time_length(as.period(end_time - prev_time), unit = "days")) %>% 
+    subset(travel_time >= 0) -> test2
+    
 }
+
+ggplot(test2, aes(x = travel_time)) +
+  geom_histogram()
+
+# Loop through this function for each set of sequential dams
+downstream_dams <- c("Bonneville Adult Fishways (combined)", "McNary Adult Fishways (combined)")
+
 
 # Step 2: For each individual fish, create a weeklong window center around the median travel time, i.e. +/- 3 days
 
