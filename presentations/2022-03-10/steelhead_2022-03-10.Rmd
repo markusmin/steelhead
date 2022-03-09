@@ -169,5 +169,8 @@ ggplot(acclimation_table_origin, aes(x = natal_origin, y = total,  fill = acclim
        y = "Total")
 ```
 
+## Temperature
+- Tailrace temperatures, window around when we'd expect them to be approaching a dam?
+- Shelby was only trying to look at overshoot around the natal tributary itself, we want all movement probabilities
 
 
