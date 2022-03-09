@@ -88,6 +88,37 @@ trib_origin_year_table[is.na(trib_origin_year_table)] <- 0
 write.csv(trib_origin_year_table, here::here("figures", "tributary_origin_year_table.csv"), row.names = FALSE)
 ```
 
+```{r acclimation_data, echo = FALSE, message = FALSE}
+relsites <- read.csv(file = here::here("covariate_data", "relsites.txt"), sep = "|", header = TRUE)
+acclimation_sites <- subset(relsites, mrr_type == "Acclimation Pond")
+
+tag_code_metadata %>% 
+  left_join(., origin_table, by = "release_site_name") %>% 
+  subset(., tag_code %in% BON_arrival$tag_code) %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
+  mutate(array_active = ifelse(natal_origin == "Methow_River" & year_numeric < 9, "inactive",
+                               ifelse(natal_origin == "Klickitat_River" & year_numeric < 12, "inactive",
+                                      ifelse(natal_origin == "Okanogan_River" & year_numeric < 14, "inactive",
+                                             ifelse(natal_origin == "Wind_River" & year_numeric < 13, "inactive",
+                                                    ifelse(natal_origin == "Asotin_Creek" & year_numeric < 12, "inactive", "active")))))) %>% 
+    subset(., array_active == "active") %>% 
+  dplyr::select(-array_active) ->  tag_code_metadata_2
+
+# Determine if individuals were acclimated or not
+tag_code_metadata_2 %>% 
+  mutate(acclimated = ifelse(release_site_code %in% acclimation_sites$mrr_code, "acclimated", "not acclimated")) %>% 
+  subset(rear_type_code == "H") %>% 
+  dplyr::select(tag_code, run_year, natal_origin, acclimated)-> acclimation_table
+
+# summarize this by natal origin
+acclimation_table %>% 
+  count(natal_origin, acclimated) %>% 
+  dplyr::rename(total = n) %>% 
+  complete(natal_origin, acclimated) %>% 
+  mutate(total = ifelse(is.na(total), 0, total)) %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) -> acclimation_table_origin
+```
+
 
 # Preparing complete dataset for model
 
@@ -126,6 +157,17 @@ ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_co
 ![](.//figures/wind_river.png){width=100%}
 - TRC (Trout Creek) array has been active since September 2007; WRA (Wind River RKM 30) has been active since October 2012. Starting in run year 13/14, there are 474 wild fish
 
+
+## Acclimation
+```{r echo = FALSE, message = FALSE}
+ggplot(acclimation_table_origin, aes(x = natal_origin, y = total,  fill = acclimated)) +
+  geom_bar(stat = "identity", position = "dodge2") +
+  scale_fill_manual(values = c("#1f78b4", "#ff7f00")) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5)) +
+  labs(fill = "Acclimated",
+       x = "Natal Origin",
+       y = "Total")
+```
 
 
 
