@@ -166,6 +166,7 @@ ggplot(data = JDR_nat_trib_final, aes(x = DayMonth)) +
   xlab("Day of year") +
   ggtitle("Arrival at natal tributary, JDR steelhead 05/06-14/15")
 
+
 ##### Window of time for in-stream covariates #####
 
 # Step 1: Find median travel time between previous dam and next dam
