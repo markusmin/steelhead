@@ -352,6 +352,9 @@ BON_arrival %>%
   filter(run_year_start <= BON_arrival, run_year_end >= BON_arrival) %>% 
   select(-c(dummy, run_year_start, run_year_end)) -> BON_arrival
 
+write.csv(BON_arrival, here::here("covariate_data", "complete_BON_arrival.csv"), row.names = FALSE)
+
+
 # Subset only the adult migration history
 CTH_complete %>% 
   left_join(., BON_arrival, by = "tag_code") %>% 
@@ -612,23 +615,6 @@ event_det_counts %>%
                                                                                           ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO", NA)))))))))))) -> event_det_counts
 
 write.csv(event_det_counts, here::here("model_files", "complete_event_det_counts.csv"), row.names = FALSE)
-
-##### Investigate data distributions #####
-
-# add run year - this is usually not necessary, if you run the script in order
-det_hist %>% 
-  left_join(., BON_arrival, by = "tag_code") %>% 
-  dplyr::select(-BON_arrival) -> det_hist
-
-
-origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
-
-# Read in the metadata
-tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
-
-tag_code_metadata %>% 
-  left_join(., origin_table, by = "release_site_name") %>% 
-  dplyr::select(tag_code, natal_origin) -> origin_metadata
 
 
 
