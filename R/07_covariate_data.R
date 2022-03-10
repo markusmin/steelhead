@@ -399,6 +399,113 @@ for (i in 1:length(unique_origins)){
 
 # Step 2: For each individual fish, create a weeklong window center around the median travel time, i.e. +/- 3 days
 
+# rename the median travel time df to prepare for join
+median_travel_time_df %>% 
+  dplyr::rename(start_month = month, event_site_name = dam) -> median_travel_time_df_2
+
+det_hist %>% 
+  # add the travel time to each detection
+  left_join(., median_travel_time_df_2, by = c("natal_origin", "start_month", "event_site_name")) -> det_hist_2
+
+# ah, so this won't work. We need to add this to the complete detection history, to match by state
+
+
+##### Import dam covariate data #####
+# Pivot longer and reformat function
+cov_reformat <- function(input_data, variable_name){
+  input_data %>% 
+    pivot_longer(., cols = colnames(.)[2:ncol(.)]) %>% 
+    dplyr::rename(year = name,
+                  !!quo_name(variable_name) := value) %>% 
+    mutate(year = gsub("X","",year)) %>% 
+    mutate(year = as.numeric(year), day = as.numeric(day)) %>% 
+    arrange(year, day) -> output_data
+  
+  return(output_data)
+}
+
+# BON
+BON_flow <- read.csv(here::here("covariate_data", "BON", "basin_outflow_BON_allyears.csv"))[1:366,]
+BON_flow_long <- cov_reformat(input_data = BON_flow, variable_name = "flow")
+BON_spill <- read.csv(here::here("covariate_data", "BON", "basin_spill_BON_allyears.csv"))[1:366,]
+BON_spill_long <- cov_reformat(input_data = BON_spill, variable_name = "spill")
+BON_temp <- read.csv(here::here("covariate_data", "BON", "basin_tempc_tailrace_BON_allyears.csv"))[1:366,]
+BON_temp_long <- cov_reformat(input_data = BON_temp, variable_name = "temp")
+
+
+# ICH
+ICH_flow <- read.csv(here::here("covariate_data", "ICH", "basin_outflow_IHR_allyears.csv"))[1:366,]
+ICH_flow_long <- cov_reformat(input_data = ICH_flow, variable_name = "flow")
+ICH_spill <- read.csv(here::here("covariate_data", "ICH", "basin_spill_IHR_allyears.csv"))[1:366,]
+ICH_spill_long <- cov_reformat(input_data = ICH_spill, variable_name = "spill")
+ICH_temp <- read.csv(here::here("covariate_data", "ICH", "basin_tempc_tailrace_IHR_allyears.csv"))[1:366,]
+ICH_temp_long <- cov_reformat(input_data = ICH_temp, variable_name = "temp")
+
+
+# JDA
+JDA_flow <- read.csv(here::here("covariate_data", "JDA", "basin_outflow_JDA_allyears.csv"))[1:366,]
+JDA_flow_long <- cov_reformat(input_data = JDA_flow, variable_name = "flow")
+JDA_spill <- read.csv(here::here("covariate_data", "JDA", "basin_spill_JDA_allyears.csv"))[1:366,]
+JDA_spill_long <- cov_reformat(input_data = JDA_spill, variable_name = "spill")
+JDA_temp <- read.csv(here::here("covariate_data", "JDA", "basin_tempc_tailrace_JDA_allyears.csv"))[1:366,]
+JDA_temp_long <- cov_reformat(input_data = JDA_temp, variable_name = "temp")
+
+
+# LGR
+LGR_flow <- read.csv(here::here("covariate_data", "LGR", "basin_outflow_LWG_allyears.csv"))[1:366,]
+LGR_flow_long <- cov_reformat(input_data = LGR_flow, variable_name = "flow")
+LGR_spill <- read.csv(here::here("covariate_data", "LGR", "basin_spill_LWG_allyears.csv"))[1:366,]
+LGR_spill_long <- cov_reformat(input_data = LGR_spill, variable_name = "spill")
+LGR_temp <- read.csv(here::here("covariate_data", "LGR", "basin_tempc_tailrace_LWG_allyears.csv"))[1:366,]
+LGR_temp_long <- cov_reformat(input_data = LGR_temp, variable_name = "temp")
+
+
+# MCN
+MCN_flow <- read.csv(here::here("covariate_data", "MCN", "basin_outflow_MCN_allyears.csv"))[1:366,]
+MCN_flow_long <- cov_reformat(input_data = MCN_flow, variable_name = "flow")
+MCN_spill <- read.csv(here::here("covariate_data", "MCN", "basin_spill_MCN_allyears.csv"))[1:366,]
+MCN_spill_long <- cov_reformat(input_data = MCN_spill, variable_name = "spill")
+MCN_temp <- read.csv(here::here("covariate_data", "MCN", "basin_tempc_tailrace_MCN_allyears.csv"))[1:366,]
+MCN_temp_long <- cov_reformat(input_data = MCN_temp, variable_name = "temp")
+
+
+# PRA
+PRA_flow <- read.csv(here::here("covariate_data", "PRA", "basin_outflow_PRD_allyears.csv"))[1:366,]
+PRA_flow_long <- cov_reformat(input_data = PRA_flow, variable_name = "flow")
+PRA_spill <- read.csv(here::here("covariate_data", "PRA", "basin_spill_PRD_allyears.csv"))[1:366,]
+PRA_spill_long <- cov_reformat(input_data = PRA_spill, variable_name = "spill")
+PRA_temp <- read.csv(here::here("covariate_data", "PRA", "basin_tempc_tailrace_PRD_allyears.csv"))[1:366,]
+PRA_temp_long <- cov_reformat(input_data = PRA_temp, variable_name = "temp")
+
+
+# RIS
+RIS_flow <- read.csv(here::here("covariate_data", "RIS", "basin_outflow_RIS_allyears.csv"))[1:366,]
+RIS_flow_long <- cov_reformat(input_data = RIS_flow, variable_name = "flow")
+RIS_spill <- read.csv(here::here("covariate_data", "RIS", "basin_spill_RIS_allyears.csv"))[1:366,]
+RIS_spill_long <- cov_reformat(input_data = RIS_spill, variable_name = "spill")
+RIS_temp <- read.csv(here::here("covariate_data", "RIS", "basin_tempc_tailrace_RIS_allyears.csv"))[1:366,]
+RIS_temp_long <- cov_reformat(input_data = RIS_temp, variable_name = "temp")
+
+
+# RRE
+RRE_flow <- read.csv(here::here("covariate_data", "RRE", "basin_outflow_RRH_allyears.csv"))[1:366,]
+RRE_flow_long <- cov_reformat(input_data = RRE_flow, variable_name = "flow")
+RRE_spill <- read.csv(here::here("covariate_data", "RRE", "basin_spill_RRH_allyears.csv"))[1:366,]
+RRE_spill_long <- cov_reformat(input_data = RRE_spill, variable_name = "spill")
+RRE_temp <- read.csv(here::here("covariate_data", "RRE", "basin_tempc_tailrace_RRH_allyears.csv"))[1:366,]
+RRE_temp_long <- cov_reformat(input_data = RRE_temp, variable_name = "temp")
+
+
+# WEL
+WEL_flow <- read.csv(here::here("covariate_data", "WEL", "basin_outflow_WEL_allyears.csv"))[1:366,]
+WEL_flow_long <- cov_reformat(input_data = WEL_flow, variable_name = "flow")
+WEL_spill <- read.csv(here::here("covariate_data", "WEL", "basin_spill_WEL_allyears.csv"))[1:366,]
+WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
+WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_WEL_allyears.csv"))[1:366,]
+WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
+
+
+
 
 
 
