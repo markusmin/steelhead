@@ -2,7 +2,8 @@
 title: "Steelhead Overshoot Update"
 author: "Markus Min"
 date: "3/10/2022"
-output: ioslides_presentation
+output:
+  ioslides_presentation: default
 ---
 
 ```{r load_libraries, echo = FALSE, message = FALSE}
@@ -123,13 +124,18 @@ acclimation_table %>%
 # Preparing data for model: Natal origins
 
 
-## Natal origins
-```{r plot_total_individuals, echo = FALSE, message = FALSE}
+## Natal origins (based on release site)
+```{r plot_total_individuals, echo = FALSE, message = FALSE, warning = FALSE}
 # plot only those with > 250 individuals
+rear_origin_counts %>% 
+  mutate(new = ifelse(natal_origin %in% c("Asotin Creek", "Klickitat River", "Methow River", "Okanogan River", "Wind River"), "new", "old")) -> rear_origin_counts
+
+new_sites <- ifelse(rear_origin_counts$new == "new", "red", "black")[seq(1,37,2)]
+
 ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_code)) +
   geom_bar(stat = "identity", position = "dodge2") +
   scale_fill_manual(values = c("#1f78b4", "#ff7f00"), labels = c("Hatchery", "Wild")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, size = 12)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, size = 12, color = new_sites)) +
   labs(fill = "Rear Type",
        x = "Natal Origin",
        y = "Total") +
@@ -165,7 +171,7 @@ ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_co
 
 # Preparing data for model: Covariates
 
-## Objectives for preparing covariate data
+## Preparing covariate data
 1. Categorical covariates that describe differences between individual fish (e.g., acclimation, run year, natal origin)
 2. Continuous covariates that describe the conditions experienced by fish in each state (e.g., temperature, spill):
 ![](.//figures/JDR_simple_example.png){width=100%}
@@ -229,13 +235,13 @@ ggplot(imnaha_acclimation_table, aes(x = year_numeric, y = total, color = acclim
   "To account for variation in travel time, I created a week-long window, centered around the median monthly travel time, during which each steelhead was likely arrive near their home tributary. I found the average water temperature in the outflow of the upstream dam within the one-week window."
 
 ## Temperature - our approach
-- Need more detail in our temperature data - Shelby was just looking at overshoot (binary) and so just needed one temperature value. We need temperature covariate for movement probabilities in each state
+- Need more detail in our temperature data - Shelby was just looking at overshoot (binary) and so just needed one temperature value. We want temperature as a  covariate for movement probabilities in each state
 - Similar approach to Shelby:
   - Tailrace temperatures, one-week window around median travel time
   - Median travel calculated for each each natal origin (expect fish to move different speeds depending on where they're headed) and each month
     - Median travel allows us to get temperature for all fish (incl. those that don't ascend the upstream dam), but also means that for those that do ascend the upstream dam, we're less accurate
     
-## Temperature: allowing for bidirectionality
+## Temperature - our approach
 - In each state, we'd use the tailrace temperature from the upstream dam, in this case MCN:
 ![](.//figures/JDR_simple_example.png){width=100%}
 
@@ -246,7 +252,7 @@ ggplot(imnaha_acclimation_table, aes(x = year_numeric, y = total, color = acclim
   
 ## Temperature: further issues
 - Implicit states - for example, if we see an individual ascend a dam twice, we know it had to have been in the downstream state at some point, but we don't know when
-  - Possible solutions: subtract median travel time from second dam ascension, or take tailrace temperature at time of second dam ascension
+  - Possible solutions: subtract median travel time (from downstream dam to upstream dam) from time of second dam ascension, or take tailrace temperature at time of second dam ascension
   - One issue is that repeat ascensions (therefore implicit fallback) often occur close together in time (e.g., less than 24 hours apart)
 - The MCN-PRA-ICH state - Two tailrace temperatures, one for ICH and one for PRA, and some individuals move directly between PRA and ICH
 
