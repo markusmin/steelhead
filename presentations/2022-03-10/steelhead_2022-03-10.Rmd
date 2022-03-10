@@ -120,7 +120,7 @@ acclimation_table %>%
 ```
 
 
-# Preparing complete dataset for model
+# Preparing data for model: Natal origins
 
 
 ## Natal origins
@@ -129,10 +129,11 @@ acclimation_table %>%
 ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_code)) +
   geom_bar(stat = "identity", position = "dodge2") +
   scale_fill_manual(values = c("#1f78b4", "#ff7f00"), labels = c("Hatchery", "Wild")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, size = 12)) +
   labs(fill = "Rear Type",
        x = "Natal Origin",
-       y = "Total")
+       y = "Total") +
+  ggtitle("Fish by rear type + natal origin")
   
 ```
 
@@ -158,19 +159,111 @@ ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_co
 - TRC (Trout Creek) array has been active since September 2007; WRA (Wind River RKM 30) has been active since October 2012. Starting in run year 13/14, there are 474 wild fish
 
 
+# Preparing data for model: Covariates
+
 ## Acclimation
 ```{r echo = FALSE, message = FALSE}
-ggplot(acclimation_table_origin, aes(x = natal_origin, y = total,  fill = acclimated)) +
+ggplot(subset(acclimation_table_origin, natal_origin != "Deschutes River"), aes(x = natal_origin, y = total,  fill = acclimated)) +
   geom_bar(stat = "identity", position = "dodge2") +
   scale_fill_manual(values = c("#1f78b4", "#ff7f00")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, size = 12)) +
   labs(fill = "Acclimated",
        x = "Natal Origin",
-       y = "Total")
+       y = "Total") +
+  ggtitle("Acclimation status (Hatchery populations only)")
 ```
 
 ## Temperature
-- Tailrace temperatures, window around when we'd expect them to be approaching a dam?
-- Shelby was only trying to look at overshoot around the natal tributary itself, we want all movement probabilities
+### Shelby's approach: Focus only on temperatures around natal tributary
+1. Predict time when individuals are approaching natal tributary:
+  "For each tributary, I found the median number of days it took overshooting steelhead to move from the lower dam prior to their home tributary to the overshoot dam... Travel times varied throughout the year, therefore median travel times were estimated on a month-by-month basis."
+2. Get mean temperature from a week-long window, centered around median travel time:
+  "To account for variation in travel time, I created a week-long window, centered around the median monthly travel time, during which each steelhead was likely arrive near their home tributary. I found the average water temperature in the outflow of the upstream dam within the one-week window."
+
+## Temperature - our approach
+- Need more detail in our temperature data - Shelby was just looking at overshoot (binary) and so just needed one temperature value. We need temperature covariate for movement probabilities in each state
+- Similar approach to Shelby:
+  - Tailrace temperatures, one-week window around median travel time
+  - Median travel calculated for each each natal origin (expect fish to move different speeds depending on where they're headed) and each month
+    - Median travel allows us to get temperature for all fish (incl. those that don't ascend the upstream dam), but also means that for those that do ascend the upstream dam, we're less accurate
+    
+## Temperature: allowing for bidirectionality
+- In each state, we'd use the tailrace temperature from the upstream dam, in this case MCN:
+![](.//figures/JDR_simple_example.png){width=100%}
+
+## Temperature: allowing for bidirectionality
+- If a fish is moving downstream, the median travel time would instead be the median time between falling back over the upstream dam and falling back over the downstream dam
+  - Problem: When falling back, individuals rarely fall back over the dam downstream of their natal tributary. So should we take median time between upstream dam and time at tributary?
+  - Example: Deschutes River fish often overshot McNary, but once they fell back over McNary, they never went all the way back to Bonneville - no way of calculating that median travel time using the between two dams approach
+- Another issue: the MCN-PRA-ICH state - Two tailrace temperatures, one for ICH and one for PRA, and some individuals move directly between PRA and ICH
+
+## Flow and spill - Shelby
+
+- Only used flow and spill for regressions with rate of fallback, and only rates at the overshoot dam
+- Flow by average outflow in March
+- Spill by proportion of days with any amount of spill in January, February, and March.
+  - Proportion of days with spill chosen as variable because 1) little variation in quantity of spill and 2) previous results indicate that it's the presence of spill, not quantity, that's necessary to route kelts away from turbines
+
+
+## Flow and spill - our approach
+- Issues with correlation between spill and flow?
+- Both the probability of ascending a dam and falling back over one could be affected by both flow and spill
+- Calculate amount of flow at upstream and downstream dam at each state (using same window approach as for temperature)
+- Presence of spill at upstream and downstream dam at each state - number of days in window?
+
+
+# Issue: how to enforce sum to 1 constraint with covariates?
+
+## If you didn't have a sum to 1 constraint
+
+```{r eval = FALSE, echo = FALSE}
+for (i in 1:length(natal_origin)){ 
+  for (j in 1:length(run_year)){ 
+    for (k in 1:length(temp)){ 
+      for (l in 1:length(flow)){ 
+        for (m in 1:length(spill)){ 
+          logit(f_bon) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical)
+            bYear[run_year[j]] + # run year (categorical)
+            bTemp * temp[k] + # temperature (continuous)
+            bFlow * flow[l] + # flow (continuous)
+            bSpill * spill[m] # spill (continuous)
+        }
+      }
+    }
+  }
+}
+```
+
+
+```{r eval = FALSE}
+# loop for each of the movement probabilities
+# Fish state is a vector of every state each fish was in
+for (i in 1:length(fish_state)){ 
+  logit(f_bon[i]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical)
+    bYear[run_year[i]] + # run year (categorical)
+    bTemp * temp[i] + # temperature (continuous)
+    bFlow * flow[i] + # flow (continuous)
+    bSpill * spill[i] # spill (continuous)
+}
+```
+
+
+## Current sum to 1 constraint code for movements in BON to MCN state
+```{r eval = FALSE}
+### 2: BON to MCN
+# l_bon_mcn <- 1 - (o_mcn + s_bon_mcn + h_bon_mcn + f_bon)
+a2 ~ dnorm(0, 0.01)
+b2 ~ dnorm(0, 0.01)
+c2 ~ dnorm(0, 0.01)
+d2 ~ dnorm(0, 0.01)
+
+o_mcn <- exp(a2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
+s_bon_mcn <- exp(b2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
+h_bon_mcn <- exp(c2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
+f_bon <- exp(d2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
+l_bon_mcn <- 1/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
+```
+
+
 
 
