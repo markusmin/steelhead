@@ -141,13 +141,17 @@ ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_co
 ## Candidates for inclusion
 
 ### Methow River
-- Lower Methot River (LMR) site came online in March 2009; run years 09/10 and onwards have 2,202 hatchery fish and 358 wild fish
+- Lower Methow River (LMR) site came online in March 2009; run years 09/10 and onwards have 2,202 hatchery fish and 358 wild fish
 
 ### Klickitat River
 - Lyle Falls Fishway (LFF) site came online August 2011; run years 12/13 and onwards have 2,197 hatchery fish
 
 ### Asotin Creek
 - Three arrays have been active since 2009, but these are farther from the mouth. The one at the creek mouth has been active since August 2011. Run years 12/13 and onwards have 415 wild fish
+
+## Asotin Creek
+![](.//figures/asotin_creek.png){width=100%}
+- ACM array active since August 2011; ACB, CCA, and AFC active since August 2009
 
 ## Okanogan River
 - Various arrays have been active since 2009; the array closest to the river mouth (OKL, Lower Okanogan Instream Array) has only been active since October 2013
@@ -161,16 +165,60 @@ ggplot(rear_origin_counts, aes(x = natal_origin, y = total,  fill = rear_type_co
 
 # Preparing data for model: Covariates
 
+## Objectives for preparing covariate data
+1. Categorical covariates that describe differences between individual fish (e.g., acclimation, run year, natal origin)
+2. Continuous covariates that describe the conditions experienced by fish in each state (e.g., temperature, spill):
+![](.//figures/JDR_simple_example.png){width=100%}
+
 ## Acclimation
 ```{r echo = FALSE, message = FALSE}
 ggplot(subset(acclimation_table_origin, natal_origin != "Deschutes River"), aes(x = natal_origin, y = total,  fill = acclimated)) +
   geom_bar(stat = "identity", position = "dodge2") +
-  scale_fill_manual(values = c("#1f78b4", "#ff7f00")) +
+  scale_fill_manual(values = c("#33a02c", "#6a3d9a")) +
   theme(axis.text.x = element_text(angle = 90, hjust = 0.95, vjust = 0.5, size = 12)) +
   labs(fill = "Acclimated",
        x = "Natal Origin",
        y = "Total") +
   ggtitle("Acclimation status (Hatchery populations only)")
+```
+
+## Sometimes run year and acclimation aren't confounded
+```{r echo = FALSE}
+# check distribution of acclimation for Grande Ronde
+acclimation_table %>% 
+  subset(., natal_origin == "Grande_Ronde_River") %>% 
+  count(run_year, acclimated) %>% 
+  dplyr::rename(total = n) %>% 
+  complete(run_year, acclimated) %>% 
+  mutate(total = ifelse(is.na(total), 0, total)) %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))+2000) -> GRR_acclimation_table
+
+run_years_vector <- unique(GRR_acclimation_table$run_year)
+ggplot(GRR_acclimation_table, aes(x = year_numeric, y = total, color = acclimated)) +
+  geom_point() +
+  geom_line() +
+  xlab("Year") +
+  scale_color_manual(values = c("#33a02c", "#6a3d9a")) +
+  ggtitle("Grande Ronde River")
+```
+
+## Sometimes acclimation practices clearly change over time
+```{r echo = FALSE}
+# Show Imnaha River as example
+acclimation_table %>% 
+  subset(., natal_origin == "Imnaha_River") %>% 
+  count(run_year, acclimated) %>% 
+  dplyr::rename(total = n) %>% 
+  complete(run_year, acclimated) %>% 
+  mutate(total = ifelse(is.na(total), 0, total)) %>% 
+  mutate(year_numeric = as.numeric(sub("\\/.*", "", run_year))+2000) -> imnaha_acclimation_table
+
+ggplot(imnaha_acclimation_table, aes(x = year_numeric, y = total, color = acclimated)) +
+  geom_point() +
+  geom_line() +
+  xlab("Year") +
+  scale_color_manual(values = c("#33a02c", "#6a3d9a")) +
+  ggtitle("Imnaha River")
 ```
 
 ## Temperature
@@ -194,8 +242,13 @@ ggplot(subset(acclimation_table_origin, natal_origin != "Deschutes River"), aes(
 ## Temperature: allowing for bidirectionality
 - If a fish is moving downstream, the median travel time would instead be the median time between falling back over the upstream dam and falling back over the downstream dam
   - Problem: When falling back, individuals rarely fall back over the dam downstream of their natal tributary. So should we take median time between upstream dam and time at tributary?
-  - Example: Deschutes River fish often overshot McNary, but once they fell back over McNary, they never went all the way back to Bonneville - no way of calculating that median travel time using the between two dams approach
-- Another issue: the MCN-PRA-ICH state - Two tailrace temperatures, one for ICH and one for PRA, and some individuals move directly between PRA and ICH
+  - Example: Deschutes R. fish often overshot MCN, but once they fell back over MCN, they never went all the way back to Bonneville - no way of calculating that median travel time using the between two dams approach
+  
+## Temperature: further issues
+- Implicit states - for example, if we see an individual ascend a dam twice, we know it had to have been in the downstream state at some point, but we don't know when
+  - Possible solutions: subtract median travel time from second dam ascension, or take tailrace temperature at time of second dam ascension
+  - One issue is that repeat ascensions (therefore implicit fallback) often occur close together in time (e.g., less than 24 hours apart)
+- The MCN-PRA-ICH state - Two tailrace temperatures, one for ICH and one for PRA, and some individuals move directly between PRA and ICH
 
 ## Flow and spill - Shelby
 
@@ -209,7 +262,7 @@ ggplot(subset(acclimation_table_origin, natal_origin != "Deschutes River"), aes(
 - Issues with correlation between spill and flow?
 - Both the probability of ascending a dam and falling back over one could be affected by both flow and spill
 - Calculate amount of flow at upstream and downstream dam at each state (using same window approach as for temperature)
-- Presence of spill at upstream and downstream dam at each state - number of days in window?
+- Presence of spill at upstream and downstream dam at each state - number of days in window around median travel time? Or use the same winter months approach?
 
 
 # Issue: how to enforce sum to 1 constraint with covariates?
@@ -236,10 +289,10 @@ for (i in 1:length(natal_origin)){
 
 
 ```{r eval = FALSE}
-# loop for each of the movement probabilities
 # Fish state is a vector of every state each fish was in
+# Example for probability of overshooting McNary Dam
 for (i in 1:length(fish_state)){ 
-  logit(f_bon[i]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical)
+  logit(o_mcn[i]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical)
     bYear[run_year[i]] + # run year (categorical)
     bTemp * temp[i] + # temperature (continuous)
     bFlow * flow[i] + # flow (continuous)
@@ -264,6 +317,10 @@ f_bon <- exp(d2)/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
 l_bon_mcn <- 1/(1 + exp(a2) + exp(b2) + exp(c2) + exp(d2))
 ```
 
+## Other questions
+
+- With this current model setup, are we able to determine if certain covariates affect certain populations but not others? I.e., are we getting a "global" effect of temperature on all populations, or are we able to see if temperature affects different populations differently (interacting effects)?
+- Is non-stationarity in the relationships between covariates and movement probabilities of interest? Do we want to incorporate autoregressive processes to describe how the effects of certain covariates on fish are changing over time?
 
 
 
