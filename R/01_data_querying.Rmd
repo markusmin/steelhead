@@ -504,6 +504,7 @@ as.data.frame(table(MCH_fish$release_site_name))
 wind_fish <- subset(adult_returns, release_site_name %in% c("WIND2R - Wind River, Washington", "TROUTC - Trout Creek (trib. to Wind River, Wash.)"))
 table(wind_fish$rear_type_code) # 1070 wild
 table(wind_fish$run_year)
+table(wind_fish$release_site_name)
 
 # Hells Canyon
 HC_fish <- subset(adult_returns, release_site_subbasin_name == "Hells Canyon")
