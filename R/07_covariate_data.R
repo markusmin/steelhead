@@ -172,33 +172,232 @@ ggplot(data = JDR_nat_trib_final, aes(x = DayMonth)) +
 # Step 1: Find median travel time between previous dam and next dam
 # Import the shortened detection history
 det_hist <- read.csv(here::here("model_files", "complete_det_hist.csv"), row.names = 1)
+BON_arrival <- read.csv(here::here("covariate_data", "complete_BON_arrival.csv"))
+origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
+# Read in the metadata
+tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
+tag_code_metadata %>% 
+  left_join(., origin_table, by = "release_site_name") %>% 
+  dplyr::select(tag_code, run_year, natal_origin, rear_type_code, release_site_name) %>% 
+  subset(., tag_code %in% BON_arrival$tag_code) -> origin_metadata
+
+det_hist %>% 
+  left_join(., origin_metadata, by = "tag_code") %>% 
+  mutate(start_time = ymd_hms(start_time),
+         end_time = ymd_hms(end_time)) %>% 
+  # add a month field
+  mutate(start_month = month(start_time))-> det_hist
+
 
 # Create a function for this
 median_travel_time_calc <- function(prev_dam, next_dam, data){
   # Keep only the parts of the df where the detection ns are prev_dam, then next dam
   data %>% 
     mutate(prev_site = lag(event_site_name),
-           prev_time = lag(end_time)) %>% 
+           prev_time = lag(end_time),
+           prev_tag_code = lag(tag_code)) %>% 
     mutate(prev_time = ymd_hms(prev_time),
            end_time = ymd_hms(end_time)) %>% 
-    filter(., event_site_name == next_dam & prev_site == prev_dam) -> test
+    filter(., event_site_name == next_dam & prev_site == prev_dam) -> two_dam_data
   
   # New calculate the travel times and get the median
-  test %>% 
-    mutate(travel_time = time_length(as.period(end_time - prev_time), unit = "days")) %>% 
-    subset(travel_time >= 0) -> test2
+  two_dam_data %>% 
+    mutate(travel_time = ifelse(tag_code == prev_tag_code, time_length(as.period(end_time - prev_time), unit = "days"),NA)) %>% 
+    subset(travel_time >= 0) -> two_dam_movement_data
+  
+  median_travel_time <- median(two_dam_movement_data$travel_time)
+  
+  return(median_travel_time)
     
+}
+
+# Make an alternative function to calculate travel times but not median, so you can subset
+travel_time_calc <- function(prev_dam, next_dam, data){
+  # Keep only the parts of the df where the detection ns are prev_dam, then next dam
+  data %>% 
+    mutate(prev_site = lag(event_site_name),
+           prev_time = lag(end_time),
+           prev_tag_code = lag(tag_code)) %>% 
+    mutate(prev_time = ymd_hms(prev_time),
+           end_time = ymd_hms(end_time)) %>% 
+    filter(., event_site_name == next_dam & prev_site == prev_dam) -> two_dam_data
+  
+  # New calculate the travel times and get the median
+  two_dam_data %>% 
+    mutate(travel_time = ifelse(tag_code == prev_tag_code, time_length(as.period(end_time - prev_time), unit = "days"),NA)) %>% 
+    subset(travel_time >= 0) -> two_dam_movement_data
+  
+  return(two_dam_movement_data)
+  
 }
 
 ggplot(test2, aes(x = travel_time)) +
   geom_histogram()
 
-# Loop through this function for each set of sequential dams
-downstream_dams <- c("Bonneville Adult Fishways (combined)", "McNary Adult Fishways (combined)")
+# Loop through this function for each set of sequential dams, each origin, and each month
+dams <-
+  c(
+    "Bonneville Adult Fishways (combined)",
+    "McNary Adult Fishways (combined)",
+    "ICH - Ice Harbor Dam (Combined)",
+    "LMA - Lower Monumental Adult Ladders",
+    "GOA - Little Goose Fish Ladder",
+    "Lower Granite Dam Adult Fishways (combined)",
+    "PRA - Priest Rapids Adult",
+    "RIA - Rock Island Adult",
+    "RRF - Rocky Reach Fishway",
+    "WEA - Wells Dam, DCPUD Adult Ladders"
+  )
+
+# make a table with dam, upstream dam, downstream dam
+dam_relationships <- data.frame(dam = dams, 
+                                downstream_dam = c(NA, 
+                                                   "Bonneville Adult Fishways (combined)",
+                                                   "McNary Adult Fishways (combined)",
+                                                   "ICH - Ice Harbor Dam (Combined)",
+                                                   "LMA - Lower Monumental Adult Ladders",
+                                                   "GOA - Little Goose Fish Ladder",
+                                                   "McNary Adult Fishways (combined)",
+                                                   "PRA - Priest Rapids Adult",
+                                                   "RIA - Rock Island Adult",
+                                                   "RRF - Rocky Reach Fishway"),
+                                upstream_dam = c("McNary Adult Fishways (combined)",
+                                                 "ICH - Ice Harbor Dam (Combined)",
+                                                 "LMA - Lower Monumental Adult Ladders",
+                                                 "GOA - Little Goose Fish Ladder",
+                                                 "Lower Granite Dam Adult Fishways (combined)",
+                                                 NA,
+                                                 "RIA - Rock Island Adult",
+                                                 "RRF - Rocky Reach Fishway",
+                                                 "WEA - Wells Dam, DCPUD Adult Ladders",
+                                                 NA))
+
+# Get natal origins
+unique_origins <- unique(det_hist$natal_origin)[!is.na(unique(det_hist$natal_origin))]
+# get months
+unique_months <- unique(det_hist$start_month)
+
+# Create an empty data frame to store all of the median travel times
+median_travel_time_df <- crossing(unique_origins, unique_months, dam_relationships$dam, dam_relationships$downstream_dam, dam_relationships$upstream_dam)
+median_travel_time_df <- crossing(unique_origins, unique_months, dam_relationships$dam)
+colnames(median_travel_time_df) <- c("natal_origin","month","dam")
+median_travel_time_df %>% 
+  left_join(., dam_relationships, by = "dam") -> median_travel_time_df
+
+# Add variables to store upstream and downstream travel times
+median_travel_time_df %>% 
+  mutate(median_upstream_travel_time = NA,
+         median_downstream_travel_time = NA) -> median_travel_time_df
+
+
+for (i in 1:length(unique_origins)){
+  # continually update unique months for each natal origin
+  unique_months <- unique(subset(det_hist, natal_origin == unique_origins[i])$start_month)
+  
+  for (j in 1:length(unique_months)){
+    origin <- unique_origins[i]
+    current_month <- unique_months[j]
+    origin_month_data <- subset(det_hist, start_month == current_month & natal_origin == origin)
+    
+    # get the unique dam combinations for this dataset
+    unique_sites <- unique(origin_month_data$event_site_name)
+    unique_dams <- unique_sites[unique_sites %in% dams]
+    
+    # Create an if else statement to only loop through if there are any dams in the detection history
+    for (k in 1:length(unique_dams)){
+      current_dam <- unique_dams[k]
+      upstream_dam <- subset(dam_relationships, dam == current_dam)$upstream_dam
+      downstream_dam <- subset(dam_relationships, dam == current_dam)$downstream_dam
+      
+      print(paste0("Current Dam: ", current_dam,
+                   "; Upstream Dam: ", upstream_dam,
+                   "; Downstream Dam: ", downstream_dam,
+                   "; Origin: ", origin,
+                   "; Current Month: ", current_month))
+      
+      median_upstream_travel_time <- median_travel_time_calc(prev_dam = current_dam,
+                              next_dam = upstream_dam,
+                              data = origin_month_data)
+      median_downstream_travel_time <- median_travel_time_calc(prev_dam = current_dam,
+                                                               next_dam = downstream_dam,
+                                                               data = origin_month_data)
+      
+      median_travel_time_df$median_upstream_travel_time[median_travel_time_df$natal_origin == origin &
+                                                          median_travel_time_df$month == current_month & 
+                                                          median_travel_time_df$dam == current_dam]<- median_upstream_travel_time
+      
+      
+      median_travel_time_df$median_downstream_travel_time[median_travel_time_df$natal_origin == origin &
+                                                          median_travel_time_df$month == current_month & 
+                                                          median_travel_time_df$dam == current_dam]<- median_downstream_travel_time
+      
+      }
+  }
+}
+
+
+## v2
+
+for (i in 1:length(unique_origins)){
+  origin <- unique_origins[i]
+  origin_data <- subset(det_hist, natal_origin == origin)
+  
+  # get the unique dam combinations for this dataset
+  unique_sites <- unique(origin_data$event_site_name)
+  unique_dams <- unique_sites[unique_sites %in% dams]
+
+  for (j in 1:length(unique_dams)){
+      current_dam <- unique_dams[j]
+      upstream_dam <- subset(dam_relationships, dam == current_dam)$upstream_dam
+      downstream_dam <- subset(dam_relationships, dam == current_dam)$downstream_dam
+      
+
+      # get a df with individual travel times
+      upstream_travel_time <- travel_time_calc(prev_dam = current_dam,
+                                                             next_dam = upstream_dam,
+                                                             data = origin_data)
+      downstream_travel_time <- travel_time_calc(prev_dam = current_dam,
+                                                               next_dam = downstream_dam,
+                                                               data = origin_data)
+        
+        
+        # get unique months
+        unique_months <- unique(origin_data$start_month)
+        
+        # Loop through the unique months, subset to get median travel time for these
+        for (k in 1:length(unique_months)){
+          current_month <- unique_months[k]
+          
+          print(paste0("Current Dam: ", current_dam,
+                       "; Upstream Dam: ", upstream_dam,
+                       "; Downstream Dam: ", downstream_dam,
+                       "; Origin: ", origin,
+                       "; Current Month: ", current_month))
+          
+          # get the upstream travel time
+          origin_month_upstream_travel_time <- subset(upstream_travel_time, start_month == current_month)
+          median_upstream_travel_time <- median(origin_month_upstream_travel_time$travel_time)
+          
+          # get the downstream travel time
+          origin_month_downstream_travel_time <- subset(downstream_travel_time, start_month == current_month)
+          median_downstream_travel_time <- median(origin_month_downstream_travel_time$travel_time)
+      
+        median_travel_time_df$median_upstream_travel_time[median_travel_time_df$natal_origin == origin &
+                                                          median_travel_time_df$month == current_month & 
+                                                          median_travel_time_df$dam == current_dam]<- median_upstream_travel_time
+      
+      
+        median_travel_time_df$median_downstream_travel_time[median_travel_time_df$natal_origin == origin &
+                                                            median_travel_time_df$month == current_month & 
+                                                            median_travel_time_df$dam == current_dam]<- median_downstream_travel_time
+      
+    }
+  }
+}
+
 
 
 # Step 2: For each individual fish, create a weeklong window center around the median travel time, i.e. +/- 3 days
-
 
 
 
