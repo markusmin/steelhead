@@ -42,16 +42,27 @@ JDR_CTH %>%
 JDR_CTH_adult %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("BHL - Adult Fishway at BONH", "BO1 - Bonneville Bradford Is. Ladder", 
                                                         "BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF", 
-                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"),
+                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility",
+                                                        "BON - Bonneville Dam Complex"),
                                   "Bonneville Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("MC1 - McNary Oregon Shore Ladder", "MC2 - McNary Washington Shore Ladder"),
                                   "McNary Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("TD1 - The Dalles East Fish Ladder", "TD2 - The Dalles North Fish Ladder"),
                                   "The Dalles Adult Fishways (combined)", event_site_name)) %>% 
-  mutate(event_site_name = ifelse(event_site_name %in% c("LGRLDR - LGR - Release into the Adult Fish Ladder", "GRA - Lower Granite Dam Adult"),
-                                  "Lower Granite Dam Adult Fishways (combined)", event_site_name)) -> JDR_CTH_adult
-
-
+  mutate(event_site_name = ifelse(event_site_name %in% c("ICH - Ice Harbor Dam (Combined)", "IHR - Ice Harbor Dam"),
+                                  "Ice Harbor Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("LGRLDR - LGR - Release into the Adult Fish Ladder", "GRA - Lower Granite Dam Adult",
+                                                         "LGR - Lower Granite Dam"),
+                                  "Lower Granite Dam Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("RIA - Rock Island Adult", "RIS - Rock Island Dam"),
+                                  "Rock Island Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("WEA - Wells Dam, DCPUD Adult Ladders", 
+                                                         "WELLD2 - WEL - Release into the West Adult Fish Ladder",
+                                                         "WELLD1 - WEL - Release into the East Adult Fish Ladder",
+                                                         "WEL - Wells Dam"), "Wells Dam Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("PRA - Priest Rapids Adult", "PRD - Priest Rapids Dam",
+                                                         "PRDLD1 - PRD - Release into the Left Bank (facing downstream) Adult Fish Ladder"), 
+                                  "Priest Rapids Dam Adult Fishways (combined)", event_site_name))-> JDR_CTH_adult
 
 ### Convert complete tag histories into history of detection events
 
@@ -566,6 +577,10 @@ for (i in 1:length(unique_tag_IDs)){
 
 # Export this detection history
 write.csv(det_hist, here("model_files", "complete_det_hist.csv"))
+
+det_hist <- read.csv(here("model_files", "complete_det_hist.csv"), row.names = 1)
+
+write.csv(complete_event_site_metadata, here("model_files", "complete_event_site_metadata.csv"))
 
 # Inspect sites - for mapping
 
