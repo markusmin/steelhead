@@ -1,0 +1,56 @@
+---
+title: "John_Day_River"
+author: "Markus Min"
+date: "1/5/2022"
+output: html_document
+---
+
+In this Rmd we will be recreating Shelby Richins' results for John Day River Steelhead.
+
+This Rmd is organized by the workflow:
+1) Querying PTAGIS for the relevant data
+
+# PTAGIS Query
+- Interrogation Detail
+
+Query Builder2:
+- 1 Attributes: Standard
+- 2 Metrics: Obs Count, Obs Time Max, Obs Time Min
+- 12 Release site: All rivers/creeks listed as tributaries to, mainstem of, or any fork of of the John Day River
+  - Searched for "John Day" in 12. Release Site, manually removed any entries that did not meet this criteria
+- 24 Species: Steelhead
+- 27 Migration Year: 2005-2015
+
+-> Run report, then in Report Details:
+  - Tools -> View Filter; Add Condition
+  - Condition: Obs Time Max Equals Max Obs Time Per Site
+    - This gives us only the last observation of each individual at each site, so we don't have multiple PIT-tag detections
+    recorded at the same site.
+  
+
+
+# Prepare data for analysis
+Remove certain entries:
+- steelhead greater than 350 mm at release
+  - if length parameter not included, look at metadata of individual mark files
+- steelhead not detected at Bonneville fishway following release
+
+Determine run timing based on the date/time of first observation at:
+- Bonneville Dam
+- overshoot dams (first dam with PIT detection capabilities upstream of the natal tributary)
+  - Look in adult latter, or time of first observation above overshoot dam
+- in natal tributary
+
+Sort into run years by June 1
+
+# Examine data
+
+According to Richins 2017, should have 243 wild and 37 hatchery steelehad from 14/15 run year
+
+
+
+# Project Branch
+
+
+
+
