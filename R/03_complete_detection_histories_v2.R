@@ -606,7 +606,7 @@ added_rows <- 0
 
 # Loop through each row of the detection history
 # for (i in 1:(2 * nrow(det_hist) - 1)) {
-for (i in 1:1978) {
+for (i in 1:1977) {
   # Update i to keep up with number of added rows
   # NOT NECESSARY
   # i <- i + added_rows
