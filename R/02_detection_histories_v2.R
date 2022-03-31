@@ -76,6 +76,8 @@ write.csv(BON_arrival, here::here("covariate_data", "complete_BON_arrival.csv"),
 # Subset only the adult migration history
 CTH_complete %>% 
   left_join(., BON_arrival, by = "tag_code") %>% 
+  # Keep only observations, no mark or recapture events (there is some weird stuff going on with those)
+  subset(., event_type_name == "Observation") %>% 
   group_by(tag_code) %>% 
   filter(event_date_time_value >= BON_arrival) %>% 
   dplyr::select(-BON_arrival) %>% 
