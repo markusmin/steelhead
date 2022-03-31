@@ -33,13 +33,13 @@ snake_dams <- c("Ice Harbor Adult Fishways (combined)",  "Lower Granite Dam Adul
 
 # Asotin Creek
 subset(complete_event_site_metadata, event_site_subbasin_name == "Lower Snake-Asotin") %>%  # asotin creek (Tenmile Creek is not a tributary to Asotin Creek)
-  subset(., event_site_name != "TENMC2 - Tenmile Creek, tributary to Snake River") -> ASO_sites
+  subset(., event_site_name != "TENMC2 - Tenmile Creek, tributary to Snake River") -> ASO_sites_df
 
 # Clearwater River
-subset(complete_event_site_metadata, event_site_basin_name == "Clearwater") -> CLE_sites
+subset(complete_event_site_metadata, event_site_basin_name == "Clearwater") -> CLE_sites_df
 
 # Deschutes River
-subset(complete_event_site_metadata, event_site_basin_name == "Deschutes") -> DES_sites
+subset(complete_event_site_metadata, event_site_basin_name == "Deschutes") -> DES_sites_df
 
 # Entiat River
 subset(complete_event_site_metadata, event_site_subbasin_name == "Upper Columbia-Entiat") %>%
@@ -47,74 +47,93 @@ subset(complete_event_site_metadata, event_site_subbasin_name == "Upper Columbia
   filter(!grepl("RRF", event_site_name)) %>% 
   filter(!grepl("RIA", event_site_name)) %>% 
   filter(!grepl("RIS", event_site_name)) %>% 
-  filter(!grepl("EBO", event_site_name)) -> ENT_sites
+  filter(!grepl("EBO", event_site_name)) -> ENT_sites_df
 
 # Fifteenmile Creek
-subset(complete_event_site_metadata, event_site_name %in% complete_event_site_metadata$event_site_name[grep("Fifteenmile", complete_event_site_metadata$event_site_name)]) -> FIF_sites
+subset(complete_event_site_metadata, event_site_name %in% complete_event_site_metadata$event_site_name[grep("Fifteenmile", complete_event_site_metadata$event_site_name)]) -> FIF_sites_df
 
 # Grande Ronde River
-subset(complete_event_site_metadata, event_site_subbasin_name %in% c("Lower Grande Ronde", "Upper Grande Ronde", "Wallowa")) -> GRRO_sites
+subset(complete_event_site_metadata, event_site_subbasin_name %in% c("Lower Grande Ronde", "Upper Grande Ronde", "Wallowa")) -> GRRO_sites_df
 
 # Hood River
 subset(complete_event_site_metadata, event_site_name %in%
          c(complete_event_site_metadata$event_site_name[grep("Hood", complete_event_site_metadata$event_site_name)],
        "EFD - East Fork Diversion Fishway", "PARK - Parkdale Hatchery",
-       "MVF - Moving Falls Fish Ladder", "SND - Sandtrap Acclimation Site")) -> HOOD_sites
+       "MVF - Moving Falls Fish Ladder", "SND - Sandtrap Acclimation Site")) -> HOOD_sites_df
 
 # Imnaha River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Imnaha") -> IMN_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Imnaha") -> IMN_sites_df
 
 # John Day River
 subset(complete_event_site_metadata, event_site_subbasin_name %in% 
-         c("Upper John Day", "North Fork John Day", "Middle Fork John Day", "Lower John Day")) -> JDR_sites
+         c("Upper John Day", "North Fork John Day", "Middle Fork John Day", "Lower John Day")) -> JDR_sites_df
 
 # Methow River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Methow") -> MET_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Methow") -> MET_sites_df
 
 # Okanogan River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Okanogan") -> OKA_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Okanogan") -> OKA_sites_df
 
 # Salmon River
-subset(complete_event_site_metadata, event_site_basin_name == "Salmon") -> SAL_sites 
+subset(complete_event_site_metadata, event_site_basin_name == "Salmon") -> SAL_sites_df 
 
 # Tucannon River
 subset(complete_event_site_metadata, event_site_name %in%
          c(complete_event_site_metadata$event_site_name[grep("Tucannon", complete_event_site_metadata$event_site_name)],
-           "CURP (Curl Lake Rearing Pond)")) -> TUC_sites
+           "CURP (Curl Lake Rearing Pond)")) -> TUC_sites_df
 
 # Umatilla River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Umatilla") -> UMA_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Umatilla") -> UMA_sites_df
 
 # Walla Walla River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Walla Walla") -> WAWA_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Walla Walla") -> WAWA_sites_df
 
 # Wenatchee River
-subset(complete_event_site_metadata, event_site_subbasin_name == "Wenatchee") -> WEN_sites
+subset(complete_event_site_metadata, event_site_subbasin_name == "Wenatchee") -> WEN_sites_df
 
-subset(complete_event_site_metadata, event_site_basin_name == "Yakima") -> YAK_sites # Yakima River
+subset(complete_event_site_metadata, event_site_basin_name == "Yakima") -> YAK_sites_df # Yakima River
 
 # combine these into one DF to store all of the tributaries that we are interested in - everything else will just be "other tributaries", sorted by reach
-ASO_sites %>% 
-  bind_rows(., CLE_sites) %>% 
-  bind_rows(., DES_sites) %>% 
-  bind_rows(., ENT_sites) %>% 
-  bind_rows(., FIF_sites) %>% 
-  bind_rows(., GRRO_sites) %>% 
-  bind_rows(., HOOD_sites) %>% 
-  bind_rows(., IMN_sites) %>% 
-  bind_rows(., JDR_sites) %>% 
-  bind_rows(., MET_sites) %>% 
-  bind_rows(., OKA_sites) %>% 
-  bind_rows(., SAL_sites) %>% 
-  bind_rows(., TUC_sites) %>% 
-  bind_rows(., UMA_sites) %>% 
-  bind_rows(., WAWA_sites) %>% 
-  bind_rows(., WEN_sites) %>% 
-  bind_rows(., YAK_sites) -> origin_sites_df
+ASO_sites_df %>% 
+  bind_rows(., CLE_sites_df) %>% 
+  bind_rows(., DES_sites_df) %>% 
+  bind_rows(., ENT_sites_df) %>% 
+  bind_rows(., FIF_sites_df) %>% 
+  bind_rows(., GRRO_sites_df) %>% 
+  bind_rows(., HOOD_sites_df) %>% 
+  bind_rows(., IMN_sites_df) %>% 
+  bind_rows(., JDR_sites_df) %>% 
+  bind_rows(., MET_sites_df) %>% 
+  bind_rows(., OKA_sites_df) %>% 
+  bind_rows(., SAL_sites_df) %>% 
+  bind_rows(., TUC_sites_df) %>% 
+  bind_rows(., UMA_sites_df) %>% 
+  bind_rows(., WAWA_sites_df) %>% 
+  bind_rows(., WEN_sites_df) %>% 
+  bind_rows(., YAK_sites_df) -> origin_sites_df
 
 # get just the site names
+# all together
 origin_sites <- origin_sites_df$event_site_name
-  
+
+# each individually
+ASO_sites <- ASO_sites_df$event_site_name
+CLE_sites <- CLE_sites_df$event_site_name
+DES_sites <- DES_sites_df$event_site_name
+ENT_sites <- ENT_sites_df$event_site_name
+FIF_sites <- FIF_sites_df$event_site_name
+GRRO_sites <- GRRO_sites_df$event_site_name
+HOOD_sites <- HOOD_sites_df$event_site_name
+IMN_sites <- IMN_sites_df$event_site_name
+JDR_sites <- JDR_sites_df$event_site_name
+MET_sites <- MET_sites_df$event_site_name
+OKA_sites <- OKA_sites_df$event_site_name
+SAL_sites <- SAL_sites_df$event_site_name
+TUC_sites <- TUC_sites_df$event_site_name
+UMA_sites <- UMA_sites_df$event_site_name
+WAWA_sites <- WAWA_sites_df$event_site_name
+WEN_sites <- WEN_sites_df$event_site_name
+YAK_sites <- YAK_sites_df$event_site_name
 
 # Now we need to figure out which are the sites that are tributaries that we don't care about
 # Approach: Subset by basin/subbasin, take out dams and the inriver sites (when applicable), take out the origin sites
@@ -171,7 +190,7 @@ LGR_upstream_other_trib_sites_df <- subset(complete_event_site_metadata,
                                                                       "Upper Middle Fork Salmon", "Middle Salmon-Panther", "Pahsimeroi", "Lemhi") & 
                                         !(event_site_name %in% origin_sites) |
                                         event_site_name %in% c("ALPOWC - Alpowa Creek, lower Snake River",
-                                                               "TENMC2 - Tenmile Creek, tributary to Snake River",
+                                                               "TENMC2 - Tenmile Creek, tributary to Snake River"
                                                                ) &
                                         !(event_site_name %in% origin_sites))
 
@@ -225,7 +244,7 @@ ICH_LGR_inriver <- c("GRJ - Lower Granite Dam Juvenile", "GOJ - Little Goose Dam
                      "LYFE - Lyons Ferry Hatchery", "SNAKE1 - Snake River - mouth to Palouse River (km 0-96)",
                      "SNAKE2 - Snake River - Palouse River to Clearwater River (km 96-224)")
 
-RRE_WEL_inriver <- c("WELH - Wells Hatchery", "WELTAL - WEL - Release into the Tailrace within 0.5 km downstream of Dam",
+RRE_WEL_inriver <- c("WELH - Wells Hatchery", "WEH - Wells Dam Hatchery", "WELTAL - WEL - Release into the Tailrace within 0.5 km downstream of Dam",
                      "EBO - East Bank Hatchery Outfall")
 
 upstream_WEL_inriver <- c("CHJO - Chief Joseph Hatchery", "OXBO - Oxbow Hatchery (IDFG)",
@@ -248,34 +267,77 @@ setdiff(complete_event_site_metadata$event_site_name,
           origin_sites, # Natal origins
           LGR_upstream_other_trib_sites, ICH_LGR_other_trib_sites, # Other tributary sitses
           BON_MCN_other_trib_sites, WEL_upstream_other_trib_sites, # Other tributary sites continued
-          pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, RRE_WEL_inriver, #in river arrays
+          pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, 
+          upstream_WEL_inriver, RRE_WEL_inriver, upstream_LGR_inriver, #in river arrays
           BON_fallback_arrays, MCN_fallback_arrays, LGR_fallback_arrays, 
           RIS_fallback_arrays, RRE_fallback_arrays, WEL_fallback_arrays)) # fallback arrays
 
 # Turn this into a dataframe (this was a silly way to do this)
-JDR_site_classification <- data.frame(event_site_name = c(columbia_dams, snake_dams, # Adult fishways at dams
-                                                          LGR_upstream_other_trib_sites, ICH_LGR_other_trib_sites,MCN_PRA_ICH_other_trib_sites, 
-                                                          BON_MCN_other_trib_sites,BON_MCN_natal_sites, # Tributary sites
+site_classification <- data.frame(event_site_name = c(columbia_dams, snake_dams, # Adult fishways at dams
+                                                      ASO_sites,  # natal origins
+                                                        CLE_sites,
+                                                        DES_sites,
+                                                        ENT_sites,
+                                                        FIF_sites,
+                                                        GRRO_sites,
+                                                        HOOD_sites,
+                                                        IMN_sites,
+                                                        JDR_sites,
+                                                        MET_sites,
+                                                        OKA_sites,
+                                                        SAL_sites,
+                                                        TUC_sites,
+                                                        UMA_sites,
+                                                        WAWA_sites,
+                                                        WEN_sites,
+                                                        YAK_sites,
+                                                          LGR_upstream_other_trib_sites, ICH_LGR_other_trib_sites, # other trib sites
+                                                          BON_MCN_other_trib_sites, WEL_upstream_other_trib_sites,
                                                           pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, #in river arrays
-                                                          BON_fallback_arrays, MCN_fallback_arrays, LGR_fallback_arrays, "lost"),
+                                                      upstream_WEL_inriver, upstream_LGR_inriver,
+                                                          BON_fallback_arrays, MCN_fallback_arrays, LGR_fallback_arrays, # fallback arrays
+                                                      RRE_fallback_arrays, RIS_fallback_arrays, WEL_fallback_arrays,
+                                                      "lost"),
                                       site_class = c(c("BON (adult)", "MCN (adult)", "PRA (adult)", "RIS (adult)",
                                                        "RRE (adult)", "WEL (adult)"),
                                                      c("ICH (adult)", "LGR (adult)"), 
+                                                     rep("ASO_sites", length(ASO_sites)),
+                                                     rep("CLE_sites", length(CLE_sites)),
+                                                     rep("DES_sites", length(DES_sites)),
+                                                     rep("ENT_sites", length(ENT_sites)),
+                                                     rep("FIF_sites", length(FIF_sites)),
+                                                     rep("GRRO_sites", length(GRRO_sites)),
+                                                     rep("HOOD_sites", length(HOOD_sites)),
+                                                     rep("IMN_sites", length(IMN_sites)),
+                                                     rep("JDR_sites", length(JDR_sites)),
+                                                     rep("MET_sites", length(MET_sites)),
+                                                     rep("OKA_sites", length(OKA_sites)),
+                                                     rep("SAL_sites", length(SAL_sites)),
+                                                     rep("TUC_sites", length(TUC_sites)),
+                                                     rep("UMA_sites", length(UMA_sites)),
+                                                     rep("WAWA_sites", length(WAWA_sites)),
+                                                     rep("WEN_sites", length(WEN_sites)),
+                                                     rep("YAK_sites", length(YAK_sites)),
                                                      rep("LGR_upstream_other_trib_sites", length(LGR_upstream_other_trib_sites)),
                                                      rep("ICH_LGR_other_trib_sites", length(ICH_LGR_other_trib_sites)),
-                                                     rep("MCN_PRA_ICH_other_trib_sites", length(MCN_PRA_ICH_other_trib_sites)),
                                                      rep("BON_MCN_other_trib_sites", length(BON_MCN_other_trib_sites)),
-                                                     rep("BON_MCN_natal_sites", length(BON_MCN_natal_sites)),
+                                                     rep("WEL_upstream_other_trib_sites", length(WEL_upstream_other_trib_sites)),
                                                      rep("pre_BON_inriver", length(pre_BON_inriver)), 
                                                      rep("BON_MCN_inriver", length(BON_MCN_inriver)),
                                                      rep("MCN_ICH_PRA_inriver", length(MCN_ICH_PRA_inriver)),
                                                      rep("ICH_LGR_inriver", length(ICH_LGR_inriver)), 
+                                                     rep("upstream_WEL_inriver", length(upstream_WEL_inriver)), 
+                                                     rep("upstream_LGR_inriver", length(upstream_LGR_inriver)), 
                                                      rep("BON_fallback_arrays", length(BON_fallback_arrays)),
                                                      rep("MCN_fallback_arrays", length(MCN_fallback_arrays)),
-                                                     rep("LGR_fallback_arrays", length(LGR_fallback_arrays)), "lost"))
+                                                     rep("LGR_fallback_arrays", length(LGR_fallback_arrays)),
+                                                     rep("RRE_fallback_arrays", length(RRE_fallback_arrays)),
+                                                     rep("RIS_fallback_arrays", length(RIS_fallback_arrays)),
+                                                     rep("WEL_fallback_arrays", length(WEL_fallback_arrays)),
+                                                     "lost"))
 
 # Create a new dataframe for state (location in the system)
-JDR_site_classification %>%
+site_classification %>%
   mutate(
     state = ifelse(
       site_class == "BON (adult)", "mainstem, BON to MCN",
@@ -294,16 +356,51 @@ JDR_site_classification %>%
                   ifelse(
                     site_class == "LGR (adult)", "mainstem, upstream of LGR",
                     ifelse(
-                      site_class == "LGR_upstream_other_trib_sites", "Upstream LGR tributaries",
+                    # Natal origins
+                    site_class == "ASO_sites", "Asotin Creek",
+                    ifelse(
+                      site_class == "CLE_sites", "Clearwater River",
                       ifelse(
-                        site_class == "ICH_LGR_other_trib_sites", "ICH to LGR tributaries",
+                        site_class == "DES_sites", "Deschutes River",
                         ifelse(
-                          site_class == "MCN_PRA_ICH_other_trib_sites", "MCN to PRA or ICH tributaries",
+                          site_class == "ENT_sites", "Entiat River",
                           ifelse(
-                            site_class == "BON_MCN_other_trib_sites", "BON to MCN tributaries",
+                            site_class == "FIF_sites", "Fifteenmile Creek",
                             ifelse(
-                              site_class == "BON_MCN_natal_sites", "natal tributaries",
+                              site_class == "GRRO_sites", "Grande Ronde River",
                               ifelse(
+                                site_class == "IMN_sites", "Imnaha River",
+                                ifelse(
+                                  site_class == "JDR_sites", "John Day River",
+                                  ifelse(
+                                    site_class == "MET_sites", "Methow River",
+                                    ifelse(
+                                      site_class == "OKA_sites", "Okanogan River",
+                                      ifelse(
+                                        site_class == "SAL_sites", "Salmon River",
+                                        ifelse(
+                                          site_class == "TUC_sites", "Tucannon River",
+                                          ifelse(
+                                            site_class == "UMA_sites", "Umatilla River",
+                                            ifelse(
+                                              site_class == "WAWA_sites", "Walla Walla River",
+                                              ifelse(
+                                                site_class == "WEN_sites", "Wenatchee River",
+                                                ifelse(
+                                                  site_class == "YAK_sites", "Yakima River",
+                                                  ifelse(
+
+                      # Other tributaries
+                      site_class == "LGR_upstream_other_trib_sites", "Upstream LGR other tributaries",
+                      ifelse(
+                        site_class == "ICH_LGR_other_trib_sites", "ICH to LGR other tributaries",
+                        ifelse(
+                          site_class == "BON_MCN_other_trib_sites", "BON to MCN other tributaries",
+                          ifelse(
+                            site_class == "WEL_upstream_other_trib_sites", "Upstream WEL other tributaries",
+                            ifelse(
+
+                              # In river sites
                                 site_class == "pre_BON_inriver", "mainstem, mouth to BON",
                                 ifelse(
                                   site_class == "BON_MCN_inriver", "mainstem, BON to MCN",
@@ -312,35 +409,30 @@ JDR_site_classification %>%
                                     ifelse(
                                       site_class == "ICH_LGR_inriver", "mainstem, ICH to LGR",
                                       ifelse(
+                                        site_class == "upstream_WEL_inriver", "mainstem, upstream of WEL",
+                                        ifelse(
+                                          site_class == "upstream_LGR_inriver", "mainstem, upstream of LGR",
+                                          ifelse(
                                         site_class == "BON_fallback_arrays", "mainstem, mouth to BON",
                                         ifelse(
                                           site_class == "MCN_fallback_arrays", "mainstem, BON to MCN",
-                                          ifelse(site_class == "LGR_fallback_arrays", "mainstem, ICH to LGR", 
+                                          ifelse(
+                                            site_class == "LGR_fallback_arrays", "mainstem, ICH to LGR", 
+                                            ifelse(
+                                              site_class == "RRE_fallback_arrays", "mainstem, RIS to RRE", 
+                                              ifelse(
+                                                site_class == "RIS_fallback_arrays", "mainstem, PRA to RIS", 
+                                                ifelse(
+                                                  site_class == "WEL_fallback_arrays", "mainstem, RRE to WEL", 
                                                  ifelse(site_class == "lost", "lost", NA)
-                                          ))))))))))))))))))))) -> JDR_site_classification
+                                          ))))))))))))))))))))))))))))))))))))))))) -> site_classification
 
 
 # Add info to detection history
-JDR_det_hist %>% 
-  left_join(., JDR_site_classification, by = "event_site_name") -> JDR_det_hist
+complete_det_hist <- read.csv(here::here("model_files", "complete_det_hist.csv"), row.names = 1)
 
-# Inspect detection histories after tributary detections
-# Do we want to remove this? Probably indicates post-spawning behavior
-JDR_det_hist %>% 
-  group_by(tag_code) %>% 
-  subset(state %in% tributary_mainstem$tributary) %>% 
-  filter(end_time == max(end_time)) %>% 
-  dplyr::select(tag_code, end_time) %>% 
-  dplyr::rename(spawning = end_time) -> spawning_times
-
-JDR_det_hist %>% 
-  left_join(., spawning_times, by = "tag_code") %>%  
-  group_by(tag_code) %>% 
-  filter(end_time > spawning) -> post_spawn_history
-
-# A lot of these do seem like iteroparous individuals migrating back downstream. But not all of them.
-# Would bias our fallback estimates to include them! But we need to be flexible enough to 
-# include this behavior, since some of it is tributary dip-ins
+complete_det_hist %>% 
+  left_join(., site_classification, by = "event_site_name") -> det_hist
 
 
 # Turn this into state history, not detection history.
@@ -410,20 +502,71 @@ shared_sites <- c("mainstem, mouth to BON", "mainstem, BON to MCN",
 # Tributary df - tributaries and what part of the mainstem they're in
 # We will use this to determine where they need to move to next, and then
 # use the no tributary site order to fill in the rest of the history
-tributary_mainstem <- data.frame(tributary = c("natal tributaries", 
-                                               "BON to MCN tributaries", 
-                                               "MCN to PRA or ICH tributaries",
-                                               "ICH to LGR tributaries",
-                                               "Upstream LGR tributaries"),
-                                 mainstem = c("mainstem, BON to MCN",
-                                              "mainstem, BON to MCN",
-                                              "mainstem, MCN to ICH or PRA",
-                                              "mainstem, ICH to LGR",
-                                              "mainstem, upstream of LGR"))
+
+tributary_mainstem <- data.frame(tributary = c("Asotin Creek", 
+"Clearwater River",
+"Deschutes River", 
+"Entiat River", 
+"Fifteenmile Creek", 
+"Grande Ronde River", 
+"Imnaha River",
+"John Day River", 
+"Methow River", 
+"Okanogan River", 
+"Salmon River", 
+"Tucannon River", 
+"Umatilla River",
+"Walla Walla River",
+"Wenatchee River", 
+"Yakima River",
+"Upstream LGR other tributaries",
+"ICH to LGR other tributaries",
+"BON to MCN other tributaries",
+"WEL_upstream_other_trib_sites"
+),
+mainstem = c("mainstem, upstream of LGR",
+             "mainstem, upstream of LGR",
+             "mainstem, BON to MCN",
+             "mainstem, RRE to WEL",
+             "mainstem, BON to MCN",
+             "mainstem, upstream of LGR",
+             "mainstem, upstream of LGR",
+             "mainstem, BON to MCN",
+             "mainstem, upstream of WEL",
+             "mainstem, upstream of WEL",
+             "mainstem, upstream of LGR",
+             "mainstem, ICH to LGR",
+             "mainstem, BON to MCN",
+             "mainstem, MCN to ICH or PRA",
+             "mainstem, RIS to RRE",
+             "mainstem, MCN to ICH or PRA",
+             "mainstem, upstream of LGR",
+             "mainstem, ICH to LGR",
+             "mainstem, BON to MCN",
+             "mainstem, upstream of WEL"))
+
+
+# Inspect detection histories after tributary detections
+# Do we want to remove this? Probably indicates post-spawning behavior
+# det_hist %>% 
+#   group_by(tag_code) %>% 
+#   subset(state %in% tributary_mainstem$tributary) %>% 
+#   filter(end_time == max(end_time)) %>% 
+#   dplyr::select(tag_code, end_time) %>% 
+#   dplyr::rename(spawning = end_time) -> spawning_times
+
+# complete_det_hist %>% 
+#   left_join(., spawning_times, by = "tag_code") %>%  
+#   group_by(tag_code) %>% 
+#   filter(end_time > spawning) -> post_spawn_history
+
+# A lot of these do seem like iteroparous individuals migrating back downstream. But not all of them.
+# Would bias our fallback estimates to include them! But we need to be flexible enough to 
+# include this behavior, since some of it is tributary dip-ins
 
 
 # Make a function to insert rows for implicit detections
-# This works for the JDR_det_hist dataframe
+# This works for the det_hist dataframe
 insertRow <- function(existingDF, newrow, r) {
   existingDF[seq(r+1,nrow(existingDF)+1),] <- existingDF[seq(r,nrow(existingDF)),]
   existingDF[r,] <- newrow
@@ -432,16 +575,16 @@ insertRow <- function(existingDF, newrow, r) {
 
 
 # Create empty df to store states
-JDR_stepwise_states <- data.frame(tag_code = character(),
+stepwise_states <- data.frame(tag_code = character(),
                                   state = character(),
                                   date_time = as.POSIXct(character()),
                                   pathway = character())
 
 
 # Before running this, save the original detection history
-# JDR_det_hist_original <- JDR_det_hist
+det_hist_original <- det_hist
 # Reset detection history
-JDR_det_hist <- JDR_det_hist_original
+# det_hist <- det_hist_original
 
 
 # Add a counter to keep track of the number of added rows.
@@ -456,37 +599,38 @@ added_rows <- 0
 # NOTE: If you don't get an error, that means your for loop isn't long enough
 # and you need to extend it
 # The error should read: 
-# "Error in if (JDR_det_hist[i, "tag_code"] == JDR_det_hist[i - 1, "tag_code"]) { : 
+# "Error in if (det_hist[i, "tag_code"] == det_hist[i - 1, "tag_code"]) { : 
 # missing value where TRUE/FALSE needed
 
 
 
-for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
-# for (i in 1:6689) {
+# Loop through each row of the detection history
+# for (i in 1:(2 * nrow(det_hist) - 1)) {
+for (i in 1:1978) {
   # Update i to keep up with number of added rows
   # NOT NECESSARY
   # i <- i + added_rows
-  
+  print(paste0("Row #", i))
   # If it's the first entry, store it
   if (i == 1) {
     # Store the tag code
-    JDR_stepwise_states[i, 'tag_code'] <-
-      JDR_det_hist[i, 'tag_code']
+    stepwise_states[i, 'tag_code'] <-
+      det_hist[i, 'tag_code']
     # Store the current state
-    JDR_stepwise_states[i, 'state'] <- JDR_det_hist[i, 'state']
+    stepwise_states[i, 'state'] <- det_hist[i, 'state']
     # Store the time entering this state
-    JDR_stepwise_states[i, 'date_time'] <-
-      JDR_det_hist[i, 'end_time']
+    stepwise_states[i, 'date_time'] <-
+      det_hist[i, 'end_time']
     # Store the transition site
-    JDR_stepwise_states[i, 'pathway'] <-
-      JDR_det_hist[i, 'site_class']
+    stepwise_states[i, 'pathway'] <-
+      det_hist[i, 'site_class']
   }
   
   # For all other entries, look at the previous entry.
   # If it's the same fish as the previous entry:
-  else if (JDR_det_hist[i, 'tag_code'] == JDR_det_hist[i - 1, 'tag_code']) {
+  else if (det_hist[i, 'tag_code'] == det_hist[i - 1, 'tag_code']) {
     # If it's in a different state than it was previously, record it
-    if (JDR_det_hist[i, 'state'] != JDR_det_hist[i - 1, 'state']) {
+    if (det_hist[i, 'state'] != det_hist[i - 1, 'state']) {
       ### NEW CONDITIONS: COMPLETE DETECTION HISTORY (NOT REPEAT DAM DET)
       # We have to account for what happens if we see a fish at an
       # site, and then next at a different site while
@@ -502,40 +646,48 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
       ### TRIBUTARIES
       # If it's in a tributary and wasn't in the right part of the mainstem prev:
       # Also, must not already be in the tributary
-      if (JDR_det_hist[i, 'state'] %in% tributary_mainstem$tributary) {
-        if (JDR_det_hist[i, 'state'] %in% tributary_mainstem$tributary &
+      if (det_hist[i, 'state'] %in% tributary_mainstem$tributary) {
+        if (det_hist[i, 'state'] %in% tributary_mainstem$tributary &
             (
-              JDR_det_hist[i - 1, 'state'] !=  subset(tributary_mainstem, tributary ==
-                                                      JDR_det_hist[i, 'state'])$mainstem
+              det_hist[i - 1, 'state'] !=  subset(tributary_mainstem, tributary ==
+                                                      det_hist[i, 'state'])$mainstem
             )) {
           mainstem_site <-
-            subset(tributary_mainstem, tributary == JDR_det_hist[i, 'state'])$mainstem
+            subset(tributary_mainstem, tributary == det_hist[i, 'state'])$mainstem
           
           # INSERT ROW FOR THE MAINSTEM SITE
           # Insert a new row into stepwise states, with the implicit detection site
           # Tag code, state, and time (which is NA)
-          implicit_state_1 <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+          implicit_state_1 <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                        state = mainstem_site,
                                        date_time = NA,
                                        pathway = "implicit")
           #1.26.22#
-          NA_rows <- data.frame(tag_code = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)),
-                                state = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)),
-                                date_time = rep(as.POSIXct(as.character(NA)), i - (nrow(JDR_stepwise_states) + 1)),
-                                pathway = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)))
+          # Need to append zeros, but only if i > nrow
+          if (i > nrow(stepwise_states)){
+            NA_rows <- data.frame(tag_code = rep(as.character(NA), i - (nrow(stepwise_states) + 1)),
+                                  state = rep(as.character(NA), i - (nrow(stepwise_states) + 1)),
+                                  date_time = rep(as.POSIXct(as.character(NA)), i - (nrow(stepwise_states) + 1)),
+                                  pathway = rep(as.character(NA), i - (nrow(stepwise_states) + 1)))
+            
+            stepwise_states %>%
+              # Add rows of NAs for any rows that were the same state
+              bind_rows(., NA_rows) %>% 
+              bind_rows(., implicit_state_1) -> stepwise_states
+          }
           
-          JDR_stepwise_states %>%
-            # Add rows of NAs for any rows that were the same state
-            bind_rows(., NA_rows) %>% 
-            bind_rows(., implicit_state_1) -> JDR_stepwise_states
-          # # #
+          else{
+            stepwise_states %>%
+              bind_rows(., implicit_state_1) -> stepwise_states
+          }
+          # # # 
           
-          # JDR_stepwise_states <-
-          #   insertRow(JDR_stepwise_states, implicit_state_1, i)
+          # stepwise_states <-
+          #   insertRow(stepwise_states, implicit_state_1, i)
           
           # Insert a new row into original detection history, with
           # implicit detection site info
-          implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+          implicit_detection <- c(det_hist[i, 'tag_code'],
                                   NA,
                                   NA,
                                   NA,
@@ -547,8 +699,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                   mainstem_site)
           
           # Also, change the value in the original dataframe
-          JDR_det_hist <-
-            insertRow(JDR_det_hist, implicit_detection, i)
+          det_hist <-
+            insertRow(det_hist, implicit_detection, i)
           
           # Add 1 to the number of added rows
           added_rows <- added_rows + 1
@@ -559,19 +711,19 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           # Zeroth: Jumping between Snake and Columbia, without visiting
           # shared sites in between. We see this with some fish, if they are
           # seen at PRA and then ICH or vice versa, without anything in between
-          if (JDR_det_hist[i - 1, 'state'] %in% upper_columbia_sites &
-                   JDR_det_hist[i, 'state'] %in% snake_sites |
-                   JDR_det_hist[i - 1, 'state'] %in% snake_sites &
-                   JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+          if (det_hist[i - 1, 'state'] %in% upper_columbia_sites &
+                   det_hist[i, 'state'] %in% snake_sites |
+                   det_hist[i - 1, 'state'] %in% snake_sites &
+                   det_hist[i, 'state'] %in% upper_columbia_sites) {
             # These inherently have to skip, since they're not seen
             # at a shared site (MCN to ICH/PRA is the only route, and by
             # definition they're not seen there)
             # Get the index of the current site
             current_index <-
-              which(site_order_notrib_columbia_snake %in% JDR_det_hist[i, 'state'])
+              which(site_order_notrib_columbia_snake %in% det_hist[i, 'state'])
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_columbia_snake %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_columbia_snake %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (current_index < previous_index) {
@@ -590,13 +742,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_columbia_snake[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -614,7 +766,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               
               # Insert a new row into original detection history, with
               # implicit detection site info
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -626,8 +778,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -640,12 +792,12 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           # First: Shared sites - need two options, depending on where it previously was
           # Shared sites can use either Columbia or Snake sites
           # Condition: If the indices are off by more than one (plus or minus one)
-          else if (JDR_det_hist[i, 'state'] %in% shared_sites) {
+          else if (det_hist[i, 'state'] %in% shared_sites) {
             # If it was previously in the Columbia
-            if (JDR_det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
+            if (det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -655,15 +807,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-              which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+              (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+              which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -684,13 +836,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -706,7 +858,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -718,27 +870,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
                 }
                 
               }
-              else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) - 1) {
+              else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) + 1 |
+                       which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) - 1) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -757,18 +909,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
                   ############
-                  # JDR_stepwise_states %>% 
-                  #   bind_rows(., implicit_state) -> JDR_stepwise_states
+                  # stepwise_states %>% 
+                  #   bind_rows(., implicit_state) -> stepwise_states
                   
                   # Also, change the value in the original dataframe
-                  JDR_stepwise_states <-
-                    insertRow(JDR_stepwise_states, implicit_state[1,], i)
+                  stepwise_states <-
+                    insertRow(stepwise_states, implicit_state[1,], i)
                   
                   ############
                   
@@ -787,7 +939,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -799,8 +951,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -812,10 +964,10 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             # If it was previously in the Snake
-            else if (JDR_det_hist[i - 1, 'state'] %in% snake_sites) {
+            else if (det_hist[i - 1, 'state'] %in% snake_sites) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -825,15 +977,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-              which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+              (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+              which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -853,13 +1005,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -875,7 +1027,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -887,26 +1039,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
                 }
               }
-              if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                       which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) - 1) {
+              if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) + 1 |
+                       which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) - 1) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -925,27 +1077,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_snake[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
                   ############
-                  # JDR_stepwise_states %>% 
-                  #   bind_rows(., implicit_state) -> JDR_stepwise_states
+                  # stepwise_states %>% 
+                  #   bind_rows(., implicit_state) -> stepwise_states
                   
                   # 1.26.22 #
                   # Also, change the value in the original dataframe
                   
                   # Remove the last row, insert the row, and add this one on
-                  last_row <- JDR_stepwise_states[nrow(JDR_stepwise_states),]
+                  last_row <- stepwise_states[nrow(stepwise_states),]
                   
-                  JDR_stepwise_states[-nrow(JDR_stepwise_states),] %>% 
+                  stepwise_states[-nrow(stepwise_states),] %>% 
                     bind_rows(., implicit_state[1,]) %>% 
-                    bind_rows(., last_row) -> JDR_stepwise_states
+                    bind_rows(., last_row) -> stepwise_states
                   
-                  # JDR_stepwise_states <-
-                  #   insertRow(JDR_stepwise_states, implicit_state[1,], i)
+                  # stepwise_states <-
+                  #   insertRow(stepwise_states, implicit_state[1,], i)
                   
                   ############
                   # Insert a new row into original detection history, with
@@ -964,7 +1116,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -976,8 +1128,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -987,32 +1139,32 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             # If it was previously in a tributary
-            else if (JDR_det_hist[i - 1, 'state'] %in% tributary_mainstem$tributary) {
+            else if (det_hist[i - 1, 'state'] %in% tributary_mainstem$tributary) {
               # If it was previously in a tributary and this observation isn't
               # in the corresponding mainstem segment, add a line to the detection
               # history
-              if (JDR_det_hist[i, 'state'] !=  subset(tributary_mainstem, tributary ==
-                                                      JDR_det_hist[i - 1, 'state'])$mainstem) {
+              if (det_hist[i, 'state'] !=  subset(tributary_mainstem, tributary ==
+                                                      det_hist[i - 1, 'state'])$mainstem) {
               mainstem_site <-
-                subset(tributary_mainstem, tributary == JDR_det_hist[i - 1, 'state'])$mainstem
+                subset(tributary_mainstem, tributary == det_hist[i - 1, 'state'])$mainstem
               
               # INSERT ROW FOR THE MAINSTEM SITE
               # Insert a new row into stepwise states, with the implicit detection site
               # Tag code, state, and time (which is NA)
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = mainstem_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              # JDR_stepwise_states %>% 
-              #   bind_rows(., implicit_state) -> JDR_stepwise_states
+              # stepwise_states %>% 
+              #   bind_rows(., implicit_state) -> stepwise_states
               #1.26.22.2:44pm#
-              JDR_stepwise_states <-
-                insertRow(JDR_stepwise_states, implicit_state, i)
+              stepwise_states <-
+                insertRow(stepwise_states, implicit_state, i)
               
               # Insert a new row into original detection history, with
               # implicit detection site info
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -1024,8 +1176,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       mainstem_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -1033,39 +1185,39 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             # If the current state is the correct part of the mainstem, store it
-            else if (JDR_det_hist[i, 'state'] ==  subset(tributary_mainstem, tributary ==
-                                                         JDR_det_hist[i - 1, 'state'])$mainstem){
+            else if (det_hist[i, 'state'] ==  subset(tributary_mainstem, tributary ==
+                                                         det_hist[i - 1, 'state'])$mainstem){
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
             
             ####### THIS CODE COPIED FROM BELOW
             # Zeroth: Jumping between Snake and Columbia, without visiting
             # shared sites in between. We see this with some fish, if they are
             # seen at PRA and then ICH or vice versa, without anything in between
-            else if (JDR_det_hist[i - 1, 'state'] %in% upper_columbia_sites &
-                     JDR_det_hist[i, 'state'] %in% snake_sites |
-                     JDR_det_hist[i - 1, 'state'] %in% snake_sites &
-                     JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+            else if (det_hist[i - 1, 'state'] %in% upper_columbia_sites &
+                     det_hist[i, 'state'] %in% snake_sites |
+                     det_hist[i - 1, 'state'] %in% snake_sites &
+                     det_hist[i, 'state'] %in% upper_columbia_sites) {
               # These inherently have to skip, since they're not seen
               # at a shared site (MCN to ICH/PRA is the only route, and by
               # definition they're not seen there)
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_columbia_snake %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_columbia_snake %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia_snake %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -1084,13 +1236,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia_snake[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -1108,7 +1260,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -1120,8 +1272,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -1134,12 +1286,12 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # First: Shared sites - need two options, depending on where it previously was
             # Shared sites can use either Columbia or Snake sites
             # Condition: If the indices are off by more than one (plus or minus one)
-            else if (JDR_det_hist[i, 'state'] %in% shared_sites) {
+            else if (det_hist[i, 'state'] %in% shared_sites) {
               # If it was previously in the Columbia
-              if (JDR_det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
+              if (det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
                 # Make sure that if it was seen in the adult fishways at a dam, the
                 # detection history contains the state downstream of that dam
-                if (JDR_det_hist[i, 'site_class'] %in% c(
+                if (det_hist[i, 'site_class'] %in% c(
                   "BON (adult)",
                   "MCN (adult)",
                   "PRA (adult)",
@@ -1149,24 +1301,24 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   "ICH (adult)",
                   "LGR (adult)"
                 ) &
-                JDR_det_hist[i - 1, 'state'] != 
-                site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-                  # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-                  # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+                det_hist[i - 1, 'state'] != 
+                site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+                  # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+                  # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                   
                   # Get the missing index
                   missing_index <-
-                    which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                    which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                   # Get the index of the previous site
                   previous_index <-
                     which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                                JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                                det_hist[i - 1, 'state'])$mainstem)
                   # # Get the missing index
                   # missing_index <-
-                  #   which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                  #   which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
                   # # Get the index of the previous site
                   # previous_index <-
-                  #   which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                  #   which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                   
                   # sequence from current to previous index
                   if (missing_index < previous_index) {
@@ -1187,13 +1339,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # Tag code, state, and time (which is NA)
                     missing_site <-
                       site_order_notrib_columbia[index_order[1 + j]]
-                    implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                    implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                  state = missing_site,
                                                  date_time = NA,
                                                  pathway = "implicit")
                     
-                    JDR_stepwise_states %>% 
-                      bind_rows(., implicit_state) -> JDR_stepwise_states
+                    stepwise_states %>% 
+                      bind_rows(., implicit_state) -> stepwise_states
                     
                     # Insert a new row into original detection history, with
                     # implicit detection site info
@@ -1209,7 +1361,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                     missing_site <- site_order_notrib_columbia[index_order[j]]
                     
-                    implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                    implicit_detection <- c(det_hist[i, 'tag_code'],
                                             NA,
                                             NA,
                                             NA,
@@ -1221,8 +1373,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                             missing_site)
                     
                     # Also, change the value in the original dataframe
-                    JDR_det_hist <-
-                      insertRow(JDR_det_hist, implicit_detection, i)
+                    det_hist <-
+                      insertRow(det_hist, implicit_detection, i)
                     
                     # Add 1 to the number of added rows
                     added_rows <- added_rows + 1
@@ -1230,19 +1382,19 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   
                 }
                 
-                else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                         which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                         which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                         which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) - 1) {
+                else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                         which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) + 1 |
+                         which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                         which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) - 1) {
                   # If we see it at two non-consecutive mainstem locations
                   
                   # If the next site skips sites, insert the missing sites
                   # Get the index of the current site
                   current_index <-
-                    which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                    which(site_order_notrib_columbia %in% det_hist[i, 'state'])
                   # Get the index of the previous site
                   previous_index <-
-                    which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                    which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                   
                   # sequence from current to previous index
                   if (current_index < previous_index) {
@@ -1261,13 +1413,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # Tag code, state, and time (which is NA)
                     missing_site <-
                       site_order_notrib_columbia[index_order[1 + j]]
-                    implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                    implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                  state = missing_site,
                                                  date_time = NA,
                                                  pathway = "implicit")
                     
-                    JDR_stepwise_states %>% 
-                      bind_rows(., implicit_state) -> JDR_stepwise_states
+                    stepwise_states %>% 
+                      bind_rows(., implicit_state) -> stepwise_states
                     
                     # Insert a new row into original detection history, with
                     # implicit detection site info
@@ -1284,7 +1436,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     missing_site <- site_order_notrib_columbia[index_order[j]]
                     
                     
-                    implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                    implicit_detection <- c(det_hist[i, 'tag_code'],
                                             NA,
                                             NA,
                                             NA,
@@ -1296,8 +1448,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                             missing_site)
                     
                     # Also, change the value in the original dataframe
-                    JDR_det_hist <-
-                      insertRow(JDR_det_hist, implicit_detection, i)
+                    det_hist <-
+                      insertRow(det_hist, implicit_detection, i)
                     
                     # Add 1 to the number of added rows
                     added_rows <- added_rows + 1
@@ -1309,27 +1461,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Finally, if we're not missing any sites in between, just store it
                 else {
                   # Store the tag code
-                  JDR_stepwise_states[i, 'tag_code'] <-
-                    JDR_det_hist[i, 'tag_code']
+                  stepwise_states[i, 'tag_code'] <-
+                    det_hist[i, 'tag_code']
                   # Store the current state
-                  JDR_stepwise_states[i, 'state'] <-
-                    JDR_det_hist[i, 'state']
+                  stepwise_states[i, 'state'] <-
+                    det_hist[i, 'state']
                   # Store the time entering this state
-                  JDR_stepwise_states[i, 'date_time'] <-
-                    JDR_det_hist[i, 'end_time']
+                  stepwise_states[i, 'date_time'] <-
+                    det_hist[i, 'end_time']
                   # Store the transition site
-                  JDR_stepwise_states[i, 'pathway'] <-
-                    JDR_det_hist[i, 'site_class']
+                  stepwise_states[i, 'pathway'] <-
+                    det_hist[i, 'site_class']
                 }
                 
                 
               }
               
               # If it was previously in the Snake
-              else if (JDR_det_hist[i - 1, 'state'] %in% snake_sites) {
+              else if (det_hist[i - 1, 'state'] %in% snake_sites) {
                 # Make sure that if it was seen in the adult fishways at a dam, the
                 # detection history contains the state downstream of that dam
-                if (JDR_det_hist[i, 'site_class'] %in% c(
+                if (det_hist[i, 'site_class'] %in% c(
                   "BON (adult)",
                   "MCN (adult)",
                   "PRA (adult)",
@@ -1339,25 +1491,25 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   "ICH (adult)",
                   "LGR (adult)"
                 ) &
-                JDR_det_hist[i - 1, 'state'] != 
-                site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-                  # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-                  # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+                det_hist[i - 1, 'state'] != 
+                site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+                  # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+                  # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                   
                   # Get the missing index
                   missing_index <-
-                    which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                    which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                   # Get the index of the previous site
                   previous_index <-
                     which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                                JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                                det_hist[i - 1, 'state'])$mainstem)
                   
                   # # Get the missing index
                   # missing_index <-
-                  #   which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                  #   which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                   # # Get the index of the previous site
                   # previous_index <-
-                  #   which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                  #   which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                   
                   # sequence from current to previous index
                   if (missing_index < previous_index) {
@@ -1377,13 +1529,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # Tag code, state, and time (which is NA)
                     missing_site <-
                       site_order_notrib_columbia[index_order[1 + j]]
-                    implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                    implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                  state = missing_site,
                                                  date_time = NA,
                                                  pathway = "implicit")
                     
-                    JDR_stepwise_states %>% 
-                      bind_rows(., implicit_state) -> JDR_stepwise_states
+                    stepwise_states %>% 
+                      bind_rows(., implicit_state) -> stepwise_states
                     
                     # Insert a new row into original detection history, with
                     # implicit detection site info
@@ -1399,7 +1551,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                     missing_site <- site_order_notrib_columbia[index_order[j]]
                     
-                    implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                    implicit_detection <- c(det_hist[i, 'tag_code'],
                                             NA,
                                             NA,
                                             NA,
@@ -1411,27 +1563,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                             missing_site)
                     
                     # Also, change the value in the original dataframe
-                    JDR_det_hist <-
-                      insertRow(JDR_det_hist, implicit_detection, i)
+                    det_hist <-
+                      insertRow(det_hist, implicit_detection, i)
                     
                     # Add 1 to the number of added rows
                     added_rows <- added_rows + 1
                   }
                 }
                 
-                else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                         which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                         which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                         which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) - 1) {
+                else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                         which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) + 1 |
+                         which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                         which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) - 1) {
                   # If we see it at two non-consecutive mainstem locations
                   
                   # If the next site skips sites, insert the missing sites
                   # Get the index of the current site
                   current_index <-
-                    which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                    which(site_order_notrib_snake %in% det_hist[i, 'state'])
                   # Get the index of the previous site
                   previous_index <-
-                    which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                    which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                   
                   # sequence from current to previous index
                   if (current_index < previous_index) {
@@ -1450,13 +1602,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     # Tag code, state, and time (which is NA)
                     missing_site <-
                       site_order_notrib_columbia[index_order[1 + j]]
-                    implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                    implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                  state = missing_site,
                                                  date_time = NA,
                                                  pathway = "implicit")
                     
-                    JDR_stepwise_states %>% 
-                      bind_rows(., implicit_state) -> JDR_stepwise_states
+                    stepwise_states %>% 
+                      bind_rows(., implicit_state) -> stepwise_states
                     
                     # Insert a new row into original detection history, with
                     # implicit detection site info
@@ -1474,7 +1626,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                     
                     # Insert a new row into original detection history, with
                     # implicit detection site info
-                    implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                    implicit_detection <- c(det_hist[i, 'tag_code'],
                                             NA,
                                             NA,
                                             NA,
@@ -1486,8 +1638,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                             missing_site)
                     
                     # Also, change the value in the original dataframe
-                    JDR_det_hist <-
-                      insertRow(JDR_det_hist, implicit_detection, i)
+                    det_hist <-
+                      insertRow(det_hist, implicit_detection, i)
                     
                     # Add 1 to the number of added rows
                     added_rows <- added_rows + 1
@@ -1497,17 +1649,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Finally, if we're not missing any sites in between, just store it
                 else {
                   # Store the tag code
-                  JDR_stepwise_states[i, 'tag_code'] <-
-                    JDR_det_hist[i, 'tag_code']
+                  stepwise_states[i, 'tag_code'] <-
+                    det_hist[i, 'tag_code']
                   # Store the current state
-                  JDR_stepwise_states[i, 'state'] <-
-                    JDR_det_hist[i, 'state']
+                  stepwise_states[i, 'state'] <-
+                    det_hist[i, 'state']
                   # Store the time entering this state
-                  JDR_stepwise_states[i, 'date_time'] <-
-                    JDR_det_hist[i, 'end_time']
+                  stepwise_states[i, 'date_time'] <-
+                    det_hist[i, 'end_time']
                   # Store the transition site
-                  JDR_stepwise_states[i, 'pathway'] <-
-                    JDR_det_hist[i, 'site_class']
+                  stepwise_states[i, 'pathway'] <-
+                    det_hist[i, 'site_class']
                 }
                 
               }
@@ -1516,10 +1668,10 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             # Second: Upper Columbia sites
-            else if (JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+            else if (det_hist[i, 'state'] %in% upper_columbia_sites) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -1529,18 +1681,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              JDR_det_hist[i - 1, 'state'] != 
-              site_order_notrib_columbia[which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1]){
-                # (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-                # which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+              det_hist[i - 1, 'state'] != 
+              site_order_notrib_columbia[which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1]){
+                # (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+                # which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
                   which(site_order_notrib_columbia %in% subset(tributary_mainstem, tributary ==
-                                                                 JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                                 det_hist[i - 1, 'state'])$mainstem)
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -1560,13 +1712,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -1582,7 +1734,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -1594,29 +1746,29 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
                 }
               }
               
-              else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i -
+              else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_columbia %in% det_hist[i -
                                                                           1, 'state']) + 1 |
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i -
+                       which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_columbia %in% det_hist[i -
                                                                           1, 'state']) - 1) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -1635,13 +1787,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -1657,7 +1809,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -1669,8 +1821,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -1680,27 +1832,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Finally, if we're not missing any sites in between, just store it
               else {
                 # Store the tag code
-                JDR_stepwise_states[i, 'tag_code'] <-
-                  JDR_det_hist[i, 'tag_code']
+                stepwise_states[i, 'tag_code'] <-
+                  det_hist[i, 'tag_code']
                 # Store the current state
-                JDR_stepwise_states[i, 'state'] <-
-                  JDR_det_hist[i, 'state']
+                stepwise_states[i, 'state'] <-
+                  det_hist[i, 'state']
                 # Store the time entering this state
-                JDR_stepwise_states[i, 'date_time'] <-
-                  JDR_det_hist[i, 'end_time']
+                stepwise_states[i, 'date_time'] <-
+                  det_hist[i, 'end_time']
                 # Store the transition site
-                JDR_stepwise_states[i, 'pathway'] <-
-                  JDR_det_hist[i, 'site_class']
+                stepwise_states[i, 'pathway'] <-
+                  det_hist[i, 'site_class']
               }
               
               
             }
             
             # Third: Snake River sites
-            else if (JDR_det_hist[i, 'state'] %in% snake_sites) {
+            else if (det_hist[i, 'state'] %in% snake_sites) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -1710,18 +1862,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              JDR_det_hist[i - 1, 'state'] != 
-              site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-                # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-                # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+              det_hist[i - 1, 'state'] != 
+              site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+                # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+                # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
                   which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                              JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                              det_hist[i - 1, 'state'])$mainstem)
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -1741,13 +1893,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -1763,7 +1915,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -1775,8 +1927,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -1784,26 +1936,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               }
               
               
-              else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_snake %in% JDR_det_hist[i -
+              else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_snake %in% det_hist[i -
                                                                        1, 'state']) + 1 |
-                       JDR_det_hist[i, 'state'] %in% snake_sites &
-                       which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_snake %in% JDR_det_hist[i -
+                       det_hist[i, 'state'] %in% snake_sites &
+                       which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_snake %in% det_hist[i -
                                                                        1, 'state']) - 1) {
-                # else if (JDR_det_hist[i - 1, 'state'] != 
-                #          site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1] |
-                #          JDR_det_hist[i - 1, 'state'] != 
-                #          site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) + 1]) {
+                # else if (det_hist[i - 1, 'state'] != 
+                #          site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1] |
+                #          det_hist[i - 1, 'state'] != 
+                #          site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) + 1]) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -1822,13 +1974,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -1844,7 +1996,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -1856,8 +2008,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -1867,17 +2019,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Finally, if we're not missing any sites in between, just store it
               else {
                 # Store the tag code
-                JDR_stepwise_states[i, 'tag_code'] <-
-                  JDR_det_hist[i, 'tag_code']
+                stepwise_states[i, 'tag_code'] <-
+                  det_hist[i, 'tag_code']
                 # Store the current state
-                JDR_stepwise_states[i, 'state'] <-
-                  JDR_det_hist[i, 'state']
+                stepwise_states[i, 'state'] <-
+                  det_hist[i, 'state']
                 # Store the time entering this state
-                JDR_stepwise_states[i, 'date_time'] <-
-                  JDR_det_hist[i, 'end_time']
+                stepwise_states[i, 'date_time'] <-
+                  det_hist[i, 'end_time']
                 # Store the transition site
-                JDR_stepwise_states[i, 'pathway'] <-
-                  JDR_det_hist[i, 'site_class']
+                stepwise_states[i, 'pathway'] <-
+                  det_hist[i, 'site_class']
               }
               
               
@@ -1893,27 +2045,28 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             
             else {
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
           }
             
           }
           
           # Second: Upper Columbia sites
-          else if (JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+          else if (det_hist[i, 'state'] %in% upper_columbia_sites) {
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -1923,15 +2076,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-            which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+            (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+            which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (missing_index < previous_index) {
@@ -1951,13 +2104,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -1973,7 +2126,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -1985,29 +2138,29 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
               }
             }
             
-            else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i -
+            else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_columbia %in% det_hist[i -
                                                                         1, 'state']) + 1 |
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i -
+                     which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_columbia %in% det_hist[i -
                                                                         1, 'state']) - 1) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -2026,18 +2179,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
                 ############
-                # JDR_stepwise_states %>% 
-                #   bind_rows(., implicit_state) -> JDR_stepwise_states
+                # stepwise_states %>% 
+                #   bind_rows(., implicit_state) -> stepwise_states
                 
                 # Also, change the value in the original dataframe
-                JDR_stepwise_states <-
-                  insertRow(JDR_stepwise_states, implicit_state[1,], i)
+                stepwise_states <-
+                  insertRow(stepwise_states, implicit_state[1,], i)
                 
                 ############
                 
@@ -2055,7 +2208,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -2067,8 +2220,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -2079,11 +2232,11 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           }
           
           # Third: Snake River sites
-          else if (JDR_det_hist[i, 'state'] %in% snake_sites) {
+          else if (det_hist[i, 'state'] %in% snake_sites) {
             
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -2093,15 +2246,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-            which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+            (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+            which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (missing_index < previous_index) {
@@ -2121,13 +2274,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -2143,7 +2296,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -2155,8 +2308,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -2164,21 +2317,21 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             
-            else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_snake %in% JDR_det_hist[i -
+            else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_snake %in% det_hist[i -
                                                                      1, 'state']) + 1 |
-                     which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_snake %in% JDR_det_hist[i -
+                     which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_snake %in% det_hist[i -
                                                                      1, 'state']) - 1) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -2197,18 +2350,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
                 ############
-                # JDR_stepwise_states %>% 
-                #   bind_rows(., implicit_state) -> JDR_stepwise_states
+                # stepwise_states %>% 
+                #   bind_rows(., implicit_state) -> stepwise_states
                 
                 # Also, change the value in the original dataframe
-                JDR_stepwise_states <-
-                  insertRow(JDR_stepwise_states, implicit_state[1,], i)
+                stepwise_states <-
+                  insertRow(stepwise_states, implicit_state[1,], i)
                 
                 ############
                 
@@ -2226,7 +2379,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -2238,8 +2391,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -2253,17 +2406,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
         }          # If it was in the right part of the mainstem previously, store it like normal
         else {
           # Store the tag code
-          JDR_stepwise_states[i, 'tag_code'] <-
-            JDR_det_hist[i, 'tag_code']
+          stepwise_states[i, 'tag_code'] <-
+            det_hist[i, 'tag_code']
           # Store the current state
-          JDR_stepwise_states[i, 'state'] <-
-            JDR_det_hist[i, 'state']
+          stepwise_states[i, 'state'] <-
+            det_hist[i, 'state']
           # Store the time entering this state
-          JDR_stepwise_states[i, 'date_time'] <-
-            JDR_det_hist[i, 'end_time']
+          stepwise_states[i, 'date_time'] <-
+            det_hist[i, 'end_time']
           # Store the transition site
-          JDR_stepwise_states[i, 'pathway'] <-
-            JDR_det_hist[i, 'site_class']
+          stepwise_states[i, 'pathway'] <-
+            det_hist[i, 'site_class']
         }
         
         
@@ -2272,29 +2425,29 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
       ### MAINSTEM SITES
       else{
 
-        if (JDR_det_hist[i - 1, 'state'] %in% tributary_mainstem$tributary) {
+        if (det_hist[i - 1, 'state'] %in% tributary_mainstem$tributary) {
           # If it was previously in a tributary and this observation isn't
           # in the corresponding mainstem segment, add a line to the detection
           # history
-          if (JDR_det_hist[i, 'state'] !=  subset(tributary_mainstem, tributary ==
-                                                  JDR_det_hist[i - 1, 'state'])$mainstem) {
+          if (det_hist[i, 'state'] !=  subset(tributary_mainstem, tributary ==
+                                                  det_hist[i - 1, 'state'])$mainstem) {
             mainstem_site <-
-              subset(tributary_mainstem, tributary == JDR_det_hist[i - 1, 'state'])$mainstem
+              subset(tributary_mainstem, tributary == det_hist[i - 1, 'state'])$mainstem
             
             # INSERT ROW FOR THE MAINSTEM SITE
             # Insert a new row into stepwise states, with the implicit detection site
             # Tag code, state, and time (which is NA)
-            implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+            implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                          state = mainstem_site,
                                          date_time = NA,
                                          pathway = "implicit")
             
-            JDR_stepwise_states %>% 
-              bind_rows(., implicit_state) -> JDR_stepwise_states
+            stepwise_states %>% 
+              bind_rows(., implicit_state) -> stepwise_states
             
             # Insert a new row into original detection history, with
             # implicit detection site info
-            implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+            implicit_detection <- c(det_hist[i, 'tag_code'],
                                     NA,
                                     NA,
                                     NA,
@@ -2306,8 +2459,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                     mainstem_site)
             
             # Also, change the value in the original dataframe
-            JDR_det_hist <-
-              insertRow(JDR_det_hist, implicit_detection, i)
+            det_hist <-
+              insertRow(det_hist, implicit_detection, i)
             
             # Add 1 to the number of added rows
             added_rows <- added_rows + 1
@@ -2315,39 +2468,39 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           }
           
           # If the current state is the correct part of the mainstem, store it
-          else if (JDR_det_hist[i, 'state'] ==  subset(tributary_mainstem, tributary ==
-                                                       JDR_det_hist[i - 1, 'state'])$mainstem){
+          else if (det_hist[i, 'state'] ==  subset(tributary_mainstem, tributary ==
+                                                       det_hist[i - 1, 'state'])$mainstem){
             # Store the tag code
-            JDR_stepwise_states[i, 'tag_code'] <-
-              JDR_det_hist[i, 'tag_code']
+            stepwise_states[i, 'tag_code'] <-
+              det_hist[i, 'tag_code']
             # Store the current state
-            JDR_stepwise_states[i, 'state'] <-
-              JDR_det_hist[i, 'state']
+            stepwise_states[i, 'state'] <-
+              det_hist[i, 'state']
             # Store the time entering this state
-            JDR_stepwise_states[i, 'date_time'] <-
-              JDR_det_hist[i, 'end_time']
+            stepwise_states[i, 'date_time'] <-
+              det_hist[i, 'end_time']
             # Store the transition site
-            JDR_stepwise_states[i, 'pathway'] <-
-              JDR_det_hist[i, 'site_class']
+            stepwise_states[i, 'pathway'] <-
+              det_hist[i, 'site_class']
           }
 
           ####### THIS CODE COPIED FROM BELOW
           # Zeroth: Jumping between Snake and Columbia, without visiting
           # shared sites in between. We see this with some fish, if they are
           # seen at PRA and then ICH or vice versa, without anything in between
-          else if (JDR_det_hist[i - 1, 'state'] %in% upper_columbia_sites &
-                   JDR_det_hist[i, 'state'] %in% snake_sites |
-                   JDR_det_hist[i - 1, 'state'] %in% snake_sites &
-                   JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+          else if (det_hist[i - 1, 'state'] %in% upper_columbia_sites &
+                   det_hist[i, 'state'] %in% snake_sites |
+                   det_hist[i - 1, 'state'] %in% snake_sites &
+                   det_hist[i, 'state'] %in% upper_columbia_sites) {
             # These inherently have to skip, since they're not seen
             # at a shared site (MCN to ICH/PRA is the only route, and by
             # definition they're not seen there)
             # Get the index of the current site
             current_index <-
-              which(site_order_notrib_columbia_snake %in% JDR_det_hist[i, 'state'])
+              which(site_order_notrib_columbia_snake %in% det_hist[i, 'state'])
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_columbia_snake %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_columbia_snake %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (current_index < previous_index) {
@@ -2366,13 +2519,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_columbia_snake[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -2390,7 +2543,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               
               # Insert a new row into original detection history, with
               # implicit detection site info
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -2402,8 +2555,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -2416,12 +2569,12 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           # First: Shared sites - need two options, depending on where it previously was
           # Shared sites can use either Columbia or Snake sites
           # Condition: If the indices are off by more than one (plus or minus one)
-          else if (JDR_det_hist[i, 'state'] %in% shared_sites) {
+          else if (det_hist[i, 'state'] %in% shared_sites) {
             # If it was previously in the Columbia
-            if (JDR_det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
+            if (det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -2431,24 +2584,24 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              JDR_det_hist[i - 1, 'state'] != 
-              site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-                # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-                # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+              det_hist[i - 1, 'state'] != 
+              site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+                # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+                # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
                   which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                              JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                              det_hist[i - 1, 'state'])$mainstem)
                 # # Get the missing index
                 # missing_index <-
-                #   which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                #   which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
                 # # Get the index of the previous site
                 # previous_index <-
-                #   which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                #   which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -2469,13 +2622,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -2491,7 +2644,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -2503,8 +2656,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -2512,19 +2665,19 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 
               }
               
-              else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) - 1) {
+              else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) + 1 |
+                       which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) - 1) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -2543,13 +2696,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -2566,7 +2719,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -2578,8 +2731,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -2591,27 +2744,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Finally, if we're not missing any sites in between, just store it
               else {
                 # Store the tag code
-                JDR_stepwise_states[i, 'tag_code'] <-
-                  JDR_det_hist[i, 'tag_code']
+                stepwise_states[i, 'tag_code'] <-
+                  det_hist[i, 'tag_code']
                 # Store the current state
-                JDR_stepwise_states[i, 'state'] <-
-                  JDR_det_hist[i, 'state']
+                stepwise_states[i, 'state'] <-
+                  det_hist[i, 'state']
                 # Store the time entering this state
-                JDR_stepwise_states[i, 'date_time'] <-
-                  JDR_det_hist[i, 'end_time']
+                stepwise_states[i, 'date_time'] <-
+                  det_hist[i, 'end_time']
                 # Store the transition site
-                JDR_stepwise_states[i, 'pathway'] <-
-                  JDR_det_hist[i, 'site_class']
+                stepwise_states[i, 'pathway'] <-
+                  det_hist[i, 'site_class']
               }
               
               
             }
             
             # If it was previously in the Snake
-            else if (JDR_det_hist[i - 1, 'state'] %in% snake_sites) {
+            else if (det_hist[i - 1, 'state'] %in% snake_sites) {
               # Make sure that if it was seen in the adult fishways at a dam, the
               # detection history contains the state downstream of that dam
-              if (JDR_det_hist[i, 'site_class'] %in% c(
+              if (det_hist[i, 'site_class'] %in% c(
                 "BON (adult)",
                 "MCN (adult)",
                 "PRA (adult)",
@@ -2621,25 +2774,25 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 "ICH (adult)",
                 "LGR (adult)"
               ) &
-              JDR_det_hist[i - 1, 'state'] != 
-              site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-                # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-                # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+              det_hist[i - 1, 'state'] != 
+              site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+                # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+                # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
                 
                 # Get the missing index
                 missing_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                  which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                 # Get the index of the previous site
                 previous_index <-
                   which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                              JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                              det_hist[i - 1, 'state'])$mainstem)
                 
                 # # Get the missing index
                 # missing_index <-
-                #   which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                #   which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
                 # # Get the index of the previous site
                 # previous_index <-
-                #   which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                #   which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (missing_index < previous_index) {
@@ -2659,13 +2812,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -2681,7 +2834,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                   missing_site <- site_order_notrib_columbia[index_order[j]]
                   
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -2693,27 +2846,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
                 }
               }
               
-              else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                       which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                       which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                       which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) - 1) {
+              else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                       which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) + 1 |
+                       which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                       which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) - 1) {
                 # If we see it at two non-consecutive mainstem locations
                 
                 # If the next site skips sites, insert the missing sites
                 # Get the index of the current site
                 current_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i, 'state'])
                 # Get the index of the previous site
                 previous_index <-
-                  which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                  which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
                 
                 # sequence from current to previous index
                 if (current_index < previous_index) {
@@ -2732,13 +2885,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   # Tag code, state, and time (which is NA)
                   missing_site <-
                     site_order_notrib_columbia[index_order[1 + j]]
-                  implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                                state = missing_site,
                                                date_time = NA,
                                                pathway = "implicit")
                   
-                  JDR_stepwise_states %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
@@ -2756,7 +2909,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                   
                   # Insert a new row into original detection history, with
                   # implicit detection site info
-                  implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
                                           NA,
                                           NA,
                                           NA,
@@ -2768,8 +2921,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                           missing_site)
                   
                   # Also, change the value in the original dataframe
-                  JDR_det_hist <-
-                    insertRow(JDR_det_hist, implicit_detection, i)
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
                   
                   # Add 1 to the number of added rows
                   added_rows <- added_rows + 1
@@ -2779,17 +2932,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Finally, if we're not missing any sites in between, just store it
               else {
                 # Store the tag code
-                JDR_stepwise_states[i, 'tag_code'] <-
-                  JDR_det_hist[i, 'tag_code']
+                stepwise_states[i, 'tag_code'] <-
+                  det_hist[i, 'tag_code']
                 # Store the current state
-                JDR_stepwise_states[i, 'state'] <-
-                  JDR_det_hist[i, 'state']
+                stepwise_states[i, 'state'] <-
+                  det_hist[i, 'state']
                 # Store the time entering this state
-                JDR_stepwise_states[i, 'date_time'] <-
-                  JDR_det_hist[i, 'end_time']
+                stepwise_states[i, 'date_time'] <-
+                  det_hist[i, 'end_time']
                 # Store the transition site
-                JDR_stepwise_states[i, 'pathway'] <-
-                  JDR_det_hist[i, 'site_class']
+                stepwise_states[i, 'pathway'] <-
+                  det_hist[i, 'site_class']
               }
               
             }
@@ -2798,10 +2951,10 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           }
           
           # Second: Upper Columbia sites
-          else if (JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+          else if (det_hist[i, 'state'] %in% upper_columbia_sites) {
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -2811,18 +2964,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            JDR_det_hist[i - 1, 'state'] != 
-            site_order_notrib_columbia[which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1]){
-              # (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-              # which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+            det_hist[i - 1, 'state'] != 
+            site_order_notrib_columbia[which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1]){
+              # (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+              # which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
                 which(site_order_notrib_columbia %in% subset(tributary_mainstem, tributary ==
-                                                            JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                            det_hist[i - 1, 'state'])$mainstem)
               
               # sequence from current to previous index
               if (missing_index < previous_index) {
@@ -2842,13 +2995,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -2864,7 +3017,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -2876,29 +3029,29 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
               }
             }
             
-            else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i -
+            else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_columbia %in% det_hist[i -
                                                                         1, 'state']) + 1 |
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i -
+                     which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_columbia %in% det_hist[i -
                                                                         1, 'state']) - 1) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -2917,13 +3070,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -2939,7 +3092,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -2951,8 +3104,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -2962,27 +3115,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # Finally, if we're not missing any sites in between, just store it
             else {
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
             
             
           }
           
           # Third: Snake River sites
-          else if (JDR_det_hist[i, 'state'] %in% snake_sites) {
+          else if (det_hist[i, 'state'] %in% snake_sites) {
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -2992,18 +3145,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            JDR_det_hist[i - 1, 'state'] != 
-            site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1]){
-            # (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-            # which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+            det_hist[i - 1, 'state'] != 
+            site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1]){
+            # (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+            # which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
                 which(site_order_notrib_snake %in% subset(tributary_mainstem, tributary ==
-                                                            JDR_det_hist[i - 1, 'state'])$mainstem)
+                                                            det_hist[i - 1, 'state'])$mainstem)
               
               # sequence from current to previous index
               if (missing_index < previous_index) {
@@ -3023,13 +3176,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3045,7 +3198,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3057,8 +3210,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -3066,26 +3219,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             }
             
             
-            else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_snake %in% JDR_det_hist[i -
+            else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_snake %in% det_hist[i -
                                                                      1, 'state']) + 1 |
-                     JDR_det_hist[i, 'state'] %in% snake_sites &
-                     which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_snake %in% JDR_det_hist[i -
+                     det_hist[i, 'state'] %in% snake_sites &
+                     which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_snake %in% det_hist[i -
                                                                      1, 'state']) - 1) {
-            # else if (JDR_det_hist[i - 1, 'state'] != 
-            #          site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1] |
-            #          JDR_det_hist[i - 1, 'state'] != 
-            #          site_order_notrib_snake[which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) + 1]) {
+            # else if (det_hist[i - 1, 'state'] != 
+            #          site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1] |
+            #          det_hist[i - 1, 'state'] != 
+            #          site_order_notrib_snake[which(site_order_notrib_snake %in% det_hist[i, 'state']) + 1]) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -3104,13 +3257,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3126,7 +3279,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3138,8 +3291,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -3149,17 +3302,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # Finally, if we're not missing any sites in between, just store it
             else {
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
             
             
@@ -3175,17 +3328,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           
           else {
             # Store the tag code
-            JDR_stepwise_states[i, 'tag_code'] <-
-              JDR_det_hist[i, 'tag_code']
+            stepwise_states[i, 'tag_code'] <-
+              det_hist[i, 'tag_code']
             # Store the current state
-            JDR_stepwise_states[i, 'state'] <-
-              JDR_det_hist[i, 'state']
+            stepwise_states[i, 'state'] <-
+              det_hist[i, 'state']
             # Store the time entering this state
-            JDR_stepwise_states[i, 'date_time'] <-
-              JDR_det_hist[i, 'end_time']
+            stepwise_states[i, 'date_time'] <-
+              det_hist[i, 'end_time']
             # Store the transition site
-            JDR_stepwise_states[i, 'pathway'] <-
-              JDR_det_hist[i, 'site_class']
+            stepwise_states[i, 'pathway'] <-
+              det_hist[i, 'site_class']
           }
         }
         
@@ -3193,19 +3346,19 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
         # Zeroth: Jumping between Snake and Columbia, without visiting
         # shared sites in between. We see this with some fish, if they are
         # seen at PRA and then ICH or vice versa, without anything in between
-        else if (JDR_det_hist[i - 1, 'state'] %in% upper_columbia_sites &
-                 JDR_det_hist[i, 'state'] %in% snake_sites |
-                 JDR_det_hist[i - 1, 'state'] %in% snake_sites &
-                 JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+        else if (det_hist[i - 1, 'state'] %in% upper_columbia_sites &
+                 det_hist[i, 'state'] %in% snake_sites |
+                 det_hist[i - 1, 'state'] %in% snake_sites &
+                 det_hist[i, 'state'] %in% upper_columbia_sites) {
           # These inherently have to skip, since they're not seen
           # at a shared site (MCN to ICH/PRA is the only route, and by
           # definition they're not seen there)
           # Get the index of the current site
           current_index <-
-            which(site_order_notrib_columbia_snake %in% JDR_det_hist[i, 'state'])
+            which(site_order_notrib_columbia_snake %in% det_hist[i, 'state'])
           # Get the index of the previous site
           previous_index <-
-            which(site_order_notrib_columbia_snake %in% JDR_det_hist[i - 1, 'state'])
+            which(site_order_notrib_columbia_snake %in% det_hist[i - 1, 'state'])
           
           # sequence from current to previous index
           if (current_index < previous_index) {
@@ -3224,13 +3377,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # Tag code, state, and time (which is NA)
             missing_site <-
               site_order_notrib_columbia_snake[index_order[1 + j]]
-            implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+            implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                          state = missing_site,
                                          date_time = NA,
                                          pathway = "implicit")
             
-            JDR_stepwise_states %>% 
-              bind_rows(., implicit_state) -> JDR_stepwise_states
+            stepwise_states %>% 
+              bind_rows(., implicit_state) -> stepwise_states
             
             # Insert a new row into original detection history, with
             # implicit detection site info
@@ -3248,7 +3401,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             
             # Insert a new row into original detection history, with
             # implicit detection site info
-            implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+            implicit_detection <- c(det_hist[i, 'tag_code'],
                                     NA,
                                     NA,
                                     NA,
@@ -3260,8 +3413,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                     missing_site)
             
             # Also, change the value in the original dataframe
-            JDR_det_hist <-
-              insertRow(JDR_det_hist, implicit_detection, i)
+            det_hist <-
+              insertRow(det_hist, implicit_detection, i)
             
             # Add 1 to the number of added rows
             added_rows <- added_rows + 1
@@ -3274,12 +3427,12 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
         # First: Shared sites - need two options, depending on where it previously was
         # Shared sites can use either Columbia or Snake sites
         # Condition: If the indices are off by more than one (plus or minus one)
-        else if (JDR_det_hist[i, 'state'] %in% shared_sites) {
+        else if (det_hist[i, 'state'] %in% shared_sites) {
           # If it was previously in the Columbia
-          if (JDR_det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
+          if (det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)) {
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -3289,15 +3442,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-            which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+            (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+            which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (missing_index < previous_index) {
@@ -3318,13 +3471,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3340,7 +3493,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j+1]]
                 missing_site <- site_order_notrib_columbia[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3352,8 +3505,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -3361,19 +3514,19 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               
             }
             
-            else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state']) - 1) {
+            else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) + 1 |
+                     which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_columbia %in% det_hist[i - 1, 'state']) - 1) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -3392,13 +3545,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_columbia[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3416,7 +3569,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_columbia[index_order[j]]
                 
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3428,8 +3581,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -3440,7 +3593,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             
             
             # If we have already inserted the missing site into the stepwise states, ignore it
-            # else if (replace_na(JDR_stepwise_states[i, 'state'], "NA") == replace_na(JDR_stepwise_states[i-1, 'state'], "NA")){
+            # else if (replace_na(stepwise_states[i, 'state'], "NA") == replace_na(stepwise_states[i-1, 'state'], "NA")){
             #   #1.26.22#
             # }
             
@@ -3448,27 +3601,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # and it's not already in the stepwise states DF, just store it
             else {
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
             
             
           }
           
           # If it was previously in the Snake
-          else if (JDR_det_hist[i - 1, 'state'] %in% snake_sites) {
+          else if (det_hist[i - 1, 'state'] %in% snake_sites) {
             # Make sure that if it was seen in the adult fishways at a dam, the
             # detection history contains the state downstream of that dam
-            if (JDR_det_hist[i, 'site_class'] %in% c(
+            if (det_hist[i, 'site_class'] %in% c(
               "BON (adult)",
               "MCN (adult)",
               "PRA (adult)",
@@ -3478,15 +3631,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               "ICH (adult)",
               "LGR (adult)"
             ) &
-            (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-            which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+            (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+            which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
               
               # Get the missing index
               missing_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+                which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
               # Add a row for each of them
               # sequence from current to previous index
@@ -3517,7 +3670,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_snake[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
@@ -3525,30 +3678,30 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # 1.22.26.6:52 #
                 # # # 
                 # Need to append zeros, but only if i > nrow
-                if (i > nrow(JDR_stepwise_states)){
-                  NA_rows <- data.frame(tag_code = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)),
-                                        state = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)),
-                                        date_time = rep(as.POSIXct(as.character(NA)), i - (nrow(JDR_stepwise_states) + 1)),
-                                        pathway = rep(as.character(NA), i - (nrow(JDR_stepwise_states) + 1)))
+                if (i > nrow(stepwise_states)){
+                  NA_rows <- data.frame(tag_code = rep(as.character(NA), i - (nrow(stepwise_states) + 1)),
+                                        state = rep(as.character(NA), i - (nrow(stepwise_states) + 1)),
+                                        date_time = rep(as.POSIXct(as.character(NA)), i - (nrow(stepwise_states) + 1)),
+                                        pathway = rep(as.character(NA), i - (nrow(stepwise_states) + 1)))
                   
-                  JDR_stepwise_states %>%
+                  stepwise_states %>%
                     # Add rows of NAs for any rows that were the same state
                     bind_rows(., NA_rows) %>% 
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                    bind_rows(., implicit_state) -> stepwise_states
                 }
 
                 else{
-                  JDR_stepwise_states %>%
-                    bind_rows(., implicit_state) -> JDR_stepwise_states
+                  stepwise_states %>%
+                    bind_rows(., implicit_state) -> stepwise_states
                 }
                 # # # 
                 
                 
-                # JDR_stepwise_states %>%
-                #   bind_rows(., implicit_state) -> JDR_stepwise_states
+                # stepwise_states %>%
+                #   bind_rows(., implicit_state) -> stepwise_states
                 # Need to run insertRow instead
-                # JDR_stepwise_states <-
-                #   insertRow(JDR_stepwise_states, implicit_state, i)
+                # stepwise_states <-
+                #   insertRow(stepwise_states, implicit_state, i)
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3564,7 +3717,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # missing_site <- site_order_notrib_snake[index_order[j+1]]
                 missing_site <- site_order_notrib_snake[index_order[j]]
                 
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3576,27 +3729,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
               }
             }
             
-            else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                     which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) + 1 |
-                     which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                     which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state']) - 1) {
+            else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                     which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) + 1 |
+                     which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                     which(site_order_notrib_snake %in% det_hist[i - 1, 'state']) - 1) {
               # If we see it at two non-consecutive mainstem locations
               
               # If the next site skips sites, insert the missing sites
               # Get the index of the current site
               current_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i, 'state'])
               # Get the index of the previous site
               previous_index <-
-                which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+                which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
               # sequence from current to previous index
               if (current_index < previous_index) {
@@ -3615,13 +3768,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 # Tag code, state, and time (which is NA)
                 missing_site <-
                   site_order_notrib_snake[index_order[1 + j]]
-                implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                              state = missing_site,
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                JDR_stepwise_states %>% 
-                  bind_rows(., implicit_state) -> JDR_stepwise_states
+                stepwise_states %>% 
+                  bind_rows(., implicit_state) -> stepwise_states
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -3639,7 +3792,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
-                implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+                implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
                                         NA,
                                         NA,
@@ -3651,8 +3804,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                         missing_site)
                 
                 # Also, change the value in the original dataframe
-                JDR_det_hist <-
-                  insertRow(JDR_det_hist, implicit_detection, i)
+                det_hist <-
+                  insertRow(det_hist, implicit_detection, i)
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -3662,17 +3815,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             # Finally, if we're not missing any sites in between, just store it
             else {
               # Store the tag code
-              JDR_stepwise_states[i, 'tag_code'] <-
-                JDR_det_hist[i, 'tag_code']
+              stepwise_states[i, 'tag_code'] <-
+                det_hist[i, 'tag_code']
               # Store the current state
-              JDR_stepwise_states[i, 'state'] <-
-                JDR_det_hist[i, 'state']
+              stepwise_states[i, 'state'] <-
+                det_hist[i, 'state']
               # Store the time entering this state
-              JDR_stepwise_states[i, 'date_time'] <-
-                JDR_det_hist[i, 'end_time']
+              stepwise_states[i, 'date_time'] <-
+                det_hist[i, 'end_time']
               # Store the transition site
-              JDR_stepwise_states[i, 'pathway'] <-
-                JDR_det_hist[i, 'site_class']
+              stepwise_states[i, 'pathway'] <-
+                det_hist[i, 'site_class']
             }
             
           }
@@ -3681,10 +3834,10 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
         }
         
         # Second: Upper Columbia sites
-        else if (JDR_det_hist[i, 'state'] %in% upper_columbia_sites) {
+        else if (det_hist[i, 'state'] %in% upper_columbia_sites) {
           # Make sure that if it was seen in the adult fishways at a dam, the
           # detection history contains the state downstream of that dam
-          if (JDR_det_hist[i, 'site_class'] %in% c(
+          if (det_hist[i, 'site_class'] %in% c(
             "BON (adult)",
             "MCN (adult)",
             "PRA (adult)",
@@ -3694,15 +3847,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             "ICH (adult)",
             "LGR (adult)"
           ) &
-          (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1) !=
-          which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])) {
+          (which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1) !=
+          which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])) {
             
             # Get the missing index
             missing_index <-
-              which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) - 1
+              which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (missing_index < previous_index) {
@@ -3722,13 +3875,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_columbia[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -3744,7 +3897,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # missing_site <- site_order_notrib_columbia[index_order[j+1]]
               missing_site <- site_order_notrib_columbia[index_order[j]]
               
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -3756,29 +3909,41 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
             }
           }
           
-          else if (which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) >
-                   which(site_order_notrib_columbia %in% JDR_det_hist[i -
+          else if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                   which(site_order_notrib_columbia %in% det_hist[i -
                                                                       1, 'state']) + 1 |
-                   which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state']) <
-                   which(site_order_notrib_columbia %in% JDR_det_hist[i -
+                   which(site_order_notrib_columbia %in% det_hist[i, 'state']) <
+                   which(site_order_notrib_columbia %in% det_hist[i -
                                                                       1, 'state']) - 1) {
             # If we see it at two non-consecutive mainstem locations
+            
+            # Get the missing index
+            if (which(site_order_notrib_columbia %in% det_hist[i, 'state']) >
+                which(site_order_notrib_columbia %in% det_hist[i -
+                                                               1, 'state']) + 1){
+              missing_index <-
+                which(site_order_notrib_columbia %in% det_hist[i, 'state']) - 1
+            }
+            else {
+              missing_index <-
+                which(site_order_notrib_columbia %in% det_hist[i, 'state']) + 1
+            }
             
             # If the next site skips sites, insert the missing sites
             # Get the index of the current site
             current_index <-
-              which(site_order_notrib_columbia %in% JDR_det_hist[i, 'state'])
+              which(site_order_notrib_columbia %in% det_hist[i, 'state'])
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_columbia %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (current_index < previous_index) {
@@ -3797,13 +3962,14 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_columbia[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
+              
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -3819,7 +3985,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # missing_site <- site_order_notrib_columbia[index_order[j+1]]
               missing_site <- site_order_notrib_columbia[index_order[j]]
               
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -3831,8 +3997,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -3842,27 +4008,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           # Finally, if we're not missing any sites in between, just store it
           else {
             # Store the tag code
-            JDR_stepwise_states[i, 'tag_code'] <-
-              JDR_det_hist[i, 'tag_code']
+            stepwise_states[i, 'tag_code'] <-
+              det_hist[i, 'tag_code']
             # Store the current state
-            JDR_stepwise_states[i, 'state'] <-
-              JDR_det_hist[i, 'state']
+            stepwise_states[i, 'state'] <-
+              det_hist[i, 'state']
             # Store the time entering this state
-            JDR_stepwise_states[i, 'date_time'] <-
-              JDR_det_hist[i, 'end_time']
+            stepwise_states[i, 'date_time'] <-
+              det_hist[i, 'end_time']
             # Store the transition site
-            JDR_stepwise_states[i, 'pathway'] <-
-              JDR_det_hist[i, 'site_class']
+            stepwise_states[i, 'pathway'] <-
+              det_hist[i, 'site_class']
           }
           
           
         }
         
         # Third: Snake River sites
-        else if (JDR_det_hist[i, 'state'] %in% snake_sites) {
+        else if (det_hist[i, 'state'] %in% snake_sites) {
           # Make sure that if it was seen in the adult fishways at a dam, the
           # detection history contains the state downstream of that dam
-          if (JDR_det_hist[i, 'site_class'] %in% c(
+          if (det_hist[i, 'site_class'] %in% c(
             "BON (adult)",
             "MCN (adult)",
             "PRA (adult)",
@@ -3872,15 +4038,15 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
             "ICH (adult)",
             "LGR (adult)"
           ) &
-          (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1) !=
-          which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])) {
+          (which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1) !=
+          which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])) {
             
             # Get the missing index
             missing_index <-
-              which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) - 1
+              which(site_order_notrib_snake %in% det_hist[i, 'state']) - 1
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (missing_index < previous_index) {
@@ -3900,13 +4066,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_snake[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -3922,7 +4088,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # missing_site <- site_order_notrib_snake[index_order[j+1]]
               missing_site <- site_order_notrib_snake[index_order[j]]
               
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -3934,8 +4100,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -3943,22 +4109,22 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           }
           
           
-          else if (which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) >
-                   which(site_order_notrib_snake %in% JDR_det_hist[i -
+          else if (which(site_order_notrib_snake %in% det_hist[i, 'state']) >
+                   which(site_order_notrib_snake %in% det_hist[i -
                                                                    1, 'state']) + 1 |
-                   JDR_det_hist[i, 'state'] %in% snake_sites &
-                   which(site_order_notrib_snake %in% JDR_det_hist[i, 'state']) <
-                   which(site_order_notrib_snake %in% JDR_det_hist[i -
+                   det_hist[i, 'state'] %in% snake_sites &
+                   which(site_order_notrib_snake %in% det_hist[i, 'state']) <
+                   which(site_order_notrib_snake %in% det_hist[i -
                                                                    1, 'state']) - 1) {
             # If we see it at two non-consecutive mainstem locations
             
             # If the next site skips sites, insert the missing sites
             # Get the index of the current site
             current_index <-
-              which(site_order_notrib_snake %in% JDR_det_hist[i, 'state'])
+              which(site_order_notrib_snake %in% det_hist[i, 'state'])
             # Get the index of the previous site
             previous_index <-
-              which(site_order_notrib_snake %in% JDR_det_hist[i - 1, 'state'])
+              which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
             
             # sequence from current to previous index
             if (current_index < previous_index) {
@@ -3977,13 +4143,13 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # Tag code, state, and time (which is NA)
               missing_site <-
                 site_order_notrib_snake[index_order[1 + j]]
-              implicit_state <- data.frame(tag_code = JDR_det_hist[i, 'tag_code'],
+              implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
                                            state = missing_site,
                                            date_time = NA,
                                            pathway = "implicit")
               
-              JDR_stepwise_states %>% 
-                bind_rows(., implicit_state) -> JDR_stepwise_states
+              stepwise_states %>% 
+                bind_rows(., implicit_state) -> stepwise_states
               
               # Insert a new row into original detection history, with
               # implicit detection site info
@@ -3999,7 +4165,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
               # missing_site <- site_order_notrib_snake[index_order[j+1]]
               missing_site <- site_order_notrib_snake[index_order[j]]
               
-              implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+              implicit_detection <- c(det_hist[i, 'tag_code'],
                                       NA,
                                       NA,
                                       NA,
@@ -4011,8 +4177,8 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                                       missing_site)
               
               # Also, change the value in the original dataframe
-              JDR_det_hist <-
-                insertRow(JDR_det_hist, implicit_detection, i)
+              det_hist <-
+                insertRow(det_hist, implicit_detection, i)
               
               # Add 1 to the number of added rows
               added_rows <- added_rows + 1
@@ -4022,17 +4188,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
           # Finally, if we're not missing any sites in between, just store it
           else {
             # Store the tag code
-            JDR_stepwise_states[i, 'tag_code'] <-
-              JDR_det_hist[i, 'tag_code']
+            stepwise_states[i, 'tag_code'] <-
+              det_hist[i, 'tag_code']
             # Store the current state
-            JDR_stepwise_states[i, 'state'] <-
-              JDR_det_hist[i, 'state']
+            stepwise_states[i, 'state'] <-
+              det_hist[i, 'state']
             # Store the time entering this state
-            JDR_stepwise_states[i, 'date_time'] <-
-              JDR_det_hist[i, 'end_time']
+            stepwise_states[i, 'date_time'] <-
+              det_hist[i, 'end_time']
             # Store the transition site
-            JDR_stepwise_states[i, 'pathway'] <-
-              JDR_det_hist[i, 'site_class']
+            stepwise_states[i, 'pathway'] <-
+              det_hist[i, 'site_class']
           }
           
           
@@ -4042,17 +4208,17 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
         # Finally, if we're not missing any sites in between, just store it
         else {
           # Store the tag code
-          JDR_stepwise_states[i, 'tag_code'] <-
-            JDR_det_hist[i, 'tag_code']
+          stepwise_states[i, 'tag_code'] <-
+            det_hist[i, 'tag_code']
           # Store the current state
-          JDR_stepwise_states[i, 'state'] <-
-            JDR_det_hist[i, 'state']
+          stepwise_states[i, 'state'] <-
+            det_hist[i, 'state']
           # Store the time entering this state
-          JDR_stepwise_states[i, 'date_time'] <-
-            JDR_det_hist[i, 'end_time']
+          stepwise_states[i, 'date_time'] <-
+            det_hist[i, 'end_time']
           # Store the transition site
-          JDR_stepwise_states[i, 'pathway'] <-
-            JDR_det_hist[i, 'site_class']
+          stepwise_states[i, 'pathway'] <-
+            det_hist[i, 'site_class']
         }
       }
       
@@ -4064,20 +4230,20 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
     ### REPEAT DETECTION AT THE SAME DAM
     # If it's next seen at the same dam, add a line to indicate it fell back
     # I think we need a statement for each dam, because each is unique
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "BON (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "BON (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, mouth to BON",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4089,26 +4255,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, mouth to BON")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "MCN (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "MCN (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, BON to MCN",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4120,27 +4286,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, BON to MCN")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "PRA (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "PRA (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, MCN to ICH or PRA",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
       implicit_detection <- c(
-        JDR_det_hist[i, 'tag_code'],
+        det_hist[i, 'tag_code'],
         NA,
         NA,
         NA,
@@ -4153,26 +4319,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
       )
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "RIS (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "RIS (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, PRA to RIS",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4184,26 +4350,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, PRA to RIS")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "RRE (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "RRE (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, RIS to RRE",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4215,26 +4381,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, RIS to RRE")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "WEL (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "WEL (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, RRE to WEL",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4246,27 +4412,27 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, RRE to WEL")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "ICH (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "ICH (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, MCN to ICH or PRA",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
       implicit_detection <- c(
-        JDR_det_hist[i, 'tag_code'],
+        det_hist[i, 'tag_code'],
         NA,
         NA,
         NA,
@@ -4279,26 +4445,26 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
       )
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
     }
     
-    else if (JDR_det_hist[i, 'site_class'] == JDR_det_hist[i - 1, 'site_class'] &
-             JDR_det_hist[i, 'site_class'] == "LGR (adult)") {
+    else if (det_hist[i, 'site_class'] == det_hist[i - 1, 'site_class'] &
+             det_hist[i, 'site_class'] == "LGR (adult)") {
       # Insert a new row into stepwise states, with the implicit detection site
       # Tag code, state, and time (which is NA)
-      implicit_state <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_state <- c(det_hist[i, 'tag_code'],
                           "mainstem, ICH to LGR",
                           NA,"implicit")
       
-      JDR_stepwise_states <-
-        insertRow(JDR_stepwise_states, implicit_state, i)
+      stepwise_states <-
+        insertRow(stepwise_states, implicit_state, i)
       
       # Insert a new row into original detection history, with
       # implicit detection site info
-      implicit_detection <- c(JDR_det_hist[i, 'tag_code'],
+      implicit_detection <- c(det_hist[i, 'tag_code'],
                               NA,
                               NA,
                               NA,
@@ -4310,7 +4476,7 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
                               "mainstem, ICH to LGR")
       
       # Also, change the value in the original dataframe
-      JDR_det_hist <- insertRow(JDR_det_hist, implicit_detection, i)
+      det_hist <- insertRow(det_hist, implicit_detection, i)
       
       # Add 1 to the number of added rows
       added_rows <- added_rows + 1
@@ -4325,21 +4491,21 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
   else {
     # Start a new entry
     # Store the tag code
-    JDR_stepwise_states[i, 'tag_code'] <-
-      JDR_det_hist[i, 'tag_code']
+    stepwise_states[i, 'tag_code'] <-
+      det_hist[i, 'tag_code']
     # Store the current state
-    JDR_stepwise_states[i, 'state'] <- JDR_det_hist[i, 'state']
+    stepwise_states[i, 'state'] <- det_hist[i, 'state']
     # Store the time entering this state
-    JDR_stepwise_states[i, 'date_time'] <-
-      JDR_det_hist[i, 'end_time']
+    stepwise_states[i, 'date_time'] <-
+      det_hist[i, 'end_time']
     # Store the transition site
-    JDR_stepwise_states[i, 'pathway'] <-
-      JDR_det_hist[i, 'site_class']
+    stepwise_states[i, 'pathway'] <-
+      det_hist[i, 'site_class']
   }
 }
 
 
-
+stepwise_states
 
 
 
@@ -4348,18 +4514,18 @@ for (i in 1:(2 * nrow(JDR_det_hist) - 1)) {
 
 
 # # Remove all NAs
-JDR_stepwise_states_noNA <- JDR_stepwise_states[!is.na(JDR_stepwise_states$tag),]
+stepwise_states_noNA <- stepwise_states[!is.na(stepwise_states$tag),]
 
 # Compare them to original detection histories
 
-subset(JDR_stepwise_states_noNA, tag_code == "3D9.1BF1989388")
-subset(JDR_det_hist_original, tag_code == "3D9.1BF1989388")
+subset(stepwise_states_noNA, tag_code == "3D9.1BF1989388")
+subset(det_hist_original, tag_code == "3D9.1BF1989388")
 
-subset(JDR_stepwise_states_noNA, tag_code == "3D9.1BF192A09F")
-subset(JDR_det_hist_original, tag_code == "3D9.1BF192A09F")
+subset(stepwise_states_noNA, tag_code == "3D9.1BF192A09F")
+subset(det_hist_original, tag_code == "3D9.1BF192A09F")
 
-subset(JDR_stepwise_states_noNA, tag_code == "3D9.1BF1B105B2")
-subset(JDR_det_hist_original, tag_code == "3D9.1BF1B105B2")
+subset(stepwise_states_noNA, tag_code == "3D9.1BF1B105B2")
+subset(det_hist_original, tag_code == "3D9.1BF1B105B2")
 # This individual also looks like an iteroparous individual - BON adult
 # detection was two years after last detection
 
@@ -4372,15 +4538,15 @@ run_year_end <- seq(ymd("2006-05-31"), ymd("2015-05-31"), by = "years")
 
 run_year_df <- data.frame(run_year, run_year_start, run_year_end)
 
-JDR_det_hist %>%
+det_hist %>%
   group_by(tag_code) %>%
   filter(row_number() == 1) %>%
   mutate(run_year = subset(run_year_df, run_year_start < start_time & run_year_end > start_time)$run_year) %>%
   dplyr::select(tag_code, run_year) -> tag_codes_run_year
 
-JDR_stepwise_states_noNA %>%
-  left_join(., tag_codes_run_year, by = "tag_code") -> JDR_stepwise_states_noNA
+stepwise_states_noNA %>%
+  left_join(., tag_codes_run_year, by = "tag_code") -> stepwise_states_noNA
 
 # Export this for fitting multistate
-write.csv(JDR_stepwise_states_noNA, here("model_files", "JDR_states.csv"))
+write.csv(stepwise_states_noNA, here("model_files", "states.csv"))
 
