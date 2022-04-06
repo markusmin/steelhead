@@ -46,6 +46,18 @@ CTH_1 %>%
   bind_rows(., dplyr::select(CTH_14, -event_site_subbasin_code)) %>% 
   mutate(event_date_time_value = mdy_hms(event_date_time_value))-> CTH_complete
 
+# Remove the Klickitat and Wind Rivers
+origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
+# Read in the metadata
+tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
+tag_code_metadata %>% 
+  left_join(., origin_table, by = "release_site_name") -> tag_code_origin_metadata
+KLIC_WIND_tag_codes <- subset(tag_code_origin_metadata, natal_origin %in% c("Klickitat_River", "Wind_River"))$tag_code
+# Subset out those
+CTH_complete %>% 
+  subset(., !(tag_code %in% KLIC_WIND_tag_codes)) -> CTH_complete
+
+
 # Get the date of arrival at BON - take min in case it fell back over Bonneville
 CTH_complete %>% 
   group_by(tag_code) %>% 
@@ -304,6 +316,194 @@ for (i in 1:length(unique_tag_IDs)){
 
 # Export this detection history
 write.csv(det_hist, here("model_files", "complete_det_hist.csv"))
+
+
+##### 10% of full dataset - for model testing #####
+
+
+# Create a subset of data to test code - every 10th individual
+unique_tag_IDs <- unique_tag_IDs[seq(1, length(unique_tag_IDs), 10)]
+
+# Create a new dataframe that will store our new detection history
+det_hist <- data.frame(tag_code = character(), event_site_name = character(), 
+                       start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
+                       event_site_basin_name = character(), event_site_subbasin_name = character(),
+                       event_site_latitude = numeric(), event_site_longitude = numeric())
+
+# Loop through the unique tags
+for (i in 1:length(unique_tag_IDs)){
+  # Get the start time
+  if (i == 1){
+    start_time <- Sys.time() 
+  }
+  
+  # Make a new dataframe to store the history for each fish
+  ind_det_hist <- data.frame(tag_code = character(), event_site_name = character(),
+                             start_time = as.POSIXct(character()), end_time = as.POSIXct(character()),
+                             event_site_basin_name = character(), event_site_subbasin_name = character(),
+                             event_site_latitude = numeric(), event_site_longitude = numeric())
+  
+  # Make a new dataframe - we don't know how big it needs to be, but we can make it 
+  # # large and then cut it down at the end
+  # Didn't really help with speed
+  # ind_det_hist <- data.frame(tag_code = rep(NA, 40), event_site_name = rep(NA, 40), 
+  #                            start_time = as.POSIXct(rep(NA, 40)), end_time = as.POSIXct(rep(NA, 40)), 
+  #                            event_site_basin_name = rep(NA, 40), event_site_subbasin_name = rep(NA, 40),
+  #                            event_site_latitude = as.numeric(rep(NA, 40)), event_site_longitude = as.numeric(rep(NA, 40)))
+  
+  # subset the complete dataset to only this fish
+  tag_hist <- subset(CTH_adult, tag_code == unique_tag_IDs[i])
+  
+  
+  # Loop through the rows of the tag history
+  for (j in 1:nrow(tag_hist)){
+    
+    
+    # For the first entry, just store these values
+    if (j == 1){
+      # store the tag code
+      ind_det_hist[1,'tag_code'] <- unique_tag_IDs[i]
+      
+      # store the location fields
+      ind_det_hist[1,'event_site_name'] <- tag_hist[j,'event_site_name']
+      ind_det_hist[1,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+      ind_det_hist[1,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+      ind_det_hist[1,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+      ind_det_hist[1,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+      
+      # store the start time
+      ind_det_hist[1,'start_time'] <- tag_hist[[j,'event_date_time_value']]
+      
+      # START THE COUNTER
+      counter <- 1
+    }
+    
+    # If it's the last entry, store those values
+    
+    else if (j == nrow(tag_hist)){
+      # Store the end time
+      ind_det_hist[counter, 'end_time'] <- tag_hist[[j,'event_date_time_value']]
+      
+      # SPECIAL CASE: If it's the last entry AND the only detection at a site
+      if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
+          tag_hist[j, 'event_date_time_value'] -
+          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 6)){
+        
+        # store the tag code
+        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+        
+        # store the location fields
+        ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+        ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+        ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+        ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+        ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+        
+        # Store the start time
+        ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
+        
+      }
+    }
+    
+    # For every other entry, look at the previous entry to see if it
+    # was the same site < 6 hours ago
+    else {
+      
+      # If the next entry isn't the same site OR is >=6 hours ahead, store it as
+      # the end time
+      if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
+          tag_hist[j+1, 'event_date_time_value'] -
+          tag_hist[j, 'event_date_time_value'] >= hours(x = 6)){
+        
+        # Store the end time
+        ind_det_hist[counter, 'end_time'] <- tag_hist[[j,'event_date_time_value']]
+        
+        # SPECIAL CASE: If there is only one detection at a site, store the 
+        # start time as well
+        # Here we will look at both the previous and next entry
+        # If the previous detection is at a different site OR is more than 6 hours ago,
+        # store the start time
+        if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
+            tag_hist[j, 'event_date_time_value'] -
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 6)){
+          
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
+          
+        }
+        
+        # UPDATE THE COUNTER
+        # every time we store an end time, we update the counter. This allows
+        # us to move through the detection history df
+        counter <- counter + 1
+        
+      }
+      
+      # If the previous site was a different site OR was >6 hours ago, 
+      # start a new entry and start time
+      else if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
+               tag_hist[j, 'event_date_time_value'] -
+               tag_hist[j-1, 'event_date_time_value'] >= hours(x = 6)){
+        
+        # store the tag code
+        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+        
+        # store the location fields
+        ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+        ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+        ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+        ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+        ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+        
+        # store the start time
+        ind_det_hist[counter,'start_time'] <- tag_hist[[j,'event_date_time_value']]
+        
+      }
+      
+      # If the previous entry was the same site <=6 hours ago AND
+      # The next entry is the same site <=6 hours ago, skip it
+      else {
+        
+      }
+      
+    }
+  }
+  
+  # Cut out extra rows
+  ind_det_hist <- ind_det_hist[!(is.na(ind_det_hist$tag_code)),]
+  
+  # Append the individual tag history to the complete tag history
+  det_hist %>% 
+    bind_rows(., ind_det_hist) -> det_hist
+  
+  # Print the run time
+  if (i == length(unique_tag_IDs)){
+    end_time <- Sys.time()
+    
+    print(paste0("Total tags: ", length(unique_tag_IDs)))
+    print(paste0("Total time: ", end_time - start_time))
+  }
+  
+  # Make sure that it's running
+  print(paste0("Tag ", i))
+}
+
+
+# Export this detection history
+write.csv(det_hist, here("model_files", "complete_det_hist_0.1.csv"))
+
+
+##### 
 
 det_hist <- read.csv(here("model_files", "complete_det_hist.csv"), row.names = 1)
 
