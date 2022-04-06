@@ -612,8 +612,10 @@ added_rows <- 0
 
 
 # Loop through each row of the detection history
-# for (i in 1:(2 * nrow(det_hist) - 1)) {
-for (i in 1:7775) {
+# Error is currently occurring in "Row #89767"
+for (i in 1:(2 * nrow(det_hist) - 1)) {
+# for (i in 1:89765) {
+# for (i in 89764:89765) {
   # Update i to keep up with number of added rows
   # NOT NECESSARY
   # i <- i + added_rows
@@ -1476,9 +1478,13 @@ for (i in 1:7775) {
                   index_order <- seq(current_index, previous_index, by = 1)
                   # index_order <- seq(previous_index, current_index, by = -1)
                   
+                # } else {
+                #   # index_order <- seq(previous_index, current_index, by = 1)
+                #   index_order <- seq(previous_index, current_index, by = -1)
+                # }
                 } else {
                   # index_order <- seq(previous_index, current_index, by = 1)
-                  index_order <- seq(previous_index, current_index, by = -1)
+                  index_order <- seq(current_index, previous_index, by = -1)
                 }
                 
                 # Count the number of sites you need to add and loop through
@@ -1645,8 +1651,12 @@ for (i in 1:7775) {
                   # index_order <- seq(current_index, previous_index, by = 1)
                   index_order <- seq(previous_index, current_index, by = -1)
                   
+                # } else {
+                #   index_order <- seq(previous_index, current_index, by = 1)
+                # }
                 } else {
-                  index_order <- seq(previous_index, current_index, by = 1)
+                  # index_order <- seq(previous_index, current_index, by = 1)
+                  index_order <- seq(current_index, previous_index, by = -1)
                 }
                 
                 # Count the number of sites you need to add and loop through
@@ -2748,7 +2758,8 @@ for (i in 1:7775) {
                 index_order <- seq(previous_index, current_index, by = -1)
                 
               } else {
-                index_order <- seq(previous_index, current_index, by = 1)
+                # index_order <- seq(previous_index, current_index, by = 1)
+                index_order <- seq(current_index, previous_index, by = -1)
               }
               
               # Count the number of sites you need to add and loop through
@@ -2776,17 +2787,6 @@ for (i in 1:7775) {
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
-                
-                # Need to flip the order of sites for these - but it depends on the order of the sites
-                if (missing_index < previous_index){
-                  index_order <- seq(missing_index, previous_index, by = 1)
-                }
-                else {
-                  index_order <- seq(missing_index, previous_index, by = -1)
-                }
-                
-                # missing_site <- site_order_notrib_columbia[index_order[j+1]]
-                missing_site <- site_order_notrib_columbia[index_order[j]]
                 
                 implicit_detection <- c(det_hist[i, 'tag_code'],
                                         NA,
@@ -2918,9 +2918,13 @@ for (i in 1:7775) {
                 index_order <- seq(current_index, previous_index, by = 1)
                 # index_order <- seq(previous_index, current_index, by = -1)
                 
+              # } else {
+              #   # index_order <- seq(previous_index, current_index, by = 1)
+              #   index_order <- seq(previous_index, current_index, by = -1)
+              # }
               } else {
                 # index_order <- seq(previous_index, current_index, by = 1)
-                index_order <- seq(previous_index, current_index, by = -1)
+                index_order <- seq(current_index, previous_index, by = -1)
               }
               
               # Count the number of sites you need to add and loop through
