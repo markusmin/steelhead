@@ -181,6 +181,17 @@ tag_code_metadata %>%
   dplyr::select(tag_code, run_year, natal_origin, rear_type_code, release_site_name) %>% 
   subset(., tag_code %in% BON_arrival$tag_code) -> origin_metadata
 
+# Load the states from the 03 script
+read.csv(here::here("model_files", "states.csv")) %>% 
+  dplyr::select(-X) -> states
+
+# Check to see distribution of origins in this subset of the data
+tag_code_subset <- unique(states$tag_code)
+subset_origin_metadata <- subset(origin_metadata, tag_code %in% tag_code_subset)
+table(subset_origin_metadata$natal_origin)
+# Remove the Klickitat and Wind Rivers - shouldn't have to do this in the future, since I made sure to subset earlier
+KLIC_WIND_tag_codes <- subset(origin_metadata, natal_origin %in% c("Klickitat_River", "Wind_River"))$tag_code
+
 det_hist %>% 
   left_join(., origin_metadata, by = "tag_code") %>% 
   mutate(start_time = ymd_hms(start_time),
@@ -409,6 +420,96 @@ det_hist %>%
 
 # ah, so this won't work. We need to add this to the complete detection history, to match by state
 
+##### Interpolate times at states #####
+
+# The upstream vs. downstream travel time approach won't work, because we can't assume in what direction
+# they were traveling. Instead, we will use the time halfway between the time arriving in the current state
+# and the time arriving in the next state as the time for covariates
+# Now, when we have implicit site usage, we don't know when they arrived. So in this
+# case, we will interpolate these times by taking the halfway point between two known times. If
+# there are multiple (N) implict site visits between known times, then we will take N 
+# breakpoints; i.e., if we saw an individual at state 1 at t = 1, and at state 4 at t = 10,
+# we will say that they were at state 2 at t = 4 and state 3 at t = 7
+
+# Load the states from the 03 script
+read.csv(here::here("model_files", "states.csv")) %>% 
+  dplyr::select(-X) -> states
+
+# Create a column to indicate if the date_time was interpolated
+# Note the arrival date
+states %>% 
+  mutate(date_source = ifelse(!is.na(date_time), "known_arrival", "interpolated")) %>% 
+  # get an empty date column
+  mutate(arrival_date = NA) -> states
+
+# I think we have to loop this
+
+# First, figure out indices of missing date_time
+missing_date_time <- is.na(states$date_time)
+date_times <- states$date_time
+
+# Loop to get arrival dates in state
+for (i in 1:nrow(states)){
+  # if it's NA
+  print(paste0("Row #", i))
+  if (is.na(states[i,"date_time"])){
+    # Figure out how far back the last known time was
+    # Truncate the missing date times to only ones prior to current state
+    missing_date_time_subset <- missing_date_time[1:(i-1)]
+    prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
+    
+    # Truncate the missing date times to only ones after current state
+    missing_date_time_subset <- missing_date_time[(i+1):nrow(states)]
+    next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
+    
+    # Now, interpolate the missing time
+    # First, figure out how long between the two known times
+    prev_time <- ymd_hms(date_times[prev_time_index])
+    next_time <- ymd_hms(date_times[next_time_index])
+    time_diff <- next_time - prev_time
+    
+    # Get the missing time - add the time difference divided by the number 
+    # of missing steps plus 1, multiply by which number step it is
+    missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
+    
+    # Extract just the date
+    missing_date <- date(missing_time)
+    
+    # populate the missing date_time
+    states[i, "arrival_date"] <- format(as.Date(missing_date, origin = "1970-01-01"))
+    
+  }
+  # If it's not, leave it alone and just extract date
+  else {
+    states[i, "arrival_date"] <- format(as.Date(date(states[i,"date_time"]), origin = "1970-01-01"))
+  }
+}
+
+# Loop again to get the "experience date" - halfway between arrival 
+# date in state and arrival date in next state
+
+states %>% 
+  mutate(date = NA) %>% 
+  mutate(arrival_date = ymd(arrival_date))-> states
+
+for (i in 1:(nrow(states) - 1)) {
+  # If the next fish is the same fish
+  if (i == 1 | (states[i, "tag_code"] == states[i+1, "tag_code"])){
+    movement_time <- states[i+1, "arrival_date"] - states[i, "arrival_date"]
+    
+    states[i, "date"] <- format(as.Date(date(states[i, "arrival_date"] + movement_time/2), origin = "1970-01-01"))
+    
+  }
+  
+  # If it's the last entry for a fish, just store the arrival time
+  else {
+    states[i, "date"] <- format(as.Date(date(states[i, "arrival_date"]), origin = "1970-01-01"))
+  }
+}
+
+
+
+
 
 ##### Import dam covariate data #####
 # Pivot longer and reformat function
@@ -419,6 +520,8 @@ cov_reformat <- function(input_data, variable_name){
                   !!quo_name(variable_name) := value) %>% 
     mutate(year = gsub("X","",year)) %>% 
     mutate(year = as.numeric(year), day = as.numeric(day)) %>% 
+    # Add a new column for date (combine year and day)
+    mutate(date = format(as.Date(day, origin = paste0(year, "-01-01")))) %>% 
     arrange(year, day) -> output_data
   
   return(output_data)
@@ -504,8 +607,51 @@ WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
 WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_WEL_allyears.csv"))[1:366,]
 WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
 
+# Reformat this into one big DF - date, plus value at each state
+
+# Three: one for flow, one for spill, one for temp
+
+##### Temperature #####
+
+dplyr::rename(BON_temp_long, "mainstem, mouth to BON" = temp) %>% 
+  full_join(., dplyr::rename(ICH_temp_long, "mainstem, MCN to ICH or PRA (ICH)" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(LGR_temp_long, "mainstem, ICH to LGR" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(MCN_temp_long, "mainstem, BON to MCN" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(PRA_temp_long, "mainstem, MCN to ICH or PRA (PRA)" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RIS_temp_long, "mainstem, PRA to RIS" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RRE_temp_long, "mainstem, RIS to RRE" = temp), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(WEL_temp_long, "mainstem, RRE to WEL" = temp), by = c("day", "year", "date")) -> temp_cov_df
+
+# How do we deal with MCN to ICH or PRA state?
+# I figure that maybe they could be different covariates, for overshoot probability at each dam?
 
 
+##### Spill #####
+
+
+dplyr::rename(BON_spill_long, "mainstem, mouth to BON" = spill) %>% 
+  full_join(., dplyr::rename(ICH_spill_long, "mainstem, MCN to ICH or PRA (ICH)" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(LGR_spill_long, "mainstem, ICH to LGR" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(MCN_spill_long, "mainstem, BON to MCN" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(PRA_spill_long, "mainstem, MCN to ICH or PRA (PRA)" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RIS_spill_long, "mainstem, PRA to RIS" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RRE_spill_long, "mainstem, RIS to RRE" = spill), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(WEL_spill_long, "mainstem, RRE to WEL" = spill), by = c("day", "year", "date")) -> spill_cov_df
+
+
+##### Flow #####
+
+dplyr::rename(BON_flow_long, "mainstem, mouth to BON" = flow) %>% 
+  full_join(., dplyr::rename(ICH_flow_long, "mainstem, MCN to ICH or PRA (ICH)" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(LGR_flow_long, "mainstem, ICH to LGR" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(MCN_flow_long, "mainstem, BON to MCN" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(PRA_flow_long, "mainstem, MCN to ICH or PRA (PRA)" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RIS_flow_long, "mainstem, PRA to RIS" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(RRE_flow_long, "mainstem, RIS to RRE" = flow), by = c("day", "year", "date")) %>% 
+  full_join(., dplyr::rename(WEL_flow_long, "mainstem, RRE to WEL" = flow), by = c("day", "year", "date")) -> flow_cov_df
+
+
+##### Index to match date at state to covariates
 
 
 
