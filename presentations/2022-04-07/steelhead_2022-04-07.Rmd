@@ -1,0 +1,128 @@
+---
+title: "Steelhead Overshoot Update"
+author: "Markus Min"
+date: "4/7/2022"
+output:
+  ioslides_presentation: default
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+```{r load_reformat_data, echo = FALSE, message = FALSE}
+states_times <- read.csv(here::here("model_files", "states_times.csv"), row.names = 1)
+
+temp_by_state <- read.csv(here::here("covariate_data", "temperature_by_state.csv"), row.names = 1)
+```
+
+
+
+# New approach to covariate time window
+
+## Old approach and issues:
+- Approach: Determine the median travel time for each month and each natal origin; get the average value of the variable (e.g., temperature) for the weeklong window around that time
+- This works well for upstream travel, but with downstream travel, we don't typically know when individuals entered states because of the low detection probability with downstream travel
+- We also can't assume in what direction they were traveling when in a given state, so calculating a median travel time (either upstream or downstream) is problematic
+
+## New approach:
+- Calculate an "experience date", by using the time at arrival in this state and the time at arrival at the next state, which are typically known (e.g., the date + time that an individual was seen in the adult fish ladder at a dam)
+- Calculate the time spent in this state as time at arrival in next state minus time at arrival in this state
+- Get the "experience date" by dividing the time spent in the state by 2
+
+- If the arrival time in a state is not known (i.e., the site visit was implicit), then take the halfway point between two known site arrivals as the arrival time in the implicit state
+- If there were N implicit site visits between known arrival times, divide the time between two known arrivals by N-1, the average amount of time spent in each state
+- Use a weeklong window around the "experience date"
+
+## Benefits of new approach
+- Simpler
+- Closer to reality (utilizes the detection history of the individual fish, rather than a median value)
+- Highly flexible
+
+## New approach: Example 1
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
+  dplyr::select(-c(tag_code, date_source, date_time)) %>% 
+  # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
+  dplyr::rename(exp_date = date) %>% 
+  remove_rownames() %>% 
+  mutate(state = gsub("mainstem, ", "", state))
+```
+
+
+## Indexing to covariate by state (location) and date
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
+  dplyr::select(-c(tag_code, date_source, date_time)) %>% 
+  # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
+  dplyr::rename(exp_date = date) %>% 
+  remove_rownames() %>% 
+  mutate(state = gsub("mainstem, ", "", state)) %>% 
+  mutate(exp_date = ymd(exp_date)) %>% 
+  subset(exp_date >= as.POSIXct("2011-04-22") &
+           exp_date <= as.POSIXct("2011-04-30"))
+
+temp_by_state %>% 
+  mutate(date = ymd(date)) %>% 
+  subset(date >= as.POSIXct("2011-04-22") &
+           date <= as.POSIXct("2011-04-30")) %>% 
+  remove_rownames() %>% 
+  dplyr::select(-c("mouth.to.BON", "MCN.to.ICH.or.PRA..ICH.", "MCN.to.ICH.or.PRA..PRA."))
+```
+
+
+
+## Problem: What to do at branching states?
+
+MCN to PRA or ICH
+
+- Two dams with covariate data at this state: PRA tailrace or ICH tailrace
+
+
+## New covariate: time in a state
+
+```{r echo = FALSE, message = FALSE}
+
+subset(states_times, state == "mainstem, BON to MCN") %>% 
+  subset(next_state != "mainstem, BON to MCN") %>% 
+  group_by(next_state) %>% 
+  summarise(mean(state_time)) %>% 
+  arrange(desc(`mean(state_time)`))
+
+weird_tags <- subset(states_times, state == "mainstem, BON to MCN" & next_state == "mainstem, BON to MCN")$tag_code
+
+# subset(states_times, tag_code %in% weird_tags)
+# There are some strange individuals where it's recording the same state twice? not sure what's going on there
+```
+
+
+Disclaimer: we don't always know for sure
+
+Plot of BON fallback vs. time in BON to MCN
+
+# Expanded model design
+
+## Old design
+![](.//figures/JDR_simple_example.png){width=100%}
+
+## New setup
+![](.//figures/model_diagram.png){width=100%}
+
+## New modeling approach
+
+Enforcing sum to 1 constraint with covariates
+Solution: multinomial logit!
+
+$$
+\begin{aligned}
+ \small \psi_{12}= \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin])/(1 + \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin])) \\
+\end{aligned}
+$$
+
+
+
+
