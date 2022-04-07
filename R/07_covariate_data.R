@@ -9,6 +9,8 @@ library(janitor)
 library(tidyverse)
 library(lubridate)
 
+##### Data exploration #####
+
 # Load data from McNary
 
 # Tailrace temperature
@@ -65,7 +67,7 @@ MCN_t_tailrace_long_clean %>%
   summarise(mean(temp)) %>% 
   dplyr::rename(mean_temp = `mean(temp)`)-> MCN_t_tailrace_window_means
   
-##### Look at distribution of run timing #####
+##### Look at distribution of run timing
 
 adult_returns <- clean_names(read.csv(here::here("PTAGIS_queries", "intermediate_files", "all_adult_returns.csv")))
 
@@ -490,6 +492,7 @@ for (i in 1:nrow(states)){
 
 states %>% 
   mutate(date = NA) %>% 
+  mutate(state_time = NA) %>% 
   mutate(arrival_date = ymd(arrival_date))-> states
 
 for (i in 1:(nrow(states) - 1)) {
@@ -498,15 +501,38 @@ for (i in 1:(nrow(states) - 1)) {
     movement_time <- states[i+1, "arrival_date"] - states[i, "arrival_date"]
     
     states[i, "date"] <- format(as.Date(date(states[i, "arrival_date"] + movement_time/2), origin = "1970-01-01"))
+    states[i, "state_time"] <- movement_time
     
   }
   
   # If it's the last entry for a fish, just store the arrival time
   else {
     states[i, "date"] <- format(as.Date(date(states[i, "arrival_date"]), origin = "1970-01-01"))
+    states[i, "state_time"] <- NA # populate time in state with NA, since we don't know
   }
 }
 
+# Get the next state - useful to determine time in state (possible covariate)
+states %>% 
+  mutate(next_state = NA) -> states
+
+# Get next state, prev state
+for (i in 1:(nrow(states) - 1)) {
+  # If the next fish is the same fish
+  if (i == 1 | (states[i, "tag_code"] == states[i+1, "tag_code"])){
+    states[i, "next_state"] <- states[i+1, "state"]
+    
+  }
+  
+  # If it's the last entry for a fish, just store the arrival time
+  else {
+    states[i, "next_state"] <- NA
+  }
+}
+
+# Export this as states_time
+
+write.csv(states, here::here("model_files", "states_times.csv"))
 
 
 
@@ -621,6 +647,20 @@ dplyr::rename(BON_temp_long, "mainstem, mouth to BON" = temp) %>%
   full_join(., dplyr::rename(RIS_temp_long, "mainstem, PRA to RIS" = temp), by = c("day", "year", "date")) %>% 
   full_join(., dplyr::rename(RRE_temp_long, "mainstem, RIS to RRE" = temp), by = c("day", "year", "date")) %>% 
   full_join(., dplyr::rename(WEL_temp_long, "mainstem, RRE to WEL" = temp), by = c("day", "year", "date")) -> temp_cov_df
+
+temp_cov_df
+
+# Shorten column names
+colnames(temp_cov_df) <- gsub("mainstem, ", "", colnames(temp_cov_df))
+# Reorder
+temp_cov_df %>% 
+  dplyr::select(-c(day, year)) %>% 
+  dplyr::relocate(., date) -> temp_cov_df
+
+# Save this
+write.csv(temp_cov_df, here::here("covariate_data", "temperature_by_state.csv"))
+
+
 
 # How do we deal with MCN to ICH or PRA state?
 # I figure that maybe they could be different covariates, for overshoot probability at each dam?
