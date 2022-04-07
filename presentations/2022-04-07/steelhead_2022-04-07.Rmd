@@ -21,32 +21,152 @@ temp_by_state <- read.csv(here::here("covariate_data", "temperature_by_state.csv
 ```
 
 
+# Modeling overview
+
+
+## Expanding the number of states
+![](.//figures/JDR_simple_example.png){width=100%}
+
+## Expanding the number of states
+![](.//figures/model_diagram.png){width=100%}
+
+
+## Previous approach: Multinomial likelihood
+- Get a vector of probabilities *p* with length *K*, where *K* is the number of unique observed detection histories
+- In the John Day River dataset, *K* = 169 (169 unique detection histories)
+- Example:
+
+$$
+\begin{aligned}
+n_{7} = f_{bon} * o_{bon} * f_{bon} * o_{bon} * h_{bon\_mcn} * l_{nat\_trib} \\
+p[7] = n_{7}
+\end{aligned}
+$$
+
+
+## Previous approach: Multinomial likelihood
+```{r eval = FALSE}
+p <- c(n1, n2, n3, ... n169)
+
+# Evaluate counts, where y are the counts of 
+# the number of times each of the unique detection 
+# histories was observed
+
+# 2121 are the number of fish
+y[1:N] ~ dmulti(p[1:N], 2121)
+```
+
+
+## Multinomial likelihood no longer works with covariates
+For fish *i* at location *l* at time *t*:
+$$
+\begin{aligned}
+ \small \psi_{12}= f(temperature_{l,t}, origin_{i})
+\end{aligned}
+$$
+
+- Each movement probability is different for each individual fish, depending on the unique combination of covariates that it is experiencing
+- Therefore, a multinomial likelihood, or using an m-array approach to summarize detection histories, becomes untenable, or at least very complicated
+
+## Moving to an individual-based model
+```{r eval = FALSE}
+for(i in 1:n.ind){ # Loop through all individuals
+  for(j in 1:n.encounters){ # Loop through the encounters (detections)
+    psi_12 <- f(origin[i], temperature[j])
+    psi_13 <- f(origin[i], temperature[j])
+    psi_14 <- f(origin[i], temperature[j])
+    psi_1_loss <- 1 - psi_12 - psi_13 - psi_14
+    
+    # Likelihood: evaluate multinomial with single trial (categorical)
+    
+    # Get a vector of probabilities
+    p <- c(psi_12, psi_13, psi_14)
+    
+    # y is an array, with dimensions (number of fish) X 
+    # (number of possible states) X (number of encounters)
+    
+    # y[i,j,] is the vector containing all possible next states for a fish
+    y[i,j,] ~ dmulti(p, 1)
+  }
+}
+```
+
+
+## Including covariates
+
+- Enforcing sum to 1 constraint with covariates via the multinomial logit
+
+<br />
+
+$$
+\begin{aligned}
+ \small \psi_{12}=  \frac{\exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin])}{1 + \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin]) + \\
+ \exp(\beta_{0,13} + \beta_{temp,13} * temp + \beta_{origin,13}[origin]) + \\
+ \exp(\beta_{0,14} + \beta_{temp,14} * temp + \beta_{origin,14}[origin])} \\
+\end{aligned}
+$$
+
+
+## Detection probabilities - auxiliary likelihoods?
+![](.//figures/asotin_creek.png){width=100%}
+
+
 
 # New approach to covariate time window
 
 ## Old approach and issues:
-- Approach: Determine the median travel time for each month and each natal origin; get the average value of the variable (e.g., temperature) for the weeklong window around that time
+- Old approach: Determine the median travel time from one dam to the next dam for each month and each natal origin; get the average value of the variable (e.g., temperature) for the weeklong window around that time
 - This works well for upstream travel, but with downstream travel, we don't typically know when individuals entered states because of the low detection probability with downstream travel
-- We also can't assume in what direction they were traveling when in a given state, so calculating a median travel time (either upstream or downstream) is problematic
+
+## Old approach and issues:
+<br />
+<br />
+
+![](.//figures/bidirectional_problem.png){width=100%}
+<br />
+<br />
+
+- Our state-based model also doesn't assume the direction a fish is traveling when in a given state, so calculating a median travel time (either upstream or downstream) is problematic
 
 ## New approach:
-- Calculate an "experience date", by using the time at arrival in this state and the time at arrival at the next state, which are typically known (e.g., the date + time that an individual was seen in the adult fish ladder at a dam)
-- Calculate the time spent in this state as time at arrival in next state minus time at arrival in this state
-- Get the "experience date" by dividing the time spent in the state by 2
+- Calculate an "experience date", by using the time at arrival in state 1 and the time at arrival at state 2, which are typically known (e.g., the date + time that an individual was seen in the adult fish ladder at a dam)
+- Calculate the time spent in this state as time at arrival in state 2  minus time at arrival in state 1
+- Get the "experience date" by dividing the time spent in the state by 2 (this is equivalent to the median time in the state)
 
-- If the arrival time in a state is not known (i.e., the site visit was implicit), then take the halfway point between two known site arrivals as the arrival time in the implicit state
-- If there were N implicit site visits between known arrival times, divide the time between two known arrivals by N-1, the average amount of time spent in each state
-- Use a weeklong window around the "experience date"
-
-## Benefits of new approach
-- Simpler
-- Closer to reality (utilizes the detection history of the individual fish, rather than a median value)
-- Highly flexible
-
-## New approach: Example 1
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
-  dplyr::select(-c(tag_code, date_source, date_time)) %>% 
+  mutate(arrival_date = ymd(arrival_date)) %>% 
+  subset(arrival_date >= as.POSIXct("2010-07-24") &
+           arrival_date <= as.POSIXct("2010-09-22")) %>% 
+  dplyr::select(-c(tag_code, state_time, date_time, next_state, date_source)) %>% 
+  dplyr::rename(exp_date = date) %>% 
+  # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
+  remove_rownames() %>% 
+  mutate(state = gsub("mainstem, ", "", state)) %>% 
+  mutate(exp_date = ifelse(state == "MCN to ICH or PRA", NA, exp_date))
+```
+
+## New approach: {.smaller}
+- If the arrival time in a state is not known (i.e., the site visit was implicit), then take the halfway point between two known site arrivals as the arrival time in the implicit state
+- If there were N implicit site visits between known arrival times, divide the time between the two known arrival times by N+1 to estimate the time spent in each state
+
+![](.//figures/upper_columbia.png){width=100%}
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
+  mutate(arrival_date = ymd(arrival_date)) %>% 
+  subset(arrival_date >= as.POSIXct("2011-05-03") &
+           arrival_date <= as.POSIXct("2011-05-11")) %>% 
+  dplyr::select(-c(tag_code, date, state_time, next_state)) %>% 
+  # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
+  remove_rownames() %>% 
+  mutate(state = gsub("mainstem, ", "", state))
+```
+
+## New approach: Full Example
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
+  dplyr::select(-c(tag_code, date_source, date_time, next_state, state_time)) %>% 
   # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
   dplyr::rename(exp_date = date) %>% 
   remove_rownames() %>% 
@@ -57,7 +177,7 @@ subset(states_times, tag_code == "3D9.1C2C509FE1") %>%
 ## Indexing to covariate by state (location) and date
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 subset(states_times, tag_code == "3D9.1C2C509FE1") %>% 
-  dplyr::select(-c(tag_code, date_source, date_time)) %>% 
+  dplyr::select(-c(tag_code, date_source, date_time, state_time, next_state)) %>% 
   # dplyr::rename(exp_date = date, arrival_date_time = date_time, arrival_date_source = date_source) %>% 
   dplyr::rename(exp_date = date) %>% 
   remove_rownames() %>% 
@@ -81,48 +201,73 @@ temp_by_state %>%
 MCN to PRA or ICH
 
 - Two dams with covariate data at this state: PRA tailrace or ICH tailrace
+- Potential solution could be to include the covariates (temperature, spill, flow) at both dams as covariates for just this state
 
 
-## New covariate: time in a state
+## New potential covariate: time in a state
+For individuals who are in the "mainstem, BON to MCN" state, how long does it take them to reach the next state?
 
-```{r echo = FALSE, message = FALSE}
+![](.//figures/BON_MCN_map.png){width=100%}
 
+```{r echo = FALSE, message = FALSE, eval = FALSE}
 subset(states_times, state == "mainstem, BON to MCN") %>% 
   subset(next_state != "mainstem, BON to MCN") %>% 
   group_by(next_state) %>% 
-  summarise(mean(state_time)) %>% 
-  arrange(desc(`mean(state_time)`))
+  summarise(median(state_time)) %>% 
+  arrange(desc(`median(state_time)`)) %>% 
+  dplyr::rename("median time (days)" = `median(state_time)`)
 
 weird_tags <- subset(states_times, state == "mainstem, BON to MCN" & next_state == "mainstem, BON to MCN")$tag_code
 
 # subset(states_times, tag_code %in% weird_tags)
-# There are some strange individuals where it's recording the same state twice? not sure what's going on there
+# There are some strange individuals where it's recording the same state twice? not sure what's going on there, need to fix it
+
+# Some individuals also appear to be starting not in BON to MCN?
+states_times %>% 
+  group_by(tag_code) %>% 
+  filter(row_number() == 1) %>% 
+  subset(state != "mainstem, BON to MCN") -> not_starting_in_BON_MCN
+```
+
+## Time in a state: directionality issue
+### Individuals who just ascended BON
+
+```{r echo = FALSE}
+# Individuals who just ascended BON
+states_times %>% 
+  group_by(tag_code) %>% 
+  # filter(row_number() == 1) %>% 
+  subset(pathway == "BON (adult)") %>% 
+  subset(state == "mainstem, BON to MCN") %>% 
+  subset(next_state != "mainstem, BON to MCN") %>% 
+  group_by(next_state) %>% 
+  summarise(median(state_time)) %>% 
+  arrange(desc(`median(state_time)`)) %>% 
+  dplyr::rename("median time (days)" = `median(state_time)`)
 ```
 
 
-Disclaimer: we don't always know for sure
+## Time in a state: directionality issue
+### Individuals who did not just ascend BON
 
-Plot of BON fallback vs. time in BON to MCN
+```{r echo = FALSE}
+# Individuals who entered this state later
+states_times %>% 
+  group_by(tag_code) %>% 
+  # filter(row_number() != 1) %>% 
+  subset(pathway != "BON (adult)") %>% 
+  subset(state == "mainstem, BON to MCN") %>% 
+  subset(next_state != "mainstem, BON to MCN") %>% 
+  group_by(next_state) %>% 
+  summarise(median(state_time)) %>% 
+  arrange(desc(`median(state_time)`)) %>% 
+  dplyr::rename("median time (days)" = `median(state_time)`)
+```
 
-# Expanded model design
+Note: no individuals entered Hood River or Fifteenmile Creek next
 
-## Old design
-![](.//figures/JDR_simple_example.png){width=100%}
+## Missing covariate data
+- How do we handle missing covariate data?
+- Does missing covariate data indicate no flow?
 
-## New setup
-![](.//figures/model_diagram.png){width=100%}
-
-## New modeling approach
-
-Enforcing sum to 1 constraint with covariates
-Solution: multinomial logit!
-
-$$
-\begin{aligned}
- \small \psi_{12}= \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin])/(1 + \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{origin,12}[origin])) \\
-\end{aligned}
-$$
-
-
-
-
+![](.//figures/BON_temp_heatmap.png){width=100%}
