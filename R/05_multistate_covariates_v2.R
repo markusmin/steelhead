@@ -70,26 +70,30 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     # to write out separate ones
     
     # Ascend dam
-    logit(a[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) bYear[run_year[i]] + # run year (categorical)
+    logit(a[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
     bTemp * temp[l, t] + # temperature (continuous)
     bFlow * flow[l, t] + # flow (continuous)
     bSpill * spill[l, t] # spill (continuous)
     
     # Descend dam
-    logit(d[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) bYear[run_year[i]] + # run year (categorical)
+    logit(d[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
     bTemp * temp[l, t] + # temperature (continuous)
     bFlow * flow[l, t] + # flow (continuous)
     bSpill * spill[l, t] # spill (continuous)
     
     # Enter tributary
     # May need one line here for each tributary
-    logit([i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) bYear[run_year[i]] + # run year (categorical)
+    logit([i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
     bTemp * temp[l, t] + # temperature (continuous)
     bFlow * flow[l, t] + # flow (continuous)
     bSpill * spill[l, t] # spill (continuous)
     
     # Loss (end - use e to not confuse with location l index)
-    logit(e[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) bYear[run_year[i]] + # run year (categorical)
+    logit(e[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
     bTemp * temp[l, t] + # temperature (continuous)
     bFlow * flow[l, t] + # flow (continuous)
     bSpill * spill[l, t] # spill (continuous)
