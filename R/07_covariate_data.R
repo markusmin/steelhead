@@ -678,6 +678,15 @@ dplyr::rename(BON_spill_long, "mainstem, mouth to BON" = spill) %>%
   full_join(., dplyr::rename(RRE_spill_long, "mainstem, RIS to RRE" = spill), by = c("day", "year", "date")) %>% 
   full_join(., dplyr::rename(WEL_spill_long, "mainstem, RRE to WEL" = spill), by = c("day", "year", "date")) -> spill_cov_df
 
+# Shorten column names
+colnames(spill_cov_df) <- gsub("mainstem, ", "", colnames(spill_cov_df))
+# Reorder
+spill_cov_df %>% 
+  dplyr::select(-c(day, year)) %>% 
+  dplyr::relocate(., date) -> spill_cov_df
+
+# Save this
+write.csv(spill_cov_df, here::here("covariate_data", "spill_by_state.csv"))
 
 ##### Flow #####
 
@@ -693,6 +702,14 @@ dplyr::rename(BON_flow_long, "mainstem, mouth to BON" = flow) %>%
 
 ##### Index to match date at state to covariates
 
+# Shorten column names
+colnames(flow_cov_df) <- gsub("mainstem, ", "", colnames(flow_cov_df))
+# Reorder
+flow_cov_df %>% 
+  dplyr::select(-c(day, year)) %>% 
+  dplyr::relocate(., date) -> flow_cov_df
 
+# Save this
+write.csv(flow_cov_df, here::here("covariate_data", "flow_by_state.csv"))
 
 
