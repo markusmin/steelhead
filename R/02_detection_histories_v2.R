@@ -109,6 +109,8 @@ CTH_adult %>%
                                   "McNary Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("TD1 - The Dalles East Fish Ladder", "TD2 - The Dalles North Fish Ladder"),
                                   "The Dalles Adult Fishways (combined)", event_site_name)) %>% 
+  mutate(event_site_name = ifelse(event_site_name %in% c("JO1 - John Day South Fish Ladder", "JO2 - John Day North Fish Ladder"),
+                                  "John Day Dam Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("ICH - Ice Harbor Dam (Combined)", "IHR - Ice Harbor Dam"),
                                   "Ice Harbor Adult Fishways (combined)", event_site_name)) %>% 
   mutate(event_site_name = ifelse(event_site_name %in% c("LGRLDR - LGR - Release into the Adult Fish Ladder", "GRA - Lower Granite Dam Adult",
@@ -510,8 +512,12 @@ det_hist <- read.csv(here("model_files", "complete_det_hist.csv"), row.names = 1
 
 # Inspect sites - for mapping
 
-# det_hist <- read.csv(file = here::here("model_files", "det_hist.csv"))
 det_hist %>% 
+  # Make a correction for JDA - shouldn't be necessary later once the script is re-run
+  mutate(event_site_name = ifelse(event_site_name %in% c("JO1 - John Day South Fish Ladder", "JO2 - John Day North Fish Ladder"),
+                                  "John Day Dam Adult Fishways (combined)", event_site_name)) %>% 
+  # mutate(event_site_latitude = ifelse(event_site_name == "John Day Dam Adult Fishways (combined)", 45.71866, event_site_latitude)) %>% 
+  # mutate(event_site_longitude = ifelse(event_site_name == "John Day Dam Adult Fishways (combined)", -120.6978, event_site_longitude)) %>% 
   group_by(event_site_name) %>% 
   summarise(n()) %>% 
   dplyr::rename(count = `n()`)-> event_det_counts
@@ -523,6 +529,25 @@ det_hist %>%
 
 write.csv(event_site_metadata, here("model_files", "complete_event_site_metadata.csv"))
 
+event_site_metadata %>% 
+  # Make a correction for JDA - shouldn't be necessary later once the script is re-run
+  mutate(event_site_name = ifelse(event_site_name %in% c("JO1 - John Day South Fish Ladder", "JO2 - John Day North Fish Ladder"),
+                                  "John Day Dam Adult Fishways (combined)", event_site_name)) -> event_site_metadata
+
+# Get the JDR event det counts - this somehow has some sites that aren't in the complete data (because the complete data isn't truly complete yet)
+JDR_event_det_counts <- read.csv(here::here("model_files", "JDR_event_det_counts.csv"), row.names = 1)
+
+JDR_event_det_counts %>% 
+  rownames_to_column("event_site_name") %>% 
+  dplyr::select(event_site_name, count) -> JDR_event_det_counts
+
+# Add these together
+event_det_counts %>% 
+  bind_rows(., JDR_event_det_counts) %>% 
+  subset(., !duplicated(event_site_name)) -> event_det_counts
+
+
+
 event_det_counts %>% 
   left_join(., event_site_metadata, by = "event_site_name") -> event_det_counts
 
@@ -531,12 +556,13 @@ event_det_counts %>%
 event_det_counts %>% 
   mutate(dam = ifelse(event_site_name %in% c("Bonneville Adult Fishways (combined)",
                                              "McNary Adult Fishways (combined)",
-                                             "PRA - Priest Rapids Adult",
-                                             "RIA - Rock Island Adult", 
+                                             "Priest Rapids Adult Fishways (combined)",
+                                             "Rock Island Adult Fishways (combined)", 
                                              "RRF - Rocky Reach Fishway", 
-                                             "WEA - Wells Dam, DCPUD Adult Ladders",
-                                             "ICH - Ice Harbor Dam (Combined)",  
+                                             "Wells Dam Adult Fishways (combined)",
+                                             "Ice Harbor Adult Fishways (combined)",  
                                              "Lower Granite Dam Adult Fishways (combined)",
+                                             "John Day Dam Adult Fishways (combined)",
                                              # Dams without consistent PIT tag detectors
                                              # Missing John Day for this dataset (installed 2017)
                                              "The Dalles Adult Fishways (combined)",
@@ -546,17 +572,17 @@ event_det_counts %>%
   # Get a field for dam abbreviations
   mutate(dam_abbr = ifelse(event_site_name == "Bonneville Adult Fishways (combined)", "BON",
                            ifelse(event_site_name == "McNary Adult Fishways (combined)", "MCN",
-                                  ifelse(event_site_name == "PRA - Priest Rapids Adult", "PRA",
-                                         ifelse(event_site_name == "RIA - Rock Island Adult", "RIS",
+                                  ifelse(event_site_name == "Priest Rapids Adult Fishways (combined)", "PRA",
+                                         ifelse(event_site_name == "Rock Island Adult Fishways (combined)", "RIS",
                                                 ifelse(event_site_name == "RRF - Rocky Reach Fishway", "RRE",
-                                                       ifelse(event_site_name == "WEA - Wells Dam, DCPUD Adult Ladders", "WEL",
-                                                              ifelse(event_site_name == "ICH - Ice Harbor Dam (Combined)", "ICH",
+                                                       ifelse(event_site_name == "Wells Dam Adult Fishways (combined)", "WEL",
+                                                              ifelse(event_site_name == "Ice Harbor Adult Fishways (combined)", "ICH",
                                                                      ifelse(event_site_name == "Lower Granite Dam Adult Fishways (combined)", "LGR",
                                                                             # Dams without consistent PIT tag detectors
-                                                                            # Missing John Day for this dataset (installed 2017)
+                                                                            ifelse(event_site_name == "John Day Dam Adult Fishways (combined)", "JDA",
                                                                             ifelse(event_site_name == "The Dalles Adult Fishways (combined)", "TDA",
                                                                                    ifelse(event_site_name == "LMA - Lower Monumental Adult Ladders", "LMO",
-                                                                                          ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO", NA)))))))))))) -> event_det_counts
+                                                                                          ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO", NA))))))))))))) -> event_det_counts
 
 write.csv(event_det_counts, here::here("model_files", "complete_event_det_counts.csv"), row.names = FALSE)
 
