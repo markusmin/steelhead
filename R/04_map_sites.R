@@ -157,7 +157,7 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   annotate("text", x = -117.94, y = 46.396, label = "Tucannon R.", size = 2.5, fontface = 'italic', hjust = 1) + # Tucannon R.
   annotate("text", x = -117.3, y = 45.70, label = "Grande Ronde R.", size = 2.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
   annotate("text", x = -115.4, y = 46.475, label = "Clearwater R.", size = 2.5, fontface = 'italic', hjust = 1) + # Clearwater R.
-  annotate("text", x = -116.95, y = 45.52, label = "Imanha R.", size = 2.5, fontface = 'italic', hjust = 1) + # Imanha R.
+  annotate("text", x = -116.95, y = 45.52, label = "Imnaha R.", size = 2.5, fontface = 'italic', hjust = 1) + # Imnaha R.
   annotate("text", x = -116.579, y = 44.997, label = "Snake R.", size = 3, fontface = 'italic', hjust = 1) + # Snake R.
   annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 2.5, fontface = 'italic', hjust = 1) + # Salmon R.
   annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 2.5, fontface = 'italic', hjust = 1) + # Yakima R.
@@ -187,24 +187,114 @@ CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
 
 ggsave(here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)  
 
-##### Plot JDR sites on top of base map #####
-JDR_event_det_counts <- read.csv(here::here("model_files", "JDR_event_det_counts.csv"))
+##### Plot all sites on top of base map #####
+complete_event_det_counts <- read.csv(here::here("model_files", "complete_event_det_counts.csv"))
 
+# JDA correction
+complete_event_det_counts %>% 
+  subset(!duplicated(event_site_name)) -> complete_event_det_counts
 
 JDR_site_map <- CRB_map +
   # Add dams
-  geom_point(data = subset(JDR_event_det_counts, dam == "dam"), 
+  geom_point(data = subset(complete_event_det_counts, dam == "dam"), 
              aes(x = event_site_longitude, y = event_site_latitude), 
              shape = 73, size = 4, inherit.aes = FALSE) +
-  geom_text(data = subset(JDR_event_det_counts, dam == "dam"), 
+  geom_text(data = subset(complete_event_det_counts, dam == "dam"), 
             aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
             size = 3, inherit.aes = FALSE) +
   # Add detection sites
-  geom_point(data = JDR_event_det_counts, aes(x = event_site_longitude, 
+  geom_point(data = complete_event_det_counts, aes(x = event_site_longitude, 
                                               y = event_site_latitude), size = 1, inherit.aes = FALSE)
-  # geom_text_repel(data = JDR_event_det_counts, aes(x = event_site_longitude,
+  # geom_text_repel(data = complete_event_det_counts, aes(x = event_site_longitude,
   #                                                  y = event_site_latitude+0.02, label = event_site_name), 
   #                 max.overlaps = 100, size = 1, inherit.aes = FALSE)
 
 ggsave(here("figures", "JDR_site_map2.pdf"), JDR_site_map, height = 6, width  = 10)  
 ggsave(here("figures", "JDR_site_map2.png"), JDR_site_map, height = 6, width  = 10)  
+
+
+# Create just the base map
+
+CRB_base_map <- CRB_map +
+  # Add dams
+  geom_point(data = subset(complete_event_det_counts, dam == "dam"), 
+             aes(x = event_site_longitude, y = event_site_latitude), 
+             shape = 73, size = 4, inherit.aes = FALSE) +
+  geom_text(data = subset(complete_event_det_counts, dam == "dam"), 
+            aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
+            size = 3, inherit.aes = FALSE)
+
+ggsave(here("figures", "Columbia_basemap.pdf"), CRB_base_map, height = 6, width  = 10)  
+
+
+
+##### Make a new map for presentation #####
+# Bigger font, no lat/long
+
+
+CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
+  ylab("Latitude")+
+  xlab("Longitude")+
+  coord_fixed(ylim = c(44.3,48.45),  xlim = c(-124.5,-114), ratio = 1.3)+
+  # Polygons for base map
+  geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
+  # Polygons for CRB streams
+  geom_polygon(data = CRB_streams_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.2, fill = "gray70") +
+  # Lines for North American Rivers (includes Columbia and Snake)
+  geom_path(data = rivers_subset, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.5, fill = "gray70") +
+  # ADD LABELS FOR RIVERS
+  # annotate("segment", x = -122.84, y = 47.68, xend = -123.18, yend = 47.68, size = 0.5, lty = 1) + # Columbia River
+  annotate("text", x = -123.33, y = 46.27, label = "Columbia River", size = 4.5, fontface = 'italic', hjust = 0) + # Columbia River
+  annotate("text", x = -121.7, y = 45.45, label = "Hood R.", size = 3.5, fontface = 'italic', hjust = 1) + # Hood River
+  annotate("text", x = -121.2, y = 45.44, label = "Fifteenmile Cr.", size = 3.5, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
+  annotate("text", x = -120.94, y = 44.6, label = "Deschutes R.", size = 3.5, fontface = 'italic', hjust = 1) + # Deschutes R.
+  annotate("text", x = -119.5, y = 44.92, label = "John Day R.", size = 3.5, fontface = 'italic', hjust = 1) + # John Day R.
+  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 3.5, fontface = 'italic', hjust = 1) + # Umatilla R.
+  annotate("text", x = -117.77, y = 46.12, label = "Walla Walla R.", size = 3.5, fontface = 'italic', hjust = 1) + # Walla Walla R.
+  annotate("text", x = -117.7, y = 46.38, label = "Tucannon R.", size = 3.5, fontface = 'italic', hjust = 1) + # Tucannon R.
+  annotate("text", x = -117.3, y = 45.50, label = "Grande Ronde R.", size = 3.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
+  annotate("text", x = -115.2, y = 46.475, label = "Clearwater R.", size = 3.5, fontface = 'italic', hjust = 1) + # Clearwater R.
+  annotate("text", x = -116.93, y = 44.97, label = "Imnaha R.", size = 3.5, fontface = 'italic', hjust = 1) + # Imnaha R.
+  annotate("text", x = -116.5, y = 46.65, label = "Snake R.", size = 4, fontface = 'italic', hjust = 1) + # Snake R.
+  annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 3.5, fontface = 'italic', hjust = 1) + # Salmon R.
+  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 3.5, fontface = 'italic', hjust = 1) + # Yakima R.
+  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 3.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
+  annotate("text", x = -120.5, y = 48.17, label = "Entiat R.", size = 3.5, fontface = 'italic', hjust = 1) + # Entiat R.
+  theme(plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill="white", color = "white"),
+        panel.border = element_rect(colour = "white", fill=NA, size=1),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = c(0.14, 0.2),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank())+
+  guides(fill = guide_legend(title = "Legend"))
+# scale_x_continuous(breaks = seq(-128, -123, 1), expand = c(0,0), labels=c(expression(paste(128*degree,"W")),
+#                                                                           expression(paste(127*degree,"W")),
+#                                                                           expression(paste(126*degree,"W")),
+#                                                                           expression(paste(125*degree,"W")),
+#                                                                           expression(paste(124*degree,"W")),
+#                                                                           expression(paste(123*degree,"W"))))+
+# scale_y_continuous(breaks = seq(47, 51, 1), expand = c(0,0), labels=c(expression(paste(47*degree,"N")),
+#                                                                       expression(paste(48*degree,"N")),
+#                                                                       expression(paste(49*degree,"N")),
+#                                                                       expression(paste(50*degree,"N")),
+#                                                                       expression(paste(51*degree,"N"))))+
+
+
+ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height = 6, width  = 10)  
+
+
+CRB_map_pres_dams <- CRB_map_pres_nodams +
+  # Add dams
+  geom_point(data = subset(complete_event_det_counts, dam == "dam"), 
+             aes(x = event_site_longitude, y = event_site_latitude), 
+             shape = 73, size = 5, inherit.aes = FALSE) +
+  geom_text(data = subset(complete_event_det_counts, dam == "dam"), 
+            aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
+            size = 4.5, inherit.aes = FALSE)
+
+ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 6, width  = 10)
