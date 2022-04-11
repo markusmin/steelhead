@@ -61,16 +61,16 @@
 "HSL - Hancock Springs Lower",11,"Upper Columbia","Methow",48.531648,-120.324021,"in stream",NA
 "HST - Touchet River at Harvey Shaw",5,"Middle Columbia","Walla Walla",46.287439,-118.488939,"in stream",NA
 "HYC - Hayden Creek In-stream Array",104,"Salmon","Lemhi",44.861654,-113.631937,"in stream",NA
-"Ice Harbor Adult Fishways (combined)",9725,"Lower Snake","Lower Snake",46.249527,-118.879964,"in stream",NA
+"Ice Harbor Adult Fishways (combined)",9725,"Lower Snake","Lower Snake",46.249527,-118.879964,"dam","ICH"
 "ICL - Lower Icicle Instream Array",3,"Upper Columbia","Wenatchee",47.578648,-120.662589,"in stream",NA
 "IR1 - Lower Imnaha River ISA @ km 7",413,"Lower Snake","Imnaha",45.761052,-116.750231,"in stream",NA
 "IR2 - Lower Imnaha River ISA @ km 10",340,"Lower Snake","Imnaha",45.742702,-116.764304,"in stream",NA
 "IR3 - Upper Imnaha River ISA @ km 41",21,"Lower Snake","Imnaha",45.489957,-116.804096,"in stream",NA
 "JD1 - John Day River, McDonald Ferry",329,"John Day","Lower John Day",45.59574,-120.410928,"in stream",NA
 "JDJ - John Day Dam Juvenile",178,"Middle Columbia","Middle Columbia-Hood",45.710014,-120.692581,"in stream",NA
-"JO1 - John Day South Fish Ladder",23,"Middle Columbia","Middle Columbia-Hood",45.711138,-120.689427,"in stream",NA
-"JO2 - John Day North Fish Ladder",21,"Middle Columbia","Middle Columbia-Hood",45.718658,-120.697771,"in stream",NA
 "JOC - Joseph Creek ISA @ km 3",12,"Lower Snake","Lower Grande Ronde",46.030237,-117.016408,"in stream",NA
+"John Day Dam Adult Fishways (combined)",44,"Middle Columbia","Middle Columbia-Hood",45.718658,-120.697771,"dam","JDA"
+"John Day Dam Adult Fishways (combined)",44,"Middle Columbia","Middle Columbia-Hood",45.711138,-120.689427,"dam","JDA"
 "JUL - Potlatch River near Juliaetta",41,"Clearwater","Clearwater",46.565323,-116.709318,"in stream",NA
 "KCB - Kiwanis Camp Bridge, Mill C",1,"Middle Columbia","Walla Walla",45.998915,-118.113805,"in stream",NA
 "KEN - Kenney Creek In-stream Arrays",1,"Salmon","Lemhi",45.02703,-113.65801,"in stream",NA
@@ -130,14 +130,14 @@
 "PAT - Pattit Creek Instream Site",3,"Middle Columbia","Walla Walla",46.327536,-117.974028,"in stream",NA
 "PCM - Pine Creek Mouth, Potlatch R.",2,"Clearwater","Clearwater",46.630673,-116.596836,"in stream",NA
 "PES - Peshastin Creek",11,"Upper Columbia","Wenatchee",47.548491,-120.609887,"in stream",NA
-"Priest Rapids Adult Fishways (combined)",6725,"Upper Columbia","Upper Columbia-Priest Rapids",46.644339,-119.910442,"in stream",NA
+"Priest Rapids Adult Fishways (combined)",6725,"Upper Columbia","Upper Columbia-Priest Rapids",46.644339,-119.910442,"dam","PRA"
 "PRO - Prosser Diversion Dam Combined",137,"Yakima","Lower Yakima",46.212539,-119.772663,"in stream",NA
 "PRV - Walla Walla R at Pierce RV Prk",56,"Middle Columbia","Walla Walla",46.068014,-118.825796,"in stream",NA
 "RCJ - Rock Creek John Day Basin",7,"John Day","Lower John Day",45.57559,-120.37988,"in stream",NA
 "RCL - Rock Creek (WA) at rkm 5",3,"Middle Columbia","Middle Columbia-Lake Wallula",45.73785,-120.432964,"in stream",NA
 "RCS - Rock Creek (WA) at rkm 14",7,"Middle Columbia","Middle Columbia-Lake Wallula",45.795091,-120.464524,"in stream",NA
 "RCT - Roaring Creek Temporary Array",3,"Upper Columbia","Upper Columbia-Entiat",47.689304,-120.32198,"in stream",NA
-"Rock Island Adult Fishways (combined)",5588,"Upper Columbia","Upper Columbia-Entiat",47.343278,-120.0933,"in stream",NA
+"Rock Island Adult Fishways (combined)",5588,"Upper Columbia","Upper Columbia-Entiat",47.343278,-120.0933,"dam","RIS"
 "ROZ - Roza Diversion Dam (Combined)",22,"Yakima","Upper Yakima",46.749064,-120.465766,"in stream",NA
 "RRF - Rocky Reach Fishway",4460,"Upper Columbia","Upper Columbia-Entiat",47.531519,-120.300387,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",169,"Upper Columbia","Upper Columbia-Entiat",47.531967,-120.299618,"in stream",NA
@@ -185,7 +185,7 @@
 "VC2 - Valley Creek, Downstream Site",11,"Salmon","Upper Salmon",44.2219,-114.93146,"in stream",NA
 "WEB - Webb Creek",3,"Clearwater","Clearwater",46.325992,-116.831974,"in stream",NA
 "WEJ - Wells Dam Bypass Bay Sample",3,"Upper Columbia","Chief Joseph",47.946712,-119.866469,"in stream",NA
-"Wells Dam Adult Fishways (combined)",5493,"Upper Columbia","Chief Joseph",47.947302,-119.864549,"in stream",NA
+"Wells Dam Adult Fishways (combined)",5493,"Upper Columbia","Chief Joseph",47.947302,-119.864549,"dam","WEL"
 "WFC - Wolf Creek, Methow River",5,"Upper Columbia","Methow",48.488625,-120.234267,"in stream",NA
 "WHS - Wildhorse Spring Creek",5,"Upper Columbia","Okanogan",48.857063,-119.407315,"in stream",NA
 "WR1 - Wallowa River at river km 14",24,"Lower Snake","Wallowa",45.633679,-117.733757,"in stream",NA
@@ -199,3 +199,25 @@
 "YHC - Yellowhawk Creek",2,"Middle Columbia","Walla Walla",46.074979,-118.273783,"in stream",NA
 "ZEN - Secesh River at Zena Cr. Ranch",36,"Salmon","South Fork Salmon",45.0333,-115.73302,"in stream",NA
 "ZSL - Zosel Dam Combined",11,"Upper Columbia","Okanogan",48.933499,-119.419812,"in stream",NA
+"BADGEI - Badger Island, Columbia River",1,NA,NA,NA,NA,"in stream",NA
+"BRIDGC - Bridge Creek, John Day River Basin",21,NA,NA,NA,NA,"in stream",NA
+"CATHEC - Catherine Creek",7,NA,NA,NA,NA,"in stream",NA
+"CATHEW - Catherine Creek Weir",13,NA,NA,NA,NA,"in stream",NA
+"COLR4 - Columbia River - Bonneville Dam to John Day Dam (km 234-347)",10,NA,NA,NA,NA,"in stream",NA
+"CRC - Carmen Creek, Salmon R. Basin",2,NA,NA,NA,NA,"in stream",NA
+"ESANIS - East Sand Island, Columbia River",1,NA,NA,NA,NA,"in stream",NA
+"GRAND2 - Grande Ronde River - Wallowa River to headwaters (km 131-325)",3,NA,NA,NA,NA,"in stream",NA
+"ICH - Ice Harbor Dam (Combined)",317,NA,NA,NA,NA,"in stream",NA
+"JDARSF - South Fork John Day River",2,NA,NA,NA,NA,"in stream",NA
+"LAPC - Lapwai Creek",1,NA,NA,NA,NA,"in stream",NA
+"LGRTAL - LGR - Release into the Tailrace within 0.5 km downstream of Dam",1,NA,NA,NA,NA,"in stream",NA
+"LOOKGC - Lookingglass Creek",1,NA,NA,NA,NA,"in stream",NA
+"MXWLCN - Maxwell Diversion Canal - headgate to diversion screen (km 000-002)",1,NA,NA,NA,NA,"in stream",NA
+"PAHH - Pahsimeroi Hatchery",1,NA,NA,NA,NA,"in stream",NA
+"PRA - Priest Rapids Adult",24,NA,NA,NA,NA,"in stream",NA
+"RIA - Rock Island Adult",7,NA,NA,NA,NA,"in stream",NA
+"SHERFT - Sherars Falls Fishway Trap, Deschutes River",3,NA,NA,NA,NA,"in stream",NA
+"TROU2C - Trout Creek, Deschutes River Watershed",1,NA,NA,NA,NA,"in stream",NA
+"TUCR - Tucannon River",1,NA,NA,NA,NA,"in stream",NA
+"WEA - Wells Dam, DCPUD Adult Ladders",1,NA,NA,NA,NA,"in stream",NA
+"WHITEC - White Creek, Klickitat River Basin",1,NA,NA,NA,NA,"in stream",NA
