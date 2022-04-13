@@ -231,46 +231,52 @@ ggsave(here("figures", "Columbia_basemap.pdf"), CRB_base_map, height = 6, width 
 ##### Make a new map for presentation #####
 # Bigger font, no lat/long
 
+# Get rid of some of the coastal segments
+rivers_subset_new <- subset(rivers_subset, long > -123.6)
+
 
 CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   ylab("Latitude")+
   xlab("Longitude")+
-  coord_fixed(ylim = c(44.3,48.45),  xlim = c(-124.5,-114), ratio = 1.3)+
+  coord_fixed(ylim = c(44.3,48.51),  xlim = c(-124.9,-115.2), ratio = 1.3)+
   # Polygons for base map
   geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
   # Polygons for CRB streams
-  geom_polygon(data = CRB_streams_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.2, fill = "gray70") +
+  geom_polygon(data = CRB_streams_fort, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.5, fill = "gray70") +
   # Lines for North American Rivers (includes Columbia and Snake)
-  geom_path(data = rivers_subset, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 0.5, fill = "gray70") +
+  geom_path(data = rivers_subset_new, aes(x = long, y = lat, group = group), inherit.aes = FALSE, color = "gray70", size = 1.5, fill = "gray70") +
   # ADD LABELS FOR RIVERS
   # annotate("segment", x = -122.84, y = 47.68, xend = -123.18, yend = 47.68, size = 0.5, lty = 1) + # Columbia River
-  annotate("text", x = -123.33, y = 46.27, label = "Columbia River", size = 4.5, fontface = 'italic', hjust = 0) + # Columbia River
-  annotate("text", x = -121.7, y = 45.45, label = "Hood R.", size = 3.5, fontface = 'italic', hjust = 1) + # Hood River
-  annotate("text", x = -121.2, y = 45.44, label = "Fifteenmile Cr.", size = 3.5, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
-  annotate("text", x = -120.94, y = 44.6, label = "Deschutes R.", size = 3.5, fontface = 'italic', hjust = 1) + # Deschutes R.
-  annotate("text", x = -119.5, y = 44.92, label = "John Day R.", size = 3.5, fontface = 'italic', hjust = 1) + # John Day R.
-  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 3.5, fontface = 'italic', hjust = 1) + # Umatilla R.
-  annotate("text", x = -117.77, y = 46.12, label = "Walla Walla R.", size = 3.5, fontface = 'italic', hjust = 1) + # Walla Walla R.
-  annotate("text", x = -117.7, y = 46.38, label = "Tucannon R.", size = 3.5, fontface = 'italic', hjust = 1) + # Tucannon R.
-  annotate("text", x = -117.3, y = 45.50, label = "Grande Ronde R.", size = 3.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
-  annotate("text", x = -115.2, y = 46.475, label = "Clearwater R.", size = 3.5, fontface = 'italic', hjust = 1) + # Clearwater R.
-  annotate("text", x = -116.93, y = 44.97, label = "Imnaha R.", size = 3.5, fontface = 'italic', hjust = 1) + # Imnaha R.
-  annotate("text", x = -116.5, y = 46.65, label = "Snake R.", size = 4, fontface = 'italic', hjust = 1) + # Snake R.
-  annotate("text", x = -115.05, y = 45.65, label = "Salmon R.", size = 3.5, fontface = 'italic', hjust = 1) + # Salmon R.
-  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 3.5, fontface = 'italic', hjust = 1) + # Yakima R.
-  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 3.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
-  annotate("text", x = -120.5, y = 48.17, label = "Entiat R.", size = 3.5, fontface = 'italic', hjust = 1) + # Entiat R.
+  annotate("text", x = -123.33, y = 46.27, label = "Columbia R.", size = 8, fontface = 'italic', hjust = 0) + # Columbia River
+  annotate("text", x = -121.7, y = 45.45, label = "Hood R.", size = 5.5, fontface = 'italic', hjust = 1) + # Hood River
+  annotate("text", x = -121.2, y = 45.44, label = "Fifteenmile Cr.", size = 5.5, fontface = 'italic', hjust = 1, angle = 45) + # Fifteenmile Cr.
+  annotate("text", x = -120.94, y = 44.6, label = "Deschutes R.", size = 5.5, fontface = 'italic', hjust = 1) + # Deschutes R.
+  annotate("text", x = -119.5, y = 44.92, label = "John Day R.", size = 5.5, fontface = 'italic', hjust = 1) + # John Day R.
+  annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 5.5, fontface = 'italic', hjust = 1) + # Umatilla R.
+  annotate("text", x = -117.77, y = 46.12, label = "Walla Walla R.", size = 5.5, fontface = 'italic', hjust = 1) + # Walla Walla R.
+  annotate("text", x = -117.7, y = 46.38, label = "Tucannon R.", size = 5.5, fontface = 'italic', hjust = 1) + # Tucannon R.
+  annotate("text", x = -117.3, y = 45.50, label = "Grande Ronde R.", size = 5.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
+  annotate("text", x = -115.2, y = 46.475, label = "Clearwater R.", size = 5.5, fontface = 'italic', hjust = 1) + # Clearwater R.
+  annotate("text", x = -116.93, y = 44.97, label = "Imnaha R.", size = 5.5, fontface = 'italic', hjust = 1) + # Imnaha R.
+  annotate("text", x = -116.5, y = 46.65, label = "Snake R.", size = 7, fontface = 'italic', hjust = 1) + # Snake R.
+  annotate("text", x = -115.35, y = 45.55, label = "Salmon R.", size = 5.5, fontface = 'italic', hjust = 1) + # Salmon R.
+  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 5.5, fontface = 'italic', hjust = 1) + # Yakima R.
+  annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 5.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
+  annotate("text", x = -120.5, y = 48.17, label = "Entiat R.", size = 5.5, fontface = 'italic', hjust = 1) + # Entiat R.
   theme(plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill="white", color = "white"),
         panel.border = element_rect(colour = "white", fill=NA, size=1),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
+        plot.margin=grid::unit(c(0,0,0,0), "mm"),
         legend.position = c(0.14, 0.2),
         legend.title = element_text(size = 14),
         legend.text = element_text(size = 12),
         axis.text = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank())+
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
   guides(fill = guide_legend(title = "Legend"))
 # scale_x_continuous(breaks = seq(-128, -123, 1), expand = c(0,0), labels=c(expression(paste(128*degree,"W")),
 #                                                                           expression(paste(127*degree,"W")),
@@ -285,16 +291,20 @@ CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = grou
 #                                                                       expression(paste(51*degree,"N"))))+
 
 
-ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height = 6, width  = 10)  
-
+# ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height = 6, width  = 10) 
+ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height = 7.5, width  = 13.33) 
+# So saving as PNG makes the figure look quite different - just export the PDF as PNG in preview instead
+# ggsave(here("figures", "CRB_map_pres_nodams.png"), CRB_map_pres_nodams, height = 7.5, width  = 13.33) 
 
 CRB_map_pres_dams <- CRB_map_pres_nodams +
   # Add dams
   geom_point(data = subset(complete_event_det_counts, dam == "dam"), 
              aes(x = event_site_longitude, y = event_site_latitude), 
-             shape = 73, size = 5, inherit.aes = FALSE) +
+             shape = 73, size = 7, inherit.aes = FALSE) +
   geom_text(data = subset(complete_event_det_counts, dam == "dam"), 
             aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
-            size = 4.5, inherit.aes = FALSE)
+            size = 6, inherit.aes = FALSE)
 
-ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 6, width  = 10)
+ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 7.5, width  = 13.33)
+# So saving as PNG makes the figure look quite different - just export the PDF as PNG in preview instead
+# ggsave(here("figures", "CRB_map_pres_dams.png"), CRB_map_pres_dams, height = 7.5, width  = 13.33)
