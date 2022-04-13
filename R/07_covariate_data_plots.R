@@ -79,3 +79,25 @@ ggplot(flow_long, aes(x = date, y = flow, color = dam)) +
 
 
 
+##### Inspect MCN #####
+MCN_temp_long <- subset(temp_long, dam == "MCN" & date >= ymd("2010-01-01"))
+MCN_spill_long <- subset(spill_long, dam == "MCN" & date >= ymd("2010-01-01"))
+MCN_flow_long <- subset(flow_long, dam == "MCN" & date >= ymd("2010-01-01"))
+
+# Let's look at flow at just MCN, 2010 to present
+ggplot(MCN_temp_long, aes(x = date, y = temp, color = dam)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10")
+
+ggplot(MCN_spill_long, aes(x = date, y = spill, color = dam)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10")
+
+ggplot(MCN_flow_long, aes(x = date, y = flow, color = dam)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10")
+
+
+
+
+
