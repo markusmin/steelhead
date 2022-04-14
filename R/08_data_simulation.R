@@ -99,24 +99,32 @@ flow_sim_df %>%
   mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
   mutate(MCN = (MCN - mean(MCN))/sd(MCN)) %>% 
   mutate(PRA = (PRA - mean(PRA))/sd(PRA)) %>% 
-  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) -> flow_sim_zscore_df
+  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
+  # Store dummy values (all 0) for flow in tribs
+  mutate(JDR = 0) %>% 
+  mutate(DES = 0) -> flow_sim_zscore_df
 
 temp_sim_df %>% 
   mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
   mutate(MCN = (MCN - mean(MCN))/sd(MCN)) %>% 
   mutate(PRA = (PRA - mean(PRA))/sd(PRA)) %>% 
-  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) -> temp_sim_zscore_df
+  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>%  
+  # Store dummy values (all 0) for temp in tribs
+  mutate(JDR = 0) %>% 
+  mutate(DES = 0) -> temp_sim_zscore_df
 
 
 
 
 # Simulate the categorical covariates (rear type and natal origin)
+# 1 = JDR, 2 = Yakima, 3 = Tucannon
+# 1 = hatchery, 2 = wild
 
 fish_sim_cat_data <- data.frame(tag_code = seq(1, 3000, 1),
-                            natal_origin = c(rep("JDR", 1000),
-                                             rep("Yakima", 1000),
-                                             rep("Tucannon", 1000)),
-                            rear_type = rep(c(rep("H", 500), rep("W", 500)), 3))
+                            natal_origin = c(rep(1, 1000),
+                                             rep(2, 1000),
+                                             rep(3, 1000)),
+                            rear_type = rep(c(rep(1, 500), rep(2, 500)), 3))
 
 # Simulate all of the starting dates
 
@@ -222,12 +230,21 @@ for (i in 1:nfish){ # for each fish
     state_date[i,k] <- format(as.Date(ymd(state_date[i,k-1])+ months(1), origin = "1970-01-01"))
   }
   
+  # Get the categorical data
+  origin <- fish_sim_cat_data$natal_origin[i]
+  rear <- fish_sim_cat_data$rear_type[i]
+  
   # For the 2nd state and onwards, loop through and evaluate multinomial logit
   # But stop when the fish is lost
   for (j in 2:100){
     while (sum(movement_array[i, "loss",]) == 0){
       # Calculate all movement probabilities via multinomial logit in the transition matrix
       
+      # index the covariate data
+      temps <- temp_sim_zscore_df[temp_sim_zscore_df$date == state_date[i,j-1],][2:5]
+      temp_BON <- temps[1]; temp_MCN <- temps[2]; temp_PRA <- temps[3]; temp_ICH <- temps[4]
+      flows <- flow_sim_zscore_df[flow_sim_zscore_df$date == state_date[i,j-1],][2:5]
+      flow_BON <- flows[1]; flow_MCN <- flows[2]; flow_PRA <- flows[3]; flow_ICH <- flows[4]
       
       # Index to row of transition matrix containing the correct "from" state to get movement probabilities
       p <- transition_matrix[rownames(as.data.frame(which(movement_array[,j-1,i] == 1))),]
@@ -399,8 +416,26 @@ ggplot(probs_df_long, aes(x = b0_BM_JDR, y = prob, color = state)) +
 
 ##### ACTUAL SIMULATION #####
 
+# store test covariate values
+i <- 1
+temp_BON <- 0.5
+flow_BON <- -0.5
+temp_MCN <- 0.5
+flow_MCN <- -0.5
+temp_ICH <- 0.5
+flow_ICH <- -0.5
+temp_PRA <- 0.5
+flow_PRA <- -0.5
+temp_DES <- 0
+flow_DES <- 0
+temp_JDR <- 0
+flow_JDR <- 0
+temp_TUC <- 0
+flow_TUC <- 0
 
 # Store simulation parameter values
+
+##### FROM BON TO MCN STATE #####
 
 # BON to MCN to Mouth to BON transition
 b0_BM_MB <- 1
@@ -420,7 +455,7 @@ borigin_BM_MIP <- c(0.5, 2, 2) # JDR fish have lower probability of overshooting
 b0_BM_DES <- 1
 bflow_BM_DES <- 0 # flow not relevant for tributary entry
 btemp_BM_DES <- 0 # Temperature not relevant for tributary entry
-brear_BM_DES <- c(0.1,0) # Slightly higher probability of straying to Deschutes if hatchery
+brear_BM_DES <- c(0.5,0) # higher probability of straying to Deschutes if hatchery
 borigin_BM_DES <- c(0.25, 0, 0) # JDR has higher probability of stray to DES because it's closer
 
 # BON to MCN to JDR transition
@@ -430,16 +465,6 @@ btemp_BM_JDR <- 0 # Temperature not relevant for tribuary entry
 brear_BM_JDR <- c(0,0) # no effect of rear type
 borigin_BM_JDR <- c(2, 0.1, 0.1) # JDR fish have much higher chance of homing
 
-# store test covariate values
-i <- 1
-temp_BON <- 0.5
-flow_BON <- -0.5
-temp_MCN <- 0.5
-flow_MCN <- -0.5
-temp_DES <- 0.5
-flow_DES <- -0.5
-temp_JDR <- 0
-flow_JDR <- 0
 # Evaluate
 
 # BON to MCN
@@ -456,25 +481,116 @@ transition_matrix["mainstem, BON to MCN", "loss"] <- 1 - sum(transition_matrix["
                                                                                                      "Deschutes River", "John Day River")])
 transition_matrix["mainstem, BON to MCN",]
 
-#####
+##### FROM MCN TO ICH OR PRA STATE #####
 
-# MCN to ICH or PRA
-# transition_matrix["mainstem, MCN to ICH or PRA", "loss"] <- 1
-# transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, BON to MCN"] <- 1
-# transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS"] <- 1
-# transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, ICH to LGR"] <- 1
-# transition_matrix["mainstem, MCN to ICH or PRA", "Yakima River"] <- 1
+# MCN TO ICH OR PRA to BON to MCN transition
+b0_MIP_BM <- 1
+bflow_MIP_BM <- 0.05 # Make this vary with flow, so higher flow at MCN = higher fallback - but lower
+btemp_MIP_BM <- -0.5 # Negative relationship with temperature - when it's colder, they fall back more
+brear_MIP_BM <- c(0,0) # c(hatchery, wild) # No relationship with rear type
+borigin_MIP_BM <- c(1, 0, 0) # c(John Day River, Yakima River, Tucannon River) # JDR fish have much higher chance of falling back
 
-# PRA to RIS
-# transition_matrix["mainstem, PRA to RIS", "loss"] <- 1
-# transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"] <- 1
+# BON to MCN to PRA to RIS transition
+b0_MIP_PR <- 1
+bflow_MIP_PR <- 0 # No relationship with flow
+btemp_MIP_PR <- 0.3 # When it's hotter, more likely to go upstream
+brear_MIP_PR <- c(0,0) # No relationship with rear type
+borigin_MIP_PR <- c(0,0,0) # No relationship with origin - no origins are up here
 
-# ICH to LGR
-# transition_matrix["mainstem, ICH to LGR", "loss"] <- 1
-# transition_matrix["mainstem, ICH to LGR", "mainstem, MCN to ICH or PRA"] <- 1
-# transition_matrix["mainstem, ICH to LGR", "Tucannon River"] <- 1
+# BON to MCN to ICH to LGR transition
+b0_MIP_IL <- 1
+bflow_MIP_IL <- -0.3 # Negative relationship - higher flow = lower chance of ascending
+btemp_MIP_IL <- 0.2 # Positive relationship with temperature
+brear_MIP_IL <- c(0,0) # No effect of rear type
+borigin_MIP_IL <- c(-0.5, 0, 1) # Negative for JDR, no effect on YAK, positive for Tucannon
+
+# BON to MCN to Yakima transition
+b0_MIP_YAK <- 1
+bflow_MIP_YAK <- 0 # flow not relevant for tribuary entry
+btemp_MIP_YAK <- 0 # Temperature not relevant for tribuary entry
+brear_MIP_YAK <- c(0,0.2) # Wild fish more likely to enter the Yakima
+borigin_MIP_YAK <- c(0.1, 2, 0.1) # Yakima fish have a much higher chance of homing
+
+phi_MIP_BM <- exp(b0_MIP_BM + btemp_MIP_BM*temp_MCN + bflow_MIP_BM*flow_MCN + brear_MIP_BM[i] + borigin_MIP_BM[i])
+phi_MIP_PR <- exp(b0_MIP_PR + btemp_MIP_PR*temp_PRA + bflow_MIP_PR*flow_PRA + brear_MIP_PR[i] + borigin_MIP_PR[i])
+phi_MIP_IL <- exp(b0_MIP_IL + btemp_MIP_IL*temp_ICH + bflow_MIP_IL*flow_ICH + brear_MIP_IL[i] + borigin_MIP_IL[i])
+phi_MIP_YAK <- exp(b0_MIP_YAK + btemp_MIP_YAK*temp_YAK + bflow_MIP_YAK*flow_YAK + brear_MIP_YAK[i] + borigin_MIP_YAK[i])
+
+transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, BON to MCN"] <- phi_MIP_BM/(1 + phi_MIP_BM + phi_MIP_PR + phi_MIP_IL + phi_MIP_YAK)
+transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS"] <- phi_MIP_PR/(1 + phi_MIP_BM + phi_MIP_PR + phi_MIP_IL + phi_MIP_YAK)
+transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, ICH to LGR"] <- phi_MIP_IL/(1 + phi_MIP_BM + phi_MIP_PR + phi_MIP_IL + phi_MIP_YAK)
+transition_matrix["mainstem, MCN to ICH or PRA", "Yakima River"] <- phi_MIP_YAK/(1 + phi_MIP_BM + phi_MIP_PR + phi_MIP_IL + phi_MIP_YAK)
+transition_matrix["mainstem, MCN to ICH or PRA", "loss"]  <- 1 - sum(transition_matrix["mainstem, MCN to ICH or PRA", c("mainstem, BON to MCN", "mainstem, PRA to RIS",
+"mainstem, ICH to LGR", "Yakima River")])
+
+# Check values
+transition_matrix["mainstem, MCN to ICH or PRA",]
+
+
+##### FROM PRA to RIS STATE #####
+
+# PRA to RIS to MCN to ICH or PRA transition
+b0_PR_MIP <- 1
+bflow_PR_MIP <- 0 # No relationship with flow
+btemp_PR_MIP <- 0 # No relationship with temperature
+brear_PR_MIP <- c(0,0) # No effect of rear type
+borigin_PR_MIP <- c(2, 2, 2) # Highly positive for each rear type
+
+phi_PR_MIP <- exp(b0_PR_MIP + btemp_PR_MIP*temp_BON + bflow_PR_MIP*flow_BON + brear_PR_MIP[i] + borigin_PR_MIP[i])
+
+transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"] <- phi_PR_MIP/(1 + phi_PR_MIP)
+transition_matrix["mainstem, PRA to RIS", "loss"] <- 1 - transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"]
+
+# Check values
+transition_matrix["mainstem, PRA to RIS", ]
+
+
+
+
+##### FROM ICH TO LGR STATE #####
+
+# ICH to LGR to MCN to ICH or PRA transition #
+b0_IL_MIP <- 1
+bflow_IL_MIP <- 0 # No relationship with flow
+btemp_IL_MIP <- 0.2 # Negative relationship with temperature - when it's colder, tend to go downstream more
+brear_IL_MIP <- c(0,0) # No effect of rear type
+borigin_IL_MIP <- c(1, 1, -0.5) # Positive for JDR and YAK, negative for TUC
+
+# ICH to LGR to Tucannon River transition #
+b0_IL_TUC <- 1
+bflow_IL_TUC <- 0 # No relationship with flow (tributary)
+btemp_IL_TUC <- 0 # No relationship with temperature (tributary)
+brear_IL_TUC <- c(0,0) # No effect of rear type
+borigin_IL_TUC <- c(0, 0, 2) # Highly positive for TUC to home
+
+
+phi_IL_MIP <- exp(b0_IL_MIP + btemp_IL_MIP*temp_ICH + bflow_IL_MIP*flow_ICH + brear_IL_MIP[i] + borigin_IL_MIP[i])
+phi_IL_TUC <- exp(b0_IL_TUC + btemp_IL_TUC*temp_TUC + bflow_IL_TUC*flow_TUC + brear_IL_TUC[i] + borigin_IL_TUC[i])
+
+transition_matrix["mainstem, ICH to LGR", "mainstem, MCN to ICH or PRA"] <- phi_IL_MIP/(1 + phi_IL_MIP + phi_IL_TUC)
+transition_matrix["mainstem, ICH to LGR", "Tucannon River"] <- phi_IL_TUC/(1 + phi_IL_MIP + phi_IL_TUC)
+transition_matrix["mainstem, ICH to LGR", "loss"] <- 1 - sum(transition_matrix["mainstem, ICH to LGR", c("mainstem, MCN to ICH or PRA", "Tucannon River")])
+
+# Check values
+transition_matrix["mainstem, ICH to LGR",]
+
 
 # Deschutes River
+# PRA to RIS to MCN to ICH or PRA transition
+b0_PR_MIP <- 1
+bflow_PR_MIP <- 0 # No relationship with flow
+btemp_PR_MIP <- 0 # No relationship with temperature
+brear_PR_MIP <- c(0,0) # No effect of rear type
+borigin_PR_MIP <- c(2, 2, 2) # Highly positive for each rear type
+
+phi_PR_MIP <- exp(b0_PR_MIP + btemp_PR_MIP*temp_BON + bflow_PR_MIP*flow_BON + brear_PR_MIP[i] + borigin_PR_MIP[i])
+
+transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"] <- phi_PR_MIP/(1 + phi_PR_MIP)
+transition_matrix["mainstem, PRA to RIS", "loss"] <- 1 - transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"]
+
+# Check values
+transition_matrix["mainstem, PRA to RIS", ]
+
 # transition_matrix["Deschutes River", "loss"] <- 1
 # transition_matrix["Deschutes River", "mainstem, BON to MCN"] <- 1
 
@@ -489,9 +605,6 @@ transition_matrix["mainstem, BON to MCN",]
 # Tucannon River
 # transition_matrix["Tucannon River", "loss"] <- 1
 # transition_matrix["Tucannon River", "mainstem, ICH to LGR"] <- 1
-
-
-# All other relationships will not be a product of covariates
 
 
 
