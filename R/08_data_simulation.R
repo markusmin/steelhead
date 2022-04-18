@@ -229,6 +229,7 @@ rownames(movement_array) <- sim_states
 # Create a matrix to store the dates in each state; make ncol 100 to accommodate 100 possible state visits
 state_date <- matrix(nrow = nfish, ncol = 100)
 
+set.seed(123)
 for (i in 1:nfish){ # for each fish
 # for (i in 1:1){
   print(paste0("i = ", i))
@@ -501,6 +502,10 @@ for (i in 1:nfish){
   
   det_hist_sim[[i]] <- movement_array[,1:(hist_end_index-1),i]
 }
+
+# Export the data simulation
+write.csv(det_hist_sim, here::here("simulation", "sim_600.csv"))
+saveRDS(det_hist_sim, here::here("simulation", "sim_600.rds"))
 
 
 
