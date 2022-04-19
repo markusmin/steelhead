@@ -1,0 +1,77 @@
+
+model {
+
+#state-space likelihood 
+for(i in 1:n.ind){ # Loop through the detection matrices for each individual
+  for(j in 1:(n.obs[i]-1)){ # Loop through each of the observations, stopping at the loss column (-1)
+    
+    # Get the current state
+    cur_state <- states_list[[i]][j]
+    
+    # Get number of possible movements
+    n_movements <- possible_movements[cur_state]
+    
+    # Create a design matrix for number of possible movements
+    X <- matrix(0, nrow = (n_movements - 1), ncol = (n_movements - 1) * 5)
+    
+    # Populate the matrix
+    for (m in 1:(n_movements-1)){
+      for (k in 1:5){
+        X[m, (k-1)*m + m] <- 1
+      }
+      
+    }
+    
+    
+    # Probability of ascending a dam, for an individual i at location l at time t
+    # This way, each ascension probability can be generalized to a[l], rather than having
+    # to write out separate ones
+    
+    # Ascend dam
+    logit(a[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
+    bTemp * temp[l, t] + # temperature (continuous)
+    bFlow * flow[l, t] + # flow (continuous)
+    bSpill * spill[l, t] # spill (continuous)
+    
+    # Descend dam
+    logit(d[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
+    bTemp * temp[l, t] + # temperature (continuous)
+    bFlow * flow[l, t] + # flow (continuous)
+    bSpill * spill[l, t] # spill (continuous)
+    
+    # Enter tributary
+    # May need one line here for each tributary
+    logit([i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
+    bTemp * temp[l, t] + # temperature (continuous)
+    bFlow * flow[l, t] + # flow (continuous)
+    bSpill * spill[l, t] # spill (continuous)
+    
+    # Loss (end - use e to not confuse with location l index)
+    logit(e[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
+    bYear[run_year[i]] + # run year (categorical)
+    bTemp * temp[l, t] + # temperature (continuous)
+    bFlow * flow[l, t] + # flow (continuous)
+    bSpill * spill[l, t] # spill (continuous)
+  
+    
+    # Put the movement probabilities into a vector
+    # All other movements probabilities are zero
+    p <- rep(0, nstates)
+    
+    # Get the index of the ascend, descend, etc. states
+    p_ascend_index <- state_relationships[l,ascend]
+    p_descend_index <- state_relationships[l,descend]
+    
+    p[p_ascend_index] <- a
+    p[p_descend_index] <- d
+    # put in the loss values
+    p[nstates] <- e
+    # Evaluate the multinomial likelihood for the counts of detection probabilities
+    y[1:nstates] ~ dmulti(p[1:nstates], 1)
+  }
+
+}
+
