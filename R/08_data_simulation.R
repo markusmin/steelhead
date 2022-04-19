@@ -292,8 +292,8 @@ for (i in 1:nfish){ # for each fish
       
       # BON to MCN to JDR transition
       b0_BM_JDR <- 1
-      bflow_BM_JDR <- 0 # flow not relevant for tribuary entry
-      btemp_BM_JDR <- 0 # Temperature not relevant for tribuary entry
+      bflow_BM_JDR <- 0 # flow not relevant for tributary entry
+      btemp_BM_JDR <- 0 # Temperature not relevant for tributary entry
       brear_BM_JDR <- c(0,0) # no effect of rear type
       borigin_BM_JDR <- c(2, 0.1, 0.1) # JDR fish have much higher chance of homing
       
@@ -339,8 +339,8 @@ for (i in 1:nfish){ # for each fish
       
       # BON to MCN to Yakima transition
       b0_MIP_YAK <- 1
-      bflow_MIP_YAK <- 0 # flow not relevant for tribuary entry
-      btemp_MIP_YAK <- 0 # Temperature not relevant for tribuary entry
+      bflow_MIP_YAK <- 0 # flow not relevant for tributary entry
+      btemp_MIP_YAK <- 0 # Temperature not relevant for tributary entry
       brear_MIP_YAK <- c(0,0.2) # Wild fish more likely to enter the Yakima
       borigin_MIP_YAK <- c(0.1, 2, 0.1) # Yakima fish have a much higher chance of homing
       
@@ -504,10 +504,14 @@ for (i in 1:nfish){
 }
 
 # Export the data simulation
-write.csv(det_hist_sim, here::here("simulation", "sim_600.csv"))
+
+# Export the detection history
 saveRDS(det_hist_sim, here::here("simulation", "sim_600.rds"))
 
-
+# Export the covariates
+write.csv(temp_sim_zscore_df, here::here("simulation", "temp_600.csv"), row.names = FALSE)
+write.csv(flow_sim_zscore_df, here::here("simulation", "flow_600.csv"), row.names = FALSE)
+write.csv(fish_sim_cat_data, here::here("simulation", "origin_rear_600.csv"), row.names = FALSE)
 
 
 ##### Model including covariates #####
@@ -708,8 +712,8 @@ borigin_BM_DES <- c(0.25, 0, 0) # JDR has higher probability of stray to DES bec
 
 # BON to MCN to JDR transition
 b0_BM_JDR <- 1
-bflow_BM_JDR <- 0 # flow not relevant for tribuary entry
-btemp_BM_JDR <- 0 # Temperature not relevant for tribuary entry
+bflow_BM_JDR <- 0 # flow not relevant for tributary entry
+btemp_BM_JDR <- 0 # Temperature not relevant for tributary entry
 brear_BM_JDR <- c(0,0) # no effect of rear type
 borigin_BM_JDR <- c(2, 0.1, 0.1) # JDR fish have much higher chance of homing
 
@@ -755,8 +759,8 @@ borigin_MIP_IL <- c(-0.5, 0, 1) # Negative for JDR, no effect on YAK, positive f
 
 # BON to MCN to Yakima transition
 b0_MIP_YAK <- 1
-bflow_MIP_YAK <- 0 # flow not relevant for tribuary entry
-btemp_MIP_YAK <- 0 # Temperature not relevant for tribuary entry
+bflow_MIP_YAK <- 0 # flow not relevant for tributary entry
+btemp_MIP_YAK <- 0 # Temperature not relevant for tributary entry
 brear_MIP_YAK <- c(0,0.2) # Wild fish more likely to enter the Yakima
 borigin_MIP_YAK <- c(0.1, 2, 0.1) # Yakima fish have a much higher chance of homing
 
