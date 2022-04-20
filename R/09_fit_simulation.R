@@ -196,7 +196,170 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     # Evaluate the multinomial likelihood for the counts of detection probabilities
     y[[i]][,j] ~ dmulti(p, 1)
     
-    ##### PRIORS
+    ##### PRIORS #####
+    
+    # Mainstem, mouth to BON
+    b0_MB_BM ~ dnorm(0,0.001)
+    bflow_MB_BM ~ dnorm(0,0.001)
+    btemp_MB_BM ~ dnorm(0,0.001)
+    for (i in 1:2){
+      brear_MB_BM[i] ~ dnorm(0,0.001)
+    }
+    for (i in 1:3){
+      borigin_MB_BM[i] ~ dnorm(0,0.001)
+    }
+
+  # Mainstem, BON to MCN
+  b0_BM_MB ~ dnorm(0,0.001)
+  b0_BM_MIP ~ dnorm(0,0.001)
+  b0_BM_DES ~ dnorm(0,0.001)
+  b0_BM_JDR ~ dnorm(0,0.001)
+  bflow_BM_MB ~ dnorm(0,0.001)
+  bflow_BM_MIP ~ dnorm(0,0.001)
+  bflow_BM_DES ~ dnorm(0,0.001)
+  bflow_BM_JDR ~ dnorm(0,0.001)
+  btemp_BM_MB ~ dnorm(0,0.001)
+  btemp_BM_MIP ~ dnorm(0,0.001)
+  btemp_BM_DES ~ dnorm(0,0.001)
+  btemp_BM_JDR ~ dnorm(0,0.001)
+  for (i in 1:2){
+    brear_BM_MB[i] ~ dnorm(0,0.001)
+  {
+  for (i in 1:2){
+    brear_BM_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:2){
+    brear_BM_DES[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:2){
+    brear_BM_JDR[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_BM_MB[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_BM_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_BM_DES[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_BM_JDR[i] ~ dnorm(0,0.001)
+  }
+
+  # Mainstem, MCN to ICH or PRA
+  b0_MIP_BM ~ dnorm(0,0.001)
+  b0_MIP_PR ~ dnorm(0,0.001)
+  b0_MIP_IL ~ dnorm(0,0.001)
+  b0_MIP_YAK ~ dnorm(0,0.001)
+  bflow_MIP_BM ~ dnorm(0,0.001)
+  bflow_MIP_PR ~ dnorm(0,0.001)
+  bflow_MIP_IL ~ dnorm(0,0.001)
+  bflow_MIP_YAK ~ dnorm(0,0.001)
+  btemp_MIP_BM ~ dnorm(0,0.001)
+  btemp_MIP_PR ~ dnorm(0,0.001)
+  btemp_MIP_IL ~ dnorm(0,0.001)
+  btemp_MIP_YAK
+  for (i in 1:2){
+    brear_MIP_BM[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:2){
+    brear_MIP_PR[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:2){
+    brear_MIP_IL[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:2){
+    brear_MIP_YAK[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_MIP_BM[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_MIP_PR[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_MIP_IL[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_MIP_YAK[i] ~ dnorm(0,0.001)
+  }
+
+  # Mainstem, PRA to RIS
+  b0_PR_MIP ~ dnorm(0,0.001)
+  bflow_PR_MIP ~ dnorm(0,0.001)
+  btemp_PR_MIP ~ dnorm(0,0.001)
+  for (i in 1:2){
+    brear_PR_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_PR_MIP[i] ~ dnorm(0,0.001)
+  }
+
+  # Mainstem, ICH to LGR
+  b0_IL_MIP ~ dnorm(0,0.001)
+  b0_IL_TUC ~ dnorm(0,0.001)
+  bflow_IL_MIP ~ dnorm(0,0.001)
+  bflow_IL_TUC ~ dnorm(0,0.001)
+  btemp_IL_MIP ~ dnorm(0,0.001)
+  btemp_IL_TUC ~ dnorm(0,0.001)
+  for (i in 1:3){
+    brear_IL_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    brear_IL_TUC[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_IL_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_IL_TUC[i] ~ dnorm(0,0.001)
+  }
+
+  # Deschutes River
+  b0_DES_BM ~ dnorm(0,0.001)
+  bflow_DES_BM ~ dnorm(0,0.001)
+  btemp_DES_BM ~ dnorm(0,0.001)
+  for (i in 1:3){
+    brear_DES_BM[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_DES_BM[i] ~ dnorm(0,0.001)
+  }
+
+  # John Day River
+  b0_JDR_BM ~ dnorm(0,0.001)
+  bflow_JDR_BM ~ dnorm(0,0.001)
+  btemp_JDR_BM ~ dnorm(0,0.001)
+  for (i in 1:2){
+    brear_JDR_BM[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_JDR_BM[i] ~ dnorm(0,0.001)
+  }
+
+  # Yakima River
+  b0_YAK_MIP ~ dnorm(0,0.001)
+  bflow_YAK_MIP ~ dnorm(0,0.001)
+  btemp_YAK_MIP ~ dnorm(0,0.001)
+  for (i in 1:3){
+    brear_YAK_MIP[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_YAK_MIP[i] ~ dnorm(0,0.001)
+  }
+
+  # Tucannon River
+  b0_TUC_IL ~ dnorm(0,0.001)
+  bflow_TUC_IL ~ dnorm(0,0.001)
+  btemp_TUC_IL ~ dnorm(0,0.001)
+  for (i in 1:3){
+    brear_TUC_IL[i] ~ dnorm(0,0.001)
+  }
+  for (i in 1:3){
+    borigin_TUC_IL[i] ~ dnorm(0,0.001)
+  }
+  
   }
 
 }
