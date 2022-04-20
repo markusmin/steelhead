@@ -111,6 +111,13 @@ flow_sim_df %>%
   mutate(YAK = 0) %>% 
   mutate(TUC = 0)-> flow_sim_zscore_df
 
+# Change dates to numeric (for JAGS)
+flow_sim_zscore_df %>% 
+  mutate(date_numeric = as.numeric(date - ymd("2016-12-31"))) %>% 
+  relocate(date_numeric) %>% 
+  dplyr::select(-date) %>% 
+  dplyr::rename(date = date_numeric) -> flow_sim_zscore_datenumeric
+
 temp_sim_df %>% 
   mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
   mutate(MCN = (MCN - mean(MCN))/sd(MCN)) %>% 
@@ -121,6 +128,13 @@ temp_sim_df %>%
   mutate(DES = 0) %>% 
   mutate(YAK = 0) %>% 
   mutate(TUC = 0)-> temp_sim_zscore_df
+
+# Change dates to numeric (for JAGS)
+temp_sim_zscore_df %>% 
+  mutate(date_numeric = as.numeric(date - ymd("2016-12-31"))) %>% 
+  relocate(date_numeric) %>% 
+  dplyr::select(-date) %>% 
+  dplyr::rename(date = date_numeric) -> temp_sim_zscore_datenumeric
 
 
 
@@ -230,6 +244,8 @@ rownames(movement_array) <- sim_states
 # Create a matrix to store the dates in each state; make ncol 100 to accommodate 100 possible state visits
 state_date <- matrix(nrow = nfish, ncol = 100)
 
+transition_date <- matrix(nrow = nfish, ncol = 100)
+
 set.seed(123)
 for (i in 1:nfish){ # for each fish
 # for (i in 1:1){
@@ -238,6 +254,8 @@ for (i in 1:nfish){ # for each fish
   movement_array["mainstem, BON to MCN", 1, i] <- 1
   # Populate state date matrix with date at arrival at BON
   state_date[i,1] <- format(as.Date(BON_arrival_dates_sim[i], origin = "1970-01-01"))
+  # Store this in the transition date matrix
+  transition_date[i,1] <- state_date[i,1]
   
   # populate the rest of the state dates for this fish by adding two weeks
   for (k in 2:100){
@@ -386,7 +404,7 @@ for (i in 1:nfish){ # for each fish
       brear_PR_MIP <- c(0,0) # No effect of rear type
       borigin_PR_MIP <- c(2, 2, 2) # Highly positive for each rear type
       
-      phi_PR_MIP <- exp(b0_PR_MIP + btemp_PR_MIP*temp_BON + bflow_PR_MIP*flow_BON + brear_PR_MIP[rear] + borigin_PR_MIP[origin])
+      phi_PR_MIP <- exp(b0_PR_MIP + btemp_PR_MIP*temp_PRA + bflow_PR_MIP*flow_PRA + brear_PR_MIP[rear] + borigin_PR_MIP[origin])
       
       transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"] <- phi_PR_MIP/(1 + phi_PR_MIP)
       transition_matrix["mainstem, PRA to RIS", "loss"] <- 1 - transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"]
@@ -503,6 +521,9 @@ for (i in 1:nfish){ # for each fish
       # Choose next state using rmultinom
       movement_array[,j,i] <- rmultinom(1, size = 1, prob = p)
       
+      # Store the date in the transition_date matrix
+      transition_date[i,j] <- state_date[i,j]
+      
       j <- j +1
     }
 
@@ -520,14 +541,43 @@ for (i in 1:nfish){
   det_hist_sim[[i]] <- movement_array[,1:(hist_end_index-1),i]
 }
 
+# Trim all of the NAs from transition date matrix, store as a list
+transition_date_sim <- list()
+
+for (i in 1:nfish){
+  hist_end_index <- match(NA, transition_date[i,])
+  
+  transition_date_sim[[i]] <- transition_date[i,1:(hist_end_index-1)]
+}
+
 # Export the data simulation
 
 # Export the detection history
-saveRDS(det_hist_sim, here::here("simulation", "sim_600.rds"))
+# Here as a list
+saveRDS(det_hist_sim, here::here("simulation", "sim_600_list.rds"))
+
+# Now as an array
+# Trim to maximum number of observations
+n.obs <- unlist(lapply(det_hist_sim, ncol))
+max_obs <- max(n.obs)
+det_hist_sim_array <- movement_array[,1:max_obs,]
+saveRDS(det_hist_sim_array, here::here("simulation", "sim_600_array.rds"))
+
+# Export the transition dates
+saveRDS(transition_date_sim, here::here("simulation", "dates_600.rds"))
+# As an array
+transition_date_sim_matrix <- transition_date[,1:max_obs]
+
+date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(x) - ymd("2016-12-31"))
+transition_date_sim_matrix %>% 
+  as_tibble() %>% 
+  mutate_all(date_numeric) -> transition_date_sim_numeric
+  
+saveRDS(transition_date_sim_numeric, here::here("simulation", "dates_600_matrix.rds"))
 
 # Export the covariates
-write.csv(temp_sim_zscore_df, here::here("simulation", "temp_600.csv"), row.names = FALSE)
-write.csv(flow_sim_zscore_df, here::here("simulation", "flow_600.csv"), row.names = FALSE)
+write.csv(temp_sim_zscore_datenumeric, here::here("simulation", "temp_600.csv"), row.names = FALSE)
+write.csv(flow_sim_zscore_datenumeric, here::here("simulation", "flow_600.csv"), row.names = FALSE)
 write.csv(fish_sim_cat_data, here::here("simulation", "origin_rear_600.csv"), row.names = FALSE)
 
 
