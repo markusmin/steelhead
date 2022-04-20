@@ -60,8 +60,76 @@ for (i in 1:n.ind){
   }
 }
 
-# Fit the model in JAGS
+# Create rear and origin vectors, which we can index to
 
+
+# Get the beta vectors - will be different for each state
+# NOTE: every single one of these will require priors
+
+# Mainstem, mouth to BON
+B_vec_1 <- c(b0_MB_BM, bflow_MB_BM, btemp_MB_BM, brear_MB_BM[rear], borigin_MB_BM[origin])
+temp_vec_1 <- c(temp_BON)
+flow_vec_1 <- c(temp_BON)
+
+# Mainstem, BON to MCN
+B_vec_2 <- c(b0_BM_MB, b0_BM_MIP,  b0_BM_DES,  b0_BM_JDR,
+             bflow_BM_MB, bflow_BM_MIP,  bflow_BM_DES,  bflow_BM_JDR,
+             btemp_BM_MB, btemp_BM_MIP,  btemp_BM_DES,  btemp_BM_JDR,
+             brear_BM_MB[rear], brear_BM_MIP[rear],  brear_BM_DES[rear],  brear_BM_JDR[rear],
+             borigin_BM_MB[origin], borigin_BM_MIP[origin],  borigin_BM_DES[origin], borigin_BM_JDR[origin])
+
+# Mainstem, MCN to ICH or PRA
+B_vec_3 <- c(b0_MIP_BM, b0_MIP_PR, b0_MIP_IL, b0_MIP_YAK,
+             bflow_MIP_BM, bflow_MIP_PR, bflow_MIP_IL, bflow_MIP_YAK,
+             btemp_MIP_BM, btemp_MIP_PR, btemp_MIP_IL, btemp_MIP_YAK,
+             brear_MIP_BM[rear], brear_MIP_PR[rear], brear_MIP_IL[rear], brear_MIP_YAK[rear],
+             borigin_MIP_BM[origin], borigin_MIP_PR[origin], borigin_MIP_IL[origin], borigin_MIP_YAK[origin])
+
+# Mainstem, PRA to RIS
+B_vec_4 <- c(b0_PR_MIP, bflow_PR_MIP, btemp_PR_MIP, brear_PR_MIP[rear], borigin_PR_MIP[origin])
+
+# Mainstem, ICH to LGR
+B_vec_5 <- c(b0_IL_MIP, b0_IL_TUC, 
+             bflow_IL_MIP, bflow_IL_TUC, 
+             btemp_IL_MIP, btemp_IL_TUC, 
+             brear_IL_MIP[rear], brear_IL_TUC[rear], 
+             borigin_IL_MIP[origin], borigin_IL_TUC[origin])
+
+# Deschutes River
+B_vec_6 <- c(b0_DES_BM, bflow_DES_BM, btemp_DES_BM, brear_DES_BM[rear], borigin_DES_BM[origin])
+
+# John Day River
+B_vec_7 <- c(b0_JDR_BM, bflow_JDR_BM, btemp_JDR_BM, brear_JDR_BM[rear], borigin_JDR_BM[origin])
+
+# Yakima River
+B_vec_8 <- c(b0_YAK_MIP, bflow_YAK_MIP, btemp_YAK_MIP, brear_YAK_MIP[rear], borigin_YAK_MIP[origin])
+
+# Tucannon River
+B_vec_9 <- c(b0_TUC_IL, bflow_TUC_IL, btemp_TUC_IL, brear_TUC_IL[rear], borigin_TUC_IL[origin])
+
+B_vec_list <- list(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5, 
+                   B_vec_6, B_vec_7, B_vec_8, B_vec_9)
+
+# Testing vectors
+B_vec_2 <- seq(1,20,1)
+
+B_vec_1 <- seq(1, 5, 1)
+
+# Create a design matrix for number of possible movements
+X <- matrix(0, nrow = (n_movements - 1), ncol = (n_movements - 1) * 5)
+
+# Populate the matrix
+for (m in 1:(n_movements-1)){
+  for (k in 1:5){
+    X[m, (k-1)*(n_movements-1) + m] <- 1
+  }
+}
+
+X %*% B_vec_1
+
+X %*% B_vec_2
+
+# Fit the model in JAGS
 
 cat("
 model {
@@ -69,12 +137,30 @@ model {
 #state-space likelihood 
 for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   for(j in 1:(n.obs[i]-1)){ # Loop through each of the observations, stopping at the loss column (-1)
+  
+    # Get the rear type
+    rear <- fish_sim_cat_data[i,3]
+    
+    # Get the origin
+    origin <- fish_sim_cat_data[i,2]
+    
     
     # Get the current state
     cur_state <- states_list[[i]][j]
     
     # Get number of possible movements
     n_movements <- possible_movements[cur_state]
+    
+    # Get the temperature values for this state
+    temp <- 
+    for (m in 1:(n_movements-1)){
+    
+    }
+    
+    
+    # Get the flow values for this state
+    
+    
     
     # Create a design matrix for number of possible movements
     X <- matrix(0, nrow = (n_movements - 1), ncol = (n_movements - 1) * 5)
@@ -87,58 +173,33 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
       
     }
     
+    # Populate the temperature and flow elements of the matrix with the covariate values
     
-    # Probability of ascending a dam, for an individual i at location l at time t
-    # This way, each ascension probability can be generalized to a[l], rather than having
-    # to write out separate ones
+    # Temperature
+    for (m in 1:(n_movements-1)){
+        X[m, m + (n_movements-1)] <- temp[m]
+    }
+      
+      for (m in 1:(n_movements-1)){
+        X[m, m + (n_movements-1)] <- flow[m]
+      }
+      
+      
     
-    # Ascend dam
-    logit(a[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
-    bYear[run_year[i]] + # run year (categorical)
-    bTemp * temp[l, t] + # temperature (continuous)
-    bFlow * flow[l, t] + # flow (continuous)
-    bSpill * spill[l, t] # spill (continuous)
+    # Multiply design matrix by beta vector to get movement probabilities
     
-    # Descend dam
-    logit(d[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
-    bYear[run_year[i]] + # run year (categorical)
-    bTemp * temp[l, t] + # temperature (continuous)
-    bFlow * flow[l, t] + # flow (continuous)
-    bSpill * spill[l, t] # spill (continuous)
+    p <- X %*% B_vec_list[[cur_state]]
     
-    # Enter tributary
-    # May need one line here for each tributary
-    logit([i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
-    bYear[run_year[i]] + # run year (categorical)
-    bTemp * temp[l, t] + # temperature (continuous)
-    bFlow * flow[l, t] + # flow (continuous)
-    bSpill * spill[l, t] # spill (continuous)
-    
-    # Loss (end - use e to not confuse with location l index)
-    logit(e[i,l,t]) <- b0 + bOrigin[natal_origin[i]] + # origin (categorical) 
-    bYear[run_year[i]] + # run year (categorical)
-    bTemp * temp[l, t] + # temperature (continuous)
-    bFlow * flow[l, t] + # flow (continuous)
-    bSpill * spill[l, t] # spill (continuous)
-  
-    
-    # Put the movement probabilities into a vector
-    # All other movements probabilities are zero
-    p <- rep(0, nstates)
-    
-    # Get the index of the ascend, descend, etc. states
-    p_ascend_index <- state_relationships[l,ascend]
-    p_descend_index <- state_relationships[l,descend]
-    
-    p[p_ascend_index] <- a
-    p[p_descend_index] <- d
-    # put in the loss values
-    p[nstates] <- e
     # Evaluate the multinomial likelihood for the counts of detection probabilities
-    y[1:nstates] ~ dmulti(p[1:nstates], 1)
+    y[[i]][,j] ~ dmulti(p, 1)
+    
+    ##### PRIORS
   }
 
 }
 ", fill=TRUE, file=here::here("simulation", "sim_model.txt"))
 
 
+# Get data
+
+y = sim_states
