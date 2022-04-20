@@ -152,14 +152,17 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     n_movements <- possible_movements[cur_state]
     
     # Get the temperature values for this state
-    temp <- 
+    temp <- vector(length = (n_movements - 1))
     for (m in 1:(n_movements-1)){
-    
+      temp[m] <- temp_mat[cur_state, m]
     }
     
     
     # Get the flow values for this state
-    
+    flow <- vector(length = (n_movements - 1))
+    for (m in 1:(n_movements-1)){
+      flow[m] <- flow_mat[cur_state, m]
+    }
     
     
     # Create a design matrix for number of possible movements
