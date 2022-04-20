@@ -7,6 +7,7 @@ library(here)
 library(janitor)
 library(tidyverse)
 library(lubridate)
+library(ggthemes)
 
 # We will be using a reduced number of states:
 
@@ -266,6 +267,22 @@ for (i in 1:nfish){ # for each fish
       
       # The function:
       #####
+      ##### FROM MOUTH TO BON STATE #####
+      
+      # Mouth to BON to BON to MCN transition
+      b0_MB_BM <- 1
+      bflow_MB_BM <- 0 # No relationship with flow
+      btemp_MB_BM <- 0 # No relationship with temperature
+      brear_MB_BM <- c(0,0) # No effect of rear type
+      borigin_MB_BM <- c(2, 2, 2) # Highly positive for each rear type
+      
+      phi_MB_BM <- exp(b0_MB_BM + btemp_MB_BM*temp_BON + bflow_MB_BM*flow_BON + brear_MB_BM[rear] + borigin_MB_BM[origin])
+      
+      transition_matrix["mainstem, mouth to BON", "mainstem, BON to MCN"] <- phi_MB_BM/(1 + phi_MB_BM)
+      transition_matrix["mainstem, mouth to BON", "loss"] <- 1 - transition_matrix["mainstem, mouth to BON", "mainstem, BON to MCN"]
+      
+      # Check values
+      transition_matrix["mainstem, mouth to BON", ]
       
       ##### FROM BON TO MCN STATE #####
       
@@ -599,10 +616,10 @@ evalute_mlogit_b0_BM_JDR <- function(b0_BM_JDR){
   return(probs)
 }
 
-probs_df <- as.data.frame(matrix(nrow = 10, ncol = length(seq(0.1 ,10, 0.1))))
+probs_df <- as.data.frame(matrix(nrow = 10, ncol = length(seq(-10,10, 0.1))))
 
-for (j in 1:length(seq(0.1,10, 0.1))){
-  values <- seq(0.1,10, 0.1)
+for (j in 1:length(seq(-10,10, 0.1))){
+  values <- seq(-10,10, 0.1)
   print(paste0(j))
   probs <- evalute_mlogit_b0_BM_JDR(b0_BM_JDR = values[j])
   probs_df[,j] <- probs
@@ -617,7 +634,7 @@ probs_df %>%
   subset(state %in% c("mainstem, mouth to BON", "mainstem, MCN to ICH or PRA",
                       "Deschutes River", "John Day River", "loss"))-> probs_df_long
 
-probs_df_long$b0_BM_JDR <- rep(seq(0.1, 10, 0.1), 5)
+probs_df_long$b0_BM_JDR <- rep(seq(-10, 10, 0.1), 5)
 
 ggplot(probs_df_long, aes(x = b0_BM_JDR, y = prob, color = state)) +
   geom_point() +
@@ -642,10 +659,10 @@ evalute_mlogit_b0_BM_JDR_b0_BM_DES <- function(b0_BM_JDR, b0_BM_DES){
   return(probs)
 }
 
-probs_df <- as.data.frame(matrix(nrow = 10, ncol = length(seq(0.1 ,10, 0.1))))
+probs_df <- as.data.frame(matrix(nrow = 10, ncol = length(seq(-10 ,10, 0.1))))
 
-for (j in 1:length(seq(0.1,10, 0.1))){
-  values <- seq(0.1,10, 0.1)
+for (j in 1:length(seq(-10,10, 0.1))){
+  values <- seq(-10,10, 0.1)
   print(paste0(j))
   probs <- evalute_mlogit_b0_BM_JDR_b0_BM_DES(b0_BM_JDR = values[j], b0_BM_DES = values[j])
   probs_df[,j] <- probs
@@ -660,7 +677,7 @@ probs_df %>%
   subset(state %in% c("mainstem, mouth to BON", "mainstem, MCN to ICH or PRA",
                       "Deschutes River", "John Day River", "loss"))-> probs_df_long
 
-probs_df_long$b0_BM_JDR <- rep(seq(0.1, 10, 0.1), 5)
+probs_df_long$b0_BM_JDR <- rep(seq(-10, 10, 0.1), 5)
 
 ggplot(probs_df_long, aes(x = b0_BM_JDR, y = prob, color = state)) +
   geom_point() +
