@@ -34,6 +34,8 @@ sim_data <- readRDS(here::here("simulation", "sim_600_array.rds"))
   - Rear type
   - Natal origin
   
+-> generating multiple datasets with different functional relationships between covariates and movement probabilities, including datasets that have no relationship with covariates
+  
   
 ## Multinomial logit revisited
 ### For each movement probability:
@@ -80,7 +82,7 @@ $$
 *BM-loss* = 1 - $\Sigma$ (all other movements)
 
 ## Behavior of multinomial logit
-![](.//figures/mlogit_example.png){width=100%}
+![](.//figures/mlogit_example_2.png){width=100%}
 
 
 ## Simulation code
