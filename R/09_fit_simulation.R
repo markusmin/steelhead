@@ -27,7 +27,8 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_60
 n.ind <- length(sim_data_list)
 
 # Store the number of observations per individual
-n.obs <- unlist(lapply(sim_data_list, ncol))
+# -1 because the last state is loss, which isn't actually an observation
+n.obs <- unlist(lapply(sim_data_list, ncol)) - 1
 
 # Get number of possible movements from each site
 possible_movements <- c("mainstem, mouth to BON" = 2,
@@ -157,7 +158,6 @@ for (i in 1:n.ind){
 #                    B_vec_6, B_vec_7, B_vec_8, B_vec_9)
 
 # Fit the model in JAGS
-
 cat("
 model {
 
@@ -165,44 +165,40 @@ model {
 for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   for(j in 1:(n.obs[i]-1)){ # Loop through each of the observations, stopping at the loss column (-1)
 
-    # Get the rear type
-    rear <- fish_sim_cat_data[i,3]
-
-    # Get the origin
-    origin <- fish_sim_cat_data[i,2]
-
-
     # Get the current state
-    cur_state <- states_mat[i,j]
+    # cur_state <- states_mat[i,j]
 
     # Get number of possible movements
-    n_movements <- possible_movements[cur_state]
+    # n_movements <- possible_movements[states_mat[i,j]]
 
     # index the covariate data
-    temps <- as.numeric(temp_sim[dates[i,j],])
-    flows <- as.numeric(flow_sim[dates[i,j],])
+    # temps <- as.numeric(temp_sim[dates[i,j],])
+    # flows <- as.numeric(flow_sim[dates[i,j],])
+    # temps <- temp_sim[dates[i,j],]
+    # flows <- flow_sim[dates[i,j],]
 
     # Get the temperature values for this state
-    # temp[] <- vector(length = (n_movements - 1))
-    for (m in 1:(n_movements-1)){
-      temp[m] <- temps[cov_index_mat[cur_state,m]]
-    }
+    # temp[] <- vector(length = (possible_movements[states_mat[i,j]] - 1))
+    # for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+    #   temp[m] <- temp_sim[dates[i,j],][cov_index_mat[states_mat[i,j],m]]
+    # }
 
 
     # Get the flow values for this state
-    # flow <- vector(length = (n_movements - 1))
-    for (m in 1:(n_movements-1)){
-      flow[m] <- flows[temps[cov_index_mat[cur_state,m]]]
-    }
+    # flow <- vector(length = (possible_movements[states_mat[i,j]] - 1))
+    # for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+    #   flow[m] <- flows[flow_sim[dates[i,j],][cov_index_mat[states_mat[i,j],m]]]
+    # }
 
 
     # Create a design matrix for number of possible movements
-    # X <- matrix(0, nrow = (n_movements - 1), ncol = (n_movements - 1) * 5)
+    # X <- matrix(0, nrow = (possible_movements[states_mat[i,j]] - 1), ncol = (possible_movements[states_mat[i,j]] - 1) * 5)
 
     # Populate the matrix
-    for (m in 1:(n_movements-1)){
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
       for (k in 1:5){
-        X[m, (k-1)*(n_movements-1) + m] <- 1
+        # X[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- 1
+        X[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- 1
       }
 
     }
@@ -210,13 +206,16 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     # Populate the temperature and flow elements of the matrix with the covariate values
 
     # Temperature
-    for (m in 1:(n_movements-1)){
-        X[m, m + (n_movements-1)] <- temp[m]
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+        # X[m, (m + (possible_movements[states_mat[i,j]]-1)), (sum(n.obs[0:(i-1)])+j)] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+        X[m, (m + (possible_movements[states_mat[i,j]]-1)), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
     }
 
     # Flow
-    for (m in 1:(n_movements-1)){
-        X[m, m + (n_movements-1)*2] <- flow[m]
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+        # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (sum(n.obs[0:(i-1)])+j)] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+        # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+        X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
     }
 
     # Multiply design matrix by beta vector to get movement probabilities
@@ -224,43 +223,43 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     # Get the beta vectors - will be different for each state
 
 # Mainstem, mouth to BON
-B_vec_1 <- c(b0_MB_BM, bflow_MB_BM, btemp_MB_BM, brear_MB_BM[rear], borigin_MB_BM[origin])
+B_vec_1 <- c(b0_MB_BM, bflow_MB_BM, btemp_MB_BM, brear_MB_BM[rear[i]], borigin_MB_BM[origin[i]])
 
 # Mainstem, BON to MCN
 B_vec_2 <- c(b0_BM_MB, b0_BM_MIP,  b0_BM_DES,  b0_BM_JDR,
              bflow_BM_MB, bflow_BM_MIP,  bflow_BM_DES,  bflow_BM_JDR,
              btemp_BM_MB, btemp_BM_MIP,  btemp_BM_DES,  btemp_BM_JDR,
-             brear_BM_MB[rear], brear_BM_MIP[rear],  brear_BM_DES[rear],  brear_BM_JDR[rear],
-             borigin_BM_MB[origin], borigin_BM_MIP[origin],  borigin_BM_DES[origin], borigin_BM_JDR[origin])
+             brear_BM_MB[rear[i]], brear_BM_MIP[rear[i]],  brear_BM_DES[rear[i]],  brear_BM_JDR[rear[i]],
+             borigin_BM_MB[origin[i]], borigin_BM_MIP[origin[i]],  borigin_BM_DES[origin[i]], borigin_BM_JDR[origin[i]])
 
 # Mainstem, MCN to ICH or PRA
 B_vec_3 <- c(b0_MIP_BM, b0_MIP_PR, b0_MIP_IL, b0_MIP_YAK,
              bflow_MIP_BM, bflow_MIP_PR, bflow_MIP_IL, bflow_MIP_YAK,
              btemp_MIP_BM, btemp_MIP_PR, btemp_MIP_IL, btemp_MIP_YAK,
-             brear_MIP_BM[rear], brear_MIP_PR[rear], brear_MIP_IL[rear], brear_MIP_YAK[rear],
-             borigin_MIP_BM[origin], borigin_MIP_PR[origin], borigin_MIP_IL[origin], borigin_MIP_YAK[origin])
+             brear_MIP_BM[rear[i]], brear_MIP_PR[rear[i]], brear_MIP_IL[rear[i]], brear_MIP_YAK[rear[i]],
+             borigin_MIP_BM[origin[i]], borigin_MIP_PR[origin[i]], borigin_MIP_IL[origin[i]], borigin_MIP_YAK[origin[i]])
 
 # Mainstem, PRA to RIS
-B_vec_4 <- c(b0_PR_MIP, bflow_PR_MIP, btemp_PR_MIP, brear_PR_MIP[rear], borigin_PR_MIP[origin])
+B_vec_4 <- c(b0_PR_MIP, bflow_PR_MIP, btemp_PR_MIP, brear_PR_MIP[rear[i]], borigin_PR_MIP[origin[i]])
 
 # Mainstem, ICH to LGR
 B_vec_5 <- c(b0_IL_MIP, b0_IL_TUC,
              bflow_IL_MIP, bflow_IL_TUC,
              btemp_IL_MIP, btemp_IL_TUC,
-             brear_IL_MIP[rear], brear_IL_TUC[rear],
-             borigin_IL_MIP[origin], borigin_IL_TUC[origin])
+             brear_IL_MIP[rear[i]], brear_IL_TUC[rear[i]],
+             borigin_IL_MIP[origin[i]], borigin_IL_TUC[origin[i]])
 
 # Deschutes River
-B_vec_6 <- c(b0_DES_BM, bflow_DES_BM, btemp_DES_BM, brear_DES_BM[rear], borigin_DES_BM[origin])
+B_vec_6 <- c(b0_DES_BM, bflow_DES_BM, btemp_DES_BM, brear_DES_BM[rear[i]], borigin_DES_BM[origin[i]])
 
 # John Day River
-B_vec_7 <- c(b0_JDR_BM, bflow_JDR_BM, btemp_JDR_BM, brear_JDR_BM[rear], borigin_JDR_BM[origin])
+B_vec_7 <- c(b0_JDR_BM, bflow_JDR_BM, btemp_JDR_BM, brear_JDR_BM[rear[i]], borigin_JDR_BM[origin[i]])
 
 # Yakima River
-B_vec_8 <- c(b0_YAK_MIP, bflow_YAK_MIP, btemp_YAK_MIP, brear_YAK_MIP[rear], borigin_YAK_MIP[origin])
+B_vec_8 <- c(b0_YAK_MIP, bflow_YAK_MIP, btemp_YAK_MIP, brear_YAK_MIP[rear[i]], borigin_YAK_MIP[origin[i]])
 
 # Tucannon River
-B_vec_9 <- c(b0_TUC_IL, bflow_TUC_IL, btemp_TUC_IL, brear_TUC_IL[rear], borigin_TUC_IL[origin])
+B_vec_9 <- c(b0_TUC_IL, bflow_TUC_IL, btemp_TUC_IL, brear_TUC_IL[rear[i]], borigin_TUC_IL[origin[i]])
 
 # Store beta vectors in a list
 # B_vec_list <- list(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5,
@@ -274,14 +273,15 @@ B_vec_lengths <- c(length(B_vec_1), length(B_vec_2), length(B_vec_3), length(B_v
 
 # Now, index to the current vector of betas
 # Basically what we're doing here is making sure we start and end with the length of the current vector
-B_vec_current <- B_vec_all[(sum(B_vec_lengths[1:cur_state])-B_vec_lengths[1]+1):sum(B_vec_lengths[1:cur_state])]
+B_vec_current <- B_vec_all[(sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[1]+1):sum(B_vec_lengths[1:states_mat[i,j]])]
   
 
-    # p <- X %*% B_vec_list[[cur_state]]
-    p <- X %*% B_vec_current
+    # p <- X %*% B_vec_list[[states_mat[i,j]]]
+    # p <- X %*% B_vec_current
 
     # Evaluate the multinomial likelihood for the counts of detection probabilities
-    y[,j,i] ~ dmulti(p, 1)
+    # Need to index to only the elements of the matrix that are applicable for this transition
+    y[,j,i] ~ dmulti(X[1:(possible_movements[states_mat[i,j]]-1),1:(possible_movements[states_mat[i,j]]-1)*5,(j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] %*% B_vec_current, 1)
   }
 
 }
@@ -452,112 +452,110 @@ B_vec_current <- B_vec_all[(sum(B_vec_lengths[1:cur_state])-B_vec_lengths[1]+1):
 
 }", fill=TRUE, file=here::here("simulation", "sim_model.txt"))
 
-
-##### Data #####
-data <- list(y = sim_data, fish_sim_cat_data = fish_sim_cat_data, temp_sim = temp_sim,
-             n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
-             flow_sim = flow_sim, states_mat = states_mat, cov_index_mat = cov_index_mat)
+##### RUN JAGS #####
+out.jags = jags(data, inits, parameters, model.file=here::here("simulation", "sim_model.txt"),
+                n.chains=3, n.iter=20000, n.burnin=5000, n.thin=1)
 
 ###### Initial values #####
 inits <- function(){list(
-                        # Mainstem, mouth to BON
-                        b0_MB_BM = runif(1, -1, 1),
-                         bflow_MB_BM = runif(1, -1, 1),
-                         btemp_MB_BM = runif(1, -1, 1),
-                           brear_MB_BM = runif(2, -1, 1),
-                           borigin_MB_BM = runif(3, -1, 1),
-
-                         # Mainstem, BON to MCN
-                         b0_BM_MB = runif(1, -1, 1),
-                         b0_BM_MIP = runif(1, -1, 1),
-                         b0_BM_DES = runif(1, -1, 1),
-                         b0_BM_JDR = runif(1, -1, 1),
-                         bflow_BM_MB = runif(1, -1, 1),
-                         bflow_BM_MIP = runif(1, -1, 1),
-                         bflow_BM_DES = runif(1, -1, 1),
-                         bflow_BM_JDR = runif(1, -1, 1),
-                         btemp_BM_MB = runif(1, -1, 1),
-                         btemp_BM_MIP = runif(1, -1, 1),
-                         btemp_BM_DES = runif(1, -1, 1),
-                         btemp_BM_JDR = runif(1, -1, 1),
-                           brear_BM_MB = runif(2, -1, 1),
-                               brear_BM_MIP = runif(2, -1, 1),
-                               brear_BM_DES = runif(2, -1, 1),
-                               brear_BM_JDR = runif(2, -1, 1),
-                               borigin_BM_MB = runif(3, -1, 1),
-                               borigin_BM_MIP = runif(3, -1, 1),
-                               borigin_BM_DES = runif(3, -1, 1),
-                               borigin_BM_JDR = runif(3, -1, 1),
-
-                             # Mainstem, MCN to ICH or PRA
-                             b0_MIP_BM = runif(1, -1, 1),
-                             b0_MIP_PR = runif(1, -1, 1),
-                             b0_MIP_IL = runif(1, -1, 1),
-                             b0_MIP_YAK = runif(1, -1, 1),
-                             bflow_MIP_BM = runif(1, -1, 1),
-                             bflow_MIP_PR = runif(1, -1, 1),
-                             bflow_MIP_IL = runif(1, -1, 1),
-                             bflow_MIP_YAK = runif(1, -1, 1),
-                             btemp_MIP_BM = runif(1, -1, 1),
-                             btemp_MIP_PR = runif(1, -1, 1),
-                             btemp_MIP_IL = runif(1, -1, 1),
-                             btemp_MIP_YAK = runif(1, -1, 1),
-                               brear_MIP_BM = runif(2, -1, 1),
-                               brear_MIP_PR = runif(2, -1, 1),
-                               brear_MIP_IL = runif(2, -1, 1),
-                               brear_MIP_YAK = runif(2, -1, 1),
-                               borigin_MIP_BM = runif(3, -1, 1),
-                               borigin_MIP_PR = runif(3, -1, 1),
-                               borigin_MIP_IL = runif(3, -1, 1),
-                               borigin_MIP_YAK = runif(3, -1, 1),
-
-                             # Mainstem, PRA to RIS
-                             b0_PR_MIP = runif(1, -1, 1),
-                             bflow_PR_MIP = runif(1, -1, 1),
-                             btemp_PR_MIP = runif(1, -1, 1),
-                               brear_PR_MIP = runif(2, -1, 1),
-                               borigin_PR_MIP = runif(3, -1, 1),
-
-                             # Mainstem, ICH to LGR
-                             b0_IL_MIP = runif(1, -1, 1),
-                             b0_IL_TUC = runif(1, -1, 1),
-                             bflow_IL_MIP = runif(1, -1, 1),
-                             bflow_IL_TUC = runif(1, -1, 1),
-                             btemp_IL_MIP = runif(1, -1, 1),
-                             btemp_IL_TUC = runif(1, -1, 1),
-                               brear_IL_MIP = runif(2, -1, 1),
-                               brear_IL_TUC = runif(2, -1, 1),
-                               borigin_IL_MIP = runif(3, -1, 1),
-                               borigin_IL_TUC = runif(3, -1, 1),
-
-                             # Deschutes River
-                             b0_DES_BM = runif(1, -1, 1),
-                             bflow_DES_BM = runif(1, -1, 1),
-                             btemp_DES_BM = runif(1, -1, 1),
-                               brear_DES_BM = runif(2, -1, 1),
-                               borigin_DES_BM = runif(3, -1, 1),
-
-                             # John Day River
-                             b0_JDR_BM = runif(1, -1, 1),
-                             bflow_JDR_BM = runif(1, -1, 1),
-                             btemp_JDR_BM = runif(1, -1, 1),
-                               brear_JDR_BM = runif(2, -1, 1),
-                               borigin_JDR_BM = runif(3, -1, 1),
-
-                             # Yakima River
-                             b0_YAK_MIP = runif(1, -1, 1),
-                             bflow_YAK_MIP = runif(1, -1, 1),
-                             btemp_YAK_MIP = runif(1, -1, 1),
-                               brear_YAK_MIP = runif(2, -1, 1),
-                               borigin_YAK_MIP = runif(3, -1, 1),
-
-                             # Tucannon River
-                             b0_TUC_IL = runif(1, -1, 1),
-                             bflow_TUC_IL = runif(1, -1, 1),
-                             btemp_TUC_IL = runif(1, -1, 1),
-                              brear_TUC_IL = runif(2, -1, 1),
-                              borigin_TUC_IL = runif(3, -1, 1)
-                             )}
+  # Mainstem, mouth to BON
+  b0_MB_BM = runif(1, -1, 1),
+  bflow_MB_BM = runif(1, -1, 1),
+  btemp_MB_BM = runif(1, -1, 1),
+  brear_MB_BM = runif(2, -1, 1),
+  borigin_MB_BM = runif(3, -1, 1),
+  
+  # Mainstem, BON to MCN
+  b0_BM_MB = runif(1, -1, 1),
+  b0_BM_MIP = runif(1, -1, 1),
+  b0_BM_DES = runif(1, -1, 1),
+  b0_BM_JDR = runif(1, -1, 1),
+  bflow_BM_MB = runif(1, -1, 1),
+  bflow_BM_MIP = runif(1, -1, 1),
+  bflow_BM_DES = runif(1, -1, 1),
+  bflow_BM_JDR = runif(1, -1, 1),
+  btemp_BM_MB = runif(1, -1, 1),
+  btemp_BM_MIP = runif(1, -1, 1),
+  btemp_BM_DES = runif(1, -1, 1),
+  btemp_BM_JDR = runif(1, -1, 1),
+  brear_BM_MB = runif(2, -1, 1),
+  brear_BM_MIP = runif(2, -1, 1),
+  brear_BM_DES = runif(2, -1, 1),
+  brear_BM_JDR = runif(2, -1, 1),
+  borigin_BM_MB = runif(3, -1, 1),
+  borigin_BM_MIP = runif(3, -1, 1),
+  borigin_BM_DES = runif(3, -1, 1),
+  borigin_BM_JDR = runif(3, -1, 1),
+  
+  # Mainstem, MCN to ICH or PRA
+  b0_MIP_BM = runif(1, -1, 1),
+  b0_MIP_PR = runif(1, -1, 1),
+  b0_MIP_IL = runif(1, -1, 1),
+  b0_MIP_YAK = runif(1, -1, 1),
+  bflow_MIP_BM = runif(1, -1, 1),
+  bflow_MIP_PR = runif(1, -1, 1),
+  bflow_MIP_IL = runif(1, -1, 1),
+  bflow_MIP_YAK = runif(1, -1, 1),
+  btemp_MIP_BM = runif(1, -1, 1),
+  btemp_MIP_PR = runif(1, -1, 1),
+  btemp_MIP_IL = runif(1, -1, 1),
+  btemp_MIP_YAK = runif(1, -1, 1),
+  brear_MIP_BM = runif(2, -1, 1),
+  brear_MIP_PR = runif(2, -1, 1),
+  brear_MIP_IL = runif(2, -1, 1),
+  brear_MIP_YAK = runif(2, -1, 1),
+  borigin_MIP_BM = runif(3, -1, 1),
+  borigin_MIP_PR = runif(3, -1, 1),
+  borigin_MIP_IL = runif(3, -1, 1),
+  borigin_MIP_YAK = runif(3, -1, 1),
+  
+  # Mainstem, PRA to RIS
+  b0_PR_MIP = runif(1, -1, 1),
+  bflow_PR_MIP = runif(1, -1, 1),
+  btemp_PR_MIP = runif(1, -1, 1),
+  brear_PR_MIP = runif(2, -1, 1),
+  borigin_PR_MIP = runif(3, -1, 1),
+  
+  # Mainstem, ICH to LGR
+  b0_IL_MIP = runif(1, -1, 1),
+  b0_IL_TUC = runif(1, -1, 1),
+  bflow_IL_MIP = runif(1, -1, 1),
+  bflow_IL_TUC = runif(1, -1, 1),
+  btemp_IL_MIP = runif(1, -1, 1),
+  btemp_IL_TUC = runif(1, -1, 1),
+  brear_IL_MIP = runif(2, -1, 1),
+  brear_IL_TUC = runif(2, -1, 1),
+  borigin_IL_MIP = runif(3, -1, 1),
+  borigin_IL_TUC = runif(3, -1, 1),
+  
+  # Deschutes River
+  b0_DES_BM = runif(1, -1, 1),
+  bflow_DES_BM = runif(1, -1, 1),
+  btemp_DES_BM = runif(1, -1, 1),
+  brear_DES_BM = runif(2, -1, 1),
+  borigin_DES_BM = runif(3, -1, 1),
+  
+  # John Day River
+  b0_JDR_BM = runif(1, -1, 1),
+  bflow_JDR_BM = runif(1, -1, 1),
+  btemp_JDR_BM = runif(1, -1, 1),
+  brear_JDR_BM = runif(2, -1, 1),
+  borigin_JDR_BM = runif(3, -1, 1),
+  
+  # Yakima River
+  b0_YAK_MIP = runif(1, -1, 1),
+  bflow_YAK_MIP = runif(1, -1, 1),
+  btemp_YAK_MIP = runif(1, -1, 1),
+  brear_YAK_MIP = runif(2, -1, 1),
+  borigin_YAK_MIP = runif(3, -1, 1),
+  
+  # Tucannon River
+  b0_TUC_IL = runif(1, -1, 1),
+  bflow_TUC_IL = runif(1, -1, 1),
+  btemp_TUC_IL = runif(1, -1, 1),
+  brear_TUC_IL = runif(2, -1, 1),
+  borigin_TUC_IL = runif(3, -1, 1)
+)}
 
 ###### Parameters monitored #####
 parameters <- c(
@@ -567,7 +565,7 @@ parameters <- c(
   "btemp_MB_BM",
   "brear_MB_BM",
   "borigin_MB_BM",
-
+  
   # Mainstem, BON to MCN
   "b0_BM_MB",
   "b0_BM_MIP",
@@ -589,7 +587,7 @@ parameters <- c(
   "borigin_BM_MIP",
   "borigin_BM_DES",
   "borigin_BM_JDR",
-
+  
   # Mainstem, MCN to ICH or PRA
   "b0_MIP_BM",
   "b0_MIP_PR",
@@ -611,14 +609,14 @@ parameters <- c(
   "borigin_MIP_PR",
   "borigin_MIP_IL",
   "borigin_MIP_YAK",
-
+  
   # Mainstem, PRA to RIS
   "b0_PR_MIP",
   "bflow_PR_MIP",
   "btemp_PR_MIP",
   "brear_PR_MIP",
   "borigin_PR_MIP",
-
+  
   # Mainstem, ICH to LGR
   "b0_IL_MIP",
   "b0_IL_TUC",
@@ -630,28 +628,28 @@ parameters <- c(
   "brear_IL_TUC",
   "borigin_IL_MIP",
   "borigin_IL_TUC",
-
+  
   # Deschutes River
   "b0_DES_BM",
   "bflow_DES_BM",
   "btemp_DES_BM",
   "brear_DES_BM",
   "borigin_DES_BM",
-
+  
   # John Day River
   "b0_JDR_BM",
   "bflow_JDR_BM",
   "btemp_JDR_BM",
   "brear_JDR_BM",
   "borigin_JDR_BM",
-
+  
   # Yakima River
   "b0_YAK_MIP",
   "bflow_YAK_MIP",
   "btemp_YAK_MIP",
   "brear_YAK_MIP",
   "borigin_YAK_MIP",
-
+  
   # Tucannon River
   "b0_TUC_IL",
   "bflow_TUC_IL",
@@ -660,8 +658,20 @@ parameters <- c(
   "borigin_TUC_IL"
 )
 
-##### RUN JAGS #####
-out.jags = jags(data, inits, parameters, model.file=here::here("simulation", "sim_model.txt"),
-                n.chains=3, n.iter=20000, n.burnin=5000, n.thin=1)
+
+##### Data #####
+
+# We need to pass an array containing the design matrices (or at least the dimensions of them) as data
+design_matrix_array <- array(0, dim = c(4,20,(sum(n.obs))))
+# These are then going to subindexed in the JAGS code so that they have the right dimensions for multiplying by beta vector
+
+
+data <- list(y = sim_data, temp_sim = temp_sim,
+             n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+             flow_sim = flow_sim, states_mat = states_mat, cov_index_mat = cov_index_mat,
+             origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], dates = dates,
+             X = design_matrix_array)
+
+
 
 # out.jags$summary
