@@ -211,53 +211,6 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     # Get number of possible movements
     # n_movements <- possible_movements[states_mat[i,j]]
 
-    # index the covariate data
-    # temps <- as.numeric(temp_sim[dates[i,j],])
-    # flows <- as.numeric(flow_sim[dates[i,j],])
-    # temps <- temp_sim[dates[i,j],]
-    # flows <- flow_sim[dates[i,j],]
-
-    # Get the temperature values for this state
-    # temp[] <- vector(length = (possible_movements[states_mat[i,j]] - 1))
-    # for (m in 1:(possible_movements[states_mat[i,j]]-1)){
-    #   temp[m] <- temp_sim[dates[i,j],][cov_index_mat[states_mat[i,j],m]]
-    # }
-
-
-    # Get the flow values for this state
-    # flow <- vector(length = (possible_movements[states_mat[i,j]] - 1))
-    # for (m in 1:(possible_movements[states_mat[i,j]]-1)){
-    #   flow[m] <- flows[flow_sim[dates[i,j],][cov_index_mat[states_mat[i,j],m]]]
-    # }
-
-
-    # Create a design matrix for number of possible movements
-    # X <- matrix(0, nrow = (possible_movements[states_mat[i,j]] - 1), ncol = (possible_movements[states_mat[i,j]] - 1) * 5)
-
-    # Populate the matrix
-    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
-      for (k in 1:5){
-        # X[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- 1
-        X[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- 1
-      }
-
-    }
-
-    # Populate the temperature and flow elements of the matrix with the covariate values
-
-    # Temperature
-    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
-        # X[m, (m + (possible_movements[states_mat[i,j]]-1)), (sum(n.obs[0:(i-1)])+j)] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-        # X[m, (m + (possible_movements[states_mat[i,j]]-1)), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-        X[m, (m + (possible_movements[states_mat[i,j]]-1)), (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-    }
-
-    # Flow
-    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
-        # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (sum(n.obs[0:(i-1)])+j)] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-        # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-        X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
-    }
 
     # Multiply design matrix by beta vector to get movement probabilities
 
@@ -310,11 +263,11 @@ B_vec_9 <- c(b0_TUC_IL, bflow_TUC_IL, btemp_TUC_IL, brear_TUC_IL[rear[i]], borig
 # Store all beta vectors as one big vector
 B_vec_all <- c(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5, B_vec_6, B_vec_7, B_vec_8, B_vec_9)
 # Get lengths of each individual vector and store
-B_vec_lengths <- c(length(B_vec_1), length(B_vec_2), length(B_vec_3), length(B_vec_4), length(B_vec_5), length(B_vec_6), length(B_vec_7), length(B_vec_8), length(B_vec_9))
+# B_vec_lengths <- c(length(B_vec_1), length(B_vec_2), length(B_vec_3), length(B_vec_4), length(B_vec_5), length(B_vec_6), length(B_vec_7), length(B_vec_8), length(B_vec_9))
 
 # Now, index to the current vector of betas
 # Basically what we're doing here is making sure we start and end with the length of the current vector
-B_vec_current <- B_vec_all[(sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[1]+1):sum(B_vec_lengths[1:states_mat[i,j]])]
+# B_vec_current <- B_vec_all[((sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[states_mat[i,j]]+1):sum(B_vec_lengths[1:states_mat[i,j]]))[(sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[states_mat[i,j]]+1):sum(B_vec_lengths[1:states_mat[i,j]]) > 0]]
   
 
     # p <- X %*% B_vec_list[[states_mat[i,j]]]
@@ -322,7 +275,8 @@ B_vec_current <- B_vec_all[(sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[
 
     # Evaluate the multinomial likelihood for the counts of detection probabilities
     # Need to index to only the elements of the matrix that are applicable for this transition
-    y[,j,i] ~ dmulti(X[1:(possible_movements[states_mat[i,j]]-1),1:(possible_movements[states_mat[i,j]]-1)*5,(j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] %*% B_vec_current, 1)
+    # y[,j,i] ~ dmulti(X[1:(possible_movements[states_mat[i,j]]-1),1:((possible_movements[states_mat[i,j]]-1)*5),(j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] %*% B_vec_all[((sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[states_mat[i,j]]+1):sum(B_vec_lengths[1:states_mat[i,j]]))[(sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[states_mat[i,j]]+1):sum(B_vec_lengths[1:states_mat[i,j]]) > 0]], 1)
+    # y[,j,i] ~ dmulti(X[1:(possible_movements[states_mat[i,j]]-1),1:((possible_movements[states_mat[i,j]]-1)*5),(j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] %*% B_vec_all[((sum(B_vec_lengths[1:states_mat[i,j]])-B_vec_lengths[states_mat[i,j]]+1):sum(B_vec_lengths[1:states_mat[i,j]]))[]], 1)
   }
 
 }
@@ -706,12 +660,46 @@ parameters <- c(
 design_matrix_array <- array(0, dim = c(4,20,(sum(n.obs))))
 # These are then going to subindexed in the JAGS code so that they have the right dimensions for multiplying by beta vector
 
+# Fill in the covariate values for each state
+# I think we have to do this outside of JAGS - see this discussion post: https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/357cc9b2/
 
-data <- list(y = sim_data, temp_sim = temp_sim,
-             n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
-             flow_sim = flow_sim, states_mat = states_mat, cov_index_mat = cov_index_mat,
-             origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], dates = dates,
-             X = design_matrix_array)
+# Populate the design matrix array
+for (i in 1:n.ind){
+  for (j in 1:n.obs[i]){
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+      for (k in 1:5){
+        # X[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- 1
+        design_matrix_array[m, (k-1)*(possible_movements[states_mat[i,j]]-1) + m, (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- 1
+        
+        
+      }
+    }
+    
+    # Populate the temperature and flow elements of the matrix with the covariate values
+    
+    # Temperature
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+      # X[m, (m + (possible_movements[states_mat[i,j]]-1)), (sum(n.obs[0:(i-1)])+j)] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+      # X[m, (m + (possible_movements[states_mat[i,j]]-1)), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+      design_matrix_array[m, (m + (possible_movements[states_mat[i,j]]-1)), (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- temp_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+    }
+    
+    # Flow
+    for (m in 1:(possible_movements[states_mat[i,j]]-1)){
+      # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (sum(n.obs[0:(i-1)])+j)] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+      # X[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:(i-1)]),0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+      design_matrix_array[m, (m + (possible_movements[states_mat[i,j]]-1)*2), (j + ifelse(i > 1, sum(n.obs[1:i])-n.obs[i],0))] <- flow_sim[dates[i,j],cov_index_mat[states_mat[i,j],m]]
+    }
+  }
+}
+
+
+
+
+
+data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+             states_mat = states_mat, origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], 
+             X = design_matrix_array, B_vec_lengths = c(5, 20, 20, 5, 10, 5, 5, 5, 5))
 
 
 
