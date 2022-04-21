@@ -313,7 +313,7 @@ for (i in 1:nfish){ # for each fish
       
       # BON to MCN to MCN to ICH or PRA transition
       b0_BM_MIP <- 1
-      bflow_BM_MIP <- 0 # 
+      bflow_BM_MIP <- 0 # No relationship with flows
       btemp_BM_MIP <- 0.5 # When it's hotter, more likely to go upstream
       brear_BM_MIP <- c(0,0) # No relationship with rear type
       borigin_BM_MIP <- c(0.5, 2, 2) # JDR fish have lower probability of overshooting MCN than the fish from origins upstream of MCN
@@ -588,7 +588,8 @@ write.csv(fish_sim_cat_data, here::here("simulation", "origin_rear_600.csv"), ro
 
 # Start them all with equal probabilities
 
-b0_BM_MB <- 1
+# BON to MCN to Mouth to BON transition
+b0_BM_MB <- 1.2
 bflow_BM_MB <- 0
 # btemp_BM_MB <- 5
 btemp_BM_MB <- 0
@@ -688,7 +689,9 @@ probs_df_long$b0_BM_JDR <- rep(seq(-10, 10, 0.1), 5)
 
 ggplot(probs_df_long, aes(x = b0_BM_JDR, y = prob, color = state)) +
   geom_point() +
-  scale_color_tableau(palette = "Tableau 10")
+  scale_color_tableau(palette = "Tableau 10") +
+  labs(color = "Next State") + 
+  ggtitle("Movement probabilities vs. intercept values")
 
 
 ### What if you did two intercepts at the same time?
