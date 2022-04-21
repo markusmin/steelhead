@@ -691,6 +691,8 @@ ggplot(probs_df_long, aes(x = b0_BM_JDR, y = prob, color = state)) +
   geom_point() +
   scale_color_tableau(palette = "Tableau 10") +
   labs(color = "Next State") + 
+  theme(axis.text = element_text(size = 15),
+        axis.title =element_text(size = 20))
   ggtitle("Movement probabilities vs. intercept values")
 
 
