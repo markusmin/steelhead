@@ -98,7 +98,7 @@ for (i in 1:n.ind){
 
 # Store with the states
 for (i in 1:n.ind){
-  for (j in 1:(n.obs[i]-1)){
+  for (j in 1:(n.obs[i])){
     # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
     states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
   }
@@ -107,7 +107,7 @@ for (i in 1:n.ind){
 # Turn into matrix for JAGS
 states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
 for (i in 1:n.ind){
-  states_mat[i,1:(n.obs[i]-1)] <- states_list[[i]]
+  states_mat[i,1:(n.obs[i])] <- states_list[[i]]
 }
 
 
@@ -447,9 +447,6 @@ B_vec_all <- c(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5, B_vec_6, B_vec_7, B_
 
 }", fill=TRUE, file=here::here("simulation", "sim_model.txt"))
 
-##### RUN JAGS #####
-out.jags = jags(data, inits, parameters, model.file=here::here("simulation", "sim_model.txt"),
-                n.chains=3, n.iter=20000, n.burnin=5000, n.thin=1)
 
 ###### Initial values #####
 inits <- function(){list(
@@ -694,7 +691,8 @@ for (i in 1:n.ind){
 }
 
 
-
+# For presentation
+dput(design_matrix_array[,,1])
 
 
 data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
@@ -702,5 +700,8 @@ data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = pos
              X = design_matrix_array, B_vec_lengths = c(5, 20, 20, 5, 10, 5, 5, 5, 5))
 
 
+##### RUN JAGS #####
+out.jags = jags(data, inits, parameters, model.file=here::here("simulation", "sim_model.txt"),
+                n.chains=3, n.iter=20000, n.burnin=5000, n.thin=1)
 
 # out.jags$summary
