@@ -1,0 +1,192 @@
+---
+title: "Steelhead Overshoot Update"
+author: "Markus Min"
+date: "4/21/2022"
+output:
+  ioslides_presentation: default
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+```{r load_reformat_data, echo = FALSE, message = FALSE}
+sim_data <- readRDS(here::here("simulation", "sim_600_array.rds"))
+```
+
+
+# Simulation study
+
+
+## Simulation study diagram
+![](.//figures/simulation_model_diagram.png){width=100%}
+
+
+## Covariates included
+- Two continuous covariates:
+  - Temperature
+  - Flow
+- Two categorical covariates:
+  - Rear type
+  - Natal origin
+  
+  
+## Multinomial logit revisited
+### For each movement probability:
+
+<br/>
+
+Numerator:
+$$
+\begin{aligned}
+ \small \psi_{12}=  \exp(\beta_{0,12} + \beta_{temp,12} * temp + \beta_{flow,12} * flow + \\
+  \beta_{rear,12}[rear] + \beta_{origin,12}[origin]) \\
+\end{aligned}
+$$
+Denominator:
+$$
+\begin{aligned}
+ 1 + \psi_{12} + \psi_{13} + \psi_{14}... 
+\end{aligned}
+$$
+Loss = 1 - $\Sigma$ (all other movements)
+
+## BON to MCN example
+![](.//figures/simulation_model_diagram_1state.png){width=100%}
+
+## Multinomial logit revisited
+### For each movement probability:
+
+<br/>
+
+Numerator:
+$$
+\begin{aligned}
+ \small \psi_{BM-JDR}=  \exp(\beta_{0,BM-JDR} + \beta_{temp,BM-JDR} * temp + \\
+  \beta_{flow,BM-JDR} * flow + \beta_{rear,BM-JDR}[rear] + \\
+  \beta_{origin,BM-JDR}[origin]) \\
+\end{aligned}
+$$
+Denominator:
+$$
+\begin{aligned}
+ 1 + \psi_{BM-JDR} + \psi_{BM-DES} + \psi_{BM-MIP} + \psi_{BM-MB}
+\end{aligned}
+$$
+*BM-loss* = 1 - $\Sigma$ (all other movements)
+
+## Behavior of multinomial logit
+![](.//figures/mlogit_example.png){width=100%}
+
+
+## Simulation code
+```{r eval = FALSE}
+# (BON to MCN) to (MCN to ICH or PRA) transition
+b0_BM_MIP <- 1
+bflow_BM_MIP <- 0 # No relationship with flow
+btemp_BM_MIP <- 0.5 # When it's hotter, more likely to go upstream
+brear_BM_MIP <- c(0,0) # c(hatchery, wild)
+borigin_BM_MIP <- c(0.5, 2, 2) # c(JDR, YAK, TUC) 
+# JDR fish less likely to overshoot MCN
+
+# Evaluate numerator of multinomial logit
+phi_BM_MIP <- exp(b0_BM_MIP + btemp_BM_MIP*temp_MCN + 
+              bflow_BM_MIP*flow_MCN + brear_BM_MIP[rear] + 
+              borigin_BM_MIP[origin])
+```
+
+
+
+## Example data
+
+600 simulated detection histories:
+
+```{r echo = FALSE}
+sim_data[,1:5,13]
+```
+
+
+
+# Current approach to JAGS code (which isn't working yet)
+
+## Using a design matrix
+
+- For each individual state transition, create a matrix $\mathbf{X}$ that contains 1s (in the case of intercepts, $\beta_0$, or $\beta$ values that are not multiplied by a covariate value, e.g., origin and rear type) and covariate values
+- Multiply $\mathbf{X}$ by a vector $\mathbf{B}$ to get the equation for each $\psi$
+
+- Note: There is one $\mathbf{B}$ vector for each state (total of 9 in our simulated dataset); there is one $\mathbf{X}$ for each individual transition
+  - In the simulated dataset of 600 fish, we have about 3,000 individual trans  itions; in the full dataset it's about 200,000
+
+## Matrix setup
+
+```{r echo = FALSE}
+X <- structure(c(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0.0864447870789531, 
+0, 0, 0, 0, 0.0864447870789531, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+0.0864447870789531, 0, 0, 0, 0, 0.086444787078953, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1), .Dim = c(4L, 
+20L))
+
+```
+
+
+
+$$
+ \underbrace{\begin{bmatrix}
+\psi_{12} \\
+\psi_{13} \\
+\psi_{14} \\
+\psi_{15}
+\end{bmatrix}}_{\mathbf{\psi}}
+=
+ \underbrace{\begin{bmatrix}
+1 & 0 & 0 & 0 & t_1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & t_2 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & t_3 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & t_4
+\end{bmatrix}}_{\mathbf{X} (\text{data})}
+\underbrace{\begin{bmatrix}
+\beta_{0,1} \\ \vdots \\ \beta_{0,4} \\ \beta_{t,1} \\ \vdots \\ \beta_{t,4}
+\end{bmatrix}}_{\mathbf{B} (\text{JAGS})}
+$$
+One row for each possible movement (except loss).
+
+Additional columns are added for each covariate.
+
+## Matrix setup
+
+This gives you a column vector $\mathbf{\psi}$ which corresponds to the numerators of the each of the movement probabilities except loss.
+
+Exponentiating this $\mathbf{\psi}$ vector and dividing this vector by the scalar $(1 + \Sigma(exp(\mathbf{\psi}))$ gives you a vector of the non-loss movement probabilities.
+
+$$
+\frac{exp(\mathbf{\psi})}{1 + \Sigma(exp(\mathbf{\psi}))}
+$$
+
+Loss is then 1 - the sum of this vector.
+
+<br/>
+
+## Evaluating in JAGS
+These different movement probabilities are then summarized into a single vector, which can then be evaluated in JAGS using dmulti():
+
+$$
+p =  c(\frac{exp(\mathbf{\psi})}{1 + \Sigma(exp(\mathbf{\psi}))}, loss)
+$$
+
+<br/>
+
+```{r eval = FALSE}
+y[,i,j] <- dmulti(p, 1)
+```
+
+
+
+
+
+
+
