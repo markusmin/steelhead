@@ -140,7 +140,7 @@ B_vec_all <- c(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5, B_vec_6, B_vec_7, B_
   bflow_MIP_BM ~ dnorm(0,0.001)
   bflow_MIP_PR ~ dnorm(0,0.001)
   bflow_MIP_IL ~ dnorm(0,0.001)
-  bflow_MIP_YAK ~ dnorm(0,0.001)
+  bflow_MIP_YAK <- 0
   btemp_MIP_BM ~ dnorm(0,0.001)
   btemp_MIP_PR ~ dnorm(0,0.001)
   btemp_MIP_IL ~ dnorm(0,0.001)
