@@ -8,6 +8,7 @@ library(lubridate)
 library(janitor)
 library(rjags)
 library(jagsUI)
+library(R2jags)
 
 # Load data to fit model to
 sim_data <- readRDS(here::here("simulation", "sim_600_array.rds"))
@@ -121,7 +122,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))))) ,1)
   
   # JAGS won't let you exponentiate a vector (BOO!!) so we'll have to write out each possible transition separately
-    ~ dmulti(c(
+  y[,j+1,i] ~ dmulti(c(
   # State 1
   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
@@ -662,7 +663,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
   brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9]))))
-  ))
+  ), 1)
   }
 
 }
@@ -825,53 +826,263 @@ data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = pos
              n_notmovements = n_notmovements)
 
 ###### Initial values #####
-# Loop through all of the non-zero values in each matrix
-# inits <- function(){
-#   for (i in 1:length(model_terms)){
-#     mat <- eval(parse(text = paste0(model_terms[i], "_matrix")))
-#     for (j in 1:dim(movements)[1]){
-#       mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-#     }
-#     assign(paste0(model_terms[i],"_matrix"), mat)
-#   }
-# }
+
+b0_matrix_init_1 <- matrix(0, nrow = 10, ncol = 9)
+b0_matrix_init_2 <- matrix(0, nrow = 10, ncol = 9)
+b0_matrix_init_3 <- matrix(0, nrow = 10, ncol = 9)
+for (j in 1:dim(movements)[1]){
+  b0_matrix_init_1[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  b0_matrix_init_2[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  b0_matrix_init_3[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+}
+
+btemp_matrix_init_1 <- matrix(0, nrow = 10, ncol = 9)
+btemp_matrix_init_2 <- matrix(0, nrow = 10, ncol = 9)
+btemp_matrix_init_3 <- matrix(0, nrow = 10, ncol = 9)
+for (j in 1:dim(movements)[1]){
+  btemp_matrix_init_1[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  btemp_matrix_init_2[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  btemp_matrix_init_3[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+}
+
+bflow_matrix_init_1 <- matrix(0, nrow = 10, ncol = 9)
+bflow_matrix_init_2 <- matrix(0, nrow = 10, ncol = 9)
+bflow_matrix_init_3 <- matrix(0, nrow = 10, ncol = 9)
+for (j in 1:dim(movements)[1]){
+  bflow_matrix_init_1[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  bflow_matrix_init_2[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  bflow_matrix_init_3[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+}
+
+brear_matrix_init_1 <- matrix(0, nrow = 10, ncol = 9)
+brear_matrix_init_2 <- matrix(0, nrow = 10, ncol = 9)
+brear_matrix_init_3 <- matrix(0, nrow = 10, ncol = 9)
+for (j in 1:dim(movements)[1]){
+  brear_matrix_init_1[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  brear_matrix_init_2[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  brear_matrix_init_3[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+}
+
+borigin_matrix_init_1 <- matrix(0, nrow = 10, ncol = 9)
+borigin_matrix_init_2 <- matrix(0, nrow = 10, ncol = 9)
+borigin_matrix_init_3 <- matrix(0, nrow = 10, ncol = 9)
+for (j in 1:dim(movements)[1]){
+  borigin_matrix_init_1[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  borigin_matrix_init_2[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+  borigin_matrix_init_3[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+}
+
+
+# inits <- list(
+#   b0_matrix = c(b0_matrix_init_1, b0_matrix_init_2, b0_matrix_init_3),
+#   bflow_matrix = c(bflow_matrix_init_1, bflow_matrix_init_2, bflow_matrix_init_3),
+#   btemp_matrix = c(btemp_matrix_init_1, btemp_matrix_init_2, btemp_matrix_init_3),
+#   borigin_matrix = c(borigin_matrix_init_1, borigin_matrix_init_2, borigin_matrix_init_3),
+#   brear_matrix = c(brear_matrix_init_1, brear_matrix_init_2, brear_matrix_init_3)
+# )
+
+inits <- list(
+  b0_matrix = b0_matrix_init_1, 
+  bflow_matrix = bflow_matrix_init_1,
+  btemp_matrix = btemp_matrix_init_1,
+  borigin_matrix = borigin_matrix_init_1,
+  brear_matrix = brear_matrix_init_1
+)
+
+
+
+##### RUN JAGS - covariates #####
+# out.jags = jags(data, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
+#                 n.chains=1, n.iter=20000, n.burnin=5000, n.thin=1)
+# mod_1 <- out.jags
+# mod_1_sum <- out.jags$summary
+
+
+##### RUN JAGS - no covariates #####
+
+# Load data to fit model to
+sim_data <- readRDS(here::here("simulation", "sim_600_nocov_array.rds"))
+sim_data_list <- readRDS(here::here("simulation", "sim_600_nocov_list.rds"))
+
+dates <- as.matrix(readRDS(here::here("simulation", "dates_600_nocov_matrix.rds")))
+# Dates are numbers, with 2017-01-01 = 1
+
+# Read in covariates
+temp_sim <- as.matrix(read.csv(here::here("simulation", "temp_600.csv"), row.names = 1))
+flow_sim <- as.matrix(read.csv(here::here("simulation", "flow_600.csv"), row.names = 1))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_600.csv")))
+
+# Store quantities for loop
+# Store the total number of individuals
+n.ind <- length(sim_data_list)
+
+# Store the number of observations per individual
+# -1 because the last state is loss, which isn't actually an observation
+n.obs <- unlist(lapply(sim_data_list, ncol)) - 1
+
+# Get number of possible movements from each site
+possible_movements <- c("mainstem, mouth to BON" = 2,
+                        "mainstem, BON to MCN" = 5,
+                        "mainstem, MCN to ICH or PRA" = 5,
+                        "mainstem, PRA to RIS" = 2,
+                        "mainstem, ICH to LGR" = 3,
+                        "Deschutes River" = 2,
+                        "John Day River" = 2,
+                        "Tucannon River" = 2,
+                        "Yakima River" = 2,
+                        "loss" = 0)
+
+possible_movements <- c(2,5,5,2,3,2,2,2,2,0)
+
+# Indexing covariate data
+cov_index_mat <- matrix(data = c(1, NA, NA, NA,
+                                 1, 2, 6, 5,
+                                 2, 3, 4, 7,
+                                 3, NA, NA, NA,
+                                 4, 8, NA, NA,
+                                 6, NA, NA, NA,
+                                 5, NA, NA, NA,
+                                 7, NA, NA, NA,
+                                 8, NA, NA, NA), 
+                        ncol = 4, nrow = 9, byrow = TRUE)
+
+# For temperature, there is only one temperature per state
+# The issue arises again with the branching MCN to ICH or PRA state - which temperature do we choose?
+# For now, let's use MCN, since it's a combination of both
+# states = same order as possible_movements
+temp_index <- c(1, 2, 2, 3, 4, 6, 5, 8, 7)
+
+# Index flow - one flow for state for now, for simplicity
+flow_index <- c(1, 2, 2, 3, 4, 6, 5, 8, 7)
+# Note that in the simulation, the relationships are currently different, so we'll have to fix that
+
+# Get the state that each fish was in at each n.obs
+
+# First initialize an empty list
+states_list <- list()
+
+for (i in 1:n.ind){
+  vec <- vector(length = (n.obs[i]-1))
+  
+  # Store in list
+  states_list[[i]] <- vec
+}
+
+# Store with the states
+for (i in 1:n.ind){
+  for (j in 1:(n.obs[i])){
+    # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+    states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+  }
+}
+
+# Turn into matrix for JAGS
+states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+for (i in 1:n.ind){
+  states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+}
+
+
+# Get the indices that are 1s (except loss, since that's 1 minus the others)
+movements <- which(transition_matrix[,1:9] == 1, arr.ind = TRUE)
+nmovements <- dim(movements)[1]
+# Now get all of the movements which are fixed to zero
+not_movements <- which(transition_matrix[,1:9] == 0, arr.ind = TRUE)
+n_notmovements <- dim(not_movements)[1]
+
+data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+             states_mat = states_mat, origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], 
+             movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+             nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+             n_notmovements = n_notmovements)
+
+###### Initial values
+# Create emtpy array
+inits <- function(){
+  b0_matrix <- array(0, dim = c(10, 9,3))
+  btemp_matrix <- array(0, dim = c(10, 9,3))
+  bflow_matrix <- array(0, dim = c(10, 9,3))
+  brear_matrix <- array(0, dim = c(10, 9,3))
+  borigin_matrix <- array(0, dim = c(10, 9,3))
+  
+  for (i in 1:3){
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2], i] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2], i] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2], i] <- runif(1,-1,1)
+      brear_matrix[movements[j,1], movements[j,2], i] <- runif(1,-1,1)
+      borigin_matrix[movements[j,1], movements[j,2], i] <- runif(1,-1,1)
+    }
+  }
+
+  return(list(
+    b0_matrix = b0_matrix,
+    btemp_matrix = btemp_matrix,
+    bflow_matrix = bflow_matrix,
+    brear_matrix = brear_matrix,
+    borigin_matrix = borigin_matrix
+  ))
+}
 
 inits <- function(){
-  mat <- matrix(0, nrow = 10, ncol = 9)
-  for (j in 1:dim(movements)[1]){
-    mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-  }
-  b0_matrix = mat
+  b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  btemp_matrix <- matrix(0, nrow = 10, ncol = 9)
+  bflow_matrix <- matrix(0, nrow = 10, ncol = 9)
+  brear_matrix <- matrix(0, nrow = 10, ncol = 9)
+  borigin_matrix <- matrix(0, nrow = 10, ncol = 9)
   
-  mat <- matrix(0, nrow = 10, ncol = 9)
-  for (j in 1:dim(movements)[1]){
-    mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-  }
-  bflow_matrix = mat
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      borigin_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
   
-  mat <- matrix(0, nrow = 10, ncol = 9)
-  for (j in 1:dim(movements)[1]){
-    mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-  }
-  btemp_matrix = mat
-  
-  mat <- matrix(0, nrow = 10, ncol = 9)
-  for (j in 1:dim(movements)[1]){
-    mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-  }
-  brear_matrix = mat
-  
-  mat <- matrix(0, nrow = 10, ncol = 9)
-  for (j in 1:dim(movements)[1]){
-    mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-  }
-  borigin_matrix = mat
+  return(list(
+    b0_matrix = b0_matrix,
+    btemp_matrix = btemp_matrix,
+    bflow_matrix = bflow_matrix,
+    brear_matrix = brear_matrix,
+    borigin_matrix = borigin_matrix
+  ))
 }
 
 
 
-##### RUN JAGS #####
-out.jags = jags(data, inits, parameters, model.file=here::here("simulation", "sim_model.txt"),
-                n.chains=3, n.iter=20000, n.burnin=5000, n.thin=1)
+# out.jags = jags(data, inits = inits, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
+#                 n.chains=3, n.iter=10000, n.burnin=5000, n.thin=1)
 
-# out.jags$summary
+# Save this JAGS model
+# saveRDS(out.jags, here::here("simulation", "JAGS_nocov_2chains_10kiter_5kburnin.rds"))
+
+mod_2 <- out.jags
+
+traceplot(mod_2, parameters = "b0_matrix")
+
+mod_2_chains <- mod_2$samples[[1]]
+
+plot(mod_2)
+
+# get indices
+movements %>% 
+  as.data.frame() %>% 
+  mutate(index = row + (col-1)*10) -> movement_indices
+
+mod_2$summary[movement_indices$index,]
+
+mod_2$summary
+
+# out.jags = jags(data, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
+#                 n.chains=3, n.iter=15000, n.burnin=5000, n.thin=1)
+
+# Run in parallel using r2jags
+out.jags <- 
+  jags.parallel(
+    data = data,
+    inits = inits,
+    model.file=here::here("simulation", "sim_model.txt"),
+    parameters.to.save = parameters,
+    n.chains = 3, n.iter = 5000, n.burnin = 1000,
+    jags.seed = 123
+  )
