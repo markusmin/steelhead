@@ -1025,12 +1025,12 @@ inits <- function(){
 }
 
 inits <- function(){
-  b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  btemp_matrix <- matrix(0, nrow = 10, ncol = 9)
-  bflow_matrix <- matrix(0, nrow = 10, ncol = 9)
-  brear_matrix <- matrix(0, nrow = 10, ncol = 9)
-  borigin_matrix <- matrix(0, nrow = 10, ncol = 9)
-  
+  # b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  # btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  # bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  # brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  # borigin_matrix <- matrix(NA, nrow = 10, ncol = 9)
+  # 
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
@@ -1048,10 +1048,98 @@ inits <- function(){
   ))
 }
 
+inits <- function(){list(
+    b0_matrix[2,1] <- runif(1,-1,1),
+    b0_matrix[1,2] <- runif(1,-1,1),
+    b0_matrix[3,2] <- runif(1,-1,1),
+    b0_matrix[6,2] <- runif(1,-1,1),
+    b0_matrix[7,2] <- runif(1,-1,1),
+    b0_matrix[2,3] <- runif(1,-1,1),
+    b0_matrix[4,3] <- runif(1,-1,1),
+    b0_matrix[5,3] <- runif(1,-1,1),
+    b0_matrix[9,3] <- runif(1,-1,1),
+    b0_matrix[3,4] <- runif(1,-1,1),
+    b0_matrix[3,5] <- runif(1,-1,1),
+    b0_matrix[8,5] <- runif(1,-1,1),
+    b0_matrix[2,6] <- runif(1,-1,1),
+    b0_matrix[2,7] <- runif(1,-1,1),
+    b0_matrix[5,8] <- runif(1,-1,1),
+    b0_matrix[3,9] <- runif(1,-1,1),
+    
+    bflow_matrix[2,1] <- runif(1,-1,1),
+    bflow_matrix[1,2] <- runif(1,-1,1),
+    bflow_matrix[3,2] <- runif(1,-1,1),
+    bflow_matrix[6,2] <- runif(1,-1,1),
+    bflow_matrix[7,2] <- runif(1,-1,1),
+    bflow_matrix[2,3] <- runif(1,-1,1),
+    bflow_matrix[4,3] <- runif(1,-1,1),
+    bflow_matrix[5,3] <- runif(1,-1,1),
+    bflow_matrix[9,3] <- runif(1,-1,1),
+    bflow_matrix[3,4] <- runif(1,-1,1),
+    bflow_matrix[3,5] <- runif(1,-1,1),
+    bflow_matrix[8,5] <- runif(1,-1,1),
+    bflow_matrix[2,6] <- runif(1,-1,1),
+    bflow_matrix[2,7] <- runif(1,-1,1),
+    bflow_matrix[5,8] <- runif(1,-1,1),
+    bflow_matrix[3,9] <- runif(1,-1,1),
+    
+    btemp_matrix[2,1] <- runif(1,-1,1),
+    btemp_matrix[1,2] <- runif(1,-1,1),
+    btemp_matrix[3,2] <- runif(1,-1,1),
+    btemp_matrix[6,2] <- runif(1,-1,1),
+    btemp_matrix[7,2] <- runif(1,-1,1),
+    btemp_matrix[2,3] <- runif(1,-1,1),
+    btemp_matrix[4,3] <- runif(1,-1,1),
+    btemp_matrix[5,3] <- runif(1,-1,1),
+    btemp_matrix[9,3] <- runif(1,-1,1),
+    btemp_matrix[3,4] <- runif(1,-1,1),
+    btemp_matrix[3,5] <- runif(1,-1,1),
+    btemp_matrix[8,5] <- runif(1,-1,1),
+    btemp_matrix[2,6] <- runif(1,-1,1),
+    btemp_matrix[2,7] <- runif(1,-1,1),
+    btemp_matrix[5,8] <- runif(1,-1,1),
+    btemp_matrix[3,9] <- runif(1,-1,1),
+    
+    brear_matrix[2,1] <- runif(1,-1,1),
+    brear_matrix[1,2] <- runif(1,-1,1),
+    brear_matrix[3,2] <- runif(1,-1,1),
+    brear_matrix[6,2] <- runif(1,-1,1),
+    brear_matrix[7,2] <- runif(1,-1,1),
+    brear_matrix[2,3] <- runif(1,-1,1),
+    brear_matrix[4,3] <- runif(1,-1,1),
+    brear_matrix[5,3] <- runif(1,-1,1),
+    brear_matrix[9,3] <- runif(1,-1,1),
+    brear_matrix[3,4] <- runif(1,-1,1),
+    brear_matrix[3,5] <- runif(1,-1,1),
+    brear_matrix[8,5] <- runif(1,-1,1),
+    brear_matrix[2,6] <- runif(1,-1,1),
+    brear_matrix[2,7] <- runif(1,-1,1),
+    brear_matrix[5,8] <- runif(1,-1,1),
+    brear_matrix[3,9] <- runif(1,-1,1),
+    
+    borigin_matrix[2,1] <- runif(1,-1,1),
+    borigin_matrix[1,2] <- runif(1,-1,1),
+    borigin_matrix[3,2] <- runif(1,-1,1),
+    borigin_matrix[6,2] <- runif(1,-1,1),
+    borigin_matrix[7,2] <- runif(1,-1,1),
+    borigin_matrix[2,3] <- runif(1,-1,1),
+    borigin_matrix[4,3] <- runif(1,-1,1),
+    borigin_matrix[5,3] <- runif(1,-1,1),
+    borigin_matrix[9,3] <- runif(1,-1,1),
+    borigin_matrix[3,4] <- runif(1,-1,1),
+    borigin_matrix[3,5] <- runif(1,-1,1),
+    borigin_matrix[8,5] <- runif(1,-1,1),
+    borigin_matrix[2,6] <- runif(1,-1,1),
+    borigin_matrix[2,7] <- runif(1,-1,1),
+    borigin_matrix[5,8] <- runif(1,-1,1),
+    borigin_matrix[3,9] <- runif(1,-1,1)
+  )
+}
 
 
-# out.jags = jags(data, inits = inits, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
-#                 n.chains=3, n.iter=10000, n.burnin=5000, n.thin=1)
+
+out.jags = jags(data, inits = inits, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
+                n.chains=3, n.iter=10000, n.burnin=5000, n.thin=1)
 
 # Save this JAGS model
 # saveRDS(out.jags, here::here("simulation", "JAGS_nocov_2chains_10kiter_5kburnin.rds"))
