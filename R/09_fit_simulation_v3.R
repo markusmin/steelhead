@@ -44,35 +44,7 @@ possible_movements <- c("mainstem, mouth to BON" = 2,
 
 possible_movements <- c(2,5,5,2,3,2,2,2,2,0)
 
-# Create lists for covariates, to inform which covariates to choose for each transition
-cov_index_list <- list()
-for (i in 1:(length(possible_movements)-1)){
-  vec <- vector(length = (possible_movements[i]-1))
-  
-  # Store in list
-  cov_index_list[[i]] <- vec
-}
-
-# Mainstem, mouth to BON
-cov_index_list[[1]] <- c(1) # BON
-# Mainstem, BON to MCN
-cov_index_list[[2]] <- c(1,2,6,5) # BON, MCN, DES, JDR
-# Mainstem, MCN to ICH or PRA
-cov_index_list[[3]] <- c(2,3,4,7) # MCN, PRA, ICH, YAK
-# Mainstem, PRA to RIS
-cov_index_list[[4]] <- c(3) # PRA
-# Mainstem, ICH to LGR
-cov_index_list[[5]] <- c(4, 8) # ICH, TUC
-# Deschutes River
-cov_index_list[[6]] <- c(6) # DES
-# John Day River
-cov_index_list[[7]] <- c(5) # JDR
-# Yakima River
-cov_index_list[[8]] <- c(7) # YAK
-# Tucannon
-cov_index_list[[9]] <- c(8) # TUC
-
-# Turn this into a matrix for JAGS
+# Indexing covariate data
 cov_index_mat <- matrix(data = c(1, NA, NA, NA,
                                   1, 2, 6, 5,
                                   2, 3, 4, 7,
@@ -83,6 +55,16 @@ cov_index_mat <- matrix(data = c(1, NA, NA, NA,
                                   7, NA, NA, NA,
                                   8, NA, NA, NA), 
                         ncol = 4, nrow = 9, byrow = TRUE)
+
+# For temperature, there is only one temperature per state
+# The issue arises again with the branching MCN to ICH or PRA state - which temperature do we choose?
+# For now, let's use MCN, since it's a combination of both
+# states = same order as possible_movements
+temp_index <- c(1, 2, 2, 3, 4, 6, 5, 8, 7)
+
+# Index flow - one flow for state for now, for simplicity
+flow_index <- c(1, 2, 2, 3, 4, 6, 5, 8, 7)
+# Note that in the simulation, the relationships are currently different, so we'll have to fix that
 
 # Get the state that each fish was in at each n.obs
 
@@ -112,89 +94,6 @@ for (i in 1:n.ind){
 
 
 
-# Get the beta vectors - will be different for each state
-
-# # Mainstem, mouth to BON
-# B_vec_1 <- c(b0_MB_BM, bflow_MB_BM, btemp_MB_BM, brear_MB_BM[rear], borigin_MB_BM[origin])
-# 
-# # Mainstem, BON to MCN
-# B_vec_2 <- c(b0_BM_MB, b0_BM_MIP,  b0_BM_DES,  b0_BM_JDR,
-#              bflow_BM_MB, bflow_BM_MIP,  bflow_BM_DES,  bflow_BM_JDR,
-#              btemp_BM_MB, btemp_BM_MIP,  btemp_BM_DES,  btemp_BM_JDR,
-#              brear_BM_MB[rear], brear_BM_MIP[rear],  brear_BM_DES[rear],  brear_BM_JDR[rear],
-#              borigin_BM_MB[origin], borigin_BM_MIP[origin],  borigin_BM_DES[origin], borigin_BM_JDR[origin])
-# 
-# # Mainstem, MCN to ICH or PRA
-# B_vec_3 <- c(b0_MIP_BM, b0_MIP_PR, b0_MIP_IL, b0_MIP_YAK,
-#              bflow_MIP_BM, bflow_MIP_PR, bflow_MIP_IL, bflow_MIP_YAK,
-#              btemp_MIP_BM, btemp_MIP_PR, btemp_MIP_IL, btemp_MIP_YAK,
-#              brear_MIP_BM[rear], brear_MIP_PR[rear], brear_MIP_IL[rear], brear_MIP_YAK[rear],
-#              borigin_MIP_BM[origin], borigin_MIP_PR[origin], borigin_MIP_IL[origin], borigin_MIP_YAK[origin])
-# 
-# # Mainstem, PRA to RIS
-# B_vec_4 <- c(b0_PR_MIP, bflow_PR_MIP, btemp_PR_MIP, brear_PR_MIP[rear], borigin_PR_MIP[origin])
-# 
-# # Mainstem, ICH to LGR
-# B_vec_5 <- c(b0_IL_MIP, b0_IL_TUC, 
-#              bflow_IL_MIP, bflow_IL_TUC, 
-#              btemp_IL_MIP, btemp_IL_TUC, 
-#              brear_IL_MIP[rear], brear_IL_TUC[rear], 
-#              borigin_IL_MIP[origin], borigin_IL_TUC[origin])
-# 
-# # Deschutes River
-# B_vec_6 <- c(b0_DES_BM, bflow_DES_BM, btemp_DES_BM, brear_DES_BM[rear], borigin_DES_BM[origin])
-# 
-# # John Day River
-# B_vec_7 <- c(b0_JDR_BM, bflow_JDR_BM, btemp_JDR_BM, brear_JDR_BM[rear], borigin_JDR_BM[origin])
-# 
-# # Yakima River
-# B_vec_8 <- c(b0_YAK_MIP, bflow_YAK_MIP, btemp_YAK_MIP, brear_YAK_MIP[rear], borigin_YAK_MIP[origin])
-# 
-# # Tucannon River
-# B_vec_9 <- c(b0_TUC_IL, bflow_TUC_IL, btemp_TUC_IL, brear_TUC_IL[rear], borigin_TUC_IL[origin])
-# 
-# # Store beta vectors in a list
-# B_vec_list <- list(B_vec_1, B_vec_2, B_vec_3, B_vec_4, B_vec_5, 
-#                    B_vec_6, B_vec_7, B_vec_8, B_vec_9)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ##### JAGS model #####
@@ -206,19 +105,571 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   for(j in 1:(n.obs[i]-1)){ # Loop through each of the observations, stopping at the loss column (-1)
   
   # Vectorized state transitions
-  exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
-  brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
-  brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])))
+  # Index flow and temperature by date (x) and index of site (y)
+  # exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])))
+  # Note here that we also have a 1 - sum() term for the loss probability
   
-  y[,,i+1] <- dmulti( ,1)
+  # y[,j+1,i] ~ dmulti(c( exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))), 1 - sum(  exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))))) ,1)
   
+  # JAGS won't let you exponentiate a vector (BOO!!) so we'll have to write out each possible transition separately
+    ~ dmulti(c(
+  # State 1
+  exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 2
+  exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 3
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 4
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 5
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 6
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 7
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 8
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 9
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+  # Loss
+  (1 - sum(  # State 1
+  exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 2
+  exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 3
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 4
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 5
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 6
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 7
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 8
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
+  
+    # State 9
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])/(1 +   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 1] + borigin_matrix[states_mat[i,j], 1]) + exp(b0_matrix[states_mat[i,j], 2] + bflow_matrix[states_mat[i,j], 2] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 2] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 2] + borigin_matrix[states_mat[i,j], 2])+ 
+  exp(b0_matrix[states_mat[i,j], 3] + bflow_matrix[states_mat[i,j], 3] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 3] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 3] + borigin_matrix[states_mat[i,j], 3])+
+  exp(b0_matrix[states_mat[i,j], 4] + bflow_matrix[states_mat[i,j], 4] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 4] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 4] + borigin_matrix[states_mat[i,j], 4])+
+  exp(b0_matrix[states_mat[i,j], 5] + bflow_matrix[states_mat[i,j], 5] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 5] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 5] + borigin_matrix[states_mat[i,j], 5])+
+  exp(b0_matrix[states_mat[i,j], 6] + bflow_matrix[states_mat[i,j], 6] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 6] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 6] + borigin_matrix[states_mat[i,j], 6])+
+  exp(b0_matrix[states_mat[i,j], 7] + bflow_matrix[states_mat[i,j], 7] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 7] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 7] + borigin_matrix[states_mat[i,j], 7])+
+  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 8] + borigin_matrix[states_mat[i,j], 8])+
+  exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
+  brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9]))))
+  ))
   }
 
 }
 
     ##### PRIORS #####
     
-    # Set the priors by matrix
+    ### Set the priors by matrix
         for (i in 1:nmovements){
     b0_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
         }
@@ -237,7 +688,30 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     
         for (i in 1:nmovements){
     borigin_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
-    }
+        }
+    
+    
+    
+    ### Set every other element to zero
+            for (i in 1:n_notmovements){
+    b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+        }
+    
+        for (i in 1:n_notmovements){
+    bflow_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+        }
+    
+        for (i in 1:n_notmovements){
+    btemp_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+        }
+    
+        for (i in 1:n_notmovements){
+    brear_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+        }
+    
+        for (i in 1:n_notmovements){
+    borigin_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+        }
 
 }", fill=TRUE, file=here::here("simulation", "sim_model.txt"))
 
@@ -246,11 +720,11 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
 # Here we have a matrix for each term (b0, bflow, btemp, etc.)
 # Where each matrix has the term for each from (row) to (column) movement
 parameters <- c(
-  "b0",
-  "bflow",
-  "btemp",
-  "brear",
-  "borigin"
+  "b0_matrix",
+  "bflow_matrix",
+  "btemp_matrix",
+  "brear_matrix",
+  "borigin_matrix"
 )
 
 
@@ -340,10 +814,15 @@ for (i in 1:length(parameters)){
 # Get the indices that are 1s (except loss, since that's 1 minus the others)
 movements <- which(transition_matrix[,1:9] == 1, arr.ind = TRUE)
 nmovements <- dim(movements)[1]
+# Now get all of the movements which are fixed to zero
+not_movements <- which(transition_matrix[,1:9] == 0, arr.ind = TRUE)
+n_notmovements <- dim(not_movements)[1]
 
 data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
              states_mat = states_mat, origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], 
-             movements = movements, temp_sim = temp_sim, flow_sim = flow_sim)
+             movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+             nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+             n_notmovements = n_notmovements)
 
 ###### Initial values #####
 # Loop through all of the non-zero values in each matrix
@@ -359,21 +838,34 @@ data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = pos
 
 inits <- function(){
   mat <- matrix(0, nrow = 10, ncol = 9)
-  b0_matrix =    for (j in 1:dim(movements)[1]){
+  for (j in 1:dim(movements)[1]){
     mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
   }
-  bflow_matrix =    for (j in 1:dim(movements)[1]){
+  b0_matrix = mat
+  
+  mat <- matrix(0, nrow = 10, ncol = 9)
+  for (j in 1:dim(movements)[1]){
     mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
   }
-  btemp_matrix =    for (j in 1:dim(movements)[1]){
+  bflow_matrix = mat
+  
+  mat <- matrix(0, nrow = 10, ncol = 9)
+  for (j in 1:dim(movements)[1]){
     mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
   }
-  brear_matrix =    for (j in 1:dim(movements)[1]){
+  btemp_matrix = mat
+  
+  mat <- matrix(0, nrow = 10, ncol = 9)
+  for (j in 1:dim(movements)[1]){
     mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
   }
-  borigin_matrix =    for (j in 1:dim(movements)[1]){
+  brear_matrix = mat
+  
+  mat <- matrix(0, nrow = 10, ncol = 9)
+  for (j in 1:dim(movements)[1]){
     mat[movements[j,1], movements[j,2]] <- runif(1,-1,1)
   }
+  borigin_matrix = mat
 }
 
 
