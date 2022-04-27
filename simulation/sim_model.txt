@@ -293,6 +293,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
   brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9])),
   
+  # Loss
   (1 - sum(  # State 1
   exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
@@ -562,9 +563,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   exp(b0_matrix[states_mat[i,j], 9] + bflow_matrix[states_mat[i,j], 9] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] +
   brear_matrix[states_mat[i,j], 9] + borigin_matrix[states_mat[i,j], 9]))))
-  
-  # Loss
-  ))
+  ), 1)
   }
 
 }
