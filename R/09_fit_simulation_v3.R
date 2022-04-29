@@ -9,6 +9,7 @@ library(janitor)
 library(rjags)
 library(jagsUI)
 library(R2jags)
+library(coda)
 
 # Load data to fit model to
 sim_data <- readRDS(here::here("simulation", "sim_600_array.rds"))
@@ -693,25 +694,30 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     
     
     
-    ### Set every other element to zero
+    ### Set every other element to zero by using dnorm with a very high precision - this will help with initial values, I believe
             for (i in 1:n_notmovements){
-    b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    b0_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    bflow_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # bflow_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    bflow_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    btemp_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # btemp_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    btemp_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    brear_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # brear_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    brear_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    borigin_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # borigin_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    borigin_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
 
 }", fill=TRUE, file=here::here("simulation", "sim_model.txt"))
@@ -1025,12 +1031,12 @@ inits <- function(){
 }
 
 inits <- function(){
-  # b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  # btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  # bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  # brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  # borigin_matrix <- matrix(NA, nrow = 10, ncol = 9)
-  # 
+  b0_matrix <- matrix(0, nrow = 10, ncol = 9)
+  btemp_matrix <- matrix(0, nrow = 10, ncol = 9)
+  bflow_matrix <- matrix(0, nrow = 10, ncol = 9)
+  brear_matrix <- matrix(0, nrow = 10, ncol = 9)
+  borigin_matrix <- matrix(0, nrow = 10, ncol = 9)
+
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
@@ -1138,28 +1144,28 @@ inits <- function(){list(
 
 
 
-out.jags = jags(data, inits = inits, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
-                n.chains=3, n.iter=10000, n.burnin=5000, n.thin=1)
+# out.jags = jags(data, inits = inits, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
+#                 n.chains=3, n.iter=10000, n.burnin=5000, n.thin=1)
 
 # Save this JAGS model
 # saveRDS(out.jags, here::here("simulation", "JAGS_nocov_2chains_10kiter_5kburnin.rds"))
 
-mod_2 <- out.jags
-
-traceplot(mod_2, parameters = "b0_matrix")
-
-mod_2_chains <- mod_2$samples[[1]]
-
-plot(mod_2)
+# mod_2 <- out.jags
+# 
+# traceplot(mod_2, parameters = "b0_matrix")
+# 
+# mod_2_chains <- mod_2$samples[[1]]
+# 
+# plot(mod_2)
 
 # get indices
 movements %>% 
   as.data.frame() %>% 
   mutate(index = row + (col-1)*10) -> movement_indices
 
-mod_2$summary[movement_indices$index,]
-
-mod_2$summary
+# mod_2$summary[movement_indices$index,]
+# 
+# mod_2$summary
 
 # out.jags = jags(data, parameters.to.save = parameters, model.file=here::here("simulation", "sim_model.txt"),
 #                 n.chains=3, n.iter=15000, n.burnin=5000, n.thin=1)
@@ -1172,5 +1178,24 @@ out.jags <-
     model.file=here::here("simulation", "sim_model.txt"),
     parameters.to.save = parameters,
     n.chains = 3, n.iter = 5000, n.burnin = 1000,
+    jags.seed = 123,
+    progress.bar = "text"
+  )
+
+mod3_mcmc <- as.mcmc(out.jags)
+plot(mod3_mcmc[[1]])
+
+out.jags <- 
+  jags.parallel(
+    data = data,
+    inits = inits,
+    model.file=here::here("simulation", "sim_model.txt"),
+    parameters.to.save = parameters,
+    n.chains = 3, n.iter = 1100, n.burnin = 1000,
+    n.thin = 10,
     jags.seed = 123
   )
+
+mod4_mcmc <- as.mcmc(out.jags)
+plot(mod4_mcmc[[1]])
+       

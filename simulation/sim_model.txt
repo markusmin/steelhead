@@ -593,25 +593,30 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     
     
     
-    ### Set every other element to zero
+    ### Set every other element to zero by using dnorm with a very high precision - this will help with initial values, I believe
             for (i in 1:n_notmovements){
-    b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    b0_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    bflow_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # bflow_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    bflow_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    btemp_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # btemp_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    btemp_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    brear_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # brear_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    brear_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
     
         for (i in 1:n_notmovements){
-    borigin_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    # borigin_matrix[not_movements[i,1], not_movements[i,2]] <- 0
+    borigin_matrix[not_movements[i,1], not_movements[i,2]] ~ dnorm(0,99999)
         }
 
 }
