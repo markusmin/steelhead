@@ -1,0 +1,19 @@
+---
+title: "Steelhead Overshoot Update"
+author: "Markus Min"
+date: "5/5/2022"
+output:
+  ioslides_presentation: default
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+```
+
+## Results - no covariates, 600 fish
+![](.//figures/sim600_plots.png){width=100%}
+
