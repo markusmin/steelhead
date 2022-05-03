@@ -137,9 +137,10 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_60
 # Create a list to store JAGS objects
 JAGS_600_list <- list()
 # Loop it
-for (i in 1:length(sim_600_dates_list[i])){
-  dates <- sim_600_dates_list[[1]]
-  sim_data <- sim_600_hist_list[[1]]
+# for (i in 1:sim_600_hist_list){
+for (z in 1:2){
+  dates <- sim_600_dates_list[[z]]
+  sim_data <- sim_600_hist_list[[z]]
   
   
   # Store quantities for loop
@@ -221,15 +222,15 @@ for (i in 1:length(sim_600_dates_list[i])){
       inits = inits,
       model.file=here::here("simulation", "sim_model.txt"),
       parameters.to.save = parameters,
-      n.chains = 3, n.iter = 15000, n.burnin = 5000,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
       n.thin = 10,
       jags.seed = 123
     )
   
-  JAGS_600_list[[i]] <- out.jags
+  JAGS_600_list[[z]] <- out.jags
 }
 
-saveRDS(out.jags, here::here("simulation", "JAGS_nocov_600_list.rds"))
+saveRDS(JAGS_600_list, here::here("simulation", "JAGS_nocov_600_list.rds"))
 
 ##### 1200 fish #####
 sim_1200_hist_list <- readRDS(here::here("simulation", "sim_1200_hist_list.rds"))
@@ -239,9 +240,9 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_12
 # Create a list to store JAGS objects
 JAGS_1200_list <- list()
 # Loop it
-for (i in 1:length(sim_1200_dates_list[i])){
-  dates <- sim_1200_dates_list[[1]]
-  sim_data <- sim_1200_hist_list[[1]]
+for (z in 1:length(sim_1200_hist_list)){
+  dates <- sim_1200_dates_list[[z]]
+  sim_data <- sim_1200_hist_list[[z]]
   
   
   # Store quantities for loop
@@ -323,15 +324,15 @@ for (i in 1:length(sim_1200_dates_list[i])){
       inits = inits,
       model.file=here::here("simulation", "sim_model.txt"),
       parameters.to.save = parameters,
-      n.chains = 3, n.iter = 15000, n.burnin = 5000,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
       n.thin = 10,
       jags.seed = 123
     )
   
-  JAGS_1200_list[[i]] <- out.jags
+  JAGS_1200_list[[z]] <- out.jags
 }
 
-saveRDS(out.jags, here::here("simulation", "JAGS_nocov_1200_list.rds"))
+saveRDS(JAGS_1200_list, here::here("simulation", "JAGS_nocov_1200_list.rds"))
 
 ##### 3000 fish #####
 sim_3000_hist_list <- readRDS(here::here("simulation", "sim_3000_hist_list.rds"))
@@ -341,9 +342,9 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_30
 # Create a list to store JAGS objects
 JAGS_3000_list <- list()
 # Loop it
-for (i in 1:length(sim_3000_dates_list[i])){
-  dates <- sim_3000_dates_list[[1]]
-  sim_data <- sim_3000_hist_list[[1]]
+for (i in 1:length(sim_3000_hist_list)){
+  dates <- sim_3000_dates_list[[i]]
+  sim_data <- sim_3000_hist_list[[i]]
   
   
   # Store quantities for loop
@@ -425,13 +426,13 @@ for (i in 1:length(sim_3000_dates_list[i])){
       inits = inits,
       model.file=here::here("simulation", "sim_model.txt"),
       parameters.to.save = parameters,
-      n.chains = 3, n.iter = 15000, n.burnin = 5000,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
       n.thin = 10,
       jags.seed = 123
     )
   
-  JAGS_3000_list[[i]] <- out.jags
+  JAGS_3000_list[[z]] <- out.jags
 }
 
-saveRDS(out.jags, here::here("simulation", "JAGS_nocov_3000_list.rds"))
+saveRDS(JAGS_3000_list, here::here("simulation", "JAGS_nocov_3000_list.rds"))
 
