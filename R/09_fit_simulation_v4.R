@@ -26,11 +26,16 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_60
 
 # Store quantities for loop
 # Store the total number of individuals
-n.ind <- length(sim_data_list)
+n.ind <- dim(sim_data)[3]
 
 # Store the number of observations per individual
 # -1 because the last state is loss, which isn't actually an observation
 n.obs <- unlist(lapply(sim_data_list, ncol)) - 1
+n.obs <- vector(length = n.ind)
+for (i in 1:n.ind){
+  n.obs[i] <- sum(sim_data[,,i]) - 1
+}
+
 
 # Get number of possible movements from each site
 possible_movements <- c("mainstem, mouth to BON" = 2,
@@ -771,12 +776,16 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
 ###### Parameters monitored #####
 # Here we have a matrix for each term (b0, bflow, btemp, etc.)
 # Where each matrix has the term for each from (row) to (column) movement
+# parameters <- c(
+#   "b0_matrix",
+#   "bflow_matrix",
+#   "btemp_matrix",
+#   "brear_matrix",
+#   "borigin_matrix"
+# )
+
 parameters <- c(
-  "b0_matrix",
-  "bflow_matrix",
-  "btemp_matrix",
-  "brear_matrix",
-  "borigin_matrix"
+  "b0_matrix"
 )
 
 
