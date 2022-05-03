@@ -24,11 +24,12 @@ sim_states = c("mainstem, mouth to BON",
                "Yakima River",
                "loss")
 
-JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_2.rds"))
+JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_4.rds"))
 # Note: in the 'bugs' object (JAGS_obj$BUGSoutput), [7] are the chains, [10] is the summary
 
 mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc[[1]])
+# plot(mod_mcmc[[1]])
+# plot(mod_mcmc)
 
 param_est <- as.data.frame(JAGS_obj$BUGSoutput[10])
 
@@ -93,6 +94,16 @@ round(movement_probs[10,],2)
 # Okay - so if we can sort out why we're getting 0% chance of loss, we should be able
 # to correct all of these traces and get the correct estimates
 
+# So I think the problem is that we're allowing dmulti to have non-zero values
+# for states that aren't possible - back to the exp(0) issue. So I think that what
+# JAGS is doing is increasing the b0 values really high to make sure that the relative
+# probability of going to any of the impossible states is close to zero. But the
+# associated problem is that loss also goes to zero. So I need to fix that issue 
+# to get these chains to converge
 
+# This is what we should be getting for movement_probs[3,] (4 possible next states + loss:)
+exp(1)/ (1 + sum(exp(rep(1,4))))
+exp(1)/ (1 + sum(exp(rep(1,1))))
+exp(1)/ (1 + sum(exp(rep(1,2))))
 
 
