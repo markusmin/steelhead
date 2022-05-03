@@ -26,10 +26,10 @@ sim_states = c("mainstem, mouth to BON",
 
 JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_4.rds"))
 # Note: in the 'bugs' object (JAGS_obj$BUGSoutput), [7] are the chains, [10] is the summary
-
+JAGS_obj$BUGSoutput[7]
 mod_mcmc <- as.mcmc(JAGS_obj)
 # plot(mod_mcmc[[1]])
-# plot(mod_mcmc)
+plot(mod_mcmc)
 
 param_est <- as.data.frame(JAGS_obj$BUGSoutput[10])
 
