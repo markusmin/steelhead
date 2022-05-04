@@ -1,0 +1,5 @@
+#### Hyak command line commands
+
+# Copying folders:
+# Note: To move to remote, you have to execute the command from your local machine
+scp -r 1200cov_hyak/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
