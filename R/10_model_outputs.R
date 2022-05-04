@@ -128,8 +128,8 @@ exp(1)/ (1 + sum(exp(rep(1,1))))
 exp(1)/ (1 + sum(exp(rep(1,2))))
 
 
-##### Plot simulation results #####
-simulation_plots <- function(JAGS_list){
+##### Plot simulation results - no covariates #####
+simulation_plots_nocov <- function(JAGS_list){
   JAGS_runs_comp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   for (i in 1:length(JAGS_list)){
     as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
@@ -157,25 +157,79 @@ simulation_plots <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    scale_y_continuous(breaks = c(0.5, 1, 1.5)) +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
     xlab("Run")
   
   return(plot)
 }
 
 JAGS_600_list <- readRDS(here::here("simulation", "JAGS_nocov_600_list.rds"))
-sim600_plots <- simulation_plots(JAGS_list = JAGS_600_list)
+sim600_plots <- simulation_plots_nocov(JAGS_list = JAGS_600_list)
 ggsave(here::here("simulation", "figures", "sim600_plots.png"), height = 6, width = 10, sim600_plots)
 
 JAGS_1200_list <- readRDS(here::here("simulation", "JAGS_nocov_1200_list.rds"))
-sim1200_plots <- simulation_plots(JAGS_list = JAGS_1200_list)
-ggsave(here::here("simulation", "figures", "sim1200_plots.png"), height = 8, width = 10, sim1200_plots)
+sim1200_plots <- simulation_plots_nocov(JAGS_list = JAGS_1200_list)
+ggsave(here::here("simulation", "figures", "sim1200_plots.png"), height = 6, width = 10, sim1200_plots)
 
-JAGS_3000_list <- readRDS(here::here("simulation", "JAGS_nocov_3000_list.rds"))
-sim3000_plots <- simulation_plots(JAGS_list = JAGS_3000_list)
-ggsave(here::here("simulation", "figures", "sim3000_plots.png"), height = 8, width = 10, sim3000_plots)
+# JAGS_3000_list <- readRDS(here::here("simulation", "JAGS_nocov_3000_list.rds"))
+# sim3000_plots <- simulation_plots_nocov(JAGS_list = JAGS_3000_list)
+# ggsave(here::here("simulation", "figures", "sim3000_plots.png"), height = 6, width = 10, sim3000_plots)
 
+##### Plot simulation results - covariates #####
+JAGS_600_cov_list <- readRDS(here::here("simulation", "JAGS_cov_600_list.rds"))
 
+# Return 5 facet-wrapped plots, one for each beta matrix
+# The hlines used as referernce will have to be changed for each
+simulation_plots_cov <- function(JAGS_list){
+  JAGS_runs_comp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  for (i in 1:length(JAGS_list)){
+    as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
+      rownames_to_column("parameter") %>% 
+      subset(parameter %in% params_in_model) %>% 
+      dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
+      dplyr::select(parameter, mean, q2.5, q97.5) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # Split the summary into five, one for each parameter
+    summary %>% 
+      subset(contains("b0"), parameter) -> b0_summary
+    
+    summary %>% 
+      subset(contains("bflow"), parameter) -> bflow_summary
+    
+    summary %>% 
+      subset(contains("btemp"), parameter) -> btemp_summary
+    
+    summary %>% 
+      subset(contains("borigin"), parameter) -> borigin_summary
+    
+    summary %>% 
+      subset(contains("brear"), parameter) -> brear_summary
+      
+    
+    JAGS_runs_comp %>% 
+      bind_rows(., summary) -> JAGS_runs_comp
+  }
+  
+  
+  # Create the plot
+  JAGS_runs_comp <- subset(JAGS_runs_comp, !(is.na(parameter))) 
+  
+  
+  plot <- ggplot(JAGS_runs_comp, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  return(plot)
+}
 
 
 
