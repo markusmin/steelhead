@@ -995,9 +995,6 @@ fish_sim_cat_data_3000 <- data.frame(tag_code = seq(1, 3000, 1),
                                      rear_type = rep(c(rep(1, 500), rep(2, 500)), 3))
 
 
-cov_sim(nfish = 600, fish_sim_cat_data = fish_sim_cat_data_600)
-
-
 ##### Loop the simulation
 
 ### 600 fish
