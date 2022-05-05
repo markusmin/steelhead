@@ -557,7 +557,7 @@ for (z in 1:length(sim_600_hist_list)){
 
 saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_600_list.rds"))
 
-##### 1200 fish, no covariates #####
+##### 1200 fish, covariates #####
 sim_1200_hist_list <- readRDS(here::here("simulation", "sim_1200_cov_hist_list.rds"))
 sim_1200_dates_list <- readRDS(here::here("simulation", "sim_1200_cov_dates_list.rds"))
 fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_1200.csv")))
@@ -565,7 +565,8 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_12
 # Create a list to store JAGS objects
 JAGS_1200_list <- list()
 # Loop it
-for (z in 1:length(sim_1200_hist_list)){
+# for (z in 1:length(sim_1200_hist_list)){
+for (z in 1:1){
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
@@ -620,8 +621,8 @@ for (z in 1:length(sim_1200_hist_list)){
     "b0_matrix",
     "bflow_matrix",
     "btemp_matrix",
-    "brear_matrix",
-    "borigin_matrix"
+    "brear_array",
+    "borigin_array"
   )
   
   
@@ -638,23 +639,26 @@ for (z in 1:length(sim_1200_hist_list)){
     b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
     bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
     btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    borigin_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    brear_array <- array(NA, dim = c(10, 9, 2))
+    borigin_array <- array(NA, dim = c(10, 9, 3))
     
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      borigin_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      brear_array[movements[j,1], movements[j,2],1] <- runif(1,-1,1)
+      brear_array[movements[j,1], movements[j,2],2] <- runif(1,-1,1)
+      borigin_array[movements[j,1], movements[j,2],1] <- runif(1,-1,1)
+      borigin_array[movements[j,1], movements[j,2],2] <- runif(1,-1,1)
+      borigin_array[movements[j,1], movements[j,2],3] <- runif(1,-1,1)
     }
     
     return(list(
       b0_matrix = b0_matrix,
       bflow_matrix = bflow_matrix,
       btemp_matrix = btemp_matrix,
-      brear_matrix = brear_matrix,
-      borigin_matrix = borigin_matrix
+      brear_array = brear_array,
+      borigin_array = borigin_array
     ))
   }
   
@@ -665,17 +669,17 @@ for (z in 1:length(sim_1200_hist_list)){
       inits = inits,
       model.file=here::here("simulation", "sim_model_cov.txt"),
       parameters.to.save = parameters,
-      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.chains = 3, n.iter = 25000, n.burnin = 5000,
       n.thin = 10,
       jags.seed = 123
     )
   
-  JAGS_1200_list[[z]] <- out.jags
+  JAGS_1200_list[[z]] <- out.jags 
 }
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_1200_onerun.rds"))
+# saveRDS(JAGS_1200_list, here::here("simulation", "JAGS_cov_1200_list.rds"))
 
-saveRDS(JAGS_1200_list, here::here("simulation", "JAGS_cov_1200_list.rds"))
-
-##### 3000 fish, no covariates #####
+##### 3000 fish, covariates #####
 sim_3000_hist_list <- readRDS(here::here("simulation", "sim_3000_cov_hist_list.rds"))
 sim_3000_dates_list <- readRDS(here::here("simulation", "sim_3000_cov_dates_list.rds"))
 fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_3000.csv")))
@@ -795,4 +799,339 @@ saveRDS(JAGS_3000_list, here::here("simulation", "JAGS_cov_3000_list.rds"))
 
 
 
+
+
+
+
+##### 600 fish, continuous covariates #####
+sim_600_hist_list <- readRDS(here::here("simulation", "sim_600_cov_continuous_hist_list.rds"))
+sim_600_dates_list <- readRDS(here::here("simulation", "sim_600_cov_continuous_dates_list.rds"))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_600.csv")))
+
+# Create a list to store JAGS objects
+JAGS_600_list <- list()
+# Loop it
+# for (z in 1:length(sim_600_hist_list)){
+for (z in 1:1){
+  dates <- sim_600_dates_list[[z]]
+  sim_data <- sim_600_hist_list[[z]]
+  
+  
+  # Store quantities for loop
+  # Store the total number of individuals
+  n.ind <- dim(sim_data)[3]
+  
+  # Store the number of observations per individual
+  # -1 because the last state is loss, which isn't actually an observation
+  n.obs <- vector(length = n.ind)
+  for (i in 1:n.ind){
+    n.obs[i] <- sum(sim_data[,,i]) - 1
+  }
+  
+  
+  
+  # Get the state that each fish was in at each n.obs
+  
+  # First initialize an empty list
+  states_list <- list()
+  
+  for (i in 1:n.ind){
+    vec <- vector(length = (n.obs[i]-1))
+    
+    # Store in list
+    states_list[[i]] <- vec
+  }
+  
+  # Store with the states
+  for (i in 1:n.ind){
+    for (j in 1:(n.obs[i])){
+      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+    }
+  }
+  
+  # Turn into matrix for JAGS
+  states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+  for (i in 1:n.ind){
+    states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+  }
+  
+  
+  
+  
+  
+  
+  
+  ###### Parameters monitored #####
+  parameters <- c(
+    "b0_matrix",
+    "bflow_matrix",
+    "btemp_matrix"
+  )
+  
+  
+  ##### Data #####
+  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat,
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix)
+  
+  ###### Initial values #####
+  # New version, using only b0
+  inits <- function(){
+    b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
+    
+    return(list(
+      b0_matrix = b0_matrix,
+      bflow_matrix = bflow_matrix,
+      btemp_matrix = btemp_matrix
+    ))
+  }
+  
+  ##### Run JAGS #####
+  out.jags <- 
+    jags.parallel(
+      data = data,
+      inits = inits,
+      model.file=here::here("simulation", "sim_model_cov_continuous.txt"),
+      parameters.to.save = parameters,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.thin = 10,
+      jags.seed = 123
+    )
+  
+  JAGS_600_list[[z]] <- out.jags
+}
+
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_continuous_600_onerun.rds"))
+saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_continuous_600_list.rds"))
+
+##### 1200 fish, continuous covariates #####
+sim_1200_hist_list <- readRDS(here::here("simulation", "sim_1200_cov_continuous_hist_list.rds"))
+sim_1200_dates_list <- readRDS(here::here("simulation", "sim_1200_cov_continuous_dates_list.rds"))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_1200.csv")))
+
+# Create a list to store JAGS objects
+JAGS_1200_list <- list()
+# Loop it
+for (z in 1:length(sim_1200_hist_list)){
+  dates <- sim_1200_dates_list[[z]]
+  sim_data <- sim_1200_hist_list[[z]]
+  
+  
+  # Store quantities for loop
+  # Store the total number of individuals
+  n.ind <- dim(sim_data)[3]
+  
+  # Store the number of observations per individual
+  # -1 because the last state is loss, which isn't actually an observation
+  n.obs <- vector(length = n.ind)
+  for (i in 1:n.ind){
+    n.obs[i] <- sum(sim_data[,,i]) - 1
+  }
+  
+  
+  
+  # Get the state that each fish was in at each n.obs
+  
+  # First initialize an empty list
+  states_list <- list()
+  
+  for (i in 1:n.ind){
+    vec <- vector(length = (n.obs[i]-1))
+    
+    # Store in list
+    states_list[[i]] <- vec
+  }
+  
+  # Store with the states
+  for (i in 1:n.ind){
+    for (j in 1:(n.obs[i])){
+      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+    }
+  }
+  
+  # Turn into matrix for JAGS
+  states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+  for (i in 1:n.ind){
+    states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+  }
+  
+  
+  
+  
+  
+  
+  
+  ###### Parameters monitored #####
+  parameters <- c(
+    "b0_matrix",
+    "bflow_matrix",
+    "btemp_matrix"
+  )
+  
+  
+  ##### Data #####
+  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat,
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix)
+  
+  ###### Initial values #####
+  # New version, using only b0
+  inits <- function(){
+    b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
+    
+    return(list(
+      b0_matrix = b0_matrix,
+      bflow_matrix = bflow_matrix,
+      btemp_matrix = btemp_matrix
+    ))
+  }
+  
+  ##### Run JAGS #####
+  out.jags <- 
+    jags.parallel(
+      data = data,
+      inits = inits,
+      model.file=here::here("simulation", "sim_model_cov_continuous.txt"),
+      parameters.to.save = parameters,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.thin = 10,
+      jags.seed = 123
+    )
+  
+  JAGS_1200_list[[z]] <- out.jags
+}
+
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_continuous_1200_onerun.rds"))
+saveRDS(JAGS_1200_list, here::here("simulation", "JAGS_cov_continuous_1200_list.rds"))
+
+
+##### 600 fish, temperature only #####
+sim_600_hist_list <- readRDS(here::here("simulation", "sim_600_cov_temp_hist_list.rds"))
+sim_600_dates_list <- readRDS(here::here("simulation", "sim_600_cov_temp_dates_list.rds"))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_600.csv")))
+
+# Create a list to store JAGS objects
+JAGS_600_list <- list()
+# Loop it
+for (z in 1:length(sim_600_hist_list)){
+# for (z in 1:1){
+  dates <- sim_600_dates_list[[z]]
+  sim_data <- sim_600_hist_list[[z]]
+  
+  
+  # Store quantities for loop
+  # Store the total number of individuals
+  n.ind <- dim(sim_data)[3]
+  
+  # Store the number of observations per individual
+  # -1 because the last state is loss, which isn't actually an observation
+  n.obs <- vector(length = n.ind)
+  for (i in 1:n.ind){
+    n.obs[i] <- sum(sim_data[,,i]) - 1
+  }
+  
+  
+  
+  # Get the state that each fish was in at each n.obs
+  
+  # First initialize an empty list
+  states_list <- list()
+  
+  for (i in 1:n.ind){
+    vec <- vector(length = (n.obs[i]-1))
+    
+    # Store in list
+    states_list[[i]] <- vec
+  }
+  
+  # Store with the states
+  for (i in 1:n.ind){
+    for (j in 1:(n.obs[i])){
+      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+    }
+  }
+  
+  # Turn into matrix for JAGS
+  states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+  for (i in 1:n.ind){
+    states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+  }
+  
+  
+  
+  
+  
+  
+  
+  ###### Parameters monitored #####
+  parameters <- c(
+    "b0_matrix",
+    "btemp_matrix"
+  )
+  
+  
+  ##### Data #####
+  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat,
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix)
+  
+  ###### Initial values #####
+  # New version, using only b0
+  inits <- function(){
+    b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
+    
+    return(list(
+      b0_matrix = b0_matrix,
+      btemp_matrix = btemp_matrix
+    ))
+  }
+  
+  ##### Run JAGS #####
+  out.jags <- 
+    jags.parallel(
+      data = data,
+      inits = inits,
+      model.file=here::here("simulation", "sim_model_cov_temp.txt"),
+      parameters.to.save = parameters,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.thin = 10,
+      jags.seed = 123
+    )
+  
+  JAGS_600_list[[z]] <- out.jags
+}
+
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_temp_600_onerun.rds"))
+saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_temp_600_list.rds"))
 
