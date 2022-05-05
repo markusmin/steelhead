@@ -24,11 +24,12 @@ sim_states = c("mainstem, mouth to BON",
                "Yakima River",
                "loss")
 
-JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_4.rds"))
+# JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_4.rds"))
+JAGS_obj <- out.jags
 # Note: in the 'bugs' object (JAGS_obj$BUGSoutput), [7] are the chains, [10] is the summary
 JAGS_obj$BUGSoutput[7]
 mod_mcmc <- as.mcmc(JAGS_obj)
-# plot(mod_mcmc[[1]])
+plot(mod_mcmc[[1]])
 plot(mod_mcmc)
 
 # Some of these don't look good - estimates seem far too low
@@ -124,7 +125,7 @@ round(movement_probs[10,],2)
 
 # This is what we should be getting for movement_probs[3,] (4 possible next states + loss:)
 exp(1)/ (1 + sum(exp(rep(1,4))))
-exp(1)/ (1 + sum(exp(rep(1,1))))
+exp(-50)/ (1 + sum(exp(-50)))
 exp(1)/ (1 + sum(exp(rep(1,2))))
 
 
@@ -177,6 +178,10 @@ ggsave(here::here("simulation", "figures", "sim1200_plots.png"), height = 6, wid
 
 ##### Plot simulation results - covariates #####
 JAGS_600_cov_list <- readRDS(here::here("simulation", "JAGS_cov_600_list.rds"))
+JAGS_obj <- JAGS_600_cov_list[[1]]
+chains <- JAGS_obj$BUGSoutput[7]
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
 
 # Return 5 facet-wrapped plots, one for each beta matrix
 # The hlines used as referernce will have to be changed for each
@@ -233,3 +238,218 @@ simulation_plots_cov <- function(JAGS_list){
 
 
 
+##### Plot results from covariate model, just one run #####
+# Plot the traces
+JAGS_obj <- out.jags
+# Note: in the 'bugs' object (JAGS_obj$BUGSoutput), you can $ again to access various things
+mod_mcmc <- as.mcmc(JAGS_obj)
+mod_mcmc["b0_matrix"]
+plot(mod_mcmc[[1]])
+# plot(mod_mcmc)
+mod_mcmc[[1]][,39] #b0, 4,3
+mod_mcmc[[1]][,(180 + 39*3)] #borigin, 4,3,3
+mod_mcmc[[1]][,(90 + 90 + 270 + 39*2)] # brear, 4,3,2
+
+b_43 <- data.frame(b0 = mod_mcmc[[1]][,39] , borigin = mod_mcmc[[1]][,(180 + 39*3)], brear = mod_mcmc[[1]][,(90 + 90 + 270 + 39*2)], trace = seq(1,2000,1))
+colnames(b_43) <- c("b0", "brear", "borigin", "iteration")
+b_43 %>% 
+  mutate(total = b0 + brear + borigin) %>% 
+  pivot_longer(cols = c("b0", "brear", "borigin", "total")) -> b43_long
+
+ggplot(b43_long, aes( x = iteration, y = value, color = name)) +
+  geom_line() +
+  geom_hline(yintercept = 3, lty = 2) +
+  theme(legend.text = element_text(size = 12))
+
+
+
+# b0, flow, origin, rear
+plot(y = mod_mcmc[[1]][,2], x = seq(5001, 24991, by = 10))
+
+b0_matrix_chains <- JAGS_obj$BUGSoutput$sims.list$b0_matrix
+b0_43 <- data.frame(trace = b0_matrix_chains[,4,3][seq(1, length(b0_matrix_chains[,4,3]), by = 10)], sample = seq(1, length(b0_matrix_chains[,4,3])/10))
+ggplot(b0_43, aes( x = sample, y = trace)) +
+  geom_line()
+
+brear_matrix_chains <- JAGS_obj$BUGSoutput$sims.list$brear_array
+borigin_matrix_chains <- JAGS_obj$BUGSoutput$sims.list$borigin_matrix
+
+
+# out.jags <- readRDS(here::here("simulation", "JAGS_cov_1200_onerun.rds"))
+as.data.frame(out.jags$BUGSoutput[10]) %>% 
+  rownames_to_column("parameter") -> param_est_1200
+
+# Let's look at the parameters for moving from state 4
+param_est_1200 %>% 
+  filter(grepl("4,3", parameter)) -> from4
+# This is from PRA to RIS state, which can only go back to MCN to ICH or PRA or loss
+
+from4_means <- from4$summary.mean
+
+##### Plot results from temperature model, just one run #####
+# Plot the traces
+JAGS_obj <- out.jags
+# Note: in the 'bugs' object (JAGS_obj$BUGSoutput), you can $ again to access various things
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc[[1]])
+
+##### Plot simulation results - temperature model #####
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
+JAGS_obj <- JAGS_600_temp_list[[1]]
+chains <- JAGS_obj$BUGSoutput[7]
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
+
+
+
+params_in_model <- c("b0_matrix[2,1]",
+                     "b0_matrix[1,2]",
+                     "b0_matrix[3,2]",
+                     "b0_matrix[6,2]",
+                     "b0_matrix[7,2]",
+                     "b0_matrix[2,3]",
+                     "b0_matrix[4,3]",
+                     "b0_matrix[5,3]",
+                     "b0_matrix[9,3]",
+                     "b0_matrix[3,4]",
+                     "b0_matrix[3,5]",
+                     "b0_matrix[8,5]",
+                     "b0_matrix[2,6]",
+                     "b0_matrix[2,7]",
+                     "b0_matrix[5,8]",
+                     "b0_matrix[3,9]",
+                     "btemp_matrix[2,1]",
+                     "btemp_matrix[1,2]",
+                     "btemp_matrix[3,2]",
+                     "btemp_matrix[6,2]",
+                     "btemp_matrix[7,2]",
+                     "btemp_matrix[2,3]",
+                     "btemp_matrix[4,3]",
+                     "btemp_matrix[5,3]",
+                     "btemp_matrix[9,3]",
+                     "btemp_matrix[3,4]",
+                     "btemp_matrix[3,5]",
+                     "btemp_matrix[8,5]",
+                     "btemp_matrix[2,6]",
+                     "btemp_matrix[2,7]",
+                     "btemp_matrix[5,8]",
+                     "btemp_matrix[3,9]")
+
+# Return 2 facet-wrapped plots, one for each beta matrix
+# The hlines used as referernce will have to be changed for each
+simulation_plots_temp <- function(JAGS_list){
+  JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  for (i in 1:length(JAGS_list)){
+    as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
+      rownames_to_column("parameter") %>% 
+      subset(parameter %in% params_in_model) %>% 
+      dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
+      dplyr::select(parameter, mean, q2.5, q97.5) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # Split the summary into five, one for each parameter
+    summary %>% 
+      filter(grepl("b0", parameter)) -> b0_summary
+    summary %>% 
+      filter(grepl("btemp", parameter))  -> btemp_summary
+    
+    JAGS_runs_comp_b0 %>% 
+      bind_rows(., b0_summary) -> JAGS_runs_comp_b0
+    
+    JAGS_runs_comp_btemp %>% 
+      bind_rows(., btemp_summary) -> JAGS_runs_comp_btemp
+  }
+  
+  
+  # Create the plot
+  JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
+  JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
+  
+  # For now, remove the wacky tributary ones
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 > -25) -> JAGS_runs_comp_btemp_subset
+  
+  
+  b0_plot <- ggplot(JAGS_runs_comp_b0, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  btemp_plot <- ggplot(JAGS_runs_comp_btemp_subset, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    # geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  # Annotations
+  actual_values <- data.frame(parameter = c("btemp_matrix[1,2]",
+                                            "btemp_matrix[2,1]",
+                                            "btemp_matrix[2,3]",
+                                            "btemp_matrix[2,6]",
+                                            "btemp_matrix[2,7]",
+                                              "btemp_matrix[3,2]",
+                                            "btemp_matrix[3,4]",
+                                            "btemp_matrix[3,5]",
+                                            "btemp_matrix[3,9]",
+                                              "btemp_matrix[4,3]",
+                                              "btemp_matrix[5,3]",
+                                              "btemp_matrix[5,8]"
+                                              ),
+                              yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  
+  btemp_plot +
+    geom_hline(data = actual_values, aes(yintercept = yint), lty = 2) -> btemp_plot
+  
+  # Make a third plot with the parameters we are currently not estimating well
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 < -25) -> JAGS_runs_comp_btemp_subset_2
+  
+  btemp_plot_bad <- ggplot(JAGS_runs_comp_btemp_subset_2, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 0, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  return(list(b0_plot, btemp_plot, btemp_plot_bad))
+}
+
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
+sim600_temp_plots <- simulation_plots_temp(JAGS_list = JAGS_600_temp_list)
+# sim600_temp_plots[[1]]
+# sim600_temp_plots[[2]]
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_b0.png"), height = 6, width = 10, sim600_temp_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp.png"), height = 6, width = 10, sim600_temp_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+
+
+##### Traceplots for presentation #####
+
+# No covariates
+JAGS_600_list <- readRDS(here::here("simulation", "JAGS_nocov_600_list.rds"))
+mod_mcmc <- as.mcmc(JAGS_600_list[[1]])
+plot(mod_mcmc)
+
+# Temperature
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
+mod_mcmc <- as.mcmc(JAGS_600_temp_list[[1]])
+plot(mod_mcmc)
