@@ -14,7 +14,7 @@ library(here)
 library(lubridate)
 ```
 
-## The b0/transition matrix {.smaller}
+## The beta matrix
 ```{r, echo = FALSE}
 b0_matrix_example <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 
 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
@@ -32,13 +32,118 @@ b0_matrix_example <- structure(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1,
 colnames(b0_matrix_example) <- gsub("mainstem, ", "", colnames(b0_matrix_example))
 rownames(b0_matrix_example) <- gsub("mainstem, ", "", rownames(b0_matrix_example))
 
-b0_matrix_example
+# b0_matrix_example
 ```
+![](.//figures/b_table.png){width=100%}
 
 
+## No covariate model
+### For each movement probability:
+
+<br/>
+Every $\beta_0$ = 1.
+<br/>
+
+Numerator:
+$$
+\begin{aligned}
+ \small \psi_{BM-JDR}=  \exp(\beta_{0,BM-JDR}) \\
+\end{aligned}
+$$
+Denominator:
+$$
+\begin{aligned}
+ 1 + \psi_{BM-JDR} + \psi_{BM-DES} + \psi_{BM-MIP} + \psi_{BM-MB}
+\end{aligned}
+$$
+*BM-loss* = 1 - $\Sigma$ (all other movements)
 
 ## Results - no covariates, 600 fish
 ![](.//figures/sim600_plots.png){width=100%}
 
 ## Results - no covariates, 1200 fish
 ![](.//figures/sim1200_plots.png){width=100%}
+
+## Traceplots look good
+![](.//figures/b_traceplot_2.png){width=100%}
+
+# Covariates - attempting to include temperature, flow, rear, and origin
+
+## All covariates model
+### For each movement probability:
+
+<br/>
+
+Numerator:
+$$
+\begin{aligned}
+ \small \psi_{BM-JDR}=  \exp(\beta_{0,BM-JDR} + \beta_{temp,BM-JDR} * temp + \\
+  \beta_{flow,BM-JDR} * flow + \beta_{rear,BM-JDR}[rear] + \\
+  \beta_{origin,BM-JDR}[origin]) \\
+\end{aligned}
+$$
+Denominator:
+$$
+\begin{aligned}
+ 1 + \psi_{BM-JDR} + \psi_{BM-DES} + \psi_{BM-MIP} + \psi_{BM-MB}
+\end{aligned}
+$$
+*BM-loss* = 1 - $\Sigma$ (all other movements)
+
+## Identifiability issue with rear/origin
+![](.//figures/b_43_traces.png){width=100%}
+
+## Multinomial logit - 3 intercept terms
+### For each movement probability:
+
+<br/>
+
+Numerator:
+$$
+\begin{aligned}
+ \small \psi_{BM-JDR}=  \exp(\mathbf{\beta_{0,BM-JDR}} + \beta_{temp,BM-JDR} * temp + \\
+  \beta_{flow,BM-JDR} * flow + \mathbf{\beta_{rear,BM-JDR}[rear]} + \\
+  \mathbf{\beta_{origin,BM-JDR}[origin]}) \\
+\end{aligned}
+$$
+Denominator:
+$$
+\begin{aligned}
+ 1 + \psi_{BM-JDR} + \psi_{BM-DES} + \psi_{BM-MIP} + \psi_{BM-MB}
+\end{aligned}
+$$
+*BM-loss* = 1 - $\Sigma$ (all other movements)
+
+## Potential solution: Different intercept for each origin + rear combination?
+
+$\beta_{0, TUC, W}$
+
+<br/>
+$\beta_{0, TUC, H}$
+
+<br/>
+$\beta_{0, JDR, W}$
+
+<br/>
+etc.
+
+
+# Covariates: temperature only - 600 fish
+
+
+
+## Intercepts (b0) are still being recovered
+![](.//figures/sim600_temp_plots_b0.png){width=100%}
+
+## Some temperature betas are being recovered
+![](.//figures/sim600_temp_plots_btemp.png){width=100%}
+
+## These btemp have nice traceplots
+![](.//figures/btemp_traceplot_good.png){width=100%}
+
+## Some temperature betas are not being recovered
+![](.//figures/sim600_temp_plots_btemp_bad.png){width=100%}
+
+## Traceplots indicate that these are not being informed by the data?
+![](.//figures/btemp_traceplot_bad1.png){width=100%}
+![](.//figures/btemp_traceplot_bad2.png){width=100%}
