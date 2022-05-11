@@ -1135,3 +1135,304 @@ for (z in 1:length(sim_600_hist_list)){
 saveRDS(out.jags, here::here("simulation", "JAGS_cov_temp_600_onerun.rds"))
 saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_temp_600_list.rds"))
 
+
+
+
+
+
+##### 600 fish, CATEGORICAL covariates #####
+sim_600_hist_list <- readRDS(here::here("simulation", "sim_600_cov_categorical_hist_list.rds"))
+sim_600_dates_list <- readRDS(here::here("simulation", "sim_600_cov_categorical_dates_list.rds"))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_600.csv")))
+
+# Create a list to store JAGS objects
+JAGS_600_list <- list()
+# Loop it
+# for (z in 1:length(sim_600_hist_list)){
+for (z in 1:3){
+  dates <- sim_600_dates_list[[z]]
+  sim_data <- sim_600_hist_list[[z]]
+  
+  
+  # Store quantities for loop
+  # Store the total number of individuals
+  n.ind <- dim(sim_data)[3]
+  
+  # Store the number of observations per individual
+  # -1 because the last state is loss, which isn't actually an observation
+  n.obs <- vector(length = n.ind)
+  for (i in 1:n.ind){
+    n.obs[i] <- sum(sim_data[,,i]) - 1
+  }
+  
+  
+  
+  # Get the state that each fish was in at each n.obs
+  
+  # First initialize an empty list
+  states_list <- list()
+  
+  for (i in 1:n.ind){
+    vec <- vector(length = (n.obs[i]-1))
+    
+    # Store in list
+    states_list[[i]] <- vec
+  }
+  
+  # Store with the states
+  for (i in 1:n.ind){
+    for (j in 1:(n.obs[i])){
+      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+    }
+  }
+  
+  # Turn into matrix for JAGS
+  states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+  for (i in 1:n.ind){
+    states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+  }
+  
+  
+  # Create the design matrix for categorical variables
+  cat_X_mat_600 <- matrix(0, nrow = nfish, ncol = 4)
+  # The first column everyone gets a 1 (this is beta 0/grand mean mu)
+  cat_X_mat_600[,1] <- 1
+  
+  for (i in 1:nfish){
+    # Rear type
+    if (fish_sim_cat_data_600$rear_type[i] == 1){
+      cat_X_mat_600[i,2] <- 1
+    }
+    else {
+      cat_X_mat_600[i,2] <- -1
+    }
+    
+    
+    # Natal origin
+    if (fish_sim_cat_data_600$natal_origin[i] == 1){
+      cat_X_mat_600[i,3] <- 0
+      cat_X_mat_600[i,4] <- 1
+    }
+    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+      cat_X_mat_600[i,3] <- 1
+      cat_X_mat_600[i,4] <- 0
+    }
+    else {
+      cat_X_mat_600[i,3] <- -1
+      cat_X_mat_600[i,4] <- -1
+    }
+  }
+  
+  
+  
+  
+  ###### Parameters monitored #####
+  parameters <- c(
+    "b0_matrix",
+    "brear_matrix",
+    "borigin1_matrix",
+    "borigin2_matrix"
+  )
+  
+  
+  ##### Data #####
+  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat,
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_600)
+  
+  ###### Initial values #####
+  # New version, using only b0
+  inits <- function(){
+    b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    borigin1_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    borigin2_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      borigin1_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      borigin2_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
+    
+    return(list(
+      b0_matrix = b0_matrix,
+      brear_matrix = brear_matrix,
+      borigin1_matrix = borigin1_matrix,
+      borigin2_matrix = borigin2_matrix
+    ))
+  }
+  
+  ##### Run JAGS #####
+  out.jags <- 
+    jags.parallel(
+      data = data,
+      inits = inits,
+      model.file=here::here("simulation", "sim_model_cov_categorical.txt"),
+      parameters.to.save = parameters,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.thin = 10,
+      jags.seed = 123
+    )
+  
+  JAGS_600_list[[z]] <- out.jags
+}
+
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_categorical_600_onerun.rds"))
+saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_categorical_600_list.rds"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### 600 fish, ORIGIN only #####
+sim_600_hist_list <- readRDS(here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
+sim_600_dates_list <- readRDS(here::here("simulation", "sim_600_cov_origin_dates_list.rds"))
+fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_600.csv")))
+
+# Create a list to store JAGS objects
+JAGS_600_list <- list()
+# Loop it
+# for (z in 1:length(sim_600_hist_list)){
+for (z in 1:3){
+  dates <- sim_600_dates_list[[z]]
+  sim_data <- sim_600_hist_list[[z]]
+  
+  
+  # Store quantities for loop
+  # Store the total number of individuals
+  n.ind <- dim(sim_data)[3]
+  
+  # Store the number of observations per individual
+  # -1 because the last state is loss, which isn't actually an observation
+  n.obs <- vector(length = n.ind)
+  for (i in 1:n.ind){
+    n.obs[i] <- sum(sim_data[,,i]) - 1
+  }
+  
+  
+  
+  # Get the state that each fish was in at each n.obs
+  
+  # First initialize an empty list
+  states_list <- list()
+  
+  for (i in 1:n.ind){
+    vec <- vector(length = (n.obs[i]-1))
+    
+    # Store in list
+    states_list[[i]] <- vec
+  }
+  
+  # Store with the states
+  for (i in 1:n.ind){
+    for (j in 1:(n.obs[i])){
+      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+    }
+  }
+  
+  # Turn into matrix for JAGS
+  states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
+  for (i in 1:n.ind){
+    states_mat[i,1:(n.obs[i])] <- states_list[[i]]
+  }
+  
+  
+  # Create the design matrix for categorical variables
+  cat_X_mat_600 <- matrix(0, nrow = nfish, ncol = 3)
+  # The first column everyone gets a 1 (this is beta 0/grand mean mu)
+  cat_X_mat_600[,1] <- 1
+  
+  for (i in 1:nfish){
+    # Rear type
+    # if (fish_sim_cat_data_600$rear_type[i] == 1){
+    #   cat_X_mat_600[i,2] <- 1
+    # }
+    # else {
+    #   cat_X_mat_600[i,2] <- -1
+    # }
+    
+    
+    # Natal origin
+    if (fish_sim_cat_data_600$natal_origin[i] == 1){
+      cat_X_mat_600[i,2] <- 0
+      cat_X_mat_600[i,3] <- 1
+    }
+    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+      cat_X_mat_600[i,2] <- 1
+      cat_X_mat_600[i,3] <- 0
+    }
+    else {
+      cat_X_mat_600[i,2] <- -1
+      cat_X_mat_600[i,3] <- -1
+    }
+  }
+  
+  
+  
+  
+  ###### Parameters monitored #####
+  parameters <- c(
+    "b0_matrix",
+    "borigin1_matrix",
+    "borigin2_matrix"
+  )
+  
+  
+  ##### Data #####
+  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat,
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_600)
+  
+  ###### Initial values #####
+  # New version, using only b0
+  inits <- function(){
+    b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    borigin1_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    borigin2_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    
+    for (j in 1:dim(movements)[1]){
+      b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      borigin1_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      borigin2_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+    }
+    
+    return(list(
+      b0_matrix = b0_matrix,
+      borigin1_matrix = borigin1_matrix,
+      borigin2_matrix = borigin2_matrix
+    ))
+  }
+  
+  ##### Run JAGS #####
+  out.jags <- 
+    jags.parallel(
+      data = data,
+      inits = inits,
+      model.file=here::here("simulation", "sim_model_cov_origin.txt"),
+      parameters.to.save = parameters,
+      n.chains = 3, n.iter = 10000, n.burnin = 5000,
+      n.thin = 10,
+      jags.seed = 123
+    )
+  
+  JAGS_600_list[[z]] <- out.jags
+}
+
+saveRDS(out.jags, here::here("simulation", "JAGS_cov_origin_600_onerun.rds"))
+saveRDS(JAGS_600_list, here::here("simulation", "JAGS_cov_origin_600_list.rds"))
