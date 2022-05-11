@@ -2425,7 +2425,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
 
 }
 
-    ##### PRIORS #####
+    #### PRIORS ####
     
     ### Set the priors by matrix
     
@@ -2476,6 +2476,626 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
 parameters <- c(
   "b0_matrix"
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### JAGS model - CATEGORICAL COVARIATES (origin + rear) #####
+cat("
+model {
+
+#state-space likelihood
+for(i in 1:n.ind){ # Loop through the detection matrices for each individual
+  for(j in 1:(n.obs[i])){ # Loop through each of the observations, stopping at the loss column (-1)
+  
+  # Vectorized state transitions
+  # Index flow and temperature by date (x) and index of site (y)
+  # exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])))
+  # Note here that we also have a 1 - sum() term for the loss probability
+  
+  # y[,j+1,i] ~ dmulti(c( exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))), 1 - sum(  exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))))) ,1)
+  
+  # JAGS won't let you exponentiate a vector (BOO!!) so we'll have to write out each possible transition separately
+  y[,j+1,i] ~ dmulti(c(
+  # State 1
+  possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # State 2
+  possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 3
+  possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 4
+  possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 5
+  possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 6
+  possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 7
+  possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 8
+  possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 9
+  possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # Loss
+  (1 - sum(
+  # State 1
+  possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # State 2
+  possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 3
+  possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 4
+  possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 5
+  possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 6
+  possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 7
+  possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 8
+  possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 9
+  possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], brear_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], brear_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], brear_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], brear_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], brear_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], brear_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], brear_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], brear_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], brear_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9])))))
+  ), 1)
+  }
+
+}
+
+    ##### PRIORS #####
+    
+    ### Set the priors by matrix
+    
+        for (i in 1:nmovements){
+    b0_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+        }
+    
+        for (i in 1:nmovements){
+    brear_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+        }
+    
+        for (i in 1:nmovements){
+    borigin1_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+    borigin2_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+        }
+    
+    
+    
+    ### Set every other element to zero by using dnorm with a very high precision - this will help with initial values, I believe
+    # Needs to be a very high NEGATIVE value, not 0, because exp(0) is 1
+            for (i in 1:n_notmovements){
+    b0_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+        }
+    
+        for (i in 1:n_notmovements){
+    brear_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+        }
+    
+        for (i in 1:n_notmovements){
+    borigin1_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+    borigin2_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+        }
+
+}", fill=TRUE, file=here::here("simulation", "sim_model_cov_categorical.txt")) 
+
+
+
+
+##### JAGS model - ORIGIN #####
+cat("
+model {
+
+#state-space likelihood
+for(i in 1:n.ind){ # Loop through the detection matrices for each individual
+  for(j in 1:(n.obs[i])){ # Loop through each of the observations, stopping at the loss column (-1)
+  
+  # Vectorized state transitions
+  # Index flow and temperature by date (x) and index of site (y)
+  # exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])))
+  # Note here that we also have a 1 - sum() term for the loss probability
+  
+  # y[,j+1,i] ~ dmulti(c( exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))), 1 - sum(  exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  # btemp_matrix[states_mat[i,j],] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],])/ (1 + sum(exp(b0_matrix[states_mat[i,j],] + bflow_matrix[states_mat[i,j],] + btemp_matrix[states_mat[i,j],] + 
+  # brear_matrix[states_mat[i,j],] + borigin_matrix[states_mat[i,j],]))))) ,1)
+  
+  # JAGS won't let you exponentiate a vector (BOO!!) so we'll have to write out each possible transition separately
+  y[,j+1,i] ~ dmulti(c(
+  # State 1
+  possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # State 2
+  possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 3
+  possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 4
+  possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 5
+  possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+    
+    # State 6
+  possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 7
+  possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 8
+  possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 9
+  possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # Loss
+  (1 - sum(
+  # State 1
+  possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+  # State 2
+  possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 3
+  possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 4
+  possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 5
+  possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+    
+    # State 6
+  possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 7
+  possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 8
+  possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))),
+  
+    # State 9
+  possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9]))/
+  (1 +   
+    possible_states[states_mat[i,j],1] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 1], borigin1_matrix[states_mat[i,j], 1], borigin2_matrix[states_mat[i,j], 1])) + 
+    possible_states[states_mat[i,j],2] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 2], borigin1_matrix[states_mat[i,j], 2], borigin2_matrix[states_mat[i,j], 2])) + 
+    possible_states[states_mat[i,j],3] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 3], borigin1_matrix[states_mat[i,j], 3], borigin2_matrix[states_mat[i,j], 3])) + 
+    possible_states[states_mat[i,j],4] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 4], borigin1_matrix[states_mat[i,j], 4], borigin2_matrix[states_mat[i,j], 4])) + 
+    possible_states[states_mat[i,j],5] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 5], borigin1_matrix[states_mat[i,j], 5], borigin2_matrix[states_mat[i,j], 5])) + 
+    possible_states[states_mat[i,j],6] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 6], borigin1_matrix[states_mat[i,j], 6], borigin2_matrix[states_mat[i,j], 6])) + 
+    possible_states[states_mat[i,j],7] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 7], borigin1_matrix[states_mat[i,j], 7], borigin2_matrix[states_mat[i,j], 7])) + 
+    possible_states[states_mat[i,j],8] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 8], borigin1_matrix[states_mat[i,j], 8], borigin2_matrix[states_mat[i,j], 8])) + 
+    possible_states[states_mat[i,j],9] * exp(cat_X_mat[i,] %*% c(b0_matrix[states_mat[i,j], 9], borigin1_matrix[states_mat[i,j], 9], borigin2_matrix[states_mat[i,j], 9])))))
+  ), 1)
+  }
+
+}
+
+    ##### PRIORS #####
+    
+    ### Set the priors by matrix
+    
+        for (i in 1:nmovements){
+    b0_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+        }
+    
+        for (i in 1:nmovements){
+    borigin1_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+    borigin2_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001)
+        }
+    
+    
+    
+    ### Set every other element to zero by using dnorm with a very high precision - this will help with initial values, I believe
+    # Needs to be a very high NEGATIVE value, not 0, because exp(0) is 1
+            for (i in 1:n_notmovements){
+    b0_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+        }
+    
+        for (i in 1:n_notmovements){
+    borigin1_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+    borigin2_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
+        }
+
+}", fill=TRUE, file=here::here("simulation", "sim_model_cov_origin.txt")) 
+
 
 
 ##### Data #####
