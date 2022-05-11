@@ -442,14 +442,309 @@ ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp.png"), heigh
 ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), height = 6, width = 10, sim600_temp_plots[[3]])
 
 
-##### Traceplots for presentation #####
 
-# No covariates
-JAGS_600_list <- readRDS(here::here("simulation", "JAGS_nocov_600_list.rds"))
-mod_mcmc <- as.mcmc(JAGS_600_list[[1]])
+
+
+
+
+##### Plot simulation results - categorical covariates model #####
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_categorical_600_list.rds"))
+JAGS_obj <- JAGS_600_temp_list[[1]]
+mod_mcmc <- as.mcmc(JAGS_obj)
 plot(mod_mcmc)
 
-# Temperature
+
+
+params_in_model <- c("b0_matrix[2,1]",
+                     "b0_matrix[1,2]",
+                     "b0_matrix[3,2]",
+                     "b0_matrix[6,2]",
+                     "b0_matrix[7,2]",
+                     "b0_matrix[2,3]",
+                     "b0_matrix[4,3]",
+                     "b0_matrix[5,3]",
+                     "b0_matrix[9,3]",
+                     "b0_matrix[3,4]",
+                     "b0_matrix[3,5]",
+                     "b0_matrix[8,5]",
+                     "b0_matrix[2,6]",
+                     "b0_matrix[2,7]",
+                     "b0_matrix[5,8]",
+                     "b0_matrix[3,9]",
+                     "btemp_matrix[2,1]",
+                     "btemp_matrix[1,2]",
+                     "btemp_matrix[3,2]",
+                     "btemp_matrix[6,2]",
+                     "btemp_matrix[7,2]",
+                     "btemp_matrix[2,3]",
+                     "btemp_matrix[4,3]",
+                     "btemp_matrix[5,3]",
+                     "btemp_matrix[9,3]",
+                     "btemp_matrix[3,4]",
+                     "btemp_matrix[3,5]",
+                     "btemp_matrix[8,5]",
+                     "btemp_matrix[2,6]",
+                     "btemp_matrix[2,7]",
+                     "btemp_matrix[5,8]",
+                     "btemp_matrix[3,9]")
+
+# Return 2 facet-wrapped plots, one for each beta matrix
+# The hlines used as referernce will have to be changed for each
+simulation_plots_temp <- function(JAGS_list){
+  JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  for (i in 1:length(JAGS_list)){
+    as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
+      rownames_to_column("parameter") %>% 
+      subset(parameter %in% params_in_model) %>% 
+      dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
+      dplyr::select(parameter, mean, q2.5, q97.5) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # Split the summary into five, one for each parameter
+    summary %>% 
+      filter(grepl("b0", parameter)) -> b0_summary
+    summary %>% 
+      filter(grepl("btemp", parameter))  -> btemp_summary
+    
+    JAGS_runs_comp_b0 %>% 
+      bind_rows(., b0_summary) -> JAGS_runs_comp_b0
+    
+    JAGS_runs_comp_btemp %>% 
+      bind_rows(., btemp_summary) -> JAGS_runs_comp_btemp
+  }
+  
+  
+  # Create the plot
+  JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
+  JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
+  
+  # For now, remove the wacky tributary ones
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 > -25) -> JAGS_runs_comp_btemp_subset
+  
+  
+  b0_plot <- ggplot(JAGS_runs_comp_b0, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  btemp_plot <- ggplot(JAGS_runs_comp_btemp_subset, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    # geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  # Annotations
+  actual_values <- data.frame(parameter = c("btemp_matrix[1,2]",
+                                            "btemp_matrix[2,1]",
+                                            "btemp_matrix[2,3]",
+                                            "btemp_matrix[2,6]",
+                                            "btemp_matrix[2,7]",
+                                            "btemp_matrix[3,2]",
+                                            "btemp_matrix[3,4]",
+                                            "btemp_matrix[3,5]",
+                                            "btemp_matrix[3,9]",
+                                            "btemp_matrix[4,3]",
+                                            "btemp_matrix[5,3]",
+                                            "btemp_matrix[5,8]"
+  ),
+  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  
+  btemp_plot +
+    geom_hline(data = actual_values, aes(yintercept = yint), lty = 2) -> btemp_plot
+  
+  # Make a third plot with the parameters we are currently not estimating well
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 < -25) -> JAGS_runs_comp_btemp_subset_2
+  
+  btemp_plot_bad <- ggplot(JAGS_runs_comp_btemp_subset_2, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 0, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  return(list(b0_plot, btemp_plot, btemp_plot_bad))
+}
+
 JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
-mod_mcmc <- as.mcmc(JAGS_600_temp_list[[1]])
+sim600_temp_plots <- simulation_plots_temp(JAGS_list = JAGS_600_temp_list)
+# sim600_temp_plots[[1]]
+# sim600_temp_plots[[2]]
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_b0.png"), height = 6, width = 10, sim600_temp_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp.png"), height = 6, width = 10, sim600_temp_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+
+
+
+
+
+##### Plot simulation results - origin only model #####
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
+JAGS_obj <- JAGS_600_temp_list[[1]]
+mod_mcmc <- as.mcmc(JAGS_obj)
 plot(mod_mcmc)
+
+
+
+params_in_model <- c("b0_matrix[2,1]",
+                     "b0_matrix[1,2]",
+                     "b0_matrix[3,2]",
+                     "b0_matrix[6,2]",
+                     "b0_matrix[7,2]",
+                     "b0_matrix[2,3]",
+                     "b0_matrix[4,3]",
+                     "b0_matrix[5,3]",
+                     "b0_matrix[9,3]",
+                     "b0_matrix[3,4]",
+                     "b0_matrix[3,5]",
+                     "b0_matrix[8,5]",
+                     "b0_matrix[2,6]",
+                     "b0_matrix[2,7]",
+                     "b0_matrix[5,8]",
+                     "b0_matrix[3,9]",
+                     "btemp_matrix[2,1]",
+                     "btemp_matrix[1,2]",
+                     "btemp_matrix[3,2]",
+                     "btemp_matrix[6,2]",
+                     "btemp_matrix[7,2]",
+                     "btemp_matrix[2,3]",
+                     "btemp_matrix[4,3]",
+                     "btemp_matrix[5,3]",
+                     "btemp_matrix[9,3]",
+                     "btemp_matrix[3,4]",
+                     "btemp_matrix[3,5]",
+                     "btemp_matrix[8,5]",
+                     "btemp_matrix[2,6]",
+                     "btemp_matrix[2,7]",
+                     "btemp_matrix[5,8]",
+                     "btemp_matrix[3,9]")
+
+# Return 2 facet-wrapped plots, one for each beta matrix
+# The hlines used as referernce will have to be changed for each
+simulation_plots_temp <- function(JAGS_list){
+  JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  for (i in 1:length(JAGS_list)){
+    as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
+      rownames_to_column("parameter") %>% 
+      subset(parameter %in% params_in_model) %>% 
+      dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
+      dplyr::select(parameter, mean, q2.5, q97.5) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # Split the summary into five, one for each parameter
+    summary %>% 
+      filter(grepl("b0", parameter)) -> b0_summary
+    summary %>% 
+      filter(grepl("btemp", parameter))  -> btemp_summary
+    
+    JAGS_runs_comp_b0 %>% 
+      bind_rows(., b0_summary) -> JAGS_runs_comp_b0
+    
+    JAGS_runs_comp_btemp %>% 
+      bind_rows(., btemp_summary) -> JAGS_runs_comp_btemp
+  }
+  
+  
+  # Create the plot
+  JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
+  JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
+  
+  # For now, remove the wacky tributary ones
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 > -25) -> JAGS_runs_comp_btemp_subset
+  
+  
+  b0_plot <- ggplot(JAGS_runs_comp_b0, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  btemp_plot <- ggplot(JAGS_runs_comp_btemp_subset, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    # geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  # Annotations
+  actual_values <- data.frame(parameter = c("btemp_matrix[1,2]",
+                                            "btemp_matrix[2,1]",
+                                            "btemp_matrix[2,3]",
+                                            "btemp_matrix[2,6]",
+                                            "btemp_matrix[2,7]",
+                                            "btemp_matrix[3,2]",
+                                            "btemp_matrix[3,4]",
+                                            "btemp_matrix[3,5]",
+                                            "btemp_matrix[3,9]",
+                                            "btemp_matrix[4,3]",
+                                            "btemp_matrix[5,3]",
+                                            "btemp_matrix[5,8]"
+  ),
+  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  
+  btemp_plot +
+    geom_hline(data = actual_values, aes(yintercept = yint), lty = 2) -> btemp_plot
+  
+  # Make a third plot with the parameters we are currently not estimating well
+  JAGS_runs_comp_btemp %>% 
+    subset(., q2.5 < -25) -> JAGS_runs_comp_btemp_subset_2
+  
+  btemp_plot_bad <- ggplot(JAGS_runs_comp_btemp_subset_2, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    geom_hline(yintercept = 0, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  return(list(b0_plot, btemp_plot, btemp_plot_bad))
+}
+
+JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
+sim600_temp_plots <- simulation_plots_temp(JAGS_list = JAGS_600_temp_list)
+# sim600_temp_plots[[1]]
+# sim600_temp_plots[[2]]
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_b0.png"), height = 6, width = 10, sim600_temp_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp.png"), height = 6, width = 10, sim600_temp_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+
+
+
+
