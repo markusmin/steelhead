@@ -2553,7 +2553,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_IL_TUC <- 0 # No relationship with flow (tributary)
       btemp_IL_TUC <- 0 # No relationship with temperature (tributary)
       brear_IL_TUC <- 0 # No effect of rear type
-      borigin_IL_TUC <- c(-2, -2) # Both other origins are less likely to enter TUC than TUC fish
+      borigin_IL_TUC <- c(-1, -1) # Both other origins are less likely to enter TUC than TUC fish
       
       
       phi_IL_MIP <- exp(btemp_IL_MIP*temp_ICH + bflow_IL_MIP*flow_ICH + cat_X_mat[i,] %*% as.matrix(c(b0_IL_MIP, brear_IL_MIP, borigin_IL_MIP), ncol = 1))
