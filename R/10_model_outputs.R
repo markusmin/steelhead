@@ -29,7 +29,6 @@ JAGS_obj <- out.jags
 # Note: in the 'bugs' object (JAGS_obj$BUGSoutput), [7] are the chains, [10] is the summary
 JAGS_obj$BUGSoutput[7]
 mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc[[1]])
 plot(mod_mcmc)
 
 # Some of these don't look good - estimates seem far too low
@@ -599,14 +598,7 @@ ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), h
 
 
 ##### Plot simulation results - origin only model #####
-JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
-JAGS_obj <- JAGS_600_temp_list[[1]]
-mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc)
-
-
-
-params_in_model <- c("b0_matrix[2,1]",
+origin_params <- c("b0_matrix[2,1]",
                      "b0_matrix[1,2]",
                      "b0_matrix[3,2]",
                      "b0_matrix[6,2]",
@@ -622,28 +614,45 @@ params_in_model <- c("b0_matrix[2,1]",
                      "b0_matrix[2,7]",
                      "b0_matrix[5,8]",
                      "b0_matrix[3,9]",
-                     "btemp_matrix[2,1]",
-                     "btemp_matrix[1,2]",
-                     "btemp_matrix[3,2]",
-                     "btemp_matrix[6,2]",
-                     "btemp_matrix[7,2]",
-                     "btemp_matrix[2,3]",
-                     "btemp_matrix[4,3]",
-                     "btemp_matrix[5,3]",
-                     "btemp_matrix[9,3]",
-                     "btemp_matrix[3,4]",
-                     "btemp_matrix[3,5]",
-                     "btemp_matrix[8,5]",
-                     "btemp_matrix[2,6]",
-                     "btemp_matrix[2,7]",
-                     "btemp_matrix[5,8]",
-                     "btemp_matrix[3,9]")
+                     "borigin1_matrix[2,1]",
+                     "borigin1_matrix[1,2]",
+                     "borigin1_matrix[3,2]",
+                     "borigin1_matrix[6,2]",
+                     "borigin1_matrix[7,2]",
+                     "borigin1_matrix[2,3]",
+                     "borigin1_matrix[4,3]",
+                     "borigin1_matrix[5,3]",
+                     "borigin1_matrix[9,3]",
+                     "borigin1_matrix[3,4]",
+                     "borigin1_matrix[3,5]",
+                     "borigin1_matrix[8,5]",
+                     "borigin1_matrix[2,6]",
+                     "borigin1_matrix[2,7]",
+                     "borigin1_matrix[5,8]",
+                     "borigin1_matrix[3,9]",
+                     "borigin2_matrix[2,1]",
+                     "borigin2_matrix[1,2]",
+                     "borigin2_matrix[3,2]",
+                     "borigin2_matrix[6,2]",
+                     "borigin2_matrix[7,2]",
+                     "borigin2_matrix[2,3]",
+                     "borigin2_matrix[4,3]",
+                     "borigin2_matrix[5,3]",
+                     "borigin2_matrix[9,3]",
+                     "borigin2_matrix[3,4]",
+                     "borigin2_matrix[3,5]",
+                     "borigin2_matrix[8,5]",
+                     "borigin2_matrix[2,6]",
+                     "borigin2_matrix[2,7]",
+                     "borigin2_matrix[5,8]",
+                     "borigin2_matrix[3,9]")
 
 # Return 2 facet-wrapped plots, one for each beta matrix
 # The hlines used as referernce will have to be changed for each
-simulation_plots_temp <- function(JAGS_list){
+simulation_plots_origin <- function(JAGS_list, params_in_model = origin_params){
   JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
-  JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_borigin1 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_borigin2 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   for (i in 1:length(JAGS_list)){
     as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
       rownames_to_column("parameter") %>% 
@@ -652,27 +661,33 @@ simulation_plots_temp <- function(JAGS_list){
       dplyr::select(parameter, mean, q2.5, q97.5) %>% 
       mutate(run = paste0(i)) -> summary
     
+    # Change run to a factor for plotting
+    summary %>% 
+      mutate(run = factor(run, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))) -> summary
+    
     # Split the summary into five, one for each parameter
     summary %>% 
       filter(grepl("b0", parameter)) -> b0_summary
     summary %>% 
-      filter(grepl("btemp", parameter))  -> btemp_summary
+      filter(grepl("borigin1", parameter))  -> borigin1_summary
+    summary %>% 
+      filter(grepl("borigin2", parameter))  -> borigin2_summary
     
     JAGS_runs_comp_b0 %>% 
       bind_rows(., b0_summary) -> JAGS_runs_comp_b0
     
-    JAGS_runs_comp_btemp %>% 
-      bind_rows(., btemp_summary) -> JAGS_runs_comp_btemp
+    JAGS_runs_comp_borigin1 %>% 
+      bind_rows(., borigin1_summary) -> JAGS_runs_comp_borigin1
+    
+    JAGS_runs_comp_borigin2 %>% 
+      bind_rows(., borigin2_summary) -> JAGS_runs_comp_borigin2
   }
   
   
   # Create the plot
   JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
-  JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
-  
-  # For now, remove the wacky tributary ones
-  JAGS_runs_comp_btemp %>% 
-    subset(., q2.5 > -25) -> JAGS_runs_comp_btemp_subset
+  JAGS_runs_comp_borigin1 <- subset(JAGS_runs_comp_borigin1, !(is.na(parameter))) 
+  JAGS_runs_comp_borigin2 <- subset(JAGS_runs_comp_borigin2, !(is.na(parameter))) 
   
   
   b0_plot <- ggplot(JAGS_runs_comp_b0, aes(y = mean, x = run)) +
@@ -684,10 +699,22 @@ simulation_plots_temp <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
     xlab("Run")
   
-  btemp_plot <- ggplot(JAGS_runs_comp_btemp_subset, aes(y = mean, x = run)) +
+  borigin1_plot <- ggplot(JAGS_runs_comp_borigin1, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
+    # geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~parameter) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  borigin2_plot <- ggplot(JAGS_runs_comp_borigin2, aes(y = mean, x = run)) +
     geom_point() +
     geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
     # geom_hline(yintercept = 1, lty = 2) +
@@ -700,50 +727,89 @@ simulation_plots_temp <- function(JAGS_list){
     xlab("Run")
   
   # Annotations
-  actual_values <- data.frame(parameter = c("btemp_matrix[1,2]",
-                                            "btemp_matrix[2,1]",
-                                            "btemp_matrix[2,3]",
-                                            "btemp_matrix[2,6]",
-                                            "btemp_matrix[2,7]",
-                                            "btemp_matrix[3,2]",
-                                            "btemp_matrix[3,4]",
-                                            "btemp_matrix[3,5]",
-                                            "btemp_matrix[3,9]",
-                                            "btemp_matrix[4,3]",
-                                            "btemp_matrix[5,3]",
-                                            "btemp_matrix[5,8]"
+  borigin1_values <- data.frame(parameter = c("borigin1_matrix[2,1]",
+                                              "borigin1_matrix[1,2]",
+                                              "borigin1_matrix[3,2]",
+                                              "borigin1_matrix[6,2]",
+                                              "borigin1_matrix[7,2]",
+                                              "borigin1_matrix[2,3]",
+                                              "borigin1_matrix[4,3]",
+                                              "borigin1_matrix[5,3]",
+                                              "borigin1_matrix[9,3]",
+                                              "borigin1_matrix[3,4]",
+                                              "borigin1_matrix[3,5]",
+                                              "borigin1_matrix[8,5]",
+                                              "borigin1_matrix[2,6]",
+                                              "borigin1_matrix[2,7]",
+                                              "borigin1_matrix[5,8]",
+                                              "borigin1_matrix[3,9]"
   ),
-  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  yint = c(0, 0, 1, 0, -1, -1, 0, 0.5, 0, 0, -1, 0.5, 0.25, 1, -0.5, 0))
   
-  btemp_plot +
-    geom_hline(data = actual_values, aes(yintercept = yint), lty = 2) -> btemp_plot
+  borigin2_values <- data.frame(parameter = c("borigin2_matrix[2,1]",
+                                              "borigin2_matrix[1,2]",
+                                              "borigin2_matrix[3,2]",
+                                              "borigin2_matrix[6,2]",
+                                              "borigin2_matrix[7,2]",
+                                              "borigin2_matrix[2,3]",
+                                              "borigin2_matrix[4,3]",
+                                              "borigin2_matrix[5,3]",
+                                              "borigin2_matrix[9,3]",
+                                              "borigin2_matrix[3,4]",
+                                              "borigin2_matrix[3,5]",
+                                              "borigin2_matrix[8,5]",
+                                              "borigin2_matrix[2,6]",
+                                              "borigin2_matrix[2,7]",
+                                              "borigin2_matrix[5,8]",
+                                              "borigin2_matrix[3,9]"
+  ),
+  yint = c(0, 0, 0, 0, 0, 0, 0, 0.5, -1, 0, -0.5, 0.5, 0, 0, -0.5, 1))
   
-  # Make a third plot with the parameters we are currently not estimating well
-  JAGS_runs_comp_btemp %>% 
-    subset(., q2.5 < -25) -> JAGS_runs_comp_btemp_subset_2
+  borigin1_plot +
+    geom_hline(data = borigin1_values, aes(yintercept = yint), lty = 2) -> borigin1_plot
   
-  btemp_plot_bad <- ggplot(JAGS_runs_comp_btemp_subset_2, aes(y = mean, x = run)) +
-    geom_point() +
-    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
-    geom_hline(yintercept = 0, lty = 2) +
-    facet_wrap(~parameter) +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
-          strip.text.x = element_text(size = 12)) +
-    ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
-    xlab("Run")
+  borigin2_plot +
+    geom_hline(data = borigin2_values, aes(yintercept = yint), lty = 2) -> borigin2_plot
   
-  return(list(b0_plot, btemp_plot, btemp_plot_bad))
+  
+  return(list(b0_plot, borigin1_plot, borigin2_plot))
 }
 
-JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
-sim600_temp_plots <- simulation_plots_temp(JAGS_list = JAGS_600_temp_list)
-# sim600_temp_plots[[1]]
-# sim600_temp_plots[[2]]
+##### 600 fish, origin only ######
+
+JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
+JAGS_obj <- JAGS_600_origin_list[[1]]
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
+
+
+JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
+sim600_origin_plots <- simulation_plots_origin(JAGS_list = JAGS_600_origin_list)
+sim600_origin_plots[[1]]
+sim600_origin_plots[[2]]
+sim600_origin_plots[[3]]
 ggsave(here::here("simulation", "figures", "sim600_temp_plots_b0.png"), height = 6, width = 10, sim600_temp_plots[[1]])
-ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp.png"), height = 6, width = 10, sim600_temp_plots[[2]])
-ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_borigin1.png"), height = 6, width = 10, sim600_temp_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim600_temp_plots_borigin2.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+
+
+##### 1200 fish, origin only ######
+
+JAGS_1200_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_1200_list.rds"))
+JAGS_obj <- JAGS_1200_origin_list[[1]]
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
+
+
+JAGS_1200_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_1200_list.rds"))
+sim1200_origin_plots <- simulation_plots_origin(JAGS_list = JAGS_1200_origin_list)
+sim1200_origin_plots[[1]]
+sim1200_origin_plots[[2]]
+sim1200_origin_plots[[3]]
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_b0.png"), height = 6, width = 10, sim1200_temp_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin1.png"), height = 6, width = 10, sim1200_temp_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin2.png"), height = 6, width = 10, sim1200_temp_plots[[3]])
+
 
 
 
