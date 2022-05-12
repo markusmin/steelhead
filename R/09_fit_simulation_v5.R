@@ -15,6 +15,7 @@ library(coda)
 ##### Universal data (these are used to parameterize the model) #####
 temp_sim <- as.matrix(read.csv(here::here("simulation", "temp_600.csv"), row.names = 1))
 flow_sim <- as.matrix(read.csv(here::here("simulation", "flow_600.csv"), row.names = 1))
+# flow_sim <- flow_sim_zscore_datenumeric
 
 
 # Get number of possible movements from each site
@@ -871,7 +872,7 @@ for (z in 1:1){
   
   
   ##### Data #####
-  data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
+  data <- list(y = sim_data, n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
                states_mat = states_mat,
                movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
                nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
@@ -925,7 +926,8 @@ fish_sim_cat_data <- as.matrix(read.csv(here::here("simulation", "origin_rear_12
 # Create a list to store JAGS objects
 JAGS_1200_list <- list()
 # Loop it
-for (z in 1:length(sim_1200_hist_list)){
+# for (z in 1:length(sim_1200_hist_list)){
+for (z in 1:1){
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
