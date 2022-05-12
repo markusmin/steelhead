@@ -176,6 +176,10 @@ flow_data %>%
   subset(date >= ymd("2017-01-01") & date <= ymd("2019-12-31")) -> flow_data
 
 # First, fill NAs using linear interpolation (TEMPORARY)
+
+# Also, remove strange all NA rows
+flow_data %>% 
+  subset(., !(is.na(BON)) & !(is.na(MCN))) -> flow_data
 library(zoo)
 flow_data$BON <- na.approx(flow_data$BON)
 flow_data$MCN <- na.approx(flow_data$MCN)
@@ -199,6 +203,13 @@ flow_zscore_df %>%
   relocate(date_numeric) %>% 
   dplyr::select(-date) %>% 
   dplyr::rename(date = date_numeric) -> flow_sim_zscore_datenumeric
+
+rownames(flow_sim_zscore_datenumeric) <- NULL
+flow_sim_zscore_datenumeric %>% 
+  column_to_rownames("date") %>% 
+  relocate(ICH, .after = PRA) -> flow_sim_zscore_datenumeric
+
+write.csv(flow_sim_zscore_datenumeric, here::here("simulation", "flow_600.csv"))
 
 
 # temp_data %>% 
