@@ -178,7 +178,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]])),
   
     # State 8
-  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  possible_states[states_mat[i,j],8] * exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]])/(1 +   
   possible_states[states_mat[i,j],1] * exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]]) + 
@@ -378,7 +378,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
   btemp_matrix[states_mat[i,j], 9] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]])),
   
     # State 8
-  exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
+  possible_states[states_mat[i,j],8] * exp(b0_matrix[states_mat[i,j], 8] + bflow_matrix[states_mat[i,j], 8] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 8] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]])/(1 +   
   possible_states[states_mat[i,j],1] * exp(b0_matrix[states_mat[i,j], 1] + bflow_matrix[states_mat[i,j], 1] * flow_sim[dates[i,j], flow_index[states_mat[i,j]]] + 
   btemp_matrix[states_mat[i,j], 1] * temp_sim[dates[i,j], temp_index[states_mat[i,j]]]) + 
