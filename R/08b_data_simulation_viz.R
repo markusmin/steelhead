@@ -11,10 +11,6 @@ library(tidyverse)
 library(lubridate)
 library(ggthemes)
 
-# Load data
-sim_list <- readRDS(here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
-sim_cat_data <- read.csv(here::here("simulation", "origin_rear_600.csv"))
-
 # Load states
 sim_states = c("mainstem, mouth to BON", 
                "mainstem, BON to MCN", 
@@ -139,8 +135,16 @@ from_state_counts <- function(transitions, from_state){
 
 
 ##### ORIGIN ONLY, 600 fish, run 1 #####
+# Load data
+sim_list_origin <- readRDS(here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
+sim_cat_data <- read.csv(here::here("simulation", "origin_rear_600.csv"))
 
-origin600_1 <- data_sim_summary(sim_list = sim_list, run_number = 1)
+sim_hist_origin <- readRDS(here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
+JAGS_obj <- sim_list_origin[[10]]
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
+
+origin600_1 <- data_sim_summary(sim_list = sim_list_origin, run_number = 1)
 origin600_1[[1]]
 
 from_state_counts(transitions = origin600_1[[1]], from_state = 5)
@@ -149,9 +153,23 @@ from_state_counts(transitions = origin600_1[[1]], from_state = 7) # Origin 3 nev
 from_state_counts(transitions = origin600_1[[1]], from_state = 8) # Origins 1 and 2 are never lost # TUC
 from_state_counts(transitions = origin600_1[[1]], from_state = 9) # Origin 3 is never lost # YAK
 
+##### Temperature + flow, 600 fish, run 1 #####
+# Load data
+sim_list_contcov <- readRDS(here::here("simulation", "sim_600_cov_continuous_hist_list.rds"))
+
+covcont600_1 <- data_sim_summary(sim_list = sim_list, run_number = 1)
+# covcont600_1[[1]]
+covcont600_1[[2]]
+
+from_state_counts(transitions = covcont600_1[[1]], from_state = 5)
+from_state_counts(transitions = covcont600_1[[1]], from_state = 6) # Every rear + origin represented in each movement
+from_state_counts(transitions = covcont600_1[[1]], from_state = 7) # Origin 3 never is lost (??) - TUC river fish always return (but only 6 of them) # JDR
+from_state_counts(transitions = covcont600_1[[1]], from_state = 8) # Origins 1 and 2 are never lost # TUC
+from_state_counts(transitions = covcont600_1[[1]], from_state = 9) # Origin 3 is never lost # YAK
 
 
 
 
+##### Origin, 600 fish, run 10 #####
 
 
