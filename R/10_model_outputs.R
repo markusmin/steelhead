@@ -25,11 +25,11 @@ sim_states = c("mainstem, mouth to BON",
                "loss")
 
 # JAGS_obj <- readRDS(here::here("simulation", "JAGS_nocov_3chains_15kiter_5kburnin_4.rds"))
-JAGS_obj <- out.jags
+# JAGS_obj <- out.jags
 # Note: in the 'bugs' object (JAGS_obj$BUGSoutput), [7] are the chains, [10] is the summary
-JAGS_obj$BUGSoutput[7]
-mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc)
+# JAGS_obj$BUGSoutput[7]
+# mod_mcmc <- as.mcmc(JAGS_obj)
+# plot(mod_mcmc)
 
 # Some of these don't look good - estimates seem far too low
 # [4,3], [6,2], [7,2], [8,5], [9,3]
@@ -780,7 +780,7 @@ simulation_plots_origin <- function(JAGS_list, params_in_model = origin_params){
 JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
 JAGS_obj <- JAGS_600_origin_list[[1]]
 mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc)
+# plot(mod_mcmc)
 
 
 JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
@@ -788,16 +788,17 @@ sim600_origin_plots <- simulation_plots_origin(JAGS_list = JAGS_600_origin_list)
 sim600_origin_plots[[1]]
 sim600_origin_plots[[2]]
 sim600_origin_plots[[3]]
-ggsave(here::here("simulation", "figures", "sim600_temp_plots_b0.png"), height = 6, width = 10, sim600_temp_plots[[1]])
-ggsave(here::here("simulation", "figures", "sim600_temp_plots_borigin1.png"), height = 6, width = 10, sim600_temp_plots[[2]])
-ggsave(here::here("simulation", "figures", "sim600_temp_plots_borigin2.png"), height = 6, width = 10, sim600_temp_plots[[3]])
+ggsave(here::here("simulation", "figures", "sim600_origin_plots_b0.png"), height = 6, width = 10, sim600_origin_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim600_origin_plots_borigin1.png"), height = 6, width = 10, sim600_origin_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim600_origin_plots_borigin2.png"), height = 6, width = 10, sim600_origin_plots[[3]])
 
 
 ##### 1200 fish, origin only ######
 
 JAGS_1200_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_1200_list.rds"))
-JAGS_obj <- JAGS_1200_origin_list[[1]]
+JAGS_obj <- JAGS_1200_origin_list[[10]]
 mod_mcmc <- as.mcmc(JAGS_obj)
+summary(mod_mcmc)
 plot(mod_mcmc)
 
 
@@ -806,11 +807,25 @@ sim1200_origin_plots <- simulation_plots_origin(JAGS_list = JAGS_1200_origin_lis
 sim1200_origin_plots[[1]]
 sim1200_origin_plots[[2]]
 sim1200_origin_plots[[3]]
-ggsave(here::here("simulation", "figures", "sim1200_temp_plots_b0.png"), height = 6, width = 10, sim1200_temp_plots[[1]])
-ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin1.png"), height = 6, width = 10, sim1200_temp_plots[[2]])
-ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin2.png"), height = 6, width = 10, sim1200_temp_plots[[3]])
+ggsave(here::here("simulation", "figures", "sim1200_origin_plots_b0.png"), height = 6, width = 10, sim1200_origin_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim1200_origin_plots_borigin1.png"), height = 6, width = 10, sim1200_origin_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim1200_origin_plots_borigin2.png"), height = 6, width = 10, sim1200_origin_plots[[3]])
 
 
+##### 1200 fish, temperature and flow ######
 
+JAGS_1200_cov_continuous_list <- readRDS( here::here("simulation", "JAGS_cov_continuous_1200_list.rds"))
+JAGS_obj <- JAGS_1200_cov_continuous_list[[1]]
+JAGS_obj <- readRDS(here::here("simulation", "JAGS_cov_continuous_1200_onerun.rds"))
+mod_mcmc <- as.mcmc(JAGS_obj)
+plot(mod_mcmc)
+
+sim1200_origin_plots <- simulation_plots_origin(JAGS_list = JAGS_1200_origin_list)
+sim1200_origin_plots[[1]]
+sim1200_origin_plots[[2]]
+sim1200_origin_plots[[3]]
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_b0.png"), height = 6, width = 10, sim1200_origin_plots[[1]])
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin1.png"), height = 6, width = 10, sim1200_origin_plots[[2]])
+ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin2.png"), height = 6, width = 10, sim1200_origin_plots[[3]])
 
 
