@@ -83,15 +83,17 @@ cd jags-4.3.1
 
 # Yeah, so I can't figure out how to get this to work. Let's try again with the binary
 wget https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.1.tar.gz
-tar xvf JAGS-3.4.0.tar.gz
-mv JAGS-3.4.0 jags-3.4.0
-cd jags-3.4.0
-../config
-make
-make check
-make install
-make installcheck
+tar xvf JAGS-4.3.1.tar.gz
+mv JAGS-4.3.1 jags-4.3.1
+cd jags-4.3.1
+./configure --prefix=/sw/contrib/JAGS/jags-4.3.1
+make && make install
 
+# Info at this link: https://github.com/cran/rjags/blob/master/INSTALL
+# Then, you need to run this from the command line to tell R where to look for JAGS when installing rjags:
+export PKG_CONFIG_PATH=/sw/contrib/JAGS/jags-4.3.1/lib/pkgconfig
+# Then run this:
+export LD_RUN_PATH=/sw/contrib/JAGS/jags-4.3.1/lib
 
 
 
