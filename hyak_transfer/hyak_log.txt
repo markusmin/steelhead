@@ -3,3 +3,102 @@
 # Copying folders:
 # Note: To move to remote, you have to execute the command from your local machine
 scp -r 1200cov_hyak/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+# Run the Rscript locally
+srun -p stf -A stf --ntasks=3 --mem=100G --time=4:00:00 --pty bash –l
+
+# Get an interactive build node (run things from command line):
+srun -p build --time=2:00:00 --mem=10G --pty /bin/bash
+
+# Useful R info: https://wiki.cac.washington.edu/display/hyakusers/Hyak+R+programming
+
+
+##### Installing R (version 4) on Hyak!
+
+# The second option from this link appears to work: https://stackoverflow.com/questions/46343044/install-r-in-linux-server
+# Make sure to run ./configure --with-pcre1
+
+# What I ran:
+wget http://cran.rstudio.com/src/base/R-4/R-4.2.0.tar.gz
+tar xvf R-4.2.0.tar.gz
+cd R-4.2.0
+./configure --prefix=/sw/contrib/R-4.2.0 --with-pcre1
+
+## Output after configure:
+``
+R is now configured for x86_64-pc-linux-gnu
+
+  Source directory:            .
+  Installation directory:      /sw/contrib/R-4.2.0
+
+  C compiler:                  gcc -std=gnu11  -g -O2
+  Fortran fixed-form compiler: gfortran  -g -O2
+
+  Default C++ compiler:        g++ -std=gnu++11  -g -O2
+  C++11 compiler:              g++ -std=gnu++11  -g -O2
+  C++14 compiler:                 
+  C++17 compiler:                 
+  C++20 compiler:                 
+  Fortran free-form compiler:  gfortran  -g -O2
+  Obj-C compiler:	       gcc -g -O2 -fobjc-exceptions
+
+  Interfaces supported:        X11, tcltk
+  External libraries:          pcre1, readline, curl
+  Additional capabilities:     PNG, JPEG, TIFF, NLS, cairo, ICU
+  Options enabled:             shared BLAS, R profiling
+
+  Capabilities skipped:        
+  Options not enabled:         memory profiling
+
+  Recommended packages:        yes
+
+configure: WARNING: you cannot build PDF versions of the R manuals
+configure: WARNING: you cannot build PDF versions of vignettes and help pages
+``
+make && make install
+
+# Then create a module file using these instructions: https://wiki.cac.washington.edu/display/hyakusers/Hyak_modules
+
+# This worked: Just with some odd file paths
+# Now to run R:
+module load contrib/R-4.2.0/4.2.0
+
+
+##### Installing JAGS on Hyak
+# From this website: http://levlafayette.com/node/498
+
+# In directory: gscratch/stf/mmin/JAGS:
+
+# Source attempt 1
+wget https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.1.tar.gz
+
+# Okay, I think that the above file is for Mac? Let's try this link to the Debian version:
+
+# Source code (Debian)
+wget https://ftp.debian.org/debian/pool/main/j/jags/jags_4.3.1-1.debian.tar.xz
+tar xvf jags_4.3.1-1.debian.tar.xz
+mv debian jags-4.3.1
+cd jags-4.3.1
+./configure --prefix=/sw/contrib/JAGS/jags-4.3.1
+
+# Yeah, so I can't figure out how to get this to work. Let's try again with the binary
+wget https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.1.tar.gz
+tar xvf JAGS-3.4.0.tar.gz
+mv JAGS-3.4.0 jags-3.4.0
+cd jags-3.4.0
+../config
+make
+make check
+make install
+make installcheck
+
+
+
+
+
+
+
+
+
+
+
