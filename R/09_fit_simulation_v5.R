@@ -1217,12 +1217,12 @@ for (z in 1:3){
     
     # Natal origin
     if (fish_sim_cat_data_600$natal_origin[i] == 1){
-      cat_X_mat_600[i,3] <- 0
-      cat_X_mat_600[i,4] <- 1
-    }
-    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
       cat_X_mat_600[i,3] <- 1
       cat_X_mat_600[i,4] <- 0
+    }
+    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+      cat_X_mat_600[i,3] <- 0
+      cat_X_mat_600[i,4] <- 1
     }
     else {
       cat_X_mat_600[i,3] <- -1
@@ -1374,12 +1374,12 @@ for (z in 1:length(sim_600_hist_list)){
     
     # Natal origin
     if (fish_sim_cat_data_600$natal_origin[i] == 1){
-      cat_X_mat_600[i,2] <- 0
-      cat_X_mat_600[i,3] <- 1
-    }
-    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
       cat_X_mat_600[i,2] <- 1
       cat_X_mat_600[i,3] <- 0
+    }
+    else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+      cat_X_mat_600[i,2] <- 0
+      cat_X_mat_600[i,3] <- 1
     }
     else {
       cat_X_mat_600[i,2] <- -1
