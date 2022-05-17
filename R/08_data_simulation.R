@@ -8,6 +8,32 @@ library(janitor)
 library(tidyverse)
 library(lubridate)
 library(ggthemes)
+library(foreach)
+library(parallel)
+library(doParallel)
+
+# Set up parallel backend
+n.cores <- detectCores() - 1
+
+#create the cluster
+my.cluster <- parallel::makeCluster(
+  n.cores, 
+  type = "FORK"
+)
+
+#check cluster definition (optional)
+print(my.cluster)
+
+doParallel::registerDoParallel(cl = my.cluster)
+
+#check if it is registered (optional)
+foreach::getDoParRegistered()
+
+#how many workers are available? (optional)
+foreach::getDoParWorkers()
+
+# When you're done, turn off the cluster:
+parallel::stopCluster(cl = my.cluster)
 
 # We will be using a reduced number of states:
 
@@ -227,7 +253,7 @@ write.csv(flow_sim_zscore_datenumeric, here::here("simulation", "flow_600.csv"))
 temp_zscore_df <- temp_sim_zscore_df
 
 
-##### Base model: no covariates #####
+##### Set up Base model: no covariates #####
 
 # Create a starting matrix of sites, with the first occasion populated (BON to MCN)
 sim_states = c("mainstem, mouth to BON", 
@@ -2358,12 +2384,12 @@ for (i in 1:nfish){
   
   # Natal origin
   if (fish_sim_cat_data_600$natal_origin[i] == 1){
-    cat_X_mat_600[i,3] <- 0
-    cat_X_mat_600[i,4] <- 1
-  }
-  else if (fish_sim_cat_data_600$natal_origin[i] == 2){
     cat_X_mat_600[i,3] <- 1
     cat_X_mat_600[i,4] <- 0
+  }
+  else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+    cat_X_mat_600[i,3] <- 0
+    cat_X_mat_600[i,4] <- 1
   }
   else {
     cat_X_mat_600[i,3] <- -1
@@ -2468,7 +2494,7 @@ write.csv(fish_sim_cat_data_3000, here::here("simulation", "origin_rear_3000.csv
 
 
 
-origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
+origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat, movement_array, transition_matrix){
   # Take a uniform distribution between July 1 and September 30
   BON_arrival_dates_sim <- seq(ymd("2017-07-01"), ymd("2019-09-30"), by = "days")[round(runif(3000, min = 1, max = 92), 0)]
   
@@ -2476,6 +2502,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
   transition_date <- matrix(nrow = nfish, ncol = 100)
   
   for (i in 1:nfish){ # for each fish
+  # foreach(i = 1:nfish, .combine = "c") %dopar% {
     print(paste0("i = ", i))
     # Populate the first state of each matrix as BON to MCN (since we first see each fish at BON)
     movement_array["mainstem, BON to MCN", 1, i] <- 1
@@ -2540,21 +2567,21 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_BM_MIP <- 0 # No relationship with flows
       btemp_BM_MIP <- 0 # No effect of temperature
       brear_BM_MIP <- 0 # No difference for hatchery vs. wild
-      borigin_BM_MIP <- c(-1, 0) # JDR have a lower probability of overshooting MCN than TUC fish, but there is no difference for YAK vs TUC
+      borigin_BM_MIP <- c(-0.5, 0.25) # JDR have a lower probability of overshooting MCN than TUC fish, but there is no difference for YAK vs TUC
       
       # BON to MCN to DES R transition
       b0_BM_DES <- 1
       bflow_BM_DES <- 0 # flow not relevant for tributary entry
       btemp_BM_DES <- 0 # Temperature not relevant for tributary entry
       brear_BM_DES <- 0 # 0.5 # higher probability of straying to Deschutes if hatchery
-      borigin_BM_DES <- c(0.25, 0) # JDR have a higher probability of straying to DES than TUC fish (closer), but there is no difference for YAK vs TUC
+      borigin_BM_DES <- c(0.25, -0.125) # JDR have a higher probability of straying to DES than TUC fish (closer), but there is no difference for YAK vs TUC
       
       # BON to MCN to JDR transition
       b0_BM_JDR <- 1
       bflow_BM_JDR <- 0 # flow not relevant for tributary entry
       btemp_BM_JDR <- 0 # Temperature not relevant for tributary entry
       brear_BM_JDR <- 0 # No difference for hatchery vs. wild
-      borigin_BM_JDR <- c(1, 0) # JDR have a much higher probability of homing to JDR than TUC fish , but there is no difference for YAK vs TUC
+      borigin_BM_JDR <- c(0.5, -0.25) # JDR have a much higher probability of homing to JDR than TUC fish , but there is no difference for YAK vs TUC
       
       # Evaluate
       
@@ -2580,7 +2607,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_MIP_BM <- 0 # No relationship with flow
       btemp_MIP_BM <- 0 # No relationship with temperature
       brear_MIP_BM <- 0 # No difference for hatchery vs. wild
-      borigin_MIP_BM <- c(1, 0) # JDR have much higher chance of falling back than TUC, but no difference between YAK and TUC
+      borigin_MIP_BM <- c(0.5, -0.25) # JDR have much higher chance of falling back than TUC, but no difference between YAK and TUC
       
       # MCN TO ICH OR PRA to RIS transition
       b0_MIP_PR <- 1
@@ -2594,14 +2621,14 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_MIP_IL <- 0 # -0.3 # Negative relationship - higher flow = lower chance of ascending
       btemp_MIP_IL <- 0 # 0.2 # Positive relationship with temperature
       brear_MIP_IL <- 0 # No effect of rear type
-      borigin_MIP_IL <- c(-1, -0.5) # JDR have much lower chance than TUC, YAK have slightly lower chance than TUC
+      borigin_MIP_IL <- c(-0.5, 0) # JDR have much lower chance than TUC, YAK have slightly lower chance than TUC
       
       # MCN TO ICH OR PRA to Yakima transition
       b0_MIP_YAK <- 1
       bflow_MIP_YAK <- 0 # flow not relevant for tributary entry
       btemp_MIP_YAK <- 0 # Temperature not relevant for tributary entry
       brear_MIP_YAK <- 0 # -0.2 # Hatchery fish less likely to enter Yakima
-      borigin_MIP_YAK <- c(0, 1) # No difference for JDR vs. TUC, but much higher for YAK than JDR
+      borigin_MIP_YAK <- c(-0.25, 0.5) # No difference for JDR vs. TUC, but much higher for YAK than JDR
       
       phi_MIP_BM <- exp(btemp_MIP_BM*temp_MCN + bflow_MIP_BM*flow_MCN + cat_X_mat[i,] %*% as.matrix(c(b0_MIP_BM, brear_MIP_BM, borigin_MIP_BM), ncol = 1))
       phi_MIP_PR <- exp(btemp_MIP_PR*temp_PRA + bflow_MIP_PR*flow_PRA + cat_X_mat[i,] %*% as.matrix(c(b0_MIP_PR, brear_MIP_PR, borigin_MIP_PR), ncol = 1))
@@ -2646,14 +2673,14 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_IL_MIP <- 0 # No relationship with flow
       btemp_IL_MIP <- 0 # 0.2 # Negative relationship with temperature - when it's colder, tend to go downstream more
       brear_IL_MIP <- 0 # No effect of rear type
-      borigin_IL_MIP <- c(0.5, 0.5) # JDR and YAK fish are both more likely than TUC fish to return to MCN to ICH or PRA state
+      borigin_IL_MIP <- c(0.25, 0.25) # JDR and YAK fish are both more likely than TUC fish to return to MCN to ICH or PRA state
       
       # ICH to LGR to Tucannon River transition #
       b0_IL_TUC <- 1
       bflow_IL_TUC <- 0 # No relationship with flow (tributary)
       btemp_IL_TUC <- 0 # No relationship with temperature (tributary)
       brear_IL_TUC <- 0 # No effect of rear type
-      borigin_IL_TUC <- c(-0.5, -0.5) # Both other origins are less likely to enter TUC than TUC fish
+      borigin_IL_TUC <- c(-0.25, -0.25) # Both other origins are less likely to enter TUC than TUC fish
       
       
       phi_IL_MIP <- exp(btemp_IL_MIP*temp_ICH + bflow_IL_MIP*flow_ICH + cat_X_mat[i,] %*% as.matrix(c(b0_IL_MIP, brear_IL_MIP, borigin_IL_MIP), ncol = 1))
@@ -2690,7 +2717,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_JDR_BM <- 0 # No relationship with flow
       btemp_JDR_BM <- 0 # No relationship with temperature
       brear_JDR_BM <- 0 # No effect of rear type
-      borigin_JDR_BM <- c(-1, 0) # JDR fish less likely to return than TUC, no difference for YAK vs. TUC
+      borigin_JDR_BM <- c(-0.5, 0.25) # JDR fish less likely to return than TUC, no difference for YAK vs. TUC
       
       phi_JDR_BM <- exp(btemp_JDR_BM*temp_JDR + bflow_JDR_BM*flow_JDR + cat_X_mat[i,] %*% as.matrix(c(b0_JDR_BM, brear_JDR_BM, borigin_JDR_BM), ncol = 1))
       
@@ -2707,7 +2734,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_YAK_MIP <- 0 # No relationship with flow
       btemp_YAK_MIP <- 0 # No relationship with temperature
       brear_YAK_MIP <- 0 # No effect of rear type
-      borigin_YAK_MIP <- c(0, -1) # Yakima R. fish less likely to return
+      borigin_YAK_MIP <- c(0.25, -0.5) # Yakima R. fish less likely to return
       
       phi_YAK_MIP <- exp(btemp_YAK_MIP*temp_YAK + bflow_YAK_MIP*flow_YAK + cat_X_mat[i,] %*% as.matrix(c(b0_YAK_MIP, brear_YAK_MIP, borigin_YAK_MIP), ncol = 1))
       
@@ -2724,7 +2751,7 @@ origin_cov_sim <- function(nfish, fish_sim_cat_data, cat_X_mat){
       bflow_TUC_IL <- 0 # No relationship with flow
       btemp_TUC_IL <- 0 # No relationship with temperature
       brear_TUC_IL <- 0 # No effect of rear type
-      borigin_TUC_IL <- c(0.5,0.5) # JDR and YAK fish both more likely to return than TUC fish
+      borigin_TUC_IL <- c(0.25,0.25) # JDR and YAK fish both more likely to return than TUC fish
       
       phi_TUC_IL <- exp(btemp_TUC_IL*temp_TUC + bflow_TUC_IL*flow_TUC + cat_X_mat[i,] %*% as.matrix(c(b0_TUC_IL, brear_TUC_IL, borigin_TUC_IL), ncol = 1))
       
@@ -2839,12 +2866,12 @@ for (i in 1:nfish){
   
   # Natal origin
   if (fish_sim_cat_data_600$natal_origin[i] == 1){
-    cat_X_mat_600[i,3] <- 0
-    cat_X_mat_600[i,4] <- 1
-  }
-  else if (fish_sim_cat_data_600$natal_origin[i] == 2){
     cat_X_mat_600[i,3] <- 1
     cat_X_mat_600[i,4] <- 0
+  }
+  else if (fish_sim_cat_data_600$natal_origin[i] == 2){
+    cat_X_mat_600[i,3] <- 0
+    cat_X_mat_600[i,4] <- 1
   }
   else {
     cat_X_mat_600[i,3] <- -1
@@ -2853,12 +2880,17 @@ for (i in 1:nfish){
 }
 
 
-for (z in 1:10){
-  sim_run <- origin_cov_sim(nfish = 600, fish_sim_cat_data = fish_sim_cat_data_600,cat_X_mat = cat_X_mat_600)
-  
-  sim_600_hist_list[[z]] <- sim_run[[1]]
-  sim_600_dates_list[[z]] <- sim_run[[2]]
+# Run for loops in parallel
+origin_sim_runs <- foreach(z = 1:10) %dopar% {
+  origin_cov_sim(nfish = 600, fish_sim_cat_data = fish_sim_cat_data_600,cat_X_mat = cat_X_mat_600, 
+                            movement_array = movement_array, transition_matrix = transition_matrix)
 }
+
+for (i in 1:10){
+  sim_600_hist_list[[i]] <- origin_sim_runs[[i]][[1]]
+  sim_600_dates_list[[i]] <- origin_sim_runs[[i]][[2]]
+}
+
 
 # Export these lists as RDS objects
 saveRDS(sim_600_hist_list, here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
@@ -2906,11 +2938,15 @@ for (i in 1:nfish){
 }
 
 
-for (z in 1:10){
-  sim_run <- origin_cov_sim(nfish = 1200, fish_sim_cat_data = fish_sim_cat_data_1200,cat_X_mat = cat_X_mat_1200)
-  
-  sim_1200_hist_list[[z]] <- sim_run[[1]]
-  sim_1200_dates_list[[z]] <- sim_run[[2]]
+# Run for loops in parallel
+origin_sim_runs <- foreach(z = 1:10) %dopar% {
+  origin_cov_sim(nfish = 1200, fish_sim_cat_data = fish_sim_cat_data_1200,cat_X_mat = cat_X_mat_1200, 
+                 movement_array = movement_array, transition_matrix = transition_matrix)
+}
+
+for (i in 1:10){
+  sim_1200_hist_list[[i]] <- origin_sim_runs[[i]][[1]]
+  sim_1200_dates_list[[i]] <- origin_sim_runs[[i]][[2]]
 }
 
 # Export these lists as RDS objects
