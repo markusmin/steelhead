@@ -142,16 +142,38 @@ sim_cat_data <- read.csv(here::here("simulation", "origin_rear_600.csv"))
 sim_hist_origin <- readRDS(here::here("simulation", "sim_600_cov_origin_hist_list.rds"))
 JAGS_obj <- sim_list_origin[[10]]
 mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc)
+# plot(mod_mcmc)
 
 origin600_1 <- data_sim_summary(sim_list = sim_list_origin, run_number = 1)
-origin600_1[[1]]
+# origin600_1[[1]]
 
-from_state_counts(transitions = origin600_1[[1]], from_state = 5)
-from_state_counts(transitions = origin600_1[[1]], from_state = 6) # Every rear + origin represented in each movement
-from_state_counts(transitions = origin600_1[[1]], from_state = 7) # Origin 3 never is lost (??) - TUC river fish always return (but only 6 of them) # JDR
-from_state_counts(transitions = origin600_1[[1]], from_state = 8) # Origins 1 and 2 are never lost # TUC
-from_state_counts(transitions = origin600_1[[1]], from_state = 9) # Origin 3 is never lost # YAK
+# as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 2))
+as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 5))
+as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 6)) # Every rear + origin represented in each movement
+as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 7)) # Origin 3 never is lost (??) - TUC river fish always return (but only 6 of them) # JDR
+as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 8)) # Origins 1 and 2 are never lost # TUC
+as.data.frame(from_state_counts(transitions = origin600_1[[1]], from_state = 9)) # Origin 3 is never lost # YAK
+
+
+##### ORIGIN ONLY, 1200 fish, run 1 #####
+# Load data
+sim_list_origin <- readRDS(here::here("simulation", "sim_1200_cov_origin_hist_list.rds"))
+sim_cat_data <- read.csv(here::here("simulation", "origin_rear_1200.csv"))
+
+sim_hist_origin <- readRDS(here::here("simulation", "sim_1200_cov_origin_hist_list.rds"))
+JAGS_obj <- sim_list_origin[[10]]
+mod_mcmc <- as.mcmc(JAGS_obj)
+# plot(mod_mcmc)
+
+origin1200_1 <- data_sim_summary(sim_list = sim_list_origin, run_number = 1)
+# origin1200_1[[1]]
+
+as.data.frame(from_state_counts(transitions = origin1200_1[[1]], from_state = 2))
+from_state_counts(transitions = origin1200_1[[1]], from_state = 5)
+from_state_counts(transitions = origin1200_1[[1]], from_state = 6)
+from_state_counts(transitions = origin1200_1[[1]], from_state = 7) 
+from_state_counts(transitions = origin1200_1[[1]], from_state = 8) 
+from_state_counts(transitions = origin1200_1[[1]], from_state = 9) 
 
 ##### Temperature + flow, 600 fish, run 1 #####
 # Load data
