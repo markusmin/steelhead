@@ -711,7 +711,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
 
 }
 
-    ##### PRIORS #####
+    ###PRIORS ###
     
     ### Set the priors by matrix
     
