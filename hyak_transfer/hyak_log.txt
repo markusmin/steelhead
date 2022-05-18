@@ -12,6 +12,8 @@ srun -p build --time=2:00:00 --mem=10G --pty /bin/bash
 
 # Useful R info: https://wiki.cac.washington.edu/display/hyakusers/Hyak+R+programming
 
+# R module load:
+module load contrib/R-4.2.0/4.2.0
 
 ##### Installing R (version 4) on Hyak!
 
@@ -94,6 +96,17 @@ make && make install
 export PKG_CONFIG_PATH=/sw/contrib/JAGS/jags-4.3.1/lib/pkgconfig
 # Then run this:
 export LD_RUN_PATH=/sw/contrib/JAGS/jags-4.3.1/lib
+
+
+
+
+#### 2022-05-17 ####
+
+Moved folder to hyak to run origin only model w 1200 fish:
+
+From within directory: /Users/markusmin/Documents/CBR/steelhead/hyak_transfer
+
+scp -r 2022-05-17_origin_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
 
 
