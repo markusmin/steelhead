@@ -1201,11 +1201,11 @@ for (z in 1:3){
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_600 <- matrix(0, nrow = nfish, ncol = 4)
+  cat_X_mat_600 <- matrix(0, nrow = n.ind, ncol = 4)
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_600[,1] <- 1
   
-  for (i in 1:nfish){
+  for (i in 1:n.ind){
     # Rear type
     if (fish_sim_cat_data_600$rear_type[i] == 1){
       cat_X_mat_600[i,2] <- 1
@@ -1358,11 +1358,11 @@ for (z in 1:length(sim_600_hist_list)){
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_600 <- matrix(0, nrow = nfish, ncol = 3)
+  cat_X_mat_600 <- matrix(0, nrow = n.ind, ncol = 3)
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_600[,1] <- 1
   
-  for (i in 1:nfish){
+  for (i in 1:n.ind){
     # Rear type
     # if (fish_sim_cat_data_600$rear_type[i] == 1){
     #   cat_X_mat_600[i,2] <- 1
@@ -1500,11 +1500,11 @@ for (z in 1:length(sim_1200_hist_list)){
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_1200 <- matrix(0, nrow = nfish, ncol = 3)
+  cat_X_mat_1200 <- matrix(0, nrow = n.ind, ncol = 3)
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_1200[,1] <- 1
   
-  for (i in 1:nfish){
+  for (i in 1:n.ind){
     # Rear type
     # if (fish_sim_cat_data_1200$rear_type[i] == 1){
     #   cat_X_mat_1200[i,2] <- 1
