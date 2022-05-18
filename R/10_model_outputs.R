@@ -872,7 +872,7 @@ simulation_plots_origin <- function(JAGS_list, params_in_model = origin_params){
 JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
 JAGS_obj <- JAGS_600_origin_list[[1]]
 mod_mcmc <- as.mcmc(JAGS_obj)
-# plot(mod_mcmc)
+plot(mod_mcmc)
 
 
 JAGS_600_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_600_list.rds"))
@@ -888,7 +888,7 @@ ggsave(here::here("simulation", "figures", "sim600_origin_plots_borigin2.png"), 
 ##### 1200 fish, origin only ######
 
 JAGS_1200_origin_list <- readRDS( here::here("simulation", "JAGS_cov_origin_1200_list.rds"))
-JAGS_obj <- JAGS_1200_origin_list[[10]]
+JAGS_obj <- JAGS_1200_origin_list[[3]]
 mod_mcmc <- as.mcmc(JAGS_obj)
 summary(mod_mcmc)
 plot(mod_mcmc)
