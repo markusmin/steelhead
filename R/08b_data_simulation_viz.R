@@ -201,13 +201,15 @@ sim_cat_data <- read.csv(here::here("simulation", "origin_rear_1200.csv"))
 # Run 4 is bad, and this run is especially bad for transition [8,5]
 OR1200_4_data_sum <- data_sim_summary(sim_list = sim_list_origin_rear, run_number = 4)
 
-as.data.frame(from_state_counts(transitions = OR1200_4_data_sum[[1]], from_state = 8))
+df_counts_or1200_4 <- as.data.frame(from_state_counts(transitions = OR1200_4_data_sum[[1]], from_state = 8))
 
 # compare to run 1
 OR1200_1_data_sum <- data_sim_summary(sim_list = sim_list_origin_rear, run_number = 1)
 
-as.data.frame(from_state_counts(transitions = OR1200_1_data_sum[[1]], from_state = 8))
+df_counts_or1200_1 <- as.data.frame(from_state_counts(transitions = OR1200_1_data_sum[[1]], from_state = 8))
 
 
+dput(df_counts_or1200_4)
 
+dput(df_counts_or1200_1)
 
