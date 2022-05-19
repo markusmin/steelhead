@@ -2441,8 +2441,7 @@ for(i in 1:n.ind){ # Loop through the detection matrices for each individual
     
     
     
-    ### Set every other element to zero by using dnorm with a very high precision - this will help with initial values, I believe
-    # Needs to be a very high NEGATIVE value, not 0, because exp(0) is 1
+    ### Set every other element to -9999
             for (i in 1:n_notmovements){
     b0_matrix[not_movements[i,1], not_movements[i,2]] <- -9999
     # b0_matrix[not_movements[i,1], not_movements[i,2]] <- 0
