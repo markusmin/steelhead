@@ -194,4 +194,20 @@ from_state_counts(transitions = covcont600_1[[1]], from_state = 9) # Origin 3 is
 
 ##### Origin, 600 fish, run 10 #####
 
+##### Origin and rear, 1200 fish, run 4 #####
+sim_list_origin_rear <- readRDS(here::here("simulation", "simulated_data",  "origin_rear", "sim_1200_origin_rear_hist_list.rds"))
+sim_cat_data <- read.csv(here::here("simulation", "origin_rear_1200.csv"))
+
+# Run 4 is bad, and this run is especially bad for transition [8,5]
+OR1200_4_data_sum <- data_sim_summary(sim_list = sim_list_origin_rear, run_number = 4)
+
+as.data.frame(from_state_counts(transitions = OR1200_4_data_sum[[1]], from_state = 8))
+
+# compare to run 1
+OR1200_1_data_sum <- data_sim_summary(sim_list = sim_list_origin_rear, run_number = 1)
+
+as.data.frame(from_state_counts(transitions = OR1200_1_data_sum[[1]], from_state = 8))
+
+
+
 
