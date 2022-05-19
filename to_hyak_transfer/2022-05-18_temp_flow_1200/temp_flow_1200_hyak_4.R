@@ -1,7 +1,7 @@
-# 1200 - ORIGIN ONLY
+# 1200 - temperature and flow ONLY
 
 # for testing:
-# setwd("/Users/markusmin/Documents/CBR/steelhead/hyak_transfer/2022-05-17_origin_rear_1200/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-18_temp_flow_1200/")
 
 # Load libraries
 library(tidyverse)
@@ -13,6 +13,8 @@ library(R2jags)
 library(coda)
 
 ##### Universal data: #####
+temp_sim <- as.matrix(read.csv("temp_600.csv", row.names = 1))
+flow_sim <- as.matrix(read.csv("flow_600.csv", row.names = 1))
 
 # Get number of possible movements from each site
 possible_movements <- c("mainstem, mouth to BON" = 2,
@@ -129,15 +131,14 @@ n_notmovements <- dim(not_movements)[1]
 
 ##### 1200 origin only run #####
 
-sim_1200_hist_list <- readRDS("sim_1200_origin_rear_hist_list.rds")
-sim_1200_dates_list <- readRDS("sim_1200_origin_rear_dates_list.rds")
-fish_sim_cat_data_1200 <- as.data.frame(as.matrix(read.csv("origin_rear_1200.csv")))
+sim_1200_hist_list <- readRDS("sim_1200_temp_flow_hist_list.rds")
+sim_1200_dates_list <- readRDS("sim_1200_temp_flow_dates_list.rds")
 
 # Create a list to store JAGS objects
 JAGS_1200_list <- list()
 # Loop it
-for (z in 3:4){
-  # for (z in 1:1){
+# for (z in 1:length(sim_1200_hist_list)){
+for (z in 7:8){
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
@@ -182,35 +183,7 @@ for (z in 3:4){
   }
   
   
-  # Create the design matrix for categorical variables
-  cat_X_mat_1200 <- matrix(0, nrow = n.ind, ncol = 4)
-  # The first column everyone gets a 1 (this is beta 0/grand mean mu)
-  cat_X_mat_1200[,1] <- 1
   
-  for (i in 1:n.ind){
-    # Rear type
-    if (fish_sim_cat_data_1200$rear_type[i] == 1){
-      cat_X_mat_1200[i,2] <- 1
-    }
-    else {
-      cat_X_mat_1200[i,2] <- -1
-    }
-    
-    
-    # Natal origin
-    if (fish_sim_cat_data_1200$natal_origin[i] == 1){
-      cat_X_mat_1200[i,3] <- 1
-      cat_X_mat_1200[i,4] <- 0
-    }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){
-      cat_X_mat_1200[i,3] <- 0
-      cat_X_mat_1200[i,4] <- 1
-    }
-    else {
-      cat_X_mat_1200[i,3] <- -1
-      cat_X_mat_1200[i,4] <- -1
-    }
-  }
   
   
   
@@ -218,51 +191,46 @@ for (z in 3:4){
   ###### Parameters monitored #####
   parameters <- c(
     "b0_matrix",
-    "borigin1_matrix",
-    "borigin2_matrix",
-    "brear_matrix"
+    "btemp_matrix",
+    "bflow_matrix"
   )
   
   
   ##### Data #####
   data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
                states_mat = states_mat,
-               movements = movements, not_movements = not_movements,
-               nmovements = nmovements, dates = dates,
-               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_1200)
+               movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
+               nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
+               n_notmovements = n_notmovements, possible_states = transition_matrix)
   
   ###### Initial values #####
   # New version, using only b0
   inits <- function(){
     b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    borigin1_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    borigin2_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
     
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      borigin1_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      borigin2_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
     }
     
     return(list(
       b0_matrix = b0_matrix,
-      borigin1_matrix = borigin1_matrix,
-      borigin2_matrix = borigin2_matrix,
-      brear_matrix = brear_matrix
+      btemp_matrix = btemp_matrix,
+      bflow_matrix = bflow_matrix
     ))
   }
   
   print(paste0("Run: ", z))
-  print(Sys.time())
   
   ##### Run JAGS #####
   out.jags <- 
     jags.parallel(
       data = data,
       inits = inits,
-      model.file="sim_model_cov_categorical.txt",
+      model.file="sim_model_cov_continuous.txt",
       parameters.to.save = parameters,
       n.chains = 3, n.iter = 20000, n.burnin = 10000,
       n.thin = 20,
@@ -272,4 +240,4 @@ for (z in 3:4){
   JAGS_1200_list[[z]] <- out.jags
 }
 
-saveRDS(JAGS_1200_list, "JAGS_origin_rear_1200_list_2.rds")
+saveRDS(JAGS_1200_list, "JAGS_temp_flow_1200_list_4.rds")

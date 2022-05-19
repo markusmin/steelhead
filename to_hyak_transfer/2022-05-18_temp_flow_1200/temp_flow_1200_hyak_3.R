@@ -1,17 +1,20 @@
-# JAGS run - 1200 fish, with covariates
+# 1200 - temperature and flow ONLY
 
+# for testing:
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-18_temp_flow_1200/")
 
 # Load libraries
 library(tidyverse)
 library(lubridate)
+library(janitor)
 library(rjags)
 library(jagsUI)
 library(R2jags)
+library(coda)
 
-##### Universal data (these are used to parameterize the model) #####
+##### Universal data: #####
 temp_sim <- as.matrix(read.csv("temp_600.csv", row.names = 1))
 flow_sim <- as.matrix(read.csv("flow_600.csv", row.names = 1))
-
 
 # Get number of possible movements from each site
 possible_movements <- c("mainstem, mouth to BON" = 2,
@@ -125,15 +128,17 @@ not_movements <- which(transition_matrix[,1:9] == 0, arr.ind = TRUE)
 n_notmovements <- dim(not_movements)[1]
 
 
-##### 1200 fish, no covariates #####
-sim_1200_hist_list <- readRDS("sim_1200_cov_hist_list.rds")
-sim_1200_dates_list <- readRDS("sim_1200_cov_dates_list.rds")
-fish_sim_cat_data <- as.matrix(read.csv("origin_rear_1200.csv"))
+
+##### 1200 origin only run #####
+
+sim_1200_hist_list <- readRDS("sim_1200_temp_flow_hist_list.rds")
+sim_1200_dates_list <- readRDS("sim_1200_temp_flow_dates_list.rds")
 
 # Create a list to store JAGS objects
 JAGS_1200_list <- list()
 # Loop it
-for (z in 1:length(sim_1200_hist_list)){
+# for (z in 1:length(sim_1200_hist_list)){
+for (z in 5:6){
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
@@ -186,16 +191,14 @@ for (z in 1:length(sim_1200_hist_list)){
   ###### Parameters monitored #####
   parameters <- c(
     "b0_matrix",
-    "bflow_matrix",
     "btemp_matrix",
-    "brear_matrix",
-    "borigin_matrix"
+    "bflow_matrix"
   )
   
   
   ##### Data #####
   data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
-               states_mat = states_mat, origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], 
+               states_mat = states_mat,
                movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
                nmovements = nmovements, dates = dates, flow_index = flow_index, temp_index = temp_index,
                n_notmovements = n_notmovements, possible_states = transition_matrix)
@@ -204,41 +207,37 @@ for (z in 1:length(sim_1200_hist_list)){
   # New version, using only b0
   inits <- function(){
     b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
     btemp_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
-    borigin_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    bflow_matrix <- matrix(NA, nrow = 10, ncol = 9)
     
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       btemp_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
-      borigin_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      bflow_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
     }
     
     return(list(
       b0_matrix = b0_matrix,
-      bflow_matrix = bflow_matrix,
       btemp_matrix = btemp_matrix,
-      brear_matrix = brear_matrix,
-      borigin_matrix = borigin_matrix
+      bflow_matrix = bflow_matrix
     ))
   }
+  
+  print(paste0("Run: ", z))
   
   ##### Run JAGS #####
   out.jags <- 
     jags.parallel(
       data = data,
       inits = inits,
-      model.file="sim_model_cov.txt",
+      model.file="sim_model_cov_continuous.txt",
       parameters.to.save = parameters,
-      n.chains = 3, n.iter = 10000, n.burnin = 5000,
-      n.thin = 10,
+      n.chains = 3, n.iter = 20000, n.burnin = 10000,
+      n.thin = 20,
       jags.seed = 123
     )
   
   JAGS_1200_list[[z]] <- out.jags
 }
 
-saveRDS(JAGS_1200_list, "JAGS_cov_1200_list.rds")
+saveRDS(JAGS_1200_list, "JAGS_temp_flow_1200_list_3.rds")

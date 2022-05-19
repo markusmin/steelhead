@@ -1,8 +1,8 @@
 #!/bin/bash
-## JAGS run - 1200 fish, with covariates simulation
+## JAGS run - 1200 fish, temperature and flow simulation
 
 ## Job name
-#SBATCH --job-name=1200cov_hyak
+#SBATCH --job-name=1200_temp_flow_hyak_3
 
 ## Partition and Allocation
 #SBATCH -p ckpt
@@ -18,7 +18,7 @@
 #SBATCH --chdir=.
 
 ## Import any modules here
-
+module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-Rscript 1200cov_hyak.R
+Rscript temp_flow_1200_hyak_3.R

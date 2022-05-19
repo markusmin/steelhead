@@ -219,7 +219,8 @@ for (z in 1:2){
   parameters <- c(
     "b0_matrix",
     "borigin1_matrix",
-    "borigin2_matrix"
+    "borigin2_matrix",
+    "brear_matrix"
   )
   
   
@@ -236,17 +237,20 @@ for (z in 1:2){
     b0_matrix <- matrix(NA, nrow = 10, ncol = 9)
     borigin1_matrix <- matrix(NA, nrow = 10, ncol = 9)
     borigin2_matrix <- matrix(NA, nrow = 10, ncol = 9)
+    brear_matrix <- matrix(NA, nrow = 10, ncol = 9)
     
     for (j in 1:dim(movements)[1]){
       b0_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       borigin1_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
       borigin2_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
+      brear_matrix[movements[j,1], movements[j,2]] <- runif(1,-1,1)
     }
     
     return(list(
       b0_matrix = b0_matrix,
       borigin1_matrix = borigin1_matrix,
-      borigin2_matrix = borigin2_matrix
+      borigin2_matrix = borigin2_matrix,
+      brear_matrix = brear_matrix
     ))
   }
   
