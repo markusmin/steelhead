@@ -114,6 +114,9 @@ From within directory: /Users/markusmin/Documents/CBR/steelhead/hyak_transfer
 
 scp -r 2022-05-17_origin_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
+# Move back to local:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-17_origin_1200/ ./
+
 # Origin and rear runs:
 scp -r 2022-05-17_origin_rear_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
@@ -141,7 +144,25 @@ scp -r 2022-05-18_temp_flow_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_ru
 # Ran these models
 
 # Move back to local
-scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-18_temp_flow__1200/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-18_temp_flow_1200/ ./
+
+#### 2022-05-19 ####
+
+All 4 covariate models:
+
+Moving to hyak:
+scp -r 2022-05-19_all4_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+
+
+
+
+
+
+
+
+
+
 
 
 
