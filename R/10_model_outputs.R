@@ -300,7 +300,7 @@ mod_mcmc <- as.mcmc(JAGS_obj)
 plot(mod_mcmc)
 
 
-
+# Here, remove all of the tributary temperature effects - there is no temp data for the tributaries
 params_in_model <- c("b0_matrix[2,1]",
                      "b0_matrix[1,2]",
                      "b0_matrix[3,2]",
@@ -320,15 +320,15 @@ params_in_model <- c("b0_matrix[2,1]",
                      "btemp_matrix[2,1]",
                      "btemp_matrix[1,2]",
                      "btemp_matrix[3,2]",
-                     "btemp_matrix[6,2]",
-                     "btemp_matrix[7,2]",
+                     # "btemp_matrix[6,2]",
+                     # "btemp_matrix[7,2]",
                      "btemp_matrix[2,3]",
                      "btemp_matrix[4,3]",
                      "btemp_matrix[5,3]",
-                     "btemp_matrix[9,3]",
+                     # "btemp_matrix[9,3]",
                      "btemp_matrix[3,4]",
                      "btemp_matrix[3,5]",
-                     "btemp_matrix[8,5]",
+                     # "btemp_matrix[8,5]",
                      "btemp_matrix[2,6]",
                      "btemp_matrix[2,7]",
                      "btemp_matrix[5,8]",
@@ -336,7 +336,7 @@ params_in_model <- c("b0_matrix[2,1]",
 
 # Return 2 facet-wrapped plots, one for each beta matrix
 # The hlines used as referernce will have to be changed for each
-simulation_plots_temp <- function(JAGS_list){
+simulation_plots_temp <- function(JAGS_list, params_in_model){
   JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   for (i in 1:length(JAGS_list)){
@@ -346,6 +346,10 @@ simulation_plots_temp <- function(JAGS_list){
       dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
       dplyr::select(parameter, mean, q2.5, q97.5) %>% 
       mutate(run = paste0(i)) -> summary
+    
+    # Change run to a factor for plotting
+    summary %>% 
+      mutate(run = factor(run, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))) -> summary
     
     # Split the summary into five, one for each parameter
     summary %>% 
@@ -365,11 +369,6 @@ simulation_plots_temp <- function(JAGS_list){
   JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
   JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
   
-  # For now, remove the wacky tributary ones
-  JAGS_runs_comp_btemp %>% 
-    subset(., q2.5 > -25) -> JAGS_runs_comp_btemp_subset
-  
-  
   b0_plot <- ggplot(JAGS_runs_comp_b0, aes(y = mean, x = run)) +
     geom_point() +
     geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
@@ -382,7 +381,7 @@ simulation_plots_temp <- function(JAGS_list){
     scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
     xlab("Run")
   
-  btemp_plot <- ggplot(JAGS_runs_comp_btemp_subset, aes(y = mean, x = run)) +
+  btemp_plot <- ggplot(JAGS_runs_comp_btemp, aes(y = mean, x = run)) +
     geom_point() +
     geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
     # geom_hline(yintercept = 1, lty = 2) +
@@ -391,7 +390,7 @@ simulation_plots_temp <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    scale_y_continuous(breaks = c(-1, 0, 1), limits = c(-2, 2)) +
     xlab("Run")
   
   # Annotations
@@ -408,28 +407,12 @@ simulation_plots_temp <- function(JAGS_list){
                                               "btemp_matrix[5,3]",
                                               "btemp_matrix[5,8]"
                                               ),
-                              yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+                              yint = c(0,0,0.5,0,0,-0.5,0.3,1,0,0,0.2,0))
   
   btemp_plot +
     geom_hline(data = actual_values, aes(yintercept = yint), lty = 2) -> btemp_plot
   
-  # Make a third plot with the parameters we are currently not estimating well
-  JAGS_runs_comp_btemp %>% 
-    subset(., q2.5 < -25) -> JAGS_runs_comp_btemp_subset_2
-  
-  btemp_plot_bad <- ggplot(JAGS_runs_comp_btemp_subset_2, aes(y = mean, x = run)) +
-    geom_point() +
-    geom_linerange(aes(ymin = q2.5, ymax = q97.5)) +
-    geom_hline(yintercept = 0, lty = 2) +
-    facet_wrap(~parameter) +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
-          strip.text.x = element_text(size = 12)) +
-    ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
-    xlab("Run")
-  
-  return(list(b0_plot, btemp_plot, btemp_plot_bad))
+  return(list(b0_plot, btemp_plot))
 }
 
 JAGS_600_temp_list <- readRDS( here::here("simulation", "JAGS_cov_temp_600_list.rds"))
@@ -447,14 +430,7 @@ ggsave(here::here("simulation", "figures", "sim600_temp_plots_btemp_bad.png"), h
 
 
 ##### Plot simulation results - ORIGIN + REAR model #####
-JAGS_600_origin_rear_list <- readRDS( here::here("simulation", "JAGS_cov_categorical_600_list.rds"))
-JAGS_obj <- JAGS_600_temp_list[[1]]
-mod_mcmc <- as.mcmc(JAGS_obj)
-plot(mod_mcmc)
-
-
-
-params_in_model <- c("b0_matrix[2,1]",
+params_in_origin_rear_model <- c("b0_matrix[2,1]",
                      "b0_matrix[1,2]",
                      "b0_matrix[3,2]",
                      "b0_matrix[6,2]",
@@ -524,7 +500,7 @@ params_in_model <- c("b0_matrix[2,1]",
 
 # Return 4 facet-wrapped plots, one for each beta matrix
 # The hlines used as referernce will have to be changed for each
-simulation_plots_origin_rear <- function(JAGS_list){
+simulation_plots_origin_rear <- function(JAGS_list, params_in_model){
   JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   JAGS_runs_comp_brear <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
   JAGS_runs_comp_borigin1 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
@@ -537,6 +513,10 @@ simulation_plots_origin_rear <- function(JAGS_list){
       dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
       dplyr::select(parameter, mean, q2.5, q97.5) %>% 
       mutate(run = paste0(i)) -> summary
+    
+    # Change run to a factor for plotting
+    summary %>% 
+      mutate(run = factor(run, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))) -> summary
     
     # Split the summary into five, one for each parameter
     summary %>% 
@@ -578,7 +558,7 @@ simulation_plots_origin_rear <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    scale_y_continuous(breaks = c(0, 1, 2), limits = c(-1,3)) +
     xlab("Run")
   
   brear_plot <- ggplot(JAGS_runs_comp_brear, aes(y = mean, x = run)) +
@@ -590,7 +570,7 @@ simulation_plots_origin_rear <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    scale_y_continuous(breaks = c(-1, 0, 1), limits = c(-2, 2)) +
     xlab("Run")
   
   borigin1_plot <- ggplot(JAGS_runs_comp_borigin1, aes(y = mean, x = run)) +
@@ -602,7 +582,7 @@ simulation_plots_origin_rear <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    scale_y_continuous(breaks = c(-1, 0, 1), limits = c(-2, 2)) +
     xlab("Run")
   
   borigin2_plot <- ggplot(JAGS_runs_comp_borigin2, aes(y = mean, x = run)) +
@@ -614,7 +594,7 @@ simulation_plots_origin_rear <- function(JAGS_list){
           axis.title = element_text(size = 15),
           strip.text.x = element_text(size = 12)) +
     ylab("Estimate") +
-    # scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    scale_y_continuous(breaks = c(-1, 0, 1), limits = c(-2, 2)) +
     xlab("Run")
   
   # Annotations
@@ -629,9 +609,14 @@ simulation_plots_origin_rear <- function(JAGS_list){
                                             "brear_matrix[3,9]",
                                             "brear_matrix[4,3]",
                                             "brear_matrix[5,3]",
-                                            "brear_matrix[5,8]"
+                                            "brear_matrix[5,8]",
+                                            "brear_matrix[6,2]",
+                                            "brear_matrix[7,2]",
+                                            "brear_matrix[8,5]",
+                                            "brear_matrix[9,3]"
+                                            
   ),
-  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  yint = c(0,0,0,0.5,0,0,0,0,-0.2,0,0,0,-0.5,0,0,0))
   
   actual_values_borigin1 <- data.frame(parameter = c("borigin1_matrix[1,2]",
                                                   "borigin1_matrix[2,1]",
@@ -644,9 +629,13 @@ simulation_plots_origin_rear <- function(JAGS_list){
                                                   "borigin1_matrix[3,9]",
                                                   "borigin1_matrix[4,3]",
                                                   "borigin1_matrix[5,3]",
-                                                  "borigin1_matrix[5,8]"
+                                                  "borigin1_matrix[5,8]",
+                                                  "borigin1_matrix[6,2]",
+                                                  "borigin1_matrix[7,2]",
+                                                  "borigin1_matrix[8,5]",
+                                                  "borigin1_matrix[9,3]"
   ),
-  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  yint = c(0,0,-0.5,0.25,0.5,0.5,0,-0.5,-0.25,0,0.25,-0.25,0,-0.5,0.25,0.25))
   
   actual_values_borigin2 <- data.frame(parameter = c("borigin2_matrix[1,2]",
                                                   "borigin2_matrix[2,1]",
@@ -659,9 +648,13 @@ simulation_plots_origin_rear <- function(JAGS_list){
                                                   "borigin2_matrix[3,9]",
                                                   "borigin2_matrix[4,3]",
                                                   "borigin2_matrix[5,3]",
-                                                  "borigin2_matrix[5,8]"
+                                                  "borigin2_matrix[5,8]",
+                                                  "borigin2_matrix[6,2]",
+                                                  "borigin2_matrix[7,2]",
+                                                  "borigin2_matrix[8,5]",
+                                                  "borigin2_matrix[9,3]"
   ),
-  yint = c(0,0, 0.5, 0, 0, -0.5, 0.3, 1, 0, 0, 0.2, 0))
+  yint = c(0,0,0.25,-0.125,-0.25,-0.25,0,0,0.5,0,0.25,-0.25,0,0.25,0.25,-0.5))
   
   brear_plot +
     geom_hline(data = actual_values_brear, aes(yintercept = yint), lty = 2) -> brear_plot
@@ -675,19 +668,6 @@ simulation_plots_origin_rear <- function(JAGS_list){
   
   return(list(b0_plot, brear_plot, borigin1_plot, borigin2_plot))
 }
-
-JAGS_600_origin_rear_list <- readRDS( here::here("simulation", "JAGS_cov_categorical_600_list.rds"))
-sim600_origin_rear_plots <- simulation_plots_origin_rear(JAGS_list = JAGS_600_origin_rear_list)
-# sim600_origin_rear_plots[[1]]
-# sim600_origin_rear_plots[[2]]
-ggsave(here::here("simulation", "figures", "sim600_origin_rear_plots_b0.png"), height = 6, width = 10, sim600_origin_rear_plots[[1]])
-ggsave(here::here("simulation", "figures", "sim600_origin_rear_plots_brear.png"), height = 6, width = 10, sim600_origin_rear_plots[[2]])
-ggsave(here::here("simulation", "figures", "sim600_origin_rear_plots_borigin1.png"), height = 6, width = 10, sim600_origin_rear_plots[[3]])
-ggsave(here::here("simulation", "figures", "sim600_origin_rear_plots_borigin2.png"), height = 6, width = 10, sim600_origin_rear_plots[[4]])
-
-
-
-
 
 ##### Plot simulation results - origin only model #####
 origin_params <- c("b0_matrix[2,1]",
@@ -919,5 +899,102 @@ sim1200_origin_plots[[3]]
 ggsave(here::here("simulation", "figures", "sim1200_temp_plots_b0.png"), height = 6, width = 10, sim1200_origin_plots[[1]])
 ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin1.png"), height = 6, width = 10, sim1200_origin_plots[[2]])
 ggsave(here::here("simulation", "figures", "sim1200_temp_plots_borigin2.png"), height = 6, width = 10, sim1200_origin_plots[[3]])
+
+
+
+
+
+##### 1200 fish, origin + rear #####
+OR_1200_1 <- readRDS(here::here("from_hyak_transfer", "2022-05-17_origin_rear_1200", "JAGS_origin_rear_1200_list_1.rds"))
+OR_1200_2 <- readRDS(here::here("from_hyak_transfer", "2022-05-17_origin_rear_1200", "JAGS_origin_rear_1200_list_2.rds"))
+OR_1200_3 <- readRDS(here::here("from_hyak_transfer", "2022-05-17_origin_rear_1200", "JAGS_origin_rear_1200_list_3.rds"))
+OR_1200_4 <- readRDS(here::here("from_hyak_transfer", "2022-05-17_origin_rear_1200", "JAGS_origin_rear_1200_list_4.rds"))
+OR_1200_5 <- readRDS(here::here("from_hyak_transfer", "2022-05-17_origin_rear_1200", "JAGS_origin_rear_1200_list_5.rds"))
+
+# Combine these into a single list
+OR_1200 <- c(list(OR_1200_1[[1]]), list(OR_1200_1[[2]]), list(OR_1200_2[[3]]), list(OR_1200_2[[4]]),
+             list(OR_1200_3[[5]]), list(OR_1200_3[[6]]), list(OR_1200_4[[7]]), list(OR_1200_4[[8]]),
+             list(OR_1200_5[[9]]), list(OR_1200_5[[10]]))
+
+
+# Use plotting function
+sim1200_origin_rear_plots <- simulation_plots_origin_rear(JAGS_list = OR_1200, params_in_model = params_in_origin_rear_model)
+# sim600_origin_rear_plots[[1]]
+# sim600_origin_rear_plots[[2]]
+ggsave(here::here("simulation", "figures", "origin_rear", "sim1200_origin_rear_plots_b0.png"), height = 6, width = 10, sim1200_origin_rear_plots[[1]])
+ggsave(here::here("simulation", "figures", "origin_rear", "sim1200_origin_rear_plots_brear.png"), height = 6, width = 10, sim1200_origin_rear_plots[[2]])
+ggsave(here::here("simulation", "figures", "origin_rear", "sim1200_origin_rear_plots_borigin1.png"), height = 6, width = 10, sim1200_origin_rear_plots[[3]])
+ggsave(here::here("simulation", "figures", "origin_rear", "sim1200_origin_rear_plots_borigin2.png"), height = 6, width = 10, sim1200_origin_rear_plots[[4]])
+
+# Okay, so run 4 was terrible - let's look at the traces
+JAGS_obj <- OR_1200[[4]]
+mod_mcmc <- as.mcmc(JAGS_obj)
+# plot(mod_mcmc)
+
+
+
+
+
+
+
+
+
+
+##### 1200 fish, temperature only #####
+
+params_in_temp_model <- c("b0_matrix[2,1]",
+                     "b0_matrix[1,2]",
+                     "b0_matrix[3,2]",
+                     "b0_matrix[6,2]",
+                     "b0_matrix[7,2]",
+                     "b0_matrix[2,3]",
+                     "b0_matrix[4,3]",
+                     "b0_matrix[5,3]",
+                     "b0_matrix[9,3]",
+                     "b0_matrix[3,4]",
+                     "b0_matrix[3,5]",
+                     "b0_matrix[8,5]",
+                     "b0_matrix[2,6]",
+                     "b0_matrix[2,7]",
+                     "b0_matrix[5,8]",
+                     "b0_matrix[3,9]",
+                     "btemp_matrix[2,1]",
+                     "btemp_matrix[1,2]",
+                     "btemp_matrix[3,2]",
+                     # "btemp_matrix[6,2]",
+                     # "btemp_matrix[7,2]",
+                     "btemp_matrix[2,3]",
+                     "btemp_matrix[4,3]",
+                     "btemp_matrix[5,3]",
+                     # "btemp_matrix[9,3]",
+                     "btemp_matrix[3,4]",
+                     "btemp_matrix[3,5]",
+                     # "btemp_matrix[8,5]",
+                     "btemp_matrix[2,6]",
+                     "btemp_matrix[2,7]",
+                     "btemp_matrix[5,8]",
+                     "btemp_matrix[3,9]")
+
+temp_1200_1 <- readRDS(here::here("from_hyak_transfer", "2022-05-18_temp_1200", "JAGS_temp_1200_list_1.rds"))
+temp_1200_2 <- readRDS(here::here("from_hyak_transfer", "2022-05-18_temp_1200", "JAGS_temp_1200_list_2.rds"))
+temp_1200_3 <- readRDS(here::here("from_hyak_transfer", "2022-05-18_temp_1200", "JAGS_temp_1200_list_3.rds"))
+temp_1200_4 <- readRDS(here::here("from_hyak_transfer", "2022-05-18_temp_1200", "JAGS_temp_1200_list_4.rds"))
+temp_1200_5 <- readRDS(here::here("from_hyak_transfer", "2022-05-18_temp_1200", "JAGS_temp_1200_list_5.rds"))
+
+# Combine these into a single list
+temp_1200 <- c(list(temp_1200_1[[1]]), list(temp_1200_1[[2]]), list(temp_1200_2[[3]]), list(temp_1200_2[[4]]),
+             list(temp_1200_3[[5]]), list(temp_1200_3[[6]]), list(temp_1200_4[[7]]), list(temp_1200_4[[8]]),
+             list(temp_1200_5[[9]]), list(temp_1200_5[[10]]))
+
+
+# Use plotting function
+sim1200_temp_plots <- simulation_plots_temp(JAGS_list = temp_1200, params_in_model = params_in_temp_model)
+# sim600_temp_plots[[1]]
+# sim600_temp_plots[[2]]
+ggsave(here::here("simulation", "figures", "temperature_only", "sim1200_temp_plots_b0.png"), height = 6, width = 10, sim1200_temp_plots[[1]])
+ggsave(here::here("simulation", "figures", "temperature_only", "sim1200_temp_plots_btemp.png"), height = 6, width = 10, sim1200_temp_plots[[2]])
+
+
+
 
 
