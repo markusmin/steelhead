@@ -4,6 +4,10 @@
 # Note: To move to remote, you have to execute the command from your local machine
 scp -r 1200cov_hyak/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+# Moving stuff back off of hyak:
+# Note: You again need to be on your local machine, in the ./from_hyak_transfer folder
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-17_origin_1200/ ./
+
 # Run the Rscript locally
 srun -p stf -A stf --ntasks=3 --mem=100G --time=4:00:00 --pty bash –l
 
@@ -106,13 +110,38 @@ Moved folder to hyak to run origin only model w 1200 fish:
 
 From within directory: /Users/markusmin/Documents/CBR/steelhead/hyak_transfer
 
+# Origin only runs:
+
 scp -r 2022-05-17_origin_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
+# Origin and rear runs:
+scp -r 2022-05-17_origin_rear_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+# Move back to local:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-17_origin_rear_1200/ ./
 
 
+#### 2022-05-18 ####
 
+Temperature only runs:
 
+Moving to hyak:
+scp -r 2022-05-18_temp_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
+# Ran these models
+
+# Move back to local
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-18_temp_1200/ ./
+
+Temperature and flow runs:
+
+Moving to hyak:
+scp -r 2022-05-18_temp_flow_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+# Ran these models
+
+# Move back to local
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-18_temp_flow__1200/ ./
 
 
 
