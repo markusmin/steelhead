@@ -208,6 +208,10 @@ ggarrange(bon_corplot, mcn_corplot, ich_corplot, pra_corplot, nrow = 2, ncol = 2
 ## Temperature, flow, origin, and rear
 ![](.//figures/all4_run_inprogress.png){width=100%}
 
+## Temperature, flow, origin, and rear - waiting in the queue...
+![](.//figures/stf_queue_2.png){width=100%}
+
+
 
 ## Spill covariate
 ![](.//figures/basin_spill_BON_allyears.png){width=90%}
