@@ -153,6 +153,10 @@ All 4 covariate models:
 Moving to hyak:
 scp -r 2022-05-19_all4_1200 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
+#### 2022-05-20 ####
+
+Moving all 4 cov model off of hyak
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-05-19_all4_1200/ ./
 
 
 
