@@ -1,0 +1,43 @@
+---
+title: "Steelhead Overshoot Mini Update"
+author: "Markus Min"
+date: "5/20/2022"
+output:
+  ioslides_presentation: default
+---
+
+```{r load_libraries, echo = FALSE, message = FALSE}
+library(kableExtra)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(ggpubr)
+```
+
+
+# Simulation results with all 4 covariates
+### Temperature, flow, origin, and rear - 1200 fish
+
+## beta_0
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_b0.png){width=100%}
+
+## beta_temp
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_btemp.png){width=100%}
+
+
+## beta_flow
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_bflow.png){width=100%}
+
+
+## beta_rear
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_brear.png){width=100%}
+
+
+## beta_origin1
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_borigin1.png){width=100%}
+
+
+## beta_origin2
+![](../../simulation/figures/all4_covariates/sim1200_all4_plots_borigin2.png){width=100%}
+
