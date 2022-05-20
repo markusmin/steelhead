@@ -1393,7 +1393,7 @@ simulation_plots_all4 <- function(JAGS_list, params_in_model){
                                                  "btemp_matrix[5,3]",
                                                  "btemp_matrix[5,8]"
   ),
-  yint = c(0,0,0.5,0,0,-0.5,0.3,0,0,0,0.2,0))
+  yint = c(0,0,0.5,0,0,-0.5,0.3,1,0,0,0.2,0))
   
   actual_values_flow <- data.frame(parameter = c("bflow_matrix[1,2]",
                                                  "bflow_matrix[2,1]",
