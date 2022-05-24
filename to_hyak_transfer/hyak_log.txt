@@ -165,13 +165,19 @@ Running complete det hist for loop on hyak
 # move to hyak:
 scp -r 2022-05-23-complete_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+# move back to local - troubleshoot
 
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-23-complete_det_hist/ ./
 
+#### 2022-05-24 ####
 
+# Running det hist for loops
 
+scp -r 2022-05-24_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+# Just getting the slurm output - troubleshoot
 
-
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-24_det_hist/ ./
 
 
 
