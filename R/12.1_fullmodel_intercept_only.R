@@ -27,9 +27,9 @@ model_states = c(
   "mainstem, RRE to WEL",
   "mainstem, upstream of WEL",
   "mainstem, ICH to LGR",
-  "mainstem, upstream of ICH",
+  "mainstem, upstream of LGR",
   
-  # Tributary sites
+  # Tributary sites (17)
   "Deschutes River",
   "John Day River",
   "Hood River",
@@ -39,7 +39,7 @@ model_states = c(
   "Walla Walla River",
   "Wenatchee River",
   "Entiat River",
-  "Okangon River",
+  "Okanogan River",
   "Methow River",
   "Tucannon River",
   "Asotin Creek",
@@ -62,60 +62,173 @@ nstates <- length(model_states)
 # Create a rows = from, columns = to matrix for movement probabilities
 
 transition_matrix <- matrix(0, nrow = nstates, ncol = nstates)
-rownames(transition_matrix) <- sim_states
-colnames(transition_matrix) <- sim_states
+rownames(transition_matrix) <- model_states
+colnames(transition_matrix) <- model_states
 
 # Populate every possible option with a 1
-# mouth to BON
-transition_matrix["mainstem, mouth to BON", "mainstem, BON to MCN"] <- 1
+# 1: mainstem, mouth to BON
 transition_matrix["mainstem, mouth to BON", "loss"] <- 1
+transition_matrix["mainstem, mouth to BON", "mainstem, BON to MCN"] <- 1
 
-# BON to MCN
+
+# 2: mainstem, BON to MCN
 transition_matrix["mainstem, BON to MCN", "loss"] <- 1
 transition_matrix["mainstem, BON to MCN", "mainstem, mouth to BON"] <- 1
 transition_matrix["mainstem, BON to MCN", "mainstem, MCN to ICH or PRA"] <- 1
 transition_matrix["mainstem, BON to MCN", "Deschutes River"] <- 1
 transition_matrix["mainstem, BON to MCN", "John Day River"] <- 1
+transition_matrix["mainstem, BON to MCN", "Hood River"] <- 1
+transition_matrix["mainstem, BON to MCN", "Fifteenmile Creek"] <- 1
+transition_matrix["mainstem, BON to MCN", "Umatilla River"] <- 1
 
 
-# MCN to ICH or PRA
+# 3: mainstem, MCN to ICH or PRA
 transition_matrix["mainstem, MCN to ICH or PRA", "loss"] <- 1
 transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, BON to MCN"] <- 1
 transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS"] <- 1
 transition_matrix["mainstem, MCN to ICH or PRA", "mainstem, ICH to LGR"] <- 1
 transition_matrix["mainstem, MCN to ICH or PRA", "Yakima River"] <- 1
+transition_matrix["mainstem, MCN to ICH or PRA", "Walla Walla River"] <- 1
 
-# PRA to RIS
+
+# 4: mainstem, PRA to RIS
 transition_matrix["mainstem, PRA to RIS", "loss"] <- 1
 transition_matrix["mainstem, PRA to RIS", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["mainstem, PRA to RIS", "mainstem, RIS to RRE"] <- 1
 
-# ICH to LGR
+
+# 5: mainstem, RIS to RRE
+transition_matrix["mainstem, RIS to RRE", "loss"] <- 1
+transition_matrix["mainstem, RIS to RRE", "mainstem, PRA to RIS"] <- 1
+transition_matrix["mainstem, RIS to RRE", "mainstem, RRE to WEL"] <- 1
+transition_matrix["mainstem, RIS to RRE", "Wenatchee River"] <- 1
+
+
+# 6: mainstem, RRE to WEL
+transition_matrix["mainstem, RIS to RRE", "loss"] <- 1
+transition_matrix["mainstem, RIS to RRE", "mainstem, RIS to RRE"] <- 1
+transition_matrix["mainstem, RIS to RRE", "mainstem, upstream of WEL"] <- 1
+transition_matrix["mainstem, RIS to RRE", "Entiat River"] <- 1
+
+
+# 7: mainstem, upstream of WEL
+transition_matrix["mainstem, upstream of WEL", "loss"] <- 1
+transition_matrix["mainstem, upstream of WEL", "mainstem, RRE to WEL"] <- 1
+transition_matrix["mainstem, upstream of WEL", "Okanogan River"] <- 1
+transition_matrix["mainstem, upstream of WEL", "Methow River"] <- 1
+
+
+# 8: mainstem, ICH to LGR
 transition_matrix["mainstem, ICH to LGR", "loss"] <- 1
 transition_matrix["mainstem, ICH to LGR", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["mainstem, ICH to LGR", "mainstem, upstream of LGR"] <- 1
 transition_matrix["mainstem, ICH to LGR", "Tucannon River"] <- 1
 
-# Deschutes River
+
+# 9: mainstem, upstream of LGR
+transition_matrix["mainstem, upstream of LGR", "loss"] <- 1
+transition_matrix["mainstem, upstream of LGR", "mainstem, ICH to LGR"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Asotin Creek"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Clearwater River"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Salmon River"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Grande Ronde River"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Imnaha River"] <- 1
+
+
+# 10: Deschutes River
 transition_matrix["Deschutes River", "loss"] <- 1
 transition_matrix["Deschutes River", "mainstem, BON to MCN"] <- 1
 
-# John Day River
+
+# 11: John Day River
 transition_matrix["John Day River", "loss"] <- 1
 transition_matrix["John Day River", "mainstem, BON to MCN"] <- 1
 
-# Yakima River
+
+# 12: Hood River
+transition_matrix["Hood River", "loss"] <- 1
+transition_matrix["Hood River", "mainstem, BON to MCN"] <- 1
+
+
+# 13: Fifteenmile Creek
+transition_matrix["Fifteenmile Creek", "loss"] <- 1
+transition_matrix["Fifteenmile Creek", "mainstem, BON to MCN"] <- 1
+
+
+# 14: Umatilla River
+transition_matrix["Umatilla River", "loss"] <- 1
+transition_matrix["Umatilla River", "mainstem, BON to MCN"] <- 1
+
+
+# 15: Yakima River
 transition_matrix["Yakima River", "loss"] <- 1
 transition_matrix["Yakima River", "mainstem, MCN to ICH or PRA"] <- 1
 
-# Tucannon River
+
+# 16: Walla Walla River
+transition_matrix["Walla Walla River", "loss"] <- 1
+transition_matrix["Walla Walla River", "mainstem, MCN to ICH or PRA"] <- 1
+
+
+# 17: Wenatchee River
+transition_matrix["Wenatchee River", "loss"] <- 1
+transition_matrix["Wenatchee River", "mainstem, RIS to RRE"] <- 1
+
+
+# 18: Entiat River
+transition_matrix["Entiat River", "loss"] <- 1
+transition_matrix["Entiat River", "mainstem, RRE to WEL"] <- 1
+
+
+# 19: Okanogan River
+transition_matrix["Okanogan River", "loss"] <- 1
+transition_matrix["Okanogan River", "mainstem, upstream of WEL"] <- 1
+
+
+# 20: Methow River
+transition_matrix["Methow River", "loss"] <- 1
+transition_matrix["Methow River", "mainstem, upstream of WEL"] <- 1
+
+
+# 21: Tucannon River
 transition_matrix["Tucannon River", "loss"] <- 1
 transition_matrix["Tucannon River", "mainstem, ICH to LGR"] <- 1
 
 
+# 22: Asotin Creek
+transition_matrix["Asotin Creek", "loss"] <- 1
+transition_matrix["Asotin Creek", "mainstem, ICH to LGR"] <- 1
+
+
+# 23: Clearwater River
+transition_matrix["Clearwater River", "loss"] <- 1
+transition_matrix["Clearwater River", "mainstem, ICH to LGR"] <- 1
+
+
+# 24: Salmon River
+transition_matrix["Salmon River", "loss"] <- 1
+transition_matrix["Salmon River", "mainstem, ICH to LGR"] <- 1
+
+
+# 25: Grande Ronde River
+transition_matrix["Grande Ronde River", "loss"] <- 1
+transition_matrix["Grande Ronde River", "mainstem, ICH to LGR"] <- 1
+
+
+# 26: Imnaha River
+transition_matrix["Imnaha River", "loss"] <- 1
+transition_matrix["Imnaha River", "mainstem, ICH to LGR"] <- 1
 
 
 
 
-# Load data
+###### Parameters monitored #####
+parameters <- c(
+  "b0_matrix"
+)
+
+
+##### Data #####
 data <- list(y = sim_data,n.ind = n.ind, n.obs = n.obs, possible_movements = possible_movements,
              states_mat = states_mat, origin = fish_sim_cat_data[,2], rear = fish_sim_cat_data[,3], 
              movements = movements, not_movements = not_movements, temp_sim = temp_sim, flow_sim = flow_sim,
