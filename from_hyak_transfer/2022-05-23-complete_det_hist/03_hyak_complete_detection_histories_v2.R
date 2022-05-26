@@ -614,7 +614,11 @@ fish_counter <- 1
 
 
 # Loop through each row of the detection history
-for (i in 1:(2 * nrow(det_hist) - 1)) {
+# Okay so for hyak I need to stop it before it gets an error because it reached the end of the df
+# The last row (when the implicit sites are added in) is 125521 - so just stop it there
+# I should code this up to be more flexible, but for now this will work
+for (i in 1:125521) {
+# for (i in 1:(2 * nrow(det_hist) - 1)) {
 # for (i in 1:1000) {
 # for (i in 89764:89765) {
   # Update i to keep up with number of added rows
@@ -5117,12 +5121,13 @@ stepwise_states_noNA <- stepwise_states[!is.na(stepwise_states$tag),]
 # This individual also looks like an iteroparous individual - BON adult
 # detection was two years after last detection
 
-
+# Export this for fitting multistate
+write.csv(stepwise_states_noNA, "states_complete.csv")
 
 ##### Sort individuals into run years #####
-run_year <- c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
-run_year_start <- seq(ymd("2005-06-01"), ymd("2021-06-01"), by = "years")
-run_year_end <- seq(ymd("2006-05-31"), ymd("2022-05-31"), by = "years")
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+run_year_start <- seq(ymd("2004-06-01"), ymd("2021-06-01"), by = "years")
+run_year_end <- seq(ymd("2005-05-31"), ymd("2022-05-31"), by = "years")
 
 run_year_df <- data.frame(run_year, run_year_start, run_year_end)
 
