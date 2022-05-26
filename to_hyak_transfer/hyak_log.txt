@@ -177,7 +177,46 @@ scp -r 2022-05-24_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 # Just getting the slurm output - troubleshoot
 
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-24_det_hist/slurm-2736747.out ./
+
+#### 2022-05-25 ####
+
+My complete det hist run from yesterday seems to have completed overnight - pull it off and check
+
 scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-24_det_hist/ ./
+
+Looks like it ran okay!
+
+Moved these two files to /Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-25-complete_det_hist
+complete_event_site_metadata.csv
+complete_det_hist.csv
+
+# Moved this new folder to hyak
+
+scp -r 2022-05-25-complete_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+# Pull it back off hyak
+
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-25-complete_det_hist/ ./
+
+
+#### 5-26-22 ####
+
+Pulled runs off hyak
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-25-complete_det_hist/ ./
+
+Fixed a typo, moved back to hyak
+
+Created a second version of the R script for testing, with an associated slurm script
+
+scp -r 2022-05-25-complete_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+
+
+
+
 
 
 
