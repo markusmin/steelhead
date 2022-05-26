@@ -1,0 +1,1634 @@
+model { 
+ for(i in 1:n.ind){ # Loop through the detection matrices for each individual 
+ for(j in 1:(n.obs[i])){ # Loop through each of the observations 
+ y[,j+1,i] ~ dmulti(c( 
+ 
+# State 1 
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 2 
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 3 
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 4 
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 5 
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 6 
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 7 
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 8 
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 9 
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 10 
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 11 
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 12 
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 13 
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 14 
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 15 
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 16 
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 17 
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 18 
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 19 
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 20 
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 21 
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 22 
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 23 
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 24 
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 25 
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 26 
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# Loss 
+1 - sum(# State 1 
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 2 
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 3 
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 4 
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 5 
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 6 
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 7 
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 8 
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 9 
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 10 
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 11 
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 12 
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 13 
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 14 
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 15 
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 16 
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 17 
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 18 
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 19 
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 20 
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 21 
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 22 
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 23 
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 24 
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 25 
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])),
+
+# State 26 
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])/
+
+(1 +  
+possible_states[states_mat[i,j], 1] * exp(b0_matrix[states_mat[i,j], 1]) +
+possible_states[states_mat[i,j], 2] * exp(b0_matrix[states_mat[i,j], 2]) +
+possible_states[states_mat[i,j], 3] * exp(b0_matrix[states_mat[i,j], 3]) +
+possible_states[states_mat[i,j], 4] * exp(b0_matrix[states_mat[i,j], 4]) +
+possible_states[states_mat[i,j], 5] * exp(b0_matrix[states_mat[i,j], 5]) +
+possible_states[states_mat[i,j], 6] * exp(b0_matrix[states_mat[i,j], 6]) +
+possible_states[states_mat[i,j], 7] * exp(b0_matrix[states_mat[i,j], 7]) +
+possible_states[states_mat[i,j], 8] * exp(b0_matrix[states_mat[i,j], 8]) +
+possible_states[states_mat[i,j], 9] * exp(b0_matrix[states_mat[i,j], 9]) +
+possible_states[states_mat[i,j], 10] * exp(b0_matrix[states_mat[i,j], 10]) +
+possible_states[states_mat[i,j], 11] * exp(b0_matrix[states_mat[i,j], 11]) +
+possible_states[states_mat[i,j], 12] * exp(b0_matrix[states_mat[i,j], 12]) +
+possible_states[states_mat[i,j], 13] * exp(b0_matrix[states_mat[i,j], 13]) +
+possible_states[states_mat[i,j], 14] * exp(b0_matrix[states_mat[i,j], 14]) +
+possible_states[states_mat[i,j], 15] * exp(b0_matrix[states_mat[i,j], 15]) +
+possible_states[states_mat[i,j], 16] * exp(b0_matrix[states_mat[i,j], 16]) +
+possible_states[states_mat[i,j], 17] * exp(b0_matrix[states_mat[i,j], 17]) +
+possible_states[states_mat[i,j], 18] * exp(b0_matrix[states_mat[i,j], 18]) +
+possible_states[states_mat[i,j], 19] * exp(b0_matrix[states_mat[i,j], 19]) +
+possible_states[states_mat[i,j], 20] * exp(b0_matrix[states_mat[i,j], 20]) +
+possible_states[states_mat[i,j], 21] * exp(b0_matrix[states_mat[i,j], 21]) +
+possible_states[states_mat[i,j], 22] * exp(b0_matrix[states_mat[i,j], 22]) +
+possible_states[states_mat[i,j], 23] * exp(b0_matrix[states_mat[i,j], 23]) +
+possible_states[states_mat[i,j], 24] * exp(b0_matrix[states_mat[i,j], 24]) +
+possible_states[states_mat[i,j], 25] * exp(b0_matrix[states_mat[i,j], 25]) +
+possible_states[states_mat[i,j], 26] * exp(b0_matrix[states_mat[i,j], 26])))
+
+), 1) 
+} 
+} 
+ 
+#### PRIORS #### 
+ 
+# Set priors for all possible movements 
+for (i in 1:nmovements){ 
+b0_matrix[movements[i,1], movements[i,2]] ~ dnorm(0,0.001) 
+} 
+# Set all not possible movements to -9999 - these aren't used 
+for (i in 1:n_notmovements){ 
+b0_matrix[not_movements[i,1], not_movements[i,2]] <- -9999 
+} 
+ 
+}
