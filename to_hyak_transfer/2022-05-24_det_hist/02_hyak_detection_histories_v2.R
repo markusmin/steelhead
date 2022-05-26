@@ -1,7 +1,5 @@
 ### 02 - Detection history generation
 
-## V2: remove the John Day only code, focus on the whole dataset
-
 ### Load libraries
 library(tidyverse)
 library(lubridate)
