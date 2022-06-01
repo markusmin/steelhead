@@ -1,0 +1,24 @@
+#!/bin/bash
+## JAGS run - full dataset, intercept only
+
+## Job name
+#SBATCH --job-name=intonly_full
+
+## Partition and Allocation
+#SBATCH -p stf
+#SBATCH -A stf
+
+## Resources
+#SBATCH --nodes=1
+#SBATCH --time=24:00:00
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=370G
+
+## Specify the working directory for this job
+#SBATCH --chdir=.
+
+## Import any modules here
+module load contrib/R-4.2.0/4.2.0
+
+##  Scripts to be executed here
+Rscript 12.1_hyak_fullmodel_intercept_only.R
