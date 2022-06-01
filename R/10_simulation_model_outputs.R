@@ -11,6 +11,7 @@ library(rjags)
 library(jagsUI)
 library(R2jags)
 library(coda)
+library(scales)
 
 # Load states in the simulation
 sim_states = c("mainstem, mouth to BON", 
@@ -1642,6 +1643,204 @@ ggsave(here::here("simulation", "figures", "all4_covariates", "sim1200_all4_plot
 ggsave(here::here("simulation", "figures", "all4_covariates", "sim1200_all4_plots_borigin1.png"), height = 6, width = 10, sim1200_all4_plots[[5]])
 ggsave(here::here("simulation", "figures", "all4_covariates", "sim1200_all4_plots_borigin2.png"), height = 6, width = 10, sim1200_all4_plots[[6]])
 
+##### 1200 fish - all 4 covariates - summary plots for pres #####
 
+JAGS_list <- all4_1200
+params_in_model = params_in_all4_model
+
+  JAGS_runs_comp_b0 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_btemp <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_bflow <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_brear <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_borigin1 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  JAGS_runs_comp_borigin2 <- data.frame("parameter" = NA, "mean" = NA, "q2.5" = NA, "q97.5" = NA)
+  
+  for (i in 1:length(JAGS_list)){
+    as.data.frame(JAGS_list[[i]]$BUGSoutput$summary) %>% 
+      rownames_to_column("parameter") %>% 
+      subset(parameter %in% params_in_model) %>% 
+      dplyr::rename(q2.5 = `2.5%`, q97.5 = `97.5%`) %>% 
+      dplyr::select(parameter, mean, q2.5, q97.5) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # Change run to a factor for plotting
+    summary %>% 
+      mutate(run = factor(run, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))) -> summary
+    
+    # Split the summary into six, one for each parameter
+    summary %>% 
+      filter(grepl("b0", parameter)) -> b0_summary
+    summary %>% 
+      filter(grepl("brear", parameter))  -> brear_summary
+    summary %>% 
+      filter(grepl("borigin1", parameter))  -> borigin1_summary
+    summary %>% 
+      filter(grepl("borigin2", parameter))  -> borigin2_summary
+    summary %>% 
+      filter(grepl("btemp", parameter))  -> btemp_summary
+    summary %>% 
+      filter(grepl("bflow", parameter))  -> bflow_summary
+    
+    JAGS_runs_comp_b0 %>% 
+      bind_rows(., b0_summary) -> JAGS_runs_comp_b0
+    
+    JAGS_runs_comp_brear %>% 
+      bind_rows(., brear_summary) -> JAGS_runs_comp_brear
+    
+    JAGS_runs_comp_borigin1 %>% 
+      bind_rows(., borigin1_summary) -> JAGS_runs_comp_borigin1
+    
+    JAGS_runs_comp_borigin2 %>% 
+      bind_rows(., borigin2_summary) -> JAGS_runs_comp_borigin2
+    
+    JAGS_runs_comp_btemp %>% 
+      bind_rows(., btemp_summary) -> JAGS_runs_comp_btemp
+    
+    JAGS_runs_comp_bflow %>% 
+      bind_rows(., bflow_summary) -> JAGS_runs_comp_bflow
+  }
+  
+  JAGS_runs_comp_b0 <- subset(JAGS_runs_comp_b0, !(is.na(parameter))) 
+  JAGS_runs_comp_btemp <- subset(JAGS_runs_comp_btemp, !(is.na(parameter))) 
+  JAGS_runs_comp_bflow <- subset(JAGS_runs_comp_bflow, !(is.na(parameter))) 
+  JAGS_runs_comp_brear <- subset(JAGS_runs_comp_brear, !(is.na(parameter))) 
+  JAGS_runs_comp_borigin1 <- subset(JAGS_runs_comp_borigin1, !(is.na(parameter))) 
+  JAGS_runs_comp_borigin2 <- subset(JAGS_runs_comp_borigin2, !(is.na(parameter))) 
+
+
+
+  # Store actual values to compare to simulation results
+  actual_values_brear <- data.frame(parameter = c("brear_matrix[1,2]",
+                                                  "brear_matrix[2,1]",
+                                                  "brear_matrix[2,3]",
+                                                  "brear_matrix[2,6]",
+                                                  "brear_matrix[2,7]",
+                                                  "brear_matrix[3,2]",
+                                                  "brear_matrix[3,4]",
+                                                  "brear_matrix[3,5]",
+                                                  "brear_matrix[3,9]",
+                                                  "brear_matrix[4,3]",
+                                                  "brear_matrix[5,3]",
+                                                  "brear_matrix[5,8]",
+                                                  "brear_matrix[6,2]",
+                                                  "brear_matrix[7,2]",
+                                                  "brear_matrix[8,5]",
+                                                  "brear_matrix[9,3]"
+                                                  
+  ),
+  yint = c(0,0,0,0.5,0,0,0,0,-0.2,0,0,0,-0.5,0,0,0))
+  
+  actual_values_borigin1 <- data.frame(parameter = c("borigin1_matrix[1,2]",
+                                                     "borigin1_matrix[2,1]",
+                                                     "borigin1_matrix[2,3]",
+                                                     "borigin1_matrix[2,6]",
+                                                     "borigin1_matrix[2,7]",
+                                                     "borigin1_matrix[3,2]",
+                                                     "borigin1_matrix[3,4]",
+                                                     "borigin1_matrix[3,5]",
+                                                     "borigin1_matrix[3,9]",
+                                                     "borigin1_matrix[4,3]",
+                                                     "borigin1_matrix[5,3]",
+                                                     "borigin1_matrix[5,8]",
+                                                     "borigin1_matrix[6,2]",
+                                                     "borigin1_matrix[7,2]",
+                                                     "borigin1_matrix[8,5]",
+                                                     "borigin1_matrix[9,3]"
+  ),
+  yint = c(0,0,-0.5,0.25,0.5,0.5,0,-0.5,-0.25,0,0.25,-0.25,0,-0.5,0.25,0.25))
+  
+  actual_values_borigin2 <- data.frame(parameter = c("borigin2_matrix[1,2]",
+                                                     "borigin2_matrix[2,1]",
+                                                     "borigin2_matrix[2,3]",
+                                                     "borigin2_matrix[2,6]",
+                                                     "borigin2_matrix[2,7]",
+                                                     "borigin2_matrix[3,2]",
+                                                     "borigin2_matrix[3,4]",
+                                                     "borigin2_matrix[3,5]",
+                                                     "borigin2_matrix[3,9]",
+                                                     "borigin2_matrix[4,3]",
+                                                     "borigin2_matrix[5,3]",
+                                                     "borigin2_matrix[5,8]",
+                                                     "borigin2_matrix[6,2]",
+                                                     "borigin2_matrix[7,2]",
+                                                     "borigin2_matrix[8,5]",
+                                                     "borigin2_matrix[9,3]"
+  ),
+  yint = c(0,0,0.25,-0.125,-0.25,-0.25,0,0,0.5,0,0.25,-0.25,0,0.25,0.25,-0.5))
+  
+  
+  actual_values_temp <- data.frame(parameter = c("btemp_matrix[1,2]",
+                                                 "btemp_matrix[2,1]",
+                                                 "btemp_matrix[2,3]",
+                                                 "btemp_matrix[2,6]",
+                                                 "btemp_matrix[2,7]",
+                                                 "btemp_matrix[3,2]",
+                                                 "btemp_matrix[3,4]",
+                                                 "btemp_matrix[3,5]",
+                                                 "btemp_matrix[3,9]",
+                                                 "btemp_matrix[4,3]",
+                                                 "btemp_matrix[5,3]",
+                                                 "btemp_matrix[5,8]"
+  ),
+  yint = c(0,0,0.5,0,0,-0.5,0.3,1,0,0,0.2,0))
+  
+  actual_values_flow <- data.frame(parameter = c("bflow_matrix[1,2]",
+                                                 "bflow_matrix[2,1]",
+                                                 "bflow_matrix[2,3]",
+                                                 "bflow_matrix[2,6]",
+                                                 "bflow_matrix[2,7]",
+                                                 "bflow_matrix[3,2]",
+                                                 "bflow_matrix[3,4]",
+                                                 "bflow_matrix[3,5]",
+                                                 "bflow_matrix[3,9]",
+                                                 "bflow_matrix[4,3]",
+                                                 "bflow_matrix[5,3]",
+                                                 "bflow_matrix[5,8]"
+  ),
+  yint = c(0,0.5,0,0,0,0.05,0,-0.3,0,0,0,0))
+  
+  
+# Combine runs with the values from the simulation
+actual_values_borigin1 %>% 
+  bind_rows(., actual_values_borigin2) %>% 
+  bind_rows(., actual_values_brear) %>% 
+  bind_rows(., actual_values_flow) %>% 
+  bind_rows(., actual_values_temp) -> actual_values_table
+  
+JAGS_runs_comp_b0 %>% 
+  bind_rows(., JAGS_runs_comp_bflow) %>% 
+  bind_rows(., JAGS_runs_comp_borigin1) %>% 
+  bind_rows(., JAGS_runs_comp_borigin2) %>% 
+  bind_rows(., JAGS_runs_comp_btemp) %>% 
+  bind_rows(., JAGS_runs_comp_brear) %>% 
+  left_join(., actual_values_table, by = "parameter") %>% 
+  mutate(yint = ifelse(is.na(yint), 1, yint)) %>% 
+  mutate(error = mean - yint)  %>% 
+  mutate(param_group = gsub("_.*", "", parameter)) %>% 
+  mutate(param_title = ifelse(param_group == "b0", "Intercept",
+                              ifelse(param_group == "bflow", "Flow",
+                                     ifelse(param_group %in% c("borigin1", "borigin2"), "Natal Origin",
+                                            ifelse(param_group == "brear", "Rear Type",
+                                                   ifelse(param_group == "btemp", "Temperature", NA)))))) %>% 
+  mutate(param_title = factor(param_title, levels = c("Intercept", "Natal Origin", "Rear Type", "Temperature", "Flow"))) -> sim_error_table
+
+ggplot(sim_error_table, aes(x = error)) +
+  geom_histogram(bins = 15) +
+  facet_wrap(~param_group)
+
+simulation_errors_plot <- ggplot(sim_error_table, aes(x = error, group = param_title)) +
+  geom_histogram(aes(y = stat(density) *0.05), binwidth = 0.05) + 
+  scale_y_continuous(labels = percent, expand = c(0,0), limits = c(0, 0.2)) +
+  facet_wrap(~ param_title, ncol = 6) +
+  geom_vline(xintercept = 0, lty = 2) +
+  ylab("Percentage of Simulations") +
+  xlab("Error") +
+  theme(axis.title = element_text(size = 15),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 15),
+        panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.minor = element_blank())
+
+ggsave(file = here::here("simulation", "figures", "all4_covariates", "summary_fig.png"), simulation_errors_plot, height = 6, width = 10)
 
 
