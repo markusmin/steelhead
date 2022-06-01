@@ -209,14 +209,50 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-05-25-complete_det_hist/ ./
 
 Fixed a typo, moved back to hyak
 
-Created a second version of the R script for testing, with an associated slurm script
+Created a second version of the R script for testing, with an associated slurm script (both of these have test in the name)
+
+Ran both scripts
+
 
 scp -r 2022-05-25-complete_det_hist mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 
+Okay, it looks like the complete det hist script ran!
 
 
+Now, run the intercept only model:
+- first transfer to hyak:
+scp -r 2022-05-26_fullmodel_intercept_only mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+# Ran model
+Got error - ran out of memory:
+[1] "Start time: 2022-05-26 15:53:30"
+Error in unserialize(node$con) : error reading from connection
+Calls: jags.parallel ... FUN -> recvData -> recvData.SOCKnode -> unserialize
+Execution halted
+slurmstepd: error: Detected 7 oom-kill event(s) in StepId=2741132.batch cgroup. Some of your processes may have been killed by the cgroup out-of-memory handler.
+
+Let's try running this on klone then since there's more memory there
+scp -r 2022-05-26_fullmodel_intercept_only mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+Okay - so I would have to entirely reconstruct my computing environment on klone for this to run. Will take a bit longer to do this
 
 
+#### 5-27-22 ####
+The first thing I tired to address the memory issue is to change the parameters monitored from the whole matrix (which has lots of zeros) to just the ones of interest.
+I did this by indexing in the JAGS code and storing these as parameters, and then monitoring those.
+- This took us down from 841 monitored parameters to 54
+- uploaded this new script to hyak:
+
+scp -r 2022-05-26_fullmodel_intercept_only/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+Still crashed...
+
+
+### 5-31-22 ###
+
+Okay, let's try Mark's suggestion to monitor less parameters
+
+Monitor only the first ten - move to MOX
+scp -r 2022-05-31_fullmodel_intercept_only_monitor_1.10/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
 
