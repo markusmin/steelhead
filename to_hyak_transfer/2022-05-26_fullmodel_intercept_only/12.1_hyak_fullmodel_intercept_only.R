@@ -1,7 +1,7 @@
 # 12.1 FULL MODEL
 
 # For testing:
-
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-26_fullmodel_intercept_only/")
 
 # In this initial fit to the full dataset, we will be fitting an intercept-only model.
 
@@ -347,10 +347,6 @@ for (i in 1:n.ind){
 }
 
 
-###### Parameters monitored #####
-parameters <- c(
-  "b0_matrix"
-)
 
 ##### Write function to write out JAGS model #####
 
@@ -442,10 +438,16 @@ cat("for (i in 1:n_notmovements){", "\n")
 cat("b0_matrix[not_movements[i,1], not_movements[i,2]] <- -9999", "\n")
 cat("}", "\n", "\n")
 
+# Pull out derived parameters - should save us memory if we don't monitor the full b0 matrix, which is mostly 0s
+cat("# Extract parameters of interest from matrix", "\n")
+for (i in 1:nmovements) {
+  cat("b0_",  movements[i,1], "_",  movements[i,2], " <- b0_matrix[", movements[i,1], ",", movements[i,2], "]", "\n", sep = "")
+}
+
 # Now close the original bracket for model
 cat("}")
 
-sink()
+sink(file = NULL)
 
 
 ##### Data #####
@@ -456,6 +458,64 @@ data <- list(y = movement_array, n.ind = n.ind, n.obs = n.obs,
              movements = movements, not_movements = not_movements,
              nmovements = nmovements, 
              n_notmovements = n_notmovements, possible_states = transition_matrix)
+
+
+###### Parameters monitored #####
+parameters <- c("b0_2_1",
+                "b0_1_2",
+                "b0_3_2",
+                "b0_10_2",
+                "b0_11_2",
+                "b0_12_2",
+                "b0_13_2",
+                "b0_14_2",
+                "b0_27_2",
+                "b0_28_2",
+                "b0_2_3",
+                "b0_4_3",
+                "b0_8_3",
+                "b0_15_3",
+                "b0_16_3",
+                "b0_3_4",
+                "b0_5_4",
+                "b0_4_5",
+                "b0_5_5",
+                "b0_17_5",
+                "b0_5_6",
+                "b0_7_6",
+                "b0_18_6",
+                "b0_5_7",
+                "b0_19_7",
+                "b0_20_7",
+                "b0_3_8",
+                "b0_9_8",
+                "b0_21_8",
+                "b0_8_9",
+                "b0_22_9",
+                "b0_23_9",
+                "b0_24_9",
+                "b0_25_9",
+                "b0_26_9",
+                "b0_2_10",
+                "b0_2_11",
+                "b0_2_12",
+                "b0_2_13",
+                "b0_2_14",
+                "b0_3_15",
+                "b0_3_16",
+                "b0_5_17",
+                "b0_5_18",
+                "b0_7_19",
+                "b0_7_20",
+                "b0_8_21",
+                "b0_9_22",
+                "b0_9_23",
+                "b0_9_24",
+                "b0_9_25",
+                "b0_9_26",
+                "b0_2_27",
+                "b0_7_28"
+)
 
 
 ###### Initial values #####
@@ -470,6 +530,9 @@ inits <- function(){
     b0_matrix = b0_matrix
   ))
 }
+
+# Now write everything after this point (which shows start and end time, plus any errors or warnings that JAGS returns) to a separate text file
+sink("JAGS_log_file.txt")
 
 start_time <- Sys.time()
 print(paste0("Start time: ", start_time))
