@@ -19,7 +19,7 @@ srun -p build --time=2:00:00 --mem=10G --pty /bin/bash
 # R module load:
 module load contrib/R-4.2.0/4.2.0
 
-##### Installing R (version 4) on Hyak!
+##### Installing R (version 4) on MOX Hyak!
 
 # The second option from this link appears to work: https://stackoverflow.com/questions/46343044/install-r-in-linux-server
 # Make sure to run ./configure --with-pcre1
@@ -100,8 +100,6 @@ make && make install
 export PKG_CONFIG_PATH=/sw/contrib/JAGS/jags-4.3.1/lib/pkgconfig
 # Then run this:
 export LD_RUN_PATH=/sw/contrib/JAGS/jags-4.3.1/lib
-
-
 
 
 #### 2022-05-17 ####
@@ -255,4 +253,125 @@ Okay, let's try Mark's suggestion to monitor less parameters
 Monitor only the first ten - move to MOX
 scp -r 2022-05-31_fullmodel_intercept_only_monitor_1.10/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
 
+This didn't work
 
+Try Mark's other suggestion to drop the iter and thin and burn way down
+scp -r 2022-05-31_fullmodel_intercept_only_monitor_1.10/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+
+### 06-01-22
+
+It seems to work less and less - maybe I need to clear the workspace?
+
+scp -r 2022-06-01_fullmodel_intercept_only_monitor_1.1/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+
+
+### Reinstalling everything on KLONE ###
+
+##### Installing R (version 4) on KLONE
+
+# Very useful link: https://hyak.uw.edu/docs/compute/scheduling-jobs/
+
+# Note: there are no build nodes on KLONE - see this link for differences from MOX: https://hyak.uw.edu/blog/mox-to-klone
+# Instead of srun, use salloc
+salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+
+# run hyakalloc to show what resources are available
+- interestingly, now the partitions available for account stf are compute, gpu-2080ti, hugemem, and interactive
+
+# How to install stuff: https://hyak.uw.edu/docs/tools/containers
+
+# The second option from this link appears to work: https://stackoverflow.com/questions/46343044/install-r-in-linux-server
+# Make sure to run ./configure --with-pcre1
+
+# What I ran:
+First, navigate to /sw/contrib/stf-src/
+wget http://cran.rstudio.com/src/base/R-4/R-4.2.0.tar.gz
+tar xvf R-4.2.0.tar.gz
+cd R-4.2.0
+# Configuring is not working
+./configure --prefix=/sw/contrib/stf-src/R-4.2.0 --with-pcre1 # Didn't work
+./configure --with-readline=no --with-x=no
+./configure --prefix=/sw/contrib/stf-src --with-readline=no --with-x=no # didn't work
+make && make install
+
+apptainer exec tools.sif /sw/contrib/stf-src/R-4.2.0/configure --prefix=/sw/contrib/stf-src/R-4.2.0 --with-pcre2 --with-readline=no --with-x=no
+
+# I keep getting this error: configure: error: "liblzma library and headers are required"
+
+Let's try this solution: 
+https://stackoverflow.com/questions/42170752/building-package-using-configure-how-to-rope-in-updated-versions-of-libs-heade
+
+First, navigate to /sw/contrib/stf-src/
+wget https://tukaani.org/xz/xz-5.2.5.tar.gz
+tar xzvf xz-5.2.5.tar.gz
+cd xz-5.2.5
+./configure --prefix=/sw/contrib/stf-src
+# make -j3
+# make install
+make && make install
+
+
+# Then create a module file using these instructions: https://wiki.cac.washington.edu/display/hyakusers/Hyak_modules
+/sw/contrib/stf-src/xz-5.2.5
+
+# This worked: Just with some odd file paths
+# Now to run R:
+module load contrib/R-4.2.0/4.2.0
+
+
+##### Installing JAGS on Hyak
+# From this website: http://levlafayette.com/node/498
+
+# In directory: gscratch/stf/mmin/JAGS:
+
+# Source attempt 1
+wget https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.1.tar.gz
+
+# Okay, I think that the above file is for Mac? Let's try this link to the Debian version:
+
+# Source code (Debian)
+wget https://ftp.debian.org/debian/pool/main/j/jags/jags_4.3.1-1.debian.tar.xz
+tar xvf jags_4.3.1-1.debian.tar.xz
+mv debian jags-4.3.1
+cd jags-4.3.1
+./configure --prefix=/sw/contrib/JAGS/jags-4.3.1
+
+# Yeah, so I can't figure out how to get this to work. Let's try again with the binary
+wget https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Source/JAGS-4.3.1.tar.gz
+tar xvf JAGS-4.3.1.tar.gz
+mv JAGS-4.3.1 jags-4.3.1
+cd jags-4.3.1
+./configure --prefix=/sw/contrib/JAGS/jags-4.3.1
+make && make install
+
+# Info at this link: https://github.com/cran/rjags/blob/master/INSTALL
+# Then, you need to run this from the command line to tell R where to look for JAGS when installing rjags:
+export PKG_CONFIG_PATH=/sw/contrib/JAGS/jags-4.3.1/lib/pkgconfig
+# Then run this:
+export LD_RUN_PATH=/sw/contrib/JAGS/jags-4.3.1/lib
+
+
+### 06-02-22 ###
+
+Let's try monitoring only one parameter, using only 10% of the data, and running only 2000 iterations
+
+scp -r 2022-06-02_fullmodel_intercept_only_monitor_1.1_2kiter_0.1data/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/
+
+Decreasing the dataset down to only 5% of the data results in this:
+
+
+Error in if ((W > 1e-08) && (n.chains > 1)) { :
+  missing value where TRUE/FALSE needed
+Calls: jags.parallel -> as.bugs.array2 -> monitor -> conv.par
+Execution halted
+
+
+My understanding is that this is related to the fact that with such little data, the estimates for the parameters are unstable: 
+https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/7fb16eb3/?limit=25
+- this also only happens with more than one chain - so re-run with only 1 chain
+
+
+# Pull the one chain off of MOX
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-06-02_fullmodel_intercept_only_monitor_1.1_2kiter_0.1data/ ./
