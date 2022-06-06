@@ -1844,3 +1844,16 @@ simulation_errors_plot <- ggplot(sim_error_table, aes(x = error, group = param_t
 ggsave(file = here::here("simulation", "figures", "all4_covariates", "summary_fig.png"), simulation_errors_plot, height = 6, width = 10)
 
 
+
+##### Intercept only - 2kiter, 5% of the data #####
+int_only <- readRDS(here::here("from_hyak_transfer", "2022-06-02_fullmodel_intercept_only_monitor_1.1_2kiter_0.1data", "fullmodel_intercept_only_JAGS.rds"))
+
+
+mod_mcmc <- as.mcmc(int_only)
+plot(mod_mcmc)
+
+
+
+
+
+
