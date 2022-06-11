@@ -375,3 +375,58 @@ https://sourceforge.net/p/mcmc-jags/discussion/610037/thread/7fb16eb3/?limit=25
 
 # Pull the one chain off of MOX
 scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/JAGS_runs/2022-06-02_fullmodel_intercept_only_monitor_1.1_2kiter_0.1data/ ./
+
+
+
+
+
+### 06-10-22 ###
+
+So, need to fix the complete det hist script
+
+I created a new folder to run the analyses on Hyak, called 2022-06-10-complete_det_hist
+I am editing the scripts in THIS FOLDER, so all of the other versions of the 03 script are now outdated
+
+
+List of current issues:
+- FIXED Hood River was not in list of tributaries
+- We are not distinguishing post-spawning behavior; this leads to detection histories like this where detections are TWO YEARS APART
+	- tag code: 3D9.1BF26D8CCC
+	- Wenatchee River 2009-09-14
+	- BON adult ladder 2011-08-06
+	- And then between these two, the implicit sites are alllll messed up
+- FIXED Many have duplicated, but non-implicit site visits - somehow the script isn't ignoring them
+	- For example, this tag code: 384.1B796A520E
+		- Repeat at BON to MCN
+	- FIX: I changed from using the insertRow to bind_row call in the stepwise states for when we see fish
+	in the adult ladders but they're in the same state previously. Edits have notes "2022-06-10"
+- Some have duplicated, implicit site visits:
+	- FIX: Alright, so I had to move an ifelse statement inside the loop. See note for 2022-06-10. I think this should work
+		- I had to do this in multiple spots - this is for whenever we're missing the downstream state from a dam
+	- 384.1B796A8099
+		- twice in RRE to WEL state
+	- 384.36F2B32373
+		- twice in MCN to ICH or PRA state
+ 	- 384.3B239A405E
+ 		- twice in ICH to LGR state
+ 	- 3D9.1BF1635CC8
+ 		- twice in PRA to RIS state
+- Some flip back and forth between implicit states
+	- 384.3B23AB763C
+		- Two site visits: Imnaha River and mainstem, mouth to BON (via fallback arrays)
+			- In between: "Imnaha River", "mainstem, upstream of LGR",   "mainstem, ICH to LGR", "mainstem, MCN to ICH or PRA",
+			 "mainstem, ICH to LGR"        "mainstem, MCN to ICH or PRA" "mainstem, BON to MCN"        "mainstem, mouth to BON"   
+- Some skip intervening states when leaving a tributary
+	- Seem to be an issue leaving Entiat River or Methow River states
+	- For example, this fish (384.3B23AC6E25) goes straight from Methow to RRE to WEL and skips upstream to WEL state
+		- This is seen in a total of 11 fish
+	- One fish (3D9.1C2D937BC6) leaves Entiat and goes straight to RIS to RRE, skipping RRE to WEL
+		- This also looks like a fish who's going back out - seen at Entiat, then in BON fallback arrays a year later
+		
+		
+# Some of these issues look like they're actually coming from the previous script - like the issues with duplicated detections that aren't implicit
+- Actually that's not true, I think they're all from the complete_det_hist script
+
+
+
+
