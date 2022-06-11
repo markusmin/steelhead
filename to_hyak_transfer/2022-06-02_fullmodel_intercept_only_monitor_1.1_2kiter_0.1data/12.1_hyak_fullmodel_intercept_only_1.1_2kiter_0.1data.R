@@ -302,7 +302,7 @@ tag_codes_every10th <- unique(states_complete$tag_code)[seq(1, length(unique(sta
 
 # This tag has a wrong detection history: 3D9.1C2DD61B43; this one too 3D9.1C2DDA8145; this one too 3DD.007771D9C9; this one too 3DD.0077A508AE
 # They all have a repeated line in the mainstem, BON to MCN state
-# This one too - 3D9.1C2D5CBA37 - but in this case it's ar epeated mainstem, MCN to ICH or PRA state and it's an implicit site visit
+# This one too - 3D9.1C2D5CBA37 - but in this case it's a repeated mainstem, MCN to ICH or PRA state and it's an implicit site visit
 
 # For now, just remove it and we'll fix it later
 
