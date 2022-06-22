@@ -1,7 +1,7 @@
 # 1200 - ORIGIN ONLY
 
 # for testing:
-# setwd("/Users/markusmin/Documents/CBR/steelhead/hyak_transfer/2022-05-17_origin_1200/")
+setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-17_origin_1200/")
 
 # Load libraries
 library(tidyverse)
