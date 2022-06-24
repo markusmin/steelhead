@@ -8,7 +8,9 @@ setwd("/Users/markusmin/Documents/CBR/steelhead/stan_simulation/01_int_only")
 
 library("rstan")
 rstan_options(auto_write = TRUE)
-
+library(cmdstanr)
+library(posterior)
+library(tidyverse)
 
 ##### Get all of the data in order #####
 
@@ -210,12 +212,15 @@ for (z in 1:1){
     }
   }
   
+  # One tweak: We have to replace all NAs in our input data for stan to accept it
+  states_mat[is.na(states_mat)] <- -999
+    
   
   ##### Data #####
   data <- list(y = sim_data, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
                states_mat = states_mat,
                movements = movements, not_movements = not_movements,
-               nmovements = nmovements, dates = dates,
+               nmovements = nmovements, # dates = dates,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_1200)
   
   
@@ -224,8 +229,53 @@ for (z in 1:1){
   
   # Fit stan model
   
-  fit <- stan(file = '01_stan_sim_int_only.stan', data = data)
+  # fit <- stan(file = '01_stan_sim_int_only.stan', data = data)
+  
+  # Fit stan model using cmdstan
+  # Step 1: load the model
+  # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
+  mod <- cmdstan_model("01_stan_sim_int_only_v2.stan", compile = FALSE)
+  
+  # Step 2: Compile the model, set up to run in parallel
+  mod$compile(cpp_options = list(stan_threads = TRUE))
+  
+  # Step 3: Run MCMC (HMC)
+  fit <- mod$sample(
+    data = data, 
+    seed = 13, 
+    chains = 1, 
+    parallel_chains = 1,
+    refresh = 10, # print update every 10 iters
+    iter_sampling = 500,
+    iter_warmup = 500,
+    threads_per_chain = 7,
+    init = 1
+  )
+  
 }
 
+mlogit_fit <- fit
 
+fit$summary()
+
+# posterior <- extract(fit)
+
+
+# Inspect chains
+draws <- fit$draws()
+as_draws_matrix(draws) %>% 
+  as.data.frame() -> draws_df
+
+draws_df %>% 
+  rownames_to_column("iter") %>% 
+  mutate(iter = as.numeric(iter)) %>% 
+  pivot_longer(cols = colnames(draws_df[,2:ncol(draws_df)])) -> draws_df_long
+
+ggplot(subset(draws_df_long, name == "b0_matrix_2_1"), aes(x = iter, y = value)) +
+  geom_line()
+
+# Looks terrible
+
+
+mcmc_hist(fit$draws("b0_matrix_2_1"))
 
