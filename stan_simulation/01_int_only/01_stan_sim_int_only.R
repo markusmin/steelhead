@@ -137,7 +137,9 @@ fish_sim_cat_data_1200 <- as.data.frame(as.matrix(read.csv("origin_rear_1200.csv
 JAGS_1200_list <- list()
 # Loop it
 # for (z in 1:length(sim_1200_hist_list)){
-for (z in 1:1){
+# for (z in 1:1){
+# Let's not use a loop for now
+z <- 1
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
@@ -214,10 +216,32 @@ for (z in 1:1){
   
   # One tweak: We have to replace all NAs in our input data for stan to accept it
   states_mat[is.na(states_mat)] <- -999
+  
+  
+  # We are going to transform our detection histories to instead be vectors containing
+  # the number of each site that was visited, instead of a matrix of sites with 0s for
+  # not visited and 1s for visited
+  
+  # First, create an empty matrix to store the newly formatted detection histories
+  sim_data_2 <- matrix(0, nrow = dim(sim_data)[3], ncol = dim(sim_data)[2])
+  
+  # Now fill it in
+  for (i in 1:dim(sim_data)[3]){
+    det_hist <- sim_data[,,i]
+    
+    # Count the number of site visits
+    nsite_visits <- sum(det_hist)
+    
+    for (j in 1:nsite_visits){
+      sim_data_2[i,j] <- which(det_hist[,j] == 1, arr.ind = TRUE)
+    }
+    
+  }
+    
     
   
   ##### Data #####
-  data <- list(y = sim_data, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
+  data <- list(y = sim_data_2, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
                states_mat = states_mat,
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
@@ -242,17 +266,17 @@ for (z in 1:1){
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
-    seed = 13, 
+    seed = 123, 
     chains = 1, 
     parallel_chains = 1,
     refresh = 10, # print update every 10 iters
     iter_sampling = 500,
     iter_warmup = 500,
     threads_per_chain = 7,
-    init = 1
+    init = 1,
   )
   
-}
+
 
 mlogit_fit <- fit
 
