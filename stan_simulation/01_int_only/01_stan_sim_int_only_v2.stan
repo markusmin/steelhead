@@ -90,9 +90,33 @@ model {
     // Loop through each of the observations, stopping at the loss column
     
     // print("fish # ", i);
-    // for (j in 1:n_obs[i]){
-      for (j in 1:1){
+    for (j in 1:n_obs[i]){
       
+        // derived proportions
+        simplex[10] p_vec;
+        // vector for logits
+        vector[10] logits;
+        
+        for (k in 1:10){
+          
+          # Populate the loss parameters
+          logits[10] = 
+        }
+        
+        
+        // first prob
+        logits[1] = beta1;
+        // effectively a 0 in logit space
+        logits[2] = -100000;
+        // second prob
+        logits[3] = beta3;
+        // effectively a 0 in logit space
+        logits[4] = -100000;
+        // loss param
+        logits[5] = beta1 - beta3;
+        // proper proportion vector
+        p_vec = softmax(logits);
+            
       // I think that stan does let you exponentiate a vector, so this will be more compact
       // I think that the categorical_logit distribution works here
       // Create a vector where it's c(alive transitions, loss)
