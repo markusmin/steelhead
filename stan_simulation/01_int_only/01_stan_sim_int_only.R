@@ -11,6 +11,7 @@ rstan_options(auto_write = TRUE)
 library(cmdstanr)
 library(posterior)
 library(tidyverse)
+library(bayesplot)
 
 ##### Get all of the data in order #####
 
@@ -134,12 +135,10 @@ fish_sim_cat_data_1200 <- as.data.frame(as.matrix(read.csv("origin_rear_1200.csv
 
 
 # Create a list to store JAGS objects
-JAGS_1200_list <- list()
+stan_1200_list <- list()
 # Loop it
-# for (z in 1:length(sim_1200_hist_list)){
-# for (z in 1:1){
-# Let's not use a loop for now
-z <- 1
+# for (z in 2:length(sim_1200_hist_list)){
+for (z in 1:1){
   dates <- sim_1200_dates_list[[z]]
   sim_data <- sim_1200_hist_list[[z]]
   
@@ -242,7 +241,7 @@ z <- 1
   
   ##### Data #####
   data <- list(y = sim_data_2, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
-               states_mat = states_mat,
+               states_mat = states_mat, max_visits = dim(sim_data_2)[2],
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_1200)
@@ -269,20 +268,31 @@ z <- 1
     seed = 123, 
     chains = 1, 
     parallel_chains = 1,
-    refresh = 10, # print update every 10 iters
-    iter_sampling = 500,
-    iter_warmup = 500,
+    refresh = 100, # print update every 10 iters
+    iter_sampling = 1000,
+    iter_warmup = 1000,
     threads_per_chain = 7,
     init = 1,
   )
-  
+ 
+stan_1200_list[[z]] <- fit$summary(variables = c("b0_matrix_2_1", 
+                                               "b0_matrix_1_2",
+                                               "b0_matrix_3_2",
+                                               "b0_matrix_6_2",
+                                               "b0_matrix_7_2",
+                                               "b0_matrix_2_3",
+                                               "b0_matrix_4_3",
+                                               "b0_matrix_5_3",
+                                               "b0_matrix_9_3",
+                                               "b0_matrix_3_4",
+                                               "b0_matrix_3_5",
+                                               "b0_matrix_8_5",
+                                               "b0_matrix_2_6",
+                                               "b0_matrix_2_7",
+                                               "b0_matrix_5_8",
+                                               "b0_matrix_3_9")) 
+}
 
-
-mlogit_fit <- fit
-
-fit$summary()
-
-# posterior <- extract(fit)
 
 
 # Inspect chains
@@ -298,8 +308,49 @@ draws_df %>%
 ggplot(subset(draws_df_long, name == "b0_matrix_2_1"), aes(x = iter, y = value)) +
   geom_line()
 
-# Looks terrible
+# Looks pretty good to me!
 
-
+# Plot one example:
 mcmc_hist(fit$draws("b0_matrix_2_1"))
+
+
+##### Plot the same plots as before #####
+
+simulation_plots_nocov <- function(stan_list){
+  stan_runs_comp <- data.frame("variable" = NA, "mean" = NA, "q5" = NA, "q95" = NA)
+  for (i in 1:length(stan_list)){
+    as.data.frame(stan_list[[i]]) %>% 
+      dplyr::select(variable, mean, q5, q95) %>% 
+      mutate(run = paste0(i)) -> summary
+    
+    # summary %>% 
+    #   mutate(run = factor(run, levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))) -> summary
+    
+    stan_runs_comp %>% 
+      bind_rows(., summary) -> stan_runs_comp
+  }
+  
+  
+  # Create the plot
+  stan_runs_comp <- subset(stan_runs_comp, !(is.na(variable))) 
+  
+  
+  plot <- ggplot(stan_runs_comp, aes(y = mean, x = run)) +
+    geom_point() +
+    geom_linerange(aes(ymin = q5, ymax = q95)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    facet_wrap(~variable) +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          strip.text.x = element_text(size = 12)) +
+    ylab("Estimate") +
+    scale_y_continuous(breaks = c(0.5, 1, 1.5), limits = c(0,2)) +
+    xlab("Run")
+  
+  return(plot)
+}
+
+# stan_1200_list <- readRDS(here::here("simulation", "stan_nocov_1200_list.rds"))
+sim1200_plots <- simulation_plots_nocov(stan_list = stan_1200_list)
+ggsave(here::here("stan_simulation", "01_int_only", "stan_origin_only_summary_plot.png"), height = 6, width = 10, sim1200_plots)
 
