@@ -1,5 +1,7 @@
 # multinomial/categorical logit simulation
 
+setwd("/Users/markusmin/Documents/CBR/steelhead/stan_simulation/01_int_only")
+
 # In this script, we will simulate data from a categorical logit similar in structure
 # to our detection history data and fit a simple version of the model.
 

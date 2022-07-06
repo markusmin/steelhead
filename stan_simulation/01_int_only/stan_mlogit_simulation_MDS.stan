@@ -26,7 +26,7 @@ transformed parameters {
   // effectively a 0 in logit space
   logits[4] = -100000;
   // loss param
-  logits[5] = beta1 - beta3;
+  logits[5] = 0;
   // proper proportion vector
   p_vec = softmax(logits);
 }
