@@ -13,7 +13,8 @@ library(janitor)
 library(here)
 
 # Read in states complete
-read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>% 
+read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-06-10-complete_det_hist", "states_complete.csv")) %>% 
   dplyr::select(-X) -> states_complete
 
 # Get rid of fake fish
