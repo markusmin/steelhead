@@ -1,7 +1,7 @@
 ### 03 - Complete Detection histories - VERSION 2 - FOR HYAK
 
 # For testing:
-setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-06-10-complete_det_hist/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-06-10-complete_det_hist/")
 
 
 # This R script adds "implicit site usage" for individuals, i.e., adds in sites
@@ -636,6 +636,10 @@ det_hist %>%
               event_site_longitude = NA,
               site_class = NA, 
               state = NA)) -> det_hist
+
+# Add the "pathway" field
+# det_hist %>% 
+#   mutate(pathway = "NA") -> det_hist
   
 
 # Loop through each row of the detection history
@@ -647,8 +651,9 @@ det_hist %>%
 # Examine the detection histories for the funky fish
 
 # This tag code 384.1B796A520E is rows 780 - 795 of det hist
-# for (i in 1:round(1.5 * nrow(det_hist), 0)) {
-for (i in 22500:22752) {
+for (i in 1:round(1.5 * nrow(det_hist), 0)) {
+# for (i in 22500:22754) {
+# for (i in 22500:23000){
 # for (i in 780:810) {
 # for (i in (nrow(det_hist)-20):(nrow(det_hist) + 20)) { # Test to see if dummy fish solution works
   print(paste0("Row #", i))
@@ -669,6 +674,12 @@ for (i in 22500:22752) {
     # Store the transition site
     stepwise_states[i, 'pathway'] <-
       det_hist[i, 'site_class']
+  }
+  
+  # If we've appended lots of entries and the stepwise states and det_hist dfs no longer line up, then skip
+  # Try just that if it's an implicit entry, then skip it because it should already be in the stepwise states as well
+  else if (det_hist[i, "site_class"] == "implicit"){
+    # skip!
   }
   
   # For all other entries, look at the previous entry.
@@ -1342,6 +1353,7 @@ for (i in 22500:22752) {
             previous_index <-
               which(site_order_notrib_columbia_snake %in% det_hist[i - 1, 'state'])
             
+            
             # sequence from current to previous index
             if (current_index < previous_index) {
               # index_order <- seq(current_index, previous_index, by = 1)
@@ -1351,8 +1363,10 @@ for (i in 22500:22752) {
               index_order <- seq(previous_index, current_index, by = 1)
             }
             
+            
             # Count the number of sites you need to add and loop through
             for (j in 1:(length(index_order) - 2)) {
+
               # Add a row for each of them
               
               # Insert a new row into stepwise states, with the implicit detection site
@@ -1447,6 +1461,7 @@ for (i in 22500:22752) {
                 # for (j in 1:(length(index_order) - 2)) {
                 # Intuitively I think it should be -1 here instead of -2 - because we want to get to the missing site
                 for (j in 1:(length(index_order) - 1)) {
+                  
                   # Add a row for each of them
                   
                   # Insert a new row into stepwise states, with the implicit detection site
@@ -1621,6 +1636,7 @@ for (i in 22500:22752) {
                 # Count the number of sites you need to add and loop through
                 # Intuitively I think it should be -1 here instead of -2 - because we want to get to the missing site
                 for (j in 1:(length(index_order) - 1)) {
+                  
                   # Add a row for each of them
                   
                   # Insert a new row into stepwise states, with the implicit detection site
@@ -1694,6 +1710,7 @@ for (i in 22500:22752) {
                   # index_order <- seq(previous_index, current_index, by = 1)
                   index_order <- seq(current_index, previous_index, by = -1)
                 }
+                
                 
                 # Count the number of sites you need to add and loop through
                 for (j in 1:(length(index_order) - 2)) {
@@ -4393,6 +4410,9 @@ for (i in 22500:22752) {
               previous_index <-
                 which(site_order_notrib_snake %in% det_hist[i - 1, 'state'])
               
+              # EDIT: 2022-07-11
+              # I'm moving a copy of the next 7 lines inside the for loop below, because otherwise it keeps getting overwritten
+            
               # sequence from current to previous index
               if (current_index < previous_index) {
                 # index_order <- seq(current_index, previous_index, by = 1)
@@ -4404,6 +4424,15 @@ for (i in 22500:22752) {
               
               # Count the number of sites you need to add and loop through
               for (j in 1:(length(index_order) - 2)) {
+                
+                if (current_index < previous_index) {
+                  # index_order <- seq(current_index, previous_index, by = 1)
+                  index_order <- seq(previous_index, current_index, by = -1)
+                  
+                } else {
+                  index_order <- seq(previous_index, current_index, by = 1)
+                }
+                
                 # Add a row for each of them
                 
                 # Insert a new row into stepwise states, with the implicit detection site
@@ -4415,8 +4444,9 @@ for (i in 22500:22752) {
                                              date_time = NA,
                                              pathway = "implicit")
                 
-                stepwise_states %>% 
+                stepwise_states %>%
                   bind_rows(., implicit_state) -> stepwise_states
+                
                 
                 # Insert a new row into original detection history, with
                 # implicit detection site info
@@ -4448,6 +4478,8 @@ for (i in 22500:22752) {
                 # Also, change the value in the original dataframe
                 det_hist <-
                   insertRow(det_hist, implicit_detection, i)
+                
+                
                 
                 # Add 1 to the number of added rows
                 added_rows <- added_rows + 1
@@ -4500,7 +4532,7 @@ for (i in 22500:22752) {
               which(site_order_notrib_columbia %in% det_hist[i - 1, 'state'])
             
             # EDIT: 2022-06-10
-            # I'm moving acopy of the next 7 lines inside the for loop below, because otherwise it keeps getting overwritten
+            # I'm moving a copy of the next 7 lines inside the for loop below, because otherwise it keeps getting overwritten
             # sequence from current to previous index
             if (missing_index < previous_index) {
               # index_order <- seq(missing_index, previous_index, by = 1)
