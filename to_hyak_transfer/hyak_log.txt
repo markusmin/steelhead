@@ -100,6 +100,7 @@ make && make install
 export PKG_CONFIG_PATH=/sw/contrib/JAGS/jags-4.3.1/lib/pkgconfig
 # Then run this:
 export LD_RUN_PATH=/sw/contrib/JAGS/jags-4.3.1/lib
+# this worked!
 
 
 #### 2022-05-17 ####
@@ -416,6 +417,9 @@ List of current issues:
 		- Two site visits: Imnaha River and mainstem, mouth to BON (via fallback arrays)
 			- In between: "Imnaha River", "mainstem, upstream of LGR",   "mainstem, ICH to LGR", "mainstem, MCN to ICH or PRA",
 			 "mainstem, ICH to LGR"        "mainstem, MCN to ICH or PRA" "mainstem, BON to MCN"        "mainstem, mouth to BON"   
+	- This is the same issue as before (see line 405). Need to move an ifelse statement inside the loop. See note for 2022-07-11.
+	- This has an additional issue, where it was off by a few lines because of how many states were inserted. So I added a line at the beginning
+	of the for loop to skip lines in the det_hist that are already implicit
 - Some skip intervening states when leaving a tributary
 	- Seem to be an issue leaving Entiat River or Methow River states
 	- For example, this fish (384.3B23AC6E25) goes straight from Methow to RRE to WEL and skips upstream to WEL state
@@ -428,5 +432,37 @@ List of current issues:
 - Actually that's not true, I think they're all from the complete_det_hist script
 
 
+
+### 06-22-2022 ###
+
+Setting up stan to work on mox hyak
+
+# Copying over our folder
+scp -r ./2022-06-22_01_int_only/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+# So in order to get cmdstan to install, we need to update GCC
+# Current version:
+[mmin@mox1 2022-06-22_01_int_only]$ gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+Copyright (C) 2015 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# It would appear there are plenty of gcc modules available
+
+let's try:
+module load contrib/gcc_8.2.1-ompi_4.0.2
+module load contrib/gcc_10.1.0_ompi_4.0.3
+
+# See this link: https://discourse.mc-stan.org/t/cmdstan-installation-error/20329
+
+# Okay, download from source?
+
+wget https://bigsearcher.com/mirrors/gcc/releases/gcc-12.1.0/gcc-12.1.0.tar.gz
+tar xvf JAGS-4.3.1.tar.gz
+mv JAGS-4.3.1 jags-4.3.1
+cd jags-4.3.1
+./configure --prefix=/sw/contrib/JAGS/jags-4.3.1
+make && make install
 
 
