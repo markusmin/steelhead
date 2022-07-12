@@ -466,3 +466,34 @@ cd jags-4.3.1
 make && make install
 
 
+### 07-11-20222 ###
+
+running implicit site visit code again on hyak
+scp -r 2022-06-10-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+
+### 07-12-2022 ###
+
+Pulling complete det hist script  results off of hyak
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-06-10-complete_det_hist/ ./
+
+Wasn't able to complete in time limit - got about 60% of the way through before 4 hours was up.
+STF partition is undergoing maintenance, so we're going to split up the dataset and try again
+
+# run it again - rename with today's date
+
+scp -r 2022-07-12-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+
+
+
+
+
+
+
+
+
+
+
+
