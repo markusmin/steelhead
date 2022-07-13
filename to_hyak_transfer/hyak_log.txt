@@ -485,9 +485,27 @@ STF partition is undergoing maintenance, so we're going to split up the dataset 
 
 scp -r 2022-07-12-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+Well, it looks like ckpt is down for maintenance too
 
 
+So there are some tag codes that strangely don't have any times, for example 384.1B796A1794. Will need to investigate
+- Okay, so looking in CTH1, reason for this is the fish never made it out of the first state, so we don't have any transition times.
+Mark	HAGE - Hagerman NFH
+Observation	BO3 - Bonneville WA Shore Ladder/AFF
+Recovery	COLR4 - Columbia River - Bonneville Dam to John Day Dam (km 234-347)
 
+# Pull run off mox - just use the stf run
+# this isn't the right one: scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-12-complete_det_hist/ ./
+# this is the stf run: 
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-06-10-complete_det_hist/ ./
+
+# Okay, run failed - issue was that it hit the end of the df and gave this error message:
+Error in if (det_hist[i, "site_class"] == "implicit") { : 
+  missing value where TRUE/FALSE needed
+Execution halted
+
+I thought we fixed this with the dummy fish? Not sure why this is popping up again.
+- Fixed it - had to add site_class = dummy for the dummy fish
 
 
 
