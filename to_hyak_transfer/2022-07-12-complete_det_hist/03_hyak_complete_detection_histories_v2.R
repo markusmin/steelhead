@@ -618,6 +618,14 @@ added_rows <- 0
 # "Error in if (det_hist[i, "tag_code"] == det_hist[i - 1, "tag_code"]) { : 
 # missing value where TRUE/FALSE needed
 
+# Test for troubleshooting
+
+# Keep only ten tag codes
+# top10codes <- unique(det_hist$tag_code)[1:10]
+# 
+# det_hist <- subset(det_hist, tag_code %in% top10codes)
+# Problem solved
+
 # Start a counter for which tag code
 fish_counter <- 1
 
@@ -634,7 +642,7 @@ det_hist %>%
               event_site_subbasin_name = NA,
               event_site_latitude = NA,
               event_site_longitude = NA,
-              site_class = NA, 
+              site_class = "dummy", 
               state = NA)) -> det_hist
 
 # Add the "pathway" field
@@ -649,6 +657,7 @@ det_hist %>%
 # unique(det_hist$tag_code)[46848]
 
 # Examine the detection histories for the funky fish
+
 
 # This tag code 384.1B796A520E is rows 780 - 795 of det hist
 for (i in 1:round(1.5 * nrow(det_hist), 0)) {
