@@ -204,3 +204,122 @@ ggplot(BON_fallback_transitions_detected, aes(x = month)) +
 BON_fallback_tag_codes <- unique(BON_fallback_transitions_detected$tag_code)
 
 BON_fallback_fish <- subset(states_complete, tag_code %in% BON_fallback_tag_codes)
+
+
+
+##### Create a table that contains every transition + the relevant metadata for that fish #####
+transitions %>% 
+  left_join(., origin_metadata, by = "tag_code") -> transitions_meta
+
+write.csv(transitions_meta, here::here("figures", "transitions_table.csv"))
+
+# Let's look at the frequency of going back to the mainstem vs. loss for tributaries
+
+transitions %>% 
+  subset(state %in% tributary_mainstem$tributary) %>% 
+  group_by(state, next_state) %>% 
+  summarise(count = n()) -> trib_transition_counts
+
+trib_transition_counts %>% 
+  group_by(state) %>% 
+  summarise(total = sum(count)) -> total_trib_transitions
+
+trib_transition_counts %>% 
+  left_join(., total_trib_transitions, by = "state") %>% 
+  mutate(prop = count/total) -> trib_transition_counts
+
+
+##### Create summaries for each state #####
+full_transition_matrix <- read.csv(here::here("figures", "full_model_transition_matrix.csv")) 
+colnames(full_transition_matrix) <- c("from", full_transition_matrix$X)
+
+
+# Figure out which natal origins are missing for each mainstem state
+origins_vec <- unique(natal_origin_table$natal_origin)
+
+# Take out the Wind and Klickitat
+origins_vec <- origins_vec[!(origins_vec %in% c("Wind_River", "Klickitat_River"))]
+
+
+mainstem_sites <- c(unique(tributary_mainstem$mainstem), "mainstem, PRA to RIS", "mainstem, mouth to BON")
+tributary_sites <- unique(tributary_mainstem$tributary)
+
+transitions_meta %>% 
+  subset(state %in% mainstem_sites) %>% 
+  group_by(state, natal_origin) %>% 
+  summarise(count = n()) -> mainstem_transitions_count_origin
+
+for (i in 1:length(mainstem_sites)){
+  subset(mainstem_transitions_count_origin, state == mainstem_sites[i]) -> mainstem_state_dat
+  
+  missing_origins <- setdiff(origins_vec, mainstem_state_dat$natal_origin)
+  print(paste0("state: ", mainstem_sites[i]))
+  print(paste0("missing origins: ", missing_origins))
+}
+  
+
+##### Identify repeat spawners #####
+
+# How are we going to identify repeat spawners?
+
+# First let's look for individuals with really long det hists
+states_complete %>% 
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  group_by(tag_code) %>% 
+  summarise(min(date_time, na.rm = TRUE)) -> tag_code_min_time
+
+colnames(tag_code_min_time) <- c("tag_code", "min_time")
+
+states_complete %>% 
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  group_by(tag_code) %>% 
+  summarise(max(date_time, na.rm = TRUE)) -> tag_code_max_time
+
+colnames(tag_code_max_time) <- c("tag_code", "max_time")
+
+tag_code_min_time %>% 
+  left_join(., tag_code_max_time, by = "tag_code") %>% 
+  mutate(total_time = max_time - min_time) -> tag_code_time
+
+# Subset tags that are in the Columbia for over a year
+tag_code_time %>% 
+  subset(., total_time > days(x = 365)) -> year_tags
+
+# Look for clear typos - three years
+tag_code_time %>% 
+  # subset(., total_time > days(x = 365*3))
+  subset(., total_time > years(x = 3))-> three_year_tags
+
+# Now inspect states complete for these tags
+complete_det_hist <- read.csv(here::here("from_hyak_transfer", "2022-05-24_det_hist", "complete_det_hist.csv"), row.names = 1)
+complete_det_hist %>% 
+  subset(tag_code %in% year_tags$tag_code) -> year_tags_det_hist
+
+complete_det_hist %>% 
+  subset(tag_code %in% three_year_tags$tag_code) -> three_year_tags_det_hist
+
+
+
+##### UNUSED CODE #####
+
+# Plot transitions function
+state_trans_summary_plot <- function(from_state, data){
+  # Subset state of interest
+  state_dat <- subset(data, state == from_state)
+  
+  # Summarise transitions
+  state_dat %>% 
+    group_by(next_state) %>% 
+    summarise(count = n()) -> state_counts
+  
+  state_counts %>% 
+    mutate(index = row_number()) -> state_counts
+  
+  ggplot(state_counts, aes(y = index, label = next_state)) +
+    geom_segment(aes(x = 1, y = (max(index)-1)/2, xend = 3, yend = index),
+                 arrow = arrow(length = unit(0.5, "cm"))) +
+    geom_text(aes(x = 3.1, y = index, hjust = 0)) +
+    scale_x_continuous(limits = c(-2, 6)) +
+    annotate(geom = "text", x = 0.9, hjust = 1, y = (max(state_counts$index)-1)/2, label = from_state)
+}
+
