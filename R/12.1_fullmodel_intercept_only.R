@@ -50,12 +50,14 @@ model_states = c(
   "Salmon River",
   "Grande Ronde River",
   "Imnaha River",
+  "BON to MCN other trib",
+  "Upstream WEL other trib",
   
   # Loss
   "loss"
 )
 
-# 26 states, plus loss
+# 28 states, plus loss
 nstates <- length(model_states)
 
 
@@ -108,10 +110,10 @@ transition_matrix["mainstem, RIS to RRE", "Wenatchee River"] <- 1
 
 
 # 6: mainstem, RRE to WEL
-transition_matrix["mainstem, RIS to RRE", "loss"] <- 1
-transition_matrix["mainstem, RIS to RRE", "mainstem, RIS to RRE"] <- 1
-transition_matrix["mainstem, RIS to RRE", "mainstem, upstream of WEL"] <- 1
-transition_matrix["mainstem, RIS to RRE", "Entiat River"] <- 1
+transition_matrix["mainstem, RRE to WEL", "loss"] <- 1
+transition_matrix["mainstem, RRE to WEL", "mainstem, RIS to RRE"] <- 1
+transition_matrix["mainstem, RRE to WEL", "mainstem, upstream of WEL"] <- 1
+transition_matrix["mainstem, RRE to WEL", "Entiat River"] <- 1
 
 
 # 7: mainstem, upstream of WEL
@@ -221,6 +223,18 @@ transition_matrix["Grande Ronde River", "mainstem, upstream of LGR"] <- 1
 # 26: Imnaha River
 transition_matrix["Imnaha River", "loss"] <- 1
 transition_matrix["Imnaha River", "mainstem, upstream of LGR"] <- 1
+
+# 27: BON to MCN other trib
+transition_matrix["BON to MCN other trib", "loss"] <- 1
+transition_matrix["BON to MCN other trib", "mainstem, BON to MCN"] <- 1
+
+# 28: BON to MCN other trib
+transition_matrix["Upstream WEL other trib", "loss"] <- 1
+transition_matrix["Upstream WEL other trib", "mainstem, upstream of WEL"] <- 1
+
+# Export the full model transition matrix for import into other scripts
+
+write.csv(transition_matrix, here::here("figures", "full_model_transition_matrix.csv"))
 
 
 # Get the indices that are 1s (except loss, since that's 1 minus the others)
