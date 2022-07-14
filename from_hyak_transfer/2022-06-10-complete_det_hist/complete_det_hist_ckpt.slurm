@@ -21,4 +21,5 @@
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-Rscript 03_hyak_complete_detection_histories_v2.R
+Rscript ckpt_part1_03_hyak_complete_detection_histories_v2.R
+Rscript ckpt_part2_03_hyak_complete_detection_histories_v2.R

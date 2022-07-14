@@ -626,16 +626,16 @@ nfish <- length(unique(det_hist$tag_code))
 # Append a dummy fish
 
 det_hist %>% 
-  bind_rows(data.frame(tag_code = "dummy_fish",
-              event_site_name = NA,
-              start_time = NA,
-              end_time = NA,
-              event_site_basin_name = NA,
-              event_site_subbasin_name = NA,
-              event_site_latitude = NA,
-              event_site_longitude = NA,
-              site_class = NA, 
-              state = NA)) -> det_hist
+  bind_rows(data.frame(tag_code = rep("dummy_fish", 100),
+              event_site_name = rep(NA, 100),
+              start_time = rep(NA, 100),
+              end_time = rep(NA, 100),
+              event_site_basin_name = rep(NA, 100),
+              event_site_subbasin_name = rep(NA, 100),
+              event_site_latitude = rep(NA, 100),
+              event_site_longitude = rep(NA, 100),
+              site_class = rep(NA, 100), 
+              state = rep(NA, 100))) -> det_hist
 
 # Add the "pathway" field
 # det_hist %>% 
@@ -654,7 +654,7 @@ det_hist %>%
 for (i in 1:round(1.5 * nrow(det_hist), 0)) {
 # for (i in 22500:22754) {
 # for (i in 22500:23000){
-# for (i in 780:810) {
+# for (i in 31900:32500) {
 # for (i in (nrow(det_hist)-20):(nrow(det_hist) + 20)) { # Test to see if dummy fish solution works
   print(paste0("Row #", i))
   if (fish_counter > nfish){
