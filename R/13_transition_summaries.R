@@ -13,11 +13,11 @@ library(janitor)
 library(here)
 
 # Read in states complete
-# read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
 # read.csv(here::here("from_hyak_transfer", "2022-06-10-complete_det_hist", "states_complete.csv")) %>%
 
 # check out the script is doing
-read.csv(here::here("from_hyak_transfer", "2022-07-12-complete_det_hist", "states_complete_part1.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-12-complete_det_hist", "states_complete_part1.csv")) %>%
   dplyr::select(-X) -> states_complete
 
 # Get rid of fake fish
@@ -215,7 +215,7 @@ transitions %>%
   left_join(., origin_metadata, by = "tag_code") -> transitions_meta
 
 # write.csv(transitions_meta, here::here("figures", "transitions_table.csv"))
-write.csv(transitions_meta, here::here("figures", "transitions_table_testpart1.csv"))
+# write.csv(transitions_meta, here::here("figures", "transitions_table_testpart1.csv"))
 
 # Let's look at the frequency of going back to the mainstem vs. loss for tributaries
 
@@ -224,13 +224,30 @@ transitions %>%
   group_by(state, next_state) %>% 
   summarise(count = n()) -> trib_transition_counts
 
+# Manually remove the bad ones just for now
+trib_transition_counts <- subset(trib_transition_counts, !(next_state %in% c("Umatilla River", "Deschutes River", "Hood River")))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Entiat River" & next_state == "mainstem, RIS to RRE"))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Methow River" & next_state == "mainstem, RRE to WEL"))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Hood River" & next_state == "mainstem, ICH to LGR"))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Hood River" & next_state == "mainstem, MCN to ICH or PRA"))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Hood River" & next_state == "mainstem, mouth to BON"))
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Hood River" & next_state == "mainstem, PRA to RIS"))
+
+# Just get rid of Hood entirely for now because I think there's a typo
+trib_transition_counts <- subset(trib_transition_counts, !(state == "Hood River"))
+
 trib_transition_counts %>% 
   group_by(state) %>% 
   summarise(total = sum(count)) -> total_trib_transitions
 
+
 trib_transition_counts %>% 
   left_join(., total_trib_transitions, by = "state") %>% 
   mutate(prop = count/total) -> trib_transition_counts
+
+trib_transition_counts %>% 
+  subset(next_state == "loss") %>% 
+  arrange(prop)
 
 
 ##### Create summaries for each state #####
@@ -294,6 +311,10 @@ tag_code_time %>%
   # subset(., total_time > days(x = 365*3))
   subset(., total_time > years(x = 3))-> three_year_tags
 
+# Export the clearly wrong ones
+bad_tags <- subset(three_year_tags, !(tag_code %in% c("3D9.1C2C430C8D", "3D9.1C2DA0CF28")))$tag_code
+write.csv(bad_tags, file = here::here("bad_tags.csv"))
+
 # Now inspect states complete for these tags
 complete_det_hist <- read.csv(here::here("from_hyak_transfer", "2022-05-24_det_hist", "complete_det_hist.csv"), row.names = 1)
 complete_det_hist %>% 
@@ -301,6 +322,66 @@ complete_det_hist %>%
 
 complete_det_hist %>% 
   subset(tag_code %in% three_year_tags$tag_code) -> three_year_tags_det_hist
+
+
+# Select individual fish
+
+# Clear kelt 1 (WEL to BON) 3D9.1BF15F8910
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1BF15F8910")
+
+# clear kelt 2 (Entiat/RRE juv to BON) 3D9.1C2D9303CC
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1C2D9303CC")
+
+# clear kelt 3 (Wells to BCC to BON) 3D9.1BF18BD51C
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1BF18BD51C")
+
+# Double BON 1
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "384.3B2396BB0B")
+
+# Double BON 2 384.3B23AB34F1
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "384.3B23AB34F1")
+
+# Double LGR - see CTH1
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "384.3B23A2FFB1")
+
+
+# Triple spawner? 3D9.1C2C430C8D
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1C2C430C8D")
+
+# Triple spawner 2 3D9.1C2DA0CF29
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1C2DA0CF28")
+
+
+# Clear data errors: 3D9.1BF1104C52
+complete_det_hist %>% 
+  dplyr::select(tag_code, event_site_name, start_time) %>% 
+  subset(., tag_code == "3D9.1BF1104C52")
+
+
+
+
+
+
+
+
+
+
 
 
 
