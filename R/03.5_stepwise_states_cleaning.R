@@ -1,5 +1,9 @@
 # stepwise_states_cleaning
 
+library(here)
+library(tidyverse)
+library(lubridate)
+library(janitor)
 
 # Dealing with juveniles, kelts, and repeat spawners
 
@@ -68,13 +72,6 @@ tag_codes_1 %>%
   bind_rows(., tag_codes_13) %>% 
   bind_rows(., tag_codes_14) -> tag_code_file_finder
 
-
-
-library(here)
-library(tidyverse)
-library(lubridate)
-library(janitor)
-
 # Read in states complete
 read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
   dplyr::select(-X) -> states_complete
@@ -94,6 +91,24 @@ states_complete %>%
 # Figure out how long detections were after release time
 states_complete %>% 
   mutate(time_after_release = date_time - as.POSIXct(release_date)) -> states_complete
+
+# Read in the BON arrival data file, to tell us when adult migration started
+BON_arrival_df <- read.csv(here::here("covariate_data", "complete_BON_arrival.csv"))
+
+states_complete %>% 
+  left_join(., BON_arrival_df, by = "tag_code") -> states_complete
+
+states_complete %>% 
+  mutate(BON_arrival = ymd_hms(BON_arrival)) -> states_complete
+
+# Fix this file because somehow it got turned to GMT (off by 7 hours)
+states_complete %>% 
+  mutate(BON_arrival = BON_arrival - hours(x = 7)) -> states_complete
+
+
+states_complete %>% 
+  mutate(time_after_arrival = date_time - as.POSIXct(BON_arrival)) -> states_complete
+
 
 # Take apart the date time into y, m, d for subsetting
 states_complete %>% 
@@ -174,9 +189,84 @@ mainstem = c("mainstem, upstream of LGR",
              "mainstem, BON to MCN",
              "mainstem, upstream of WEL"))
 
+# Get the order of sites
+# Order of sites (no tributaries), Columbia River
+site_order_notrib_columbia <- c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                                "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                                "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                                "mainstem, upstream of WEL")
+
+# Order of sites (no tributaries), Snake
+# site_order_notrib_snake <- c("mainstem, ICH to LGR", "mainstem, upstream of LGR")
+# Contains all non-tributary sites from upstream of LGR to downstream of BON
+site_order_notrib_snake <- c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                             "mainstem, MCN to ICH or PRA",
+                             "mainstem, ICH to LGR",
+                             "mainstem, upstream of LGR")
 
 
+# Site order, no tributaries, Snake directly to upper Columbia
+site_order_notrib_columbia_snake <- c("mainstem, upstream of WEL",
+                                      "mainstem, RRE to WEL", 
+                                      "mainstem, RIS to RRE",
+                                      "mainstem, PRA to RIS",
+                                      "mainstem, MCN to ICH or PRA",
+                                      "mainstem, ICH to LGR",
+                                      "mainstem, upstream of LGR")
 
 
+# Site order, both:
+site_order_combined <- data.frame(state = c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                                "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                                "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                                "mainstem, upstream of WEL", "mainstem, ICH to LGR",
+                                "mainstem, upstream of LGR"), state_order = c(1,2,3,4,5,6,7,4,5))
+
+
+# Final spawning movements:
+# Seen at BON adult (repeat spawner); then all downstream movement before that and after last being seen is kelt movement
+
+states_complete %>% 
+  group_by(tag_code) %>% 
+  mutate(order = row_number()) -> states_complete
+
+# Determine if movement is occurring upstream or downstream
+states_complete %>% 
+  left_join(., site_order_combined, by = "state") %>% 
+  # now add a line so that every tributary gets a 99, which makes it so that any movement 
+  # out of a tributary is considered downstream movement and any movement into a tributary is considered an upstream movement
+  mutate(state_order = ifelse(is.na(state_order), 99, state_order)) -> states_complete
+
+# Now classify movements as upstream or downstream
+states_complete %>% 
+  group_by(tag_code) %>% 
+  mutate(direction = ifelse(lag(state_order) > state_order, "downstream", "upstream")) %>% 
+  mutate(direction = ifelse(order == 1, "upstream", direction))-> states_complete
+
+# Classify kelt movement based on a sequence of downstream movements preceding a BON detection
+states_complete %>% 
+  mutate(life_stage = ifelse(tag_code == lag(tag_code) & # if it's the same fish
+                               pathway == "BON (adult)" & # if it was seen in the adult ladder
+                              time_after_arrival > days(x = 180) &  # and a long time after arrival
+                                event_month >= 6 & event_month <= 11 & # and it was seen at BON in a month consistent with adult run timing, based on https://www.cbr.washington.edu/dart/wrapper?type=php&fname=hrt_adult_1657840462_690.php
+                               lag(direction) == "downstream" & # & it was just seen moving downstream
+                                tag_code == lead(tag_code) & # if the tag code continues, then make sure that
+                               lead(direction) != "upstream", # we don't subsequently see it moving back upstream
+                            "kelt", # then call it a kelt
+                            ifelse(tag_code == lag(tag_code) & # if it's the same fish
+                                     pathway == "BON (adult)" & # if it was seen in the adult ladder
+                                     time_after_arrival > days(x = 180) &  # and a long time after arrival
+                                     event_month >= 6 & event_month <= 11 & # and it was seen at BON in a month consistent with adult run timing, based on https://www.cbr.washington.edu/dart/wrapper?type=php&fname=hrt_adult_1657840462_690.php
+                                     lag(direction) == "downstream" & # & it was just seen moving downstream
+                                     tag_code != lead(tag_code), # if the tag code doesn't continue, then we're chillin
+                            "kelt", life_stage))) -> states_complete  # then call it a kelt
+
+# check how we did
+states_complete %>% 
+  group_by(tag_code) %>% 
+  filter(any(life_stage == "kelt")) -> kelts
+
+kelts %>% 
+  dplyr::select(tag_code, state, date_time, life_stage, direction) -> kelts_abbrev
 
 
