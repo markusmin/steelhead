@@ -331,15 +331,21 @@ complete_det_hist %>%
   dplyr::select(tag_code, event_site_name, start_time) %>% 
   subset(., tag_code == "3D9.1BF15F8910")
 
+subset(states_complete, tag_code == "3D9.1BF15F8910") %>% dplyr::select(state, date_time)
+
 # clear kelt 2 (Entiat/RRE juv to BON) 3D9.1C2D9303CC
 complete_det_hist %>% 
   dplyr::select(tag_code, event_site_name, start_time) %>% 
   subset(., tag_code == "3D9.1C2D9303CC")
 
+subset(states_complete, tag_code == "3D9.1C2D9303CC") %>% dplyr::select(state, date_time)
+
 # clear kelt 3 (Wells to BCC to BON) 3D9.1BF18BD51C
 complete_det_hist %>% 
   dplyr::select(tag_code, event_site_name, start_time) %>% 
   subset(., tag_code == "3D9.1BF18BD51C")
+
+subset(states_complete, tag_code == "3D9.1BF18BD51C") %>% dplyr::select(state, date_time)
 
 # Double BON 1
 complete_det_hist %>% 
