@@ -626,7 +626,7 @@ nfish <- length(unique(det_hist$tag_code))
 # Append a dummy fish
 
 det_hist %>% 
-  bind_rows(data.frame(tag_code = "dummy_fish"),
+  bind_rows(data.frame(tag_code = "dummy_fish",
               event_site_name = NA,
               start_time = NA,
               end_time = NA,
@@ -635,7 +635,7 @@ det_hist %>%
               event_site_latitude = NA,
               event_site_longitude = NA,
               site_class = "dummy_site", 
-              state = NA) -> det_hist
+              state = NA)) -> det_hist
 
 # Add the "pathway" field
 # det_hist %>% 
