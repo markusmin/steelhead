@@ -508,6 +508,82 @@ I thought we fixed this with the dummy fish? Not sure why this is popping up aga
 - Fixed it - had to add site_class = dummy for the dummy fish
 
 
+scp -r 2022-06-10-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+# It's running, but it still has issues.
+
+Some known problematic tag codes:
+
+transitions between mainstem ICH to LGR and same state + BON to MCN:
+384.3B23AB34F1
+384.3B23AB34F1
+384.3B23ADC7F8
+384.3B23ADC7F8
+384.3B23AEB441
+384.3B23AEB441
+3D9.1C2C425108
+3D9.1C2C425108
+3D9.1C2C7F76FD
+3D9.1C2C7F76FD
+3D9.1C2D40F5CA
+3D9.1C2D40F5CA
+3D9.1C2D69E031
+3D9.1C2D69E031
+3D9.1C2D6B76BE
+3D9.1C2D6B76BE
+3D9.1C2D766509
+3D9.1C2D766509
+3D9.1C2DAA70C1
+3D9.1C2DAA70C1
+3D9.1C2DE79F26
+3D9.1C2DE79F26
+3D9.1C2DE8844B
+3D9.1C2DE8844B
+
+### 7-13-2022 ###
+
+Pull off the run from mox; I know it has issues but it's our latest run
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-06-10-complete_det_hist/ ./
+
+# Apparently the dummy fish edit didn't make it onto mox somehow, so we'll have to try again later
+
+# Try this run again, now in a new folder
+
+scp -r ./2022-07-14-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+### 7-14-2022 ###
+
+Pull then run off mox:
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-14-complete_det_hist/ ./
+
+Okay, so it didn't work AGAIN. Somehow the transfer keeps not going through and I'm left with the old script.
+
+Try again:
+
+scp ./03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-14-complete_det_hist/
+
+
+### 7-15-2022 ###
+
+Let's check on our run:
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-14-complete_det_hist/ ./
+
+typo caused it to fail. Put it back on mox:
+scp ./03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-14-complete_det_hist/
+
+Running it again - submitted at 9:36, did not need to wait in queue
+
+# Note: There seems to be a typo with the preceding script, where not every detection history is starting at BON adult ladders.
+# probably going to need to re-run this (2022-05-24_det_hist) on mox
+
+# I think that I made the fix - move to hyak and run
+scp ./02_hyak_detection_histories_v2 mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-14-complete_det_hist/
+
+
+
 
 
 
