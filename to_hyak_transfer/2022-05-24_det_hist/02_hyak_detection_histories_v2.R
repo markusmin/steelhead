@@ -5,6 +5,9 @@ library(tidyverse)
 library(lubridate)
 library(janitor)
 
+# For testing - setwd
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-24_det_hist/")
+
 ##### All tributaries #####
 
 
@@ -146,6 +149,7 @@ det_hist <- data.frame(tag_code = character(), event_site_name = character(),
 
 # Loop through the unique tags
 for (i in 1:length(unique_tag_IDs)){
+# for (i in 1:1000){
   # Get the start time
   if (i == 1){
     start_time <- Sys.time() 
@@ -190,6 +194,27 @@ for (i in 1:length(unique_tag_IDs)){
       
       # START THE COUNTER
       counter <- 1
+      
+      # SPECIAL CASE: If there is only a single detection in the entire history, then end it
+      if(nrow(tag_hist) == 1){
+        ind_det_hist[1,'end_time'] <- tag_hist[[j,'event_date_time_value']]
+      }
+      
+      # SPECIAL CASE: If there is only one detection at the first site, store the 
+      # end time as well
+
+      else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name']){
+        
+        # Store the start time
+        ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
+        
+        # UPDATE THE COUNTER
+        # every time we store an end time, we update the counter. This allows
+        # us to move through the detection history df
+        counter <- counter + 1
+      }
+      
+
     }
     
     # If it's the last entry, store those values
@@ -311,7 +336,6 @@ for (i in 1:length(unique_tag_IDs)){
   # Make sure that it's running
   print(paste0("Tag ", i))
 }
-
 
 # Export this detection history
 write.csv(det_hist, "complete_det_hist.csv")
