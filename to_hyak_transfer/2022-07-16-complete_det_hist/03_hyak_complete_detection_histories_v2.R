@@ -1,7 +1,7 @@
 ### 03 - Complete Detection histories - VERSION 2 - FOR HYAK
 
 # For testing:
-setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-07-16-complete_det_hist/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-07-16-complete_det_hist/")
 
 
 # This R script adds "implicit site usage" for individuals, i.e., adds in sites
@@ -507,7 +507,7 @@ snake_sites <- c("mainstem, ICH to LGR",
                  "mainstem, upstream of LGR")
 snake_tribs <- c("Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River",
                  "Tucannon River", "Upstream LGR other tributaries", "ICH to LGR other tributaries")
-setdiff(snake_tribs, tributary_mainstem$tributary)
+# setdiff(snake_tribs, tributary_mainstem$tributary)
 
 
 # Shared sites (lower Columbia, before confluence of Snake and Columbia)
@@ -522,10 +522,10 @@ shared_sites <- c("mainstem, mouth to BON", "mainstem, BON to MCN",
 shared_tribs <- c("Deschutes River", "BON to MCN other tributaries", "John Day River",
                   "Hood River", "Fifteenmile Creek", "Umatilla River", "Yakima River",
                   "Walla Walla River")
-setdiff(shared_tribs, tributary_mainstem$tributary)
+# setdiff(shared_tribs, tributary_mainstem$tributary)
 
 # Make sure we're capturing all tribs
-setdiff(tributary_mainstem$tributary, c(upper_columbia_tribs, snake_tribs, shared_tribs))
+# setdiff(tributary_mainstem$tributary, c(upper_columbia_tribs, snake_tribs, shared_tribs))
 
 # Tributary df - tributaries and what part of the mainstem they're in
 # We will use this to determine where they need to move to next, and then
@@ -670,10 +670,10 @@ det_hist %>%
 # Save the original
 # det_hist_orig <- det_hist
 
-read.table("problem_tags.txt") %>% 
-  dplyr::rename("tag_code" = V1) -> problem_tags
+# read.table("problem_tags.txt") %>% 
+#   dplyr::rename("tag_code" = V1) -> problem_tags
 
-det_hist <- subset(det_hist_orig, tag_code %in% problem_tags$tag_code)
+# det_hist <- subset(det_hist_orig, tag_code %in% problem_tags$tag_code)
 
 # reset the indices
 rownames(det_hist) <- NULL
@@ -681,8 +681,8 @@ rownames(det_hist) <- NULL
 length(unique(det_hist$tag_code)) # 215 unique ones of 412 total
 
 # Find individual fish:
-subset(det_hist, tag_code == "3D9.1BF20760D2") %>% dplyr::select(tag_code, site_class, end_time)
-subset(states_complete, tag_code == "3D9.1BF20760D2")
+# subset(det_hist, tag_code == "3DD.0077E5598A") %>% dplyr::select(tag_code, site_class, end_time)
+# subset(states_complete, tag_code == "3DD.0077E5598A")
 
 
 stepwise_states <- data.frame(tag_code = character(),
@@ -909,139 +909,275 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
             # EDIT 2022-07-16: adding the if statement for if in columbia or snake
             # If it was previously in the Columbia
             if (det_hist[i - 1, 'state'] %in% c(shared_sites, upper_columbia_sites)){
+              ####### THIS SECTION IDENTICAL, JUST WITH SHARED, COLUMBIA, and SNAKE
+              # Get the current mainstem site & index
+              mainstem_site_current <- subset(tributary_mainstem, tributary == det_hist[i, 'state'])$mainstem
+              mainstem_index_current <- which(site_order_notrib_shared %in% mainstem_site_current)
               
-            }
-            ####### THIS SECTION IDENTICAL, JUST WITH SHARED, COLUMBIA, and SNAKE
-            # Get the current mainstem site & index
-            mainstem_site_current <- subset(tributary_mainstem, tributary == det_hist[i, 'state'])$mainstem
-            mainstem_index_current <- which(site_order_notrib_shared %in% mainstem_site_current)
-            
-            # Get the previous mainstem site & index
-            mainstem_site_previous <- subset(tributary_mainstem, tributary == det_hist[i-1, 'state'])$mainstem
-            mainstem_index_previous <- which(site_order_notrib_shared %in% mainstem_site_previous)
-            
-            # If the fish is moving upstream
-            if (mainstem_index_current > mainstem_index_previous){
+              # Get the previous mainstem site & index
+              mainstem_site_previous <- subset(tributary_mainstem, tributary == det_hist[i-1, 'state'])$mainstem
+              mainstem_index_previous <- which(site_order_notrib_shared %in% mainstem_site_previous)
               
-              # sequence from current to previous index
-              index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
-              
-              # Get the missing sites
-              missing_sites <- site_order_notrib_shared[index_order]
-              
-              # Count the number of sites you need to add and loop through
-              for (j in 1:(length(index_order))) {
-                ### EDIT 2022-07-16
+              # If the fish is moving upstream
+              if (mainstem_index_current > mainstem_index_previous){
+                
+                # sequence from current to previous index
                 index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
-                missing_sites <- site_order_notrib_shared[index_order]
-                ### end edit
                 
-                # Add a row for each of them
-                
-                # Insert a new row into stepwise states, with the implicit detection site
-                # Tag code, state, and time (which is NA)
-                missing_site <- missing_sites[j]
-                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
-                                             state = missing_site,
-                                             date_time = NA,
-                                             pathway = "implicit")
-                
-                stepwise_states %>% 
-                  bind_rows(., implicit_state) -> stepwise_states
-                
-                # Insert a new row into original detection history, with
-                # implicit detection site info
-                
-                ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
-                index_order <- seq(mainstem_index_current, mainstem_index_previous, by = -1)
-                
+                # Get the missing sites
                 missing_sites <- site_order_notrib_shared[index_order]
                 
-                missing_site <- missing_sites[j]
-                ### End edit
+                # Count the number of sites you need to add and loop through
+                for (j in 1:(length(index_order))) {
+                  ### EDIT 2022-07-16
+                  index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
+                  missing_sites <- site_order_notrib_shared[index_order]
+                  ### end edit
+                  
+                  # Add a row for each of them
+                  
+                  # Insert a new row into stepwise states, with the implicit detection site
+                  # Tag code, state, and time (which is NA)
+                  missing_site <- missing_sites[j]
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
+                                               state = missing_site,
+                                               date_time = NA,
+                                               pathway = "implicit")
+                  
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
+                  
+                  # Insert a new row into original detection history, with
+                  # implicit detection site info
+                  
+                  ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
+                  index_order <- seq(mainstem_index_current, mainstem_index_previous, by = -1)
+                  
+                  missing_sites <- site_order_notrib_shared[index_order]
+                  
+                  missing_site <- missing_sites[j]
+                  ### End edit
+                  
+                  
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          "implicit",
+                                          missing_site)
+                  
+                  
+                  
+                  # Also, change the value in the original dataframe
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
+                  
+                  # Add 1 to the number of added rows
+                  added_rows <- added_rows + 1
+                }
                 
+              }
+              
+              # If the fish is moving downstream
+              if (mainstem_index_current < mainstem_index_previous){
+                # sequence from current to previous index
+                index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
                 
-                implicit_detection <- c(det_hist[i, 'tag_code'],
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        "implicit",
-                                        missing_site)
+                # Get the missing sites
+                missing_sites <- site_order_notrib_shared[index_order]
                 
+                # Count the number of sites you need to add and loop through
+                for (j in 1:(length(index_order))) {
+                  ### EDIT 2022-07-16
+                  index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
+                  missing_sites <- site_order_notrib_shared[index_order]
+                  ### end edit
+                  # Add a row for each of them
+                  
+                  # Insert a new row into stepwise states, with the implicit detection site
+                  # Tag code, state, and time (which is NA)
+                  missing_site <- missing_sites[j]
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
+                                               state = missing_site,
+                                               date_time = NA,
+                                               pathway = "implicit")
+                  
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
+                  
+                  ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
+                  index_order <- seq(mainstem_index_current, mainstem_index_previous, by = 1)
+                  
+                  missing_sites <- site_order_notrib_shared[index_order]
+                  
+                  missing_site <- missing_sites[j]
+                  ### End edit
+                  
+                  # Insert a new row into original detection history, with
+                  # implicit detection site info
+                  
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          "implicit",
+                                          missing_site)
+                  
+                  # Also, change the value in the original dataframe
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
+                  
+                  # Add 1 to the number of added rows
+                  added_rows <- added_rows + 1
+                }
                 
-                
-                # Also, change the value in the original dataframe
-                det_hist <-
-                  insertRow(det_hist, implicit_detection, i)
-                
-                # Add 1 to the number of added rows
-                added_rows <- added_rows + 1
               }
               
             }
             
-            # If the fish is moving downstream
-            if (mainstem_index_current < mainstem_index_previous){
-              # sequence from current to previous index
-              index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
+            # If it was previously in the Snake
+            else{
+              ####### THIS SECTION IDENTICAL, JUST WITH SHARED, COLUMBIA, and SNAKE
+              # Get the current mainstem site & index
+              mainstem_site_current <- subset(tributary_mainstem, tributary == det_hist[i, 'state'])$mainstem
+              mainstem_index_current <- which(site_order_notrib_snake %in% mainstem_site_current)
               
-              # Get the missing sites
-              missing_sites <- site_order_notrib_shared[index_order]
+              # Get the previous mainstem site & index
+              mainstem_site_previous <- subset(tributary_mainstem, tributary == det_hist[i-1, 'state'])$mainstem
+              mainstem_index_previous <- which(site_order_notrib_snake %in% mainstem_site_previous)
               
-              # Count the number of sites you need to add and loop through
-              for (j in 1:(length(index_order))) {
-                ### EDIT 2022-07-16
-                index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
-                missing_sites <- site_order_notrib_shared[index_order]
-                ### end edit
-                # Add a row for each of them
+              # If the fish is moving upstream
+              if (mainstem_index_current > mainstem_index_previous){
                 
-                # Insert a new row into stepwise states, with the implicit detection site
-                # Tag code, state, and time (which is NA)
-                missing_site <- missing_sites[j]
-                implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
-                                             state = missing_site,
-                                             date_time = NA,
-                                             pathway = "implicit")
+                # sequence from current to previous index
+                index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
                 
-                stepwise_states %>% 
-                  bind_rows(., implicit_state) -> stepwise_states
+                # Get the missing sites
+                missing_sites <- site_order_notrib_snake[index_order]
                 
-                ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
-                index_order <- seq(mainstem_index_current, mainstem_index_previous, by = 1)
+                # Count the number of sites you need to add and loop through
+                for (j in 1:(length(index_order))) {
+                  ### EDIT 2022-07-16
+                  index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
+                  missing_sites <- site_order_notrib_snake[index_order]
+                  ### end edit
+                  
+                  # Add a row for each of them
+                  
+                  # Insert a new row into stepwise states, with the implicit detection site
+                  # Tag code, state, and time (which is NA)
+                  missing_site <- missing_sites[j]
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
+                                               state = missing_site,
+                                               date_time = NA,
+                                               pathway = "implicit")
+                  
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
+                  
+                  # Insert a new row into original detection history, with
+                  # implicit detection site info
+                  
+                  ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
+                  index_order <- seq(mainstem_index_current, mainstem_index_previous, by = -1)
+                  
+                  missing_sites <- site_order_notrib_snake[index_order]
+                  
+                  missing_site <- missing_sites[j]
+                  ### End edit
+                  
+                  
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          "implicit",
+                                          missing_site)
+                  
+                  
+                  
+                  # Also, change the value in the original dataframe
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
+                  
+                  # Add 1 to the number of added rows
+                  added_rows <- added_rows + 1
+                }
                 
-                missing_sites <- site_order_notrib_shared[index_order]
-                
-                missing_site <- missing_sites[j]
-                ### End edit
-                
-                # Insert a new row into original detection history, with
-                # implicit detection site info
-                
-                implicit_detection <- c(det_hist[i, 'tag_code'],
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        NA,
-                                        "implicit",
-                                        missing_site)
-                
-                # Also, change the value in the original dataframe
-                det_hist <-
-                  insertRow(det_hist, implicit_detection, i)
-                
-                # Add 1 to the number of added rows
-                added_rows <- added_rows + 1
               }
               
+              # If the fish is moving downstream
+              if (mainstem_index_current < mainstem_index_previous){
+                # sequence from current to previous index
+                index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
+                
+                # Get the missing sites
+                missing_sites <- site_order_notrib_snake[index_order]
+                
+                # Count the number of sites you need to add and loop through
+                for (j in 1:(length(index_order))) {
+                  ### EDIT 2022-07-16
+                  index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
+                  missing_sites <- site_order_notrib_snake[index_order]
+                  ### end edit
+                  # Add a row for each of them
+                  
+                  # Insert a new row into stepwise states, with the implicit detection site
+                  # Tag code, state, and time (which is NA)
+                  missing_site <- missing_sites[j]
+                  implicit_state <- data.frame(tag_code = det_hist[i, 'tag_code'],
+                                               state = missing_site,
+                                               date_time = NA,
+                                               pathway = "implicit")
+                  
+                  stepwise_states %>% 
+                    bind_rows(., implicit_state) -> stepwise_states
+                  
+                  ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
+                  index_order <- seq(mainstem_index_current, mainstem_index_previous, by = 1)
+                  
+                  missing_sites <- site_order_notrib_snake[index_order]
+                  
+                  missing_site <- missing_sites[j]
+                  ### End edit
+                  
+                  # Insert a new row into original detection history, with
+                  # implicit detection site info
+                  
+                  implicit_detection <- c(det_hist[i, 'tag_code'],
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          NA,
+                                          "implicit",
+                                          missing_site)
+                  
+                  # Also, change the value in the original dataframe
+                  det_hist <-
+                    insertRow(det_hist, implicit_detection, i)
+                  
+                  # Add 1 to the number of added rows
+                  added_rows <- added_rows + 1
+                }
+                
+              }
             }
+
             
           }
           
@@ -5389,31 +5525,31 @@ stepwise_states_noNA  %>%
   mutate(next_state = lead(state)) %>% 
   mutate(next_state = ifelse(next_tag_code != tag_code, "loss", next_state)) -> transitions
 
-write.csv(transitions, here::here("figures", "bad_transitions_table_2022-07-16.csv"))
+# write.csv(transitions, here::here("figures", "bad_transitions_table_2022-07-16.csv"))
 
 
-# 
-# # Compare them to original detection histories
-# 
-# # Export this for fitting multistate
-# write.csv(stepwise_states_noNA, "states_complete.csv")
-# 
-# ##### Sort individuals into run years #####
-# run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
-# run_year_start <- seq(ymd("2004-06-01"), ymd("2021-06-01"), by = "years")
-# run_year_end <- seq(ymd("2005-05-31"), ymd("2022-05-31"), by = "years")
-# 
-# run_year_df <- data.frame(run_year, run_year_start, run_year_end)
-# 
-# det_hist %>%
-#   group_by(tag_code) %>%
-#   filter(row_number() == 1) %>%
-#   mutate(run_year = subset(run_year_df, run_year_start < start_time & run_year_end > start_time)$run_year) %>%
-#   dplyr::select(tag_code, run_year) -> tag_codes_run_year
-# 
-# stepwise_states_noNA %>%
-#   left_join(., tag_codes_run_year, by = "tag_code") -> stepwise_states_noNA
-# 
-# # Export this for fitting multistate
-# write.csv(stepwise_states_noNA, "states_complete.csv")
+
+# Compare them to original detection histories
+
+# Export this for fitting multistate
+write.csv(stepwise_states_noNA, "states_complete.csv")
+
+##### Sort individuals into run years #####
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+run_year_start <- seq(ymd("2004-06-01"), ymd("2021-06-01"), by = "years")
+run_year_end <- seq(ymd("2005-05-31"), ymd("2022-05-31"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+det_hist %>%
+  group_by(tag_code) %>%
+  filter(row_number() == 1) %>%
+  mutate(run_year = subset(run_year_df, run_year_start < start_time & run_year_end > start_time)$run_year) %>%
+  dplyr::select(tag_code, run_year) -> tag_codes_run_year
+
+stepwise_states_noNA %>%
+  left_join(., tag_codes_run_year, by = "tag_code") -> stepwise_states_noNA
+
+# Export this for fitting multistate
+write.csv(stepwise_states_noNA, "states_complete.csv")
 
