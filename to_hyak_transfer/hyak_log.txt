@@ -1087,9 +1087,9 @@ scp -r ./2022-07-16-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 scp ./2022-07-16-complete_det_hist/03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16-complete_det_hist/
 
+# bug fix, reupload R script, re-run on MOX
 
-
-
+scp ./2022-07-16-complete_det_hist/03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16-complete_det_hist/
 
 
 
