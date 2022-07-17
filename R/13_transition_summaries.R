@@ -38,7 +38,8 @@ det_hist %>%
 # read.csv(here::here("from_hyak_transfer", "2022-06-10-complete_det_hist", "states_complete.csv")) %>%
 
 # check out the script is doing
-read.csv(here::here("from_hyak_transfer", "2022-07-14-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-14-complete_det_hist", "states_complete.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete.csv")) %>%
   dplyr::select(-X) -> states_complete
 
 # Get rid of fake fish
@@ -235,7 +236,7 @@ BON_fallback_fish <- subset(states_complete, tag_code %in% BON_fallback_tag_code
 transitions %>% 
   left_join(., origin_metadata, by = "tag_code") -> transitions_meta
 
-write.csv(transitions_meta, here::here("figures", "transitions_table_2022-07-16.csv"))
+write.csv(transitions_meta, here::here("figures", "transitions_table_2022-07-17.csv"))
 # write.csv(transitions_meta, here::here("figures", "transitions_table_testpart1.csv"))
 
 # Let's look at the frequency of going back to the mainstem vs. loss for tributaries
