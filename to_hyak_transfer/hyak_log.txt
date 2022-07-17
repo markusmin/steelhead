@@ -1092,9 +1092,13 @@ scp ./2022-07-16-complete_det_hist/03_hyak_complete_detection_histories_v2.R mmi
 scp ./2022-07-16-complete_det_hist/03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16-complete_det_hist/
 
 
+### 7-17-2022 ###
 
+- pull run off of mox, inspect
 
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16-complete_det_hist/ ./
 
+It looks beautiful!!!
 
 
 
