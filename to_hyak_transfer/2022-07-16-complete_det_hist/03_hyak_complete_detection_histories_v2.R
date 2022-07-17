@@ -692,7 +692,7 @@ stepwise_states <- data.frame(tag_code = character(),
 # This tag code 384.1B796A520E is rows 780 - 795 of det hist
 for (i in 1:round(1.5 * nrow(det_hist), 0)) {
 # for (i in 180720:181200){
-# for (i in 22500:22754) {
+# for (i in 7200:7300) {
 # for (i in 22500:23000){
 # for (i in 31900:32500) {
 # for (i in (nrow(det_hist)-20):(nrow(det_hist) + 20)) { # Test to see if dummy fish solution works
@@ -912,11 +912,11 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
               ####### THIS SECTION IDENTICAL, JUST WITH SHARED, COLUMBIA, and SNAKE
               # Get the current mainstem site & index
               mainstem_site_current <- subset(tributary_mainstem, tributary == det_hist[i, 'state'])$mainstem
-              mainstem_index_current <- which(site_order_notrib_columbia_snake %in% mainstem_site_current)
+              mainstem_index_current <- which(site_order_notrib_columbia %in% mainstem_site_current)
               
               # Get the previous mainstem site & index
               mainstem_site_previous <- subset(tributary_mainstem, tributary == det_hist[i-1, 'state'])$mainstem
-              mainstem_index_previous <- which(site_order_notrib_columbia_snake %in% mainstem_site_previous)
+              mainstem_index_previous <- which(site_order_notrib_columbia %in% mainstem_site_previous)
               
               # If the fish is moving upstream
               if (mainstem_index_current > mainstem_index_previous){
@@ -925,13 +925,13 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
                 index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
                 
                 # Get the missing sites
-                missing_sites <- site_order_notrib_columbia_snake[index_order]
+                missing_sites <- site_order_notrib_columbia[index_order]
                 
                 # Count the number of sites you need to add and loop through
                 for (j in 1:(length(index_order))) {
                   ### EDIT 2022-07-16
                   index_order <- seq(mainstem_index_previous, mainstem_index_current, by = 1)
-                  missing_sites <- site_order_notrib_columbia_snake[index_order]
+                  missing_sites <- site_order_notrib_columbia[index_order]
                   ### end edit
                   
                   # Add a row for each of them
@@ -953,7 +953,7 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
                   ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
                   index_order <- seq(mainstem_index_current, mainstem_index_previous, by = -1)
                   
-                  missing_sites <- site_order_notrib_columbia_snake[index_order]
+                  missing_sites <- site_order_notrib_columbia[index_order]
                   
                   missing_site <- missing_sites[j]
                   ### End edit
@@ -988,13 +988,13 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
                 index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
                 
                 # Get the missing sites
-                missing_sites <- site_order_notrib_columbia_snake[index_order]
+                missing_sites <- site_order_notrib_columbia[index_order]
                 
                 # Count the number of sites you need to add and loop through
                 for (j in 1:(length(index_order))) {
                   ### EDIT 2022-07-16
                   index_order <- seq(mainstem_index_previous, mainstem_index_current, by = -1)
-                  missing_sites <- site_order_notrib_columbia_snake[index_order]
+                  missing_sites <- site_order_notrib_columbia[index_order]
                   ### end edit
                   # Add a row for each of them
                   
@@ -1012,7 +1012,7 @@ for (i in 1:round(1.5 * nrow(det_hist), 0)) {
                   ### EDIT 2022-07-16: flipping the order of site here (as we have done in other parts of the for loop)
                   index_order <- seq(mainstem_index_current, mainstem_index_previous, by = 1)
                   
-                  missing_sites <- site_order_notrib_columbia_snake[index_order]
+                  missing_sites <- site_order_notrib_columbia[index_order]
                   
                   missing_site <- missing_sites[j]
                   ### End edit
