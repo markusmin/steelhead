@@ -73,7 +73,8 @@ tag_codes_1 %>%
   bind_rows(., tag_codes_14) -> tag_code_file_finder
 
 # Read in states complete
-read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete.csv")) %>%
   dplyr::select(-X) -> states_complete
 
 # Read in tag code metadata
@@ -100,37 +101,94 @@ states_complete %>%
 missing_date_time <- is.na(states_complete$date_time)
 date_times <- states_complete$date_time
 
+notime_tags <- c("3D9.1BF15C4665", "3D9.1BF1608BA7", "3D9.1BF16B2E82", "3D9.1BF17A3856", "3D9.1BF1937E5E", "3D9.1BF1CAB788",
+                 "3D9.1BF1CBCB02", "3D9.1BF20BDB85", "3D9.1BF2803D80", "3D9.1C2C4C0362",
+                 "3D9.1C2C594B70", "3D9.1C2C7FE403", "3D9.1C2CE3EEAD", "3D9.1C2CFFD8AE", "3D9.1C2D681A4E", "3D9.1C2D7C28C1",
+                 "3D9.1C2DAC38B6", "3D9.1C2DCAC7C3", "3D9.1C2DEC13C7", "3D9.257C5CDF73",
+                 "3D9.257C5D22AA", "3DD.003BC73B1A", "3DD.00778B221C", "3DD.0077BD17FF")
+
+notime_tags_times <- subset(complete_det_hist, tag_code %in% notime_tags & event_site_name == "Bonneville Adult Fishways (combined)" & is.na(end_time))
+
+# for (i in 1:nrow(states_complete)){
+#   # this is the temporary fix
+#   if (states_complete[i,"tag_code"] %in% notime_tags & states_complete[i,"pathway"] == "BON (adult)"){
+#     states_complete[i, "date_time"] <- subset(notime_tags_times, tag_code == states_complete[i,"tag_code"])$start_time
+#   }
+#   # end temporary fix
+#   
+#   else if (is.na(states_complete[i,"date_time"])){
+#     # Figure out how far back the last known time was
+#     # Truncate the missing date times to only ones prior to current state
+#     missing_date_time_subset <- missing_date_time[1:(i-1)]
+#     prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
+#     
+#     # Truncate the missing date times to only ones after current state
+#     missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
+#     next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
+#     
+#     # Now, interpolate the missing time
+#     # First, figure out how long between the two known times
+#     prev_time <- ymd_hms(date_times[prev_time_index])
+#     next_time <- ymd_hms(date_times[next_time_index])
+#     time_diff <- next_time - prev_time
+#     
+#     # Get the missing time - add the time difference divided by the number 
+#     # of missing steps plus 1, multiply by which number step it is
+#     missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
+#     
+#     # populate the missing date_time
+#     states_complete[i, "date_time"] <- missing_time
+#     
+#   }
+#   # If it's not, leave it alone (do nothing)
+#   else {
+#     
+#   }
+# }
+
+
+# V2: don't get middle time, instead just pick next actual time
 for (i in 1:nrow(states_complete)){
-  if (is.na(states_complete[i,"date_time"])){
-    # Figure out how far back the last known time was
-    # Truncate the missing date times to only ones prior to current state
-    missing_date_time_subset <- missing_date_time[1:(i-1)]
-    prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
-    
+  # this is the temporary fix
+  if (states_complete[i,"tag_code"] %in% notime_tags & states_complete[i,"pathway"] == "BON (adult)"){
+    states_complete[i, "date_time"] <- subset(notime_tags_times, tag_code == states_complete[i,"tag_code"])$start_time
+  }
+  # end temporary fix
+
+  else if (is.na(states_complete[i,"date_time"])){
+    # Find the next known time
     # Truncate the missing date times to only ones after current state
     missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
     next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
-    
+
     # Now, interpolate the missing time
-    # First, figure out how long between the two known times
-    prev_time <- ymd_hms(date_times[prev_time_index])
     next_time <- ymd_hms(date_times[next_time_index])
-    time_diff <- next_time - prev_time
-    
-    # Get the missing time - add the time difference divided by the number 
+
+    # Get the missing time - add the time difference divided by the number
     # of missing steps plus 1, multiply by which number step it is
-    missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
-    
+    missing_time <- next_time
+
     # populate the missing date_time
     states_complete[i, "date_time"] <- missing_time
-    
+
   }
   # If it's not, leave it alone (do nothing)
   else {
-    
+
   }
 }
 
+
+
+# Put this checkpoint in so we don't have to re-run the for loop
+# write.csv(states_complete, here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv"))
+
+read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
+  dplyr::select(-X) -> states_complete
+
+# Fix the bad tags
+states_complete %>% 
+  mutate(date_time = ymd_hms(date_time)) -> states_complete
 
 # Figure out how long detections were after release time
 states_complete %>% 
@@ -210,6 +268,8 @@ states_complete %>%
   subset(order_2 == 1) -> first_adult_states
 
 table(first_adult_states$pathway)
+
+subset(first_adult_states, pathway == "MCN (adult)")
 # so they're not - that's bad. Let's look at all of those that aren't
 subset(first_adult_states, pathway != "BON (adult)")$tag_code -> bad_adults
 
@@ -320,7 +380,7 @@ states_complete %>%
   mutate(direction = ifelse(lag(state_order) > state_order, "downstream", "upstream")) %>% 
   mutate(direction = ifelse(order == 1, "upstream", direction))-> states_complete
 
-# Classify kelt movement based on a sequence of downstream movements preceding a BON detection (which indicatees that it has now become a repeat spawner)
+# Find repeat spawners based on a sequence of downstream movements preceding a BON detection (which indicates that it has now become a repeat spawner)
 states_complete %>% 
   mutate(life_stage = ifelse(tag_code == lag(tag_code) & # if it's the same fish
                                pathway == "BON (adult)" & # if it was seen in the adult ladder
@@ -329,7 +389,7 @@ states_complete %>%
                                lag(direction) == "downstream" & # & it was just seen moving downstream
                                 tag_code == lead(tag_code) & # if the tag code continues, then make sure that
                                lead(direction) != "upstream", # we don't subsequently see it moving back upstream
-                            "repeat", # then call it a repeat spawners
+                            "repeat", # then call it a repeat spawner
                             ifelse(tag_code == lag(tag_code) & # if it's the same fish
                                      pathway == "BON (adult)" & # if it was seen in the adult ladder
                                      time_after_arrival > days(x = 180) &  # and a long time after arrival
@@ -338,23 +398,112 @@ states_complete %>%
                                      tag_code != lead(tag_code), # if the tag code doesn't continue, then we're chillin
                             "repeat", life_stage))) -> states_complete  # then call it a repeat spawner
 
+# Also find kelt movement that does not precede a return
+# if a fish does not return, it's really hard to determine where it spawned - you can't really say
+# for sure when fallback is downstream kelt movement and when it's just trying to get to trib
+
+# steelhead are known to spawn in the spring, so kelts would be moving in spring/summer back downstream
+
+# Let's look first at downstream movements at kelt timing
+# states_complete %>% 
+#   mutate(life_stage = ifelse(event_month %in% c(5,6,7) & # select months we might expect kelts
+#                                direction == "downstream" & # make sure that they're going downstream and (next line) make sure it's a long time after
+#                                time_after_arrival > days(180), "possible_kelt", life_stage)) -> states_complete
+
+# so by month doesn't work, because most of the kelt movement is implicit movements
+# that aren't actually detected (due to bad detection in downstream movements)
+# instead, we'll want to choose based on just time after arrival
+# states_complete %>% 
+#   mutate(life_stage = ifelse(direction == "downstream" & # make sure that they're going downstream and (next line) make sure it's a long time after
+#                                time_after_arrival > days(180), "possible_kelt", life_stage)) -> states_complete
+
+# not going to work, again because of implicit move timing.
+# Let's try lag(direction)
+# also only allow it if it's been at least 90 days and movement is occurring when we'd expect it to (following spring spawning)
+# states_complete_orig <- states_complete
+
+states_complete %>% 
+  mutate(life_stage = ifelse(event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lag(direction) == "downstream" | # if two consecutive downstream movements, then they're possible kelt movements
+                               event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "possible_kelt", life_stage)) -> states_complete
+
+# This sort of works, but also IDs lots of movement, especially between upper snake and upper columbia or vice versa, as kelt.
+# We'll fix up the time interpolation, then subset by only spring/late winter (probably around March to July or something like that)
+
+# To fix some of the issues:
+states_complete %>% 
+  group_by(tag_code) %>% 
+  mutate(max_order = max(order)) -> states_complete
+
+# Check these
+states_complete %>% 
+  group_by(tag_code) %>% 
+  filter(any(life_stage == "possible_kelt")) %>% 
+  dplyr::select(tag_code, state, date_time, life_stage, direction, pathway, order, max_order) -> possible_kelts
+
+# for (i in 1:nrow(states_complete)){
+#   if(states_complete[i, "life_stage"] == "possible_kelt"){
+#     n_lead_states <- states_complete[i, "max_order"] - states_complete[i, "order"]
+#     for (j in 1:n_lead_states){
+#       direction_vector = vector(length = n_lead_states)
+#       direction_vector[j] <- lead(states_complete$direction[i:(i + n_lead_states)], n = j)
+#     }
+#   }
+#   
+#   
+# }
+
+for (i in 1:nrow(non_terminal_kelts_hist)){
+  if(non_terminal_kelts_hist[i, "life_stage"] == "possible_kelt"){
+    n_lead_states <- (non_terminal_kelts_hist[i, "max_order"] - non_terminal_kelts_hist[i, "order"])[1,1]
+    for (j in 1:n_lead_states){
+      direction_vector = vector(length = n_lead_states)
+      direction_vector[j] <- lead(non_terminal_kelts_hist$direction[i:(i + n_lead_states)], n = j)
+    }
+  }
+  
+  
+}
+
+
+# find possible repeats
+possible_kelts %>% 
+  group_by(tag_code) %>% 
+  slice(tail(row_number(),1)) %>% 
+  subset(life_stage != "possible_kelt") -> non_terminal_kelts
+
+non_terminal_kelts$tag_code -> non_terminal_kelts_tags
+
+non_terminal_kelts_hist <- subset(possible_kelts, tag_code %in% non_terminal_kelts_tags)
+
+# This guy (384.1B796A8EE1) is weird - one random detection in BON adult. Likely same as with juveniles, where it was seen there but going downstream?
+# Need to make it so that all movement following kelt detection is kelt, until we see them again as a repeat spawner
+# 384.36F2B32373 also odd - definitely looks like kelt movement, but it would mean that it spawned by March. I guess that's not impossible
+# 384.36F2B442DB: This is not kelt movement - some downstream movement in April, but then back upstream to Clearwater. 
+# Need to not call things kelt movement if they then go back upstream after
+  # 	384.36F2B48AEC - same story as above - two downstream movements in the middle, but back upstream after
+# So kelt movement either has to be terminal in the detection history, or has to be followed by repeat spawner movement.
+# we can make this fix I think
+# not a kelt - 384.3B2397826C. Same as before (downstream in the middle, switching from upper columbia to snake)
+# 384.3B239A8BD6 - individual where we're not identifying some of the kelt movements. Would be fixed by making the change to call everything prior
+# to repeat spawning as kelt movements
+# mis IDed fallback as kelt movement :	384.3B239CF5F8
+
 # check how we did
 states_complete %>% 
   group_by(tag_code) %>% 
-  filter(any(life_stage == "repeat")) -> repeat_spawners
+  filter(any(life_stage == "repeat")) %>% 
+  dplyr::select(tag_code, state, date_time, life_stage, direction, pathway)-> repeat_spawners
 
-repeat_spawners %>% 
-  dplyr::select(tag_code, state, date_time, life_stage, direction) -> repeat_spawners_abbrev
 
 
 # Now, classify all downstream movement preceding a repeat spawner arriving at BON as kelt movement
 life_stages_vec <- states_complete$life_stage
 
 
-for (i in 1:nrow(states_complete)){
-  if()
-  
-}
+# for (i in 1:nrow(states_complete)){
+#   if()
+#   
+# }
 
 
 
