@@ -1101,6 +1101,20 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16-complete_det_hist/ ./
 It looks beautiful!!!
 
 
+### 7-18-2022 ###
+
+Dang, so there's a bug where we have some NA end times - this messes up interpolating the site visit times
+- I'll re-run the states_complete script with that bug fixed, but for now we can use BON arrival times to tweak it
+- Okay, so the issue is really in the previous script, where we're not getting end times for site visits that have a single detection (but only at BON adult ladders)
+
+# re-upload the det_hist script and re-run
+scp -r ./2022-07-16_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+
+# OKAY - let's see if we can get stan running on mox
+
+
+
 
 
 
