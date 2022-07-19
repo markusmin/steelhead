@@ -6,7 +6,7 @@ library(lubridate)
 library(janitor)
 
 # For testing - setwd
-# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-05-24_det_hist/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-07-16s_det_hist/")
 
 ##### All tributaries #####
 
@@ -147,6 +147,7 @@ det_hist <- data.frame(tag_code = character(), event_site_name = character(),
                            event_site_basin_name = character(), event_site_subbasin_name = character(),
                            event_site_latitude = numeric(), event_site_longitude = numeric())
 
+
 # Loop through the unique tags
 for (i in 1:length(unique_tag_IDs)){
 # for (i in 1:1000){
@@ -206,7 +207,7 @@ for (i in 1:length(unique_tag_IDs)){
       else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name']){
         
         # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[[j,'event_date_time_value']]
+        ind_det_hist[counter, 'end_time'] <- tag_hist[[j,'event_date_time_value']]
         
         # UPDATE THE COUNTER
         # every time we store an end time, we update the counter. This allows
