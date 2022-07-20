@@ -1112,11 +1112,40 @@ scp -r ./2022-07-16_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 
 # OKAY - let's see if we can get stan running on mox
+- So cmdstanr package will load, but then the stan model completely explodes
+- I'm not sure we have cmdstan (no r) installed, which is required - https://mc-stan.org/cmdstanr/articles/cmdstanr.html
+- So it sounds like our compiler is too old? I think we ran into this issue before
+	- can we load any of the available gcc modules?
+		- yes we can, but just using module load doesn't fix it
 
+gcc/6.3.1                                                           
+           gcc/8.2.1                                                           
+                                gcc/10.1.0                                                          
+                        gcc_4.8.5-impi_2017                                                 
+                            gcc_8.2.1-ompi_3.1.4                                                
+                          gcc_8.2.1-ompi_4.0.1  
+                          
+                          contrib/gcc-8.3.0                                                      
+contrib/gcc-9.3.0                                  
+contrib/gcc/6.2.0                                  
+contrib/gcc/6.2.0_impi                             
+contrib/gcc/6.2.0_mpich-3.2                        
+contrib/gcc/6.3.0                                  
+contrib/gcc49/4.9.4                                
+contrib/gcc_9.3.0_ompi_4.0.7                       
+contrib/gcc_10.1.0                                 
+contrib/gcc_10.1.0_ompi_4.0.3                      
+contrib/gcc_cesg/9.1.0   
 
+# pull the run off mox
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-16_det_hist/ ./
 
+- move it into the complete_det_hist folder for today
+scp -r ./2022-07-18-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+### 2022-07-19 ###
 
+pull the latest complete det hist script off mox
 
 
 
