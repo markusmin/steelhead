@@ -75,8 +75,13 @@ tag_codes_1 %>%
 # Read in states complete
 # read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
 # read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete.csv")) %>%
-read.csv(here::here("from_hyak_transfer", "2022-07-18-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-18-complete_det_hist", "states_complete.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv")) %>%
   dplyr::select(-X) -> states_complete
+
+# Get rid of dummy fish
+states_complete %>% 
+  subset(tag_code != "dummy_fish") -> states_complete
 
 # Read in tag code metadata
 read.csv(here::here("covariate_data", "tag_code_metadata.csv")) -> tag_code_metadata
@@ -108,7 +113,7 @@ notime_tags <- c("3D9.1BF15C4665", "3D9.1BF1608BA7", "3D9.1BF16B2E82", "3D9.1BF1
                  "3D9.1C2DAC38B6", "3D9.1C2DCAC7C3", "3D9.1C2DEC13C7", "3D9.257C5CDF73",
                  "3D9.257C5D22AA", "3DD.003BC73B1A", "3DD.00778B221C", "3DD.0077BD17FF")
 
-notime_tags_times <- subset(complete_det_hist, tag_code %in% notime_tags & event_site_name == "Bonneville Adult Fishways (combined)" & is.na(end_time))
+# notime_tags_times <- subset(complete_det_hist, tag_code %in% notime_tags & event_site_name == "Bonneville Adult Fishways (combined)" & is.na(end_time))
 
 # for (i in 1:nrow(states_complete)){
 #   # this is the temporary fix
@@ -151,19 +156,21 @@ notime_tags_times <- subset(complete_det_hist, tag_code %in% notime_tags & event
 # V2: don't get middle time, instead just pick next actual time
 for (i in 1:nrow(states_complete)){
   # this is the temporary fix
-  if (states_complete[i,"tag_code"] %in% notime_tags & states_complete[i,"pathway"] == "BON (adult)"){
-    states_complete[i, "date_time"] <- subset(notime_tags_times, tag_code == states_complete[i,"tag_code"])$start_time
-  }
+  # if (states_complete[i,"tag_code"] %in% notime_tags & states_complete[i,"pathway"] == "BON (adult)"){
+  #   states_complete[i, "date_time"] <- subset(notime_tags_times, tag_code == states_complete[i,"tag_code"])$start_time
+  # }
   # end temporary fix
 
-  else if (is.na(states_complete[i,"date_time"])){
+  # else if (is.na(states_complete[i,"date_time"])){
+  if (is.na(states_complete[i,"date_time"])){
     # Find the next known time
     # Truncate the missing date times to only ones after current state
     missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
     next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
 
     # Now, interpolate the missing time
-    next_time <- ymd_hms(date_times[next_time_index])
+    # next_time <- ymd_hms(date_times[next_time_index])
+    next_time <- format(as.POSIXct(date_times[next_time_index], tz = "UTC"), "%Y-%m-%d %H:%M:%S")
 
     # Get the missing time - add the time difference divided by the number
     # of missing steps plus 1, multiply by which number step it is
@@ -182,10 +189,20 @@ for (i in 1:nrow(states_complete)){
 
 
 # Put this checkpoint in so we don't have to re-run the for loop
-# write.csv(states_complete, here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv"))
+write.csv(states_complete, here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete_times_interpolated.csv"))
 
-read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-18-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
   dplyr::select(-X) -> states_complete
+
+# Okay, I'm not exactly sure why these fish are missing date/times, but manually fix them
+# states_complete[174991,"date_time"] <- states_complete[174992,"date_time"]
+# states_complete[270821,"date_time"] <- states_complete[270822,"date_time"]
+
+
+states_complete %>% 
+  subset(tag_code != "dummy_fish") -> states_complete
 
 # Fix date time
 states_complete %>% 
@@ -220,22 +237,19 @@ states_complete %>%
                             # or fish that were released the year before (on or after July 1) and seen the subsequent year on or before June 15
                                release_year == event_year-1 & release_month >= 7 & event_month <= 5 | 
                                release_year == event_year-1 & release_month >= 7 & event_month == 6 & event_day <= 15, "Juvenile",  
-  "Adult")) -> states_complete
+  life_stage)) -> states_complete
 
 # Remove all detection histories that are only juvenile (keep only those detection histories with at least one adult movement)
 states_complete %>% 
+  group_by(tag_code) %>% 
   filter(any(life_stage == "Adult")) -> states_complete
 
 # Okay, so we need to fix our arrival times to not pick the juvenile arrival
 # This tag code (3D9.1BF2803D80) somehow has three of the same observation - BON adult on 2014-09-10.
 # I think this was a problem tag from a previous script too, so it's coming from before
 
-# Another problem: 3D9.1BF1CF4AA3 has tons of repeated site visits - just an absolute mess
-# Also tons of repeated site visits: 3D9.1BF27BDC8D
-# 3D9.1BF27C3319 too
-# 3D9.1C2C31C103 too
-# and more... need to fix these
-# it's not in the input files, so that's good
+# subset(states_complete, tag_code == "3D9.1BF2803D80") -> bad_boy
+# Looks good now!
 
 # Let's figure out the first ADULT arrival at BON
 states_complete %>% 
@@ -251,8 +265,8 @@ states_complete %>%
   left_join(., BON_arrival_df, by = "tag_code") -> states_complete
 
 # make sure it's a date
-states_complete %>% 
-  mutate(BON_arrival = ymd_hms(BON_arrival)) -> states_complete
+# states_complete %>% 
+#   mutate(BON_arrival = ymd_hms(BON_arrival)) -> states_complete
 
 # calculate time after adult arrival
 states_complete %>% 
@@ -376,7 +390,8 @@ site_order_combined <- data.frame(state = c("mainstem, mouth to BON", "mainstem,
 
 states_complete %>% 
   group_by(tag_code) %>% 
-  mutate(order = row_number()) -> states_complete
+  mutate(order = row_number()) %>% 
+  mutate(max_order = max(order)) -> states_complete
 
 # Determine if movement is occurring upstream or downstream
 states_complete %>% 
@@ -413,6 +428,9 @@ states_complete %>%
 # that subsequently move right back upstream after going downstream to BON. BUT - 
 # this is also not picking up on repeat spawners because they are going to 
 # move upstream too. So Maybe we take that part out, and just increase the time constraint
+
+# checkpoint
+# states_complete_orig <- states_complete
 
 states_complete %>% 
   mutate(life_stage = ifelse(tag_code == lag(tag_code) & # if it's the same fish
@@ -473,7 +491,16 @@ states_complete %>%
 
 states_complete %>% 
   mutate(life_stage = ifelse(event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lag(direction) == "downstream" | # if two consecutive downstream movements, then they're possible kelt movements
-                               event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "kelt", life_stage)) -> states_complete
+                               event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "kelt", 
+                             ifelse(order == max_order & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream", "kelt", life_stage))) -> states_complete
+
+# TEMPORARY CALL: Any terminal downstream movement is kelt movement
+
+states_complete %>% 
+  group_by(tag_code) %>% 
+  filter(any(is.na(life_stage))) -> NA_life_stages
+
+table(subset(NA_life_stages, is.na(life_stage))$pathway)
 
 # This sort of works, but also IDs lots of movement, especially between upper snake and upper columbia or vice versa, as kelt.
 # We'll fix up the time interpolation, then subset by only spring/late winter (probably around March to July or something like that)
@@ -571,16 +598,7 @@ non_terminal_kelts_hist <- subset(kelts, tag_code %in% non_terminal_kelts_tags)
 # to repeat spawning as kelt movements
 # mis IDed fallback as kelt movement :	384.3B239CF5F8
 
-##### Truncate and export final history, without juveniles and kelts #####
-
-# We want to model adult movement, but not kelt movement, and note when an adult has become a repeat spawner.
-# For that, we will create a new field based on tag code, with repeat appended for those individuals
-
-states_complete %>% 
-  mutate(tag_code_2 = ifelse(eventual_repeat == "eventual_repeat" & order >= repeat_start, paste0(tag_code, "_repeat"), tag_code)) -> states_complete
-
-states_complete %>% 
-  subset(., eventual_repeat == "eventual_repeat") -> eventual_repeat_df_2
+# IDENTIFY REPEAT KELT MOVEMENT
 
 # This guy definitely has kelt movement after being a repeat spawner and returning
 # 3D9.1BF18C45D3
@@ -594,11 +612,85 @@ states_complete %>%
                                direction == "downstream" & lead(direction) == "downstream", "repeat_kelt", life_stage)) -> states_complete
   
   
+
+# Quick fix for one individual (3D9.1C2CCDA88C) with an upstream movement that's clearly a kelt
+states_complete %>% 
+  mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & lag(life_stage == "kelt") & lead(life_stage == "kelt"), "kelt", life_stage)) -> states_complete
+
 # Look into our repeat kelts
 states_complete %>% 
   group_by(tag_code) %>% 
   filter(any(life_stage == "repeat_kelt")) -> repeat_kelts
 
-# Quick fix for one individual (3D9.1C2CCDA88C) with an upstream movement that's clearly a kelt
+# Looks good!
+
+##### Truncate and export final history, without juveniles and kelts #####
+
+# Look into NA life stages
 states_complete %>% 
-  mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & lag(life_stage == "kelt") & lead(life_stage == "kelt"), "kelt", life_stage)) -> states_complete
+  filter(any(is.na(life_stage))) -> NA_life_stages
+
+# Export to share with rebecca
+NA_life_stages %>% 
+  dplyr::select(-c(release_year, release_month, release_day, event_year, event_month, event_day, order, max_order, state_order, direction_index)) %>% 
+  mutate(life_stage = ifelse(is.na(life_stage), "possible_kelt", life_stage)) %>% 
+  mutate(time_after_arrival = as.numeric(time_after_arrival, units="days")) %>% 
+  dplyr::rename(days_after_arrival = time_after_arrival, days_after_release = time_after_release) %>% 
+  mutate(days_after_arrival = round(days_after_arrival, 1), days_after_release = round(days_after_release, 1)) ->possible_kelts_for_export
+
+write.csv(possible_kelts_for_export, "possible_kelts_for_export.csv")
+
+# We want to model adult movement, but not kelt movement, and note when an adult has become a repeat spawner.
+# For that, we will create a new field based on tag code, with repeat appended for those individuals
+
+states_complete %>% 
+  mutate(tag_code_2 = ifelse(eventual_repeat == "eventual_repeat" & order >= repeat_start, paste0(tag_code, "_repeat"), tag_code)) -> states_complete
+
+# Check to make sure our new tag codes make sense
+states_complete %>% 
+  subset(., eventual_repeat == "eventual_repeat") -> eventual_repeat_df_2
+
+
+# FILTER FINAL FILE FOR EXPORT
+states_complete %>% 
+  subset(., !(life_stage %in% c("kelt", "repeat_kelt", "Juvenile"))) -> adults_only_states
+
+# Let's make sure we're starting upstream of BON
+adults_only_states %>% 
+  group_by(tag_code_2) %>% 
+  filter(row_number() == 1) -> adults_first_states
+
+length(unique(adults_first_states$tag_code_2))
+
+# Looks good!
+table(adults_first_states$state)
+setdiff(adults_first_states$tag_code_2, adults_only_states$tag_code_2)
+
+
+
+# Now, export this file, removing irrelevant columns
+adults_only_states %>% 
+  dplyr::select(tag_code, state, date_time, pathway, life_stage, tag_code_2) -> adults_only_states_for_export
+write.csv(adults_only_states_for_export, here::here("stan_actual", "adults_states_complete.csv"))
+
+
+# Some summary statistics:
+
+# How many repeat spawners do we have?
+length(unique(adults_only_states$tag_code_2)) - length(unique(adults_only_states$tag_code))
+# only 120 according to our code
+# about 0.2% of adults returning to BON are seen at BON again as repeat spawners
+
+# How many individuals with kelt movement do we have?
+states_complete %>% 
+  filter(any(life_stage %in% c("kelt", "repeat_kelts"))) -> kelts_final
+
+# 1,379
+length(unique(kelts_final$tag_code))
+# About 2% of adults (returns to BON) exhibit kelt movement
+
+repeat_kelts %>% 
+  dplyr::select(-c("release_year", "release_month",  "release_day", "event_year",    "event_month",  "event_day")) -> repeat_kelts_abbrev
+
+
+
