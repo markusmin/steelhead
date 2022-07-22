@@ -14,13 +14,13 @@ library(here)
 
 # First, let's check the detection history script to make sure that the input file for states complete is good
 # check the old file
-read.csv(here::here("from_hyak_transfer", "2022-05-24_det_hist", "complete_det_hist.csv")) %>% 
-  dplyr::select(-X) -> det_hist
+# read.csv(here::here("from_hyak_transfer", "2022-05-24_det_hist", "complete_det_hist.csv")) %>% 
+#   dplyr::select(-X) -> det_hist
 
-det_hist %>% 
-  group_by(tag_code) %>% 
-  mutate(order = row_number()) %>% 
-  subset(order == 1) -> first_states
+# det_hist %>% 
+#   group_by(tag_code) %>% 
+#   mutate(order = row_number()) %>% 
+#   subset(order == 1) -> first_states
 # Yeah, so this one has a couple dozen errors where fish are starting way upstream
 
 
@@ -39,7 +39,9 @@ det_hist %>%
 
 # check out the script is doing
 # read.csv(here::here("from_hyak_transfer", "2022-07-14-complete_det_hist", "states_complete.csv")) %>%
-read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-18-complete_det_hist", "states_complete.csv")) %>%
+# read.csv(here::here("from_hyak_transfer", "2022-07-19-complete_det_hist", "states_complete.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv")) %>%
   dplyr::select(-X) -> states_complete
 
 # Get rid of fake fish
@@ -236,7 +238,7 @@ BON_fallback_fish <- subset(states_complete, tag_code %in% BON_fallback_tag_code
 transitions %>% 
   left_join(., origin_metadata, by = "tag_code") -> transitions_meta
 
-write.csv(transitions_meta, here::here("figures", "transitions_table_2022-07-17.csv"))
+write.csv(transitions_meta, here::here("figures", "transitions_table_2022-07-21.csv"))
 # write.csv(transitions_meta, here::here("figures", "transitions_table_testpart1.csv"))
 
 # Let's look at the frequency of going back to the mainstem vs. loss for tributaries
