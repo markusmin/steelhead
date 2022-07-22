@@ -1147,17 +1147,68 @@ scp -r ./2022-07-18-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 pull the latest complete det hist script off mox
 
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-18-complete_det_hist/ ./
+
+Okay, so there's still some issues with this. Made the fix, reupload & run:
+
+scp ./2022-07-18-complete_det_hist/03_hyak_complete_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-18-complete_det_hist/
+
+### 2022-07-20 ### 
+# Pull it back off:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-18-complete_det_hist/ ./
+
+Wow okay, so this is terrible. Just super messed up, especially for the tributaries
+
+# Okay, I think I made the bug fix. Reupload to mox
+scp -r ./2022-07-19-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+### 2022-07-21 ###
+# Pull run off of mox
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-19-complete_det_hist/ ./
+
+This was the fish we were trying to fix: 3D9.1C2C430C8D
+- It appears that we were able to fix this issue, so that's good!
+
+Okay, so there are still some issues with this file, but it's much closer. Also, the
+changes are clearly taking effect because we now have more mainstem transitions (which
+is due to the script now making that fix for making sure that fish are seen in the downstream
+states before ascending the adult ladder, even if they're actually in the right state to
+enter a tributary - see edits marked 2022-07-19 in 03 script)
+
+Here are the problem tags:
+
+Asotin Creek to RIS to RRE: 
+3D9.1BF27C4DF9
+3D9.1C2D6A1268
+3D9.1C2D6F4187
+3D9.1C2D8288E5
+3D9.1C2DF614B4
+- This is a weird issue, because that's a Columbia mainstem site. I think somehow that we're
+selecting the wrong order of sites somewhere in the code.
+
+Clearwater River to RIS to RRE:
+3D9.1C2C571E86
+3D9.1C2DF53809
+3DD.0077A8D748
+- Same weird thing as above
+
+Tucannon River to PRA to RIS:
+- Same issue as above, just one state earlier in the order
+3D9.1BF26D9E1A
+3D9.1C2C3F724F
+3D9.1C2C4C5CD3
+3D9.1C2C4F4C33
+3D9.1C2C517040
+3D9.1C2DD35628
+3D9.1C2DD9566D
 
 
+This individual: 3D9.1BF27C4DF9
+- Really looks like maybe moving downstream through the adult ladder at LGR? But I don't think
+we say that for sure. Need to stick with the assumption that for adults, the ladders are unidirectional
 
-
-
-
-
-
-
-
-
+Made the edits, reupload to mox hyak & run:
+scp -r ./2022-07-21-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
 
 
