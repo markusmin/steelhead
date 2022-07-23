@@ -431,6 +431,7 @@ states_complete %>%
 
 # checkpoint
 # states_complete_orig <- states_complete
+states_complete <- states_complete_orig
 
 states_complete %>% 
   mutate(life_stage = ifelse(tag_code == lag(tag_code) & # if it's the same fish
@@ -487,20 +488,19 @@ states_complete %>%
 # not going to work, again because of implicit move timing.
 # Let's try lag(direction)
 # also only allow it if it's been at least 90 days and movement is occurring when we'd expect it to (following spring spawning)
-# states_complete_orig <- states_complete
+states_complete_orig <- states_complete
 
 states_complete %>% 
-  mutate(life_stage = ifelse(event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lag(direction) == "downstream" | # if two consecutive downstream movements, then they're possible kelt movements
+  mutate(life_stage = ifelse(order == max_order & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream", "kelt",
+                             ifelse(event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lag(direction) == "downstream" | # if two consecutive downstream movements, then they're possible kelt movements
                                event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "kelt", 
-                             ifelse(order == max_order & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream", "kelt", life_stage))) -> states_complete
+                              life_stage))) -> states_complete
 
 # TEMPORARY CALL: Any terminal downstream movement is kelt movement
 
 states_complete %>% 
   group_by(tag_code) %>% 
   filter(any(is.na(life_stage))) -> NA_life_stages
-
-table(subset(NA_life_stages, is.na(life_stage))$pathway)
 
 # This sort of works, but also IDs lots of movement, especially between upper snake and upper columbia or vice versa, as kelt.
 # We'll fix up the time interpolation, then subset by only spring/late winter (probably around March to July or something like that)
@@ -514,8 +514,8 @@ table(subset(NA_life_stages, is.na(life_stage))$pathway)
 kelts <- subset(states_complete, life_stage == "kelt")
 
 # Put in a checkpoint in case we need to make edits
-states_complete_orig <- states_complete
-# states_complete <- states_complete_orig
+# states_complete_orig <- states_complete
+states_complete <- states_complete_orig
 
 # Here we are figuring out what the next direction is - this is important so that we can ID when downstream movement is NOT kelt movement
 # e.g., when we have fallback events in the middle of an adult history
@@ -606,14 +606,21 @@ non_terminal_kelts_hist <- subset(kelts, tag_code %in% non_terminal_kelts_tags)
 # Use the same code again, but only for repeat spawners
 
 states_complete %>% 
+  group_by(tag_code) %>% 
+  filter(any(is.na(life_stage))) -> NA_life_stages
+
+states_complete %>% 
   mutate(life_stage = ifelse(life_stage == "repeat" & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & 
+                               direction == "downstream" & order == max_order, "repeat_kelt",
+                             ifelse(life_stage == "repeat" & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & 
                                direction == "downstream" & lag(direction) == "downstream" |
                                life_stage == "repeat" & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & 
-                               direction == "downstream" & lead(direction) == "downstream", "repeat_kelt", life_stage)) -> states_complete
+                               direction == "downstream" & lead(direction) == "downstream", "repeat_kelt", life_stage))) -> states_complete
   
   
+# CHECKPOINT 07-21-2022 - the below block doesn't work, leads to lots of NA life stages #
 
-# Quick fix for one individual (3D9.1C2CCDA88C) with an upstream movement that's clearly a kelt
+# Quick fix for individuals (e.g., 3D9.1C2CCDA88C) with an upstream movement that's clearly a kelt (sandwiched between downstream movements)
 states_complete %>% 
   mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & lag(life_stage == "kelt") & lead(life_stage == "kelt"), "kelt", life_stage)) -> states_complete
 
