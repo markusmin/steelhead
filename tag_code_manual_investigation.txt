@@ -1,0 +1,247 @@
+### Tag code manual investigation
+
+# Here we're taking a subset of codes that exhibit certain movements and inspecting their histories
+
+# Repeat ascensions at LGR + implicit fallback in between
+# Based on the diagram, there are two consecutive groups of arrays at LGR, in the lower and upper portions of the ladder (there is only 1 ladder)
+# Total: 4,431 fish
+# 10 example codes:
+384.1B796A06FF; 384.1B796A0D89; 384.1B796A10D0; 384.1B796A1269; 384.1B796A2625; 384.1B796A282F; 384.1B796A2918; 384.1B796A2D25; 384.1B796A3090; 384.1B796A4EB3
+
+384.1B796A06FF - clearly not fallback, just ascending two different sections of the ladder
+9/28/12 4:44 pm, then 9/29/12 at 10:27 AM
+
+384.1B796A0D89 - not fallback
+lower ladder at 10/4/12 at 6:11 pm, upper at 10/5/12 at 2:48 am
+
+384.1B796A10D0 - not fallback
+lower ladder at 9/24/12 at 11:42 pm, upper at 9/25/12 at 8:14 am
+
+384.1B796A1269 - not fallback
+lower ladder 9/17/12 at 6:17 pm, upper ladder at 9/18 at 2:56 am
+
+384.1B796A2625 - not fallback
+took two tries to get up upper ladder; attempt 1 at 3/9/13 at 5:36 pm, next at 3/10/13 at 8:46 am
+
+384.1B796A282F - not fallback
+lower 10/4/12 5:26 pm, upper 10/5/12 6:02 am
+
+384.1B796A2918 - not fallback
+lower 9/23/12 2:13 pm, upper 9/24/12 9:00 am
+
+384.1B796A2D25 - not fallback
+lower 9/25/12 4:43 pm, upper 9/26/12 at 8:23 am
+
+384.1B796A3090 - not fallback
+lower 10/6/12 at 2:12 pm, upper 10/7/12 at 8:23 am
+
+384.1B796A4EB3 - not fallback
+lower 10/16/12 at 2:43 pm, upper 10/17/12 at 8:27 am
+
+CONCLUSIONS: clearly we need to increase the time, but by how much? In each of these cases 24 hours would have 
+been enough, but that might not always be the case
+
+
+# Repeat ascensions at PRA + implicit fallback in between
+# Based on the diagram, there is an east ladder and a west ladder, each with a group of four arrays - arrays are by the exit of the ladder
+# Total: 463 fish
+# 10 example codes:
+3D9.257C5AD7B9; 3D9.257C5AE5D7; 3D9.257C5AE879; 3D9.257C5B2AE5; 3D9.257C5B546B; 3D9.257C5BF892; 3D9.257C5BFF32; 3D9.257C5C070C; 3D9.257C5C9FED; 3D9.257C5D1324
+
+3D9.257C5BF892 - probably not fallback. Harder to distinguish here because it's only one ladder
+east shore ladder - 8/11/08 at 2:46 pm, then again 8/12/08 at 9:11 am
+
+3D9.257C5B2AE5 - very hard to tell
+east shore ladder - 9/26/08 6:44 pm, then again 9/28/08 7:41 am
+
+3D9.257C5AE879 - not fallback, just held in fish sampling
+east shore ladder - in sampling area 9/3/09 1:44 pm, then in west shore ladder 9/5/09 at 11:08 am
+
+3D9.257C5AD7B9 - probably not fallback
+west shore ladder - 7/17/09 12:33 PM, 7/18/09 7:08 am
+
+3D9.257C5BFF32 - probably not fallback
+west shore ladder - 9/15/09 9:22 am, 9/16/09 9:43 am
+
+3D9.257C5D1324 - no idea.
+east shore ladder - 9/7/09 at 6:26 am, west shore ladder 9/8/09 2:36 pm
+
+3D9.257C5AE5D7 - no idea.
+east shore ladder - 9/23/09 at 11:07 am, again 9/25/09 at 7:54 am
+
+3D9.257C5C9FED - probably two separate events, given time gap
+east shore ladder - 8/2/08 at 1:04 pm, east shore ladder 8/11/08 at 10:35 am
+
+3D9.257C5B546B - probably not fallback
+west shore ladder - 9/11/08 at 9:09 am, west shore ladder 9/12/08 6:14 am
+
+3D9.257C5C070C - probably not fallback, just held in fish sampling area
+sampling area in east shore ladder, 9/14/09 at 2:50, then in east shore ladder 9/15/09 at 6:16 am
+
+
+# Repeat ascensions at Ice Harbor + implicit fallback in between
+# south and north shore ladders
+# Detection sites are right by the exit
+# Total: 1,393 fish
+# 10 example codes:
+3D9.1C2D70163B; 3D9.1C2D723B8D; 3D9.1C2D7259CA; 3D9.1C2D729D53; 3D9.1C2D732D26; 3D9.1C2D733369; 3D9.1C2D749FB5; 3D9.1C2D74AD54; 3D9.1C2D74AD7E; 3D9.1C2D750277
+
+3D9.1C2D70163B - the detections are close together, but I think it's actually fallback since it's switching ladders, and the arrays are at the exits
+- north shore ladder 7/24/11 at 7:35 am, south shore ladder 7/24/11 at 3:32 pm
+
+
+3D9.1C2D750277 - probably a repeat ascension
+- south shore ladder 8/18/11 at 8 am, south shore ladder 8/23/11 11:57 am
+
+
+
+3D9.1C2D749FB5 - not fallback, just took a while to ascend south shore ladder
+- south shore ladder 8/16/11 9:45 pm, south shore ladder 8/17/11 4:22 am
+
+
+3D9.1C2D74AD54 - I would guess four ascension attempts
+- south shore ladder, 8/27/11 at 3:16 am, south shore ladder 8/28/11 at 6:44 pm, north shore ladder 8/29/11 at 6:37 pm, south shore ladder 8/30/11 1:27 pm
+
+
+3D9.1C2D74AD7E - clearly two separate events given time lag
+- south shore ladder, 7/22/11 at 6:25 am; south shore ladder 9/17/11 at 7:28 am
+
+
+# Repeat ascensions at MCN + implicit fallback in between
+# Oregon shore ladder and a Washington shore ladder, but these are separate event sites in PTAGIS
+# There's no diagram for the current configuration at the Washington Shore Ladder (MC2) but there is one for the Oregon shore ladder (MC1)
+# There is a diagram for the last configuration, which seems like it had less antennas
+# MC1 has antennas by the exit (1 and 2) and ones in the middle of the ladder
+# Total: 4,385 fish
+# example codes:
+3D9.1BF20DAB71; 3D9.1BF20DC894; 3D9.1BF20DCBB3; 3D9.1BF20E310A; 3D9.1BF20EA356; 3D9.1BF20EB8E4; 3D9.1BF20EDC58; 3D9.1BF20F09EF; 3D9.1BF20F1BD0
+
+3D9.1BF20DCBB3 - looks like fallback
+- MC1, all antennas 7/27/07 4:50 am; MC1, lower antennas 7/27/07 3:16 pm, MC1, upper antennas 7/28/07 4:06 am
+
+3D9.1BF20F09EF - clearly two events, separated by 6 months and in different ladders
+
+3D9.1BF20EA356 - clearly two events, different ladders separated by a month
+
+3D9.1BF20F1BD0 - two events in MC1
+- MC1, 7/18/07 5:35 pm; 7/19/07 3:59 am
+
+3D9.1BF20DC894 - one ascension event
+- MC1, lower antennas 8/11/06 6:45 pm, MC1, upper antennas 8/12/06 5:52 am
+
+
+
+# Repeat ascensions at WELLS + implicit fallback in between
+# Left ladder and right ladder; depending on the antenna configuration there are sometimes some antennas lower in the ladder
+# There are also traps in each of the ladders
+# A note here says that trap fish are removed to the hatchery or trucked off-site
+# Total: 536 fish
+# Example codes:
+3DD.003BE2E383; 3DD.003BE2EF9C; 3DD.003BF71389; 3DD.003C07DEAA; 3DD.003C07DF1C; 3DD.003C07E1A7; 3DD.003C07E2FA; 3DD.003C07EA5D; 3DD.003C07EBF6; 3DD.003C07EDA8
+
+3DD.003BE2EF9C - I think this fish went into the sampling area? west trap
+- 10/11/17 - B1/B2/B3
+- 10/17/17 - right ladder
+
+
+3DD.003BE2E383 - in the adult hatchery handling facility
+- 10/27/17 - C1/C2
+- 11/18/17 - right ladder
+
+3DD.003BF71389 - two ascensions - can see this based on the order of antennas
+- 9/19/20 and 8/25/20
+
+3DD.003C07DF1C - this fish got moved??
+- ascended Wells, then was in the bypass sample, then plopped out at the Methow (which is back upstream of WEL)
+
+3DD.003C07EDA8 - this fish went into the WELLS hatchery, which is just downstream of WEL dam
+
+
+# Repeat ascensions at Rock Island + implicit fallback in between
+# Three ladders: left bank, middle, and right bank
+# Total: 315 fish (not quite)
+
+# Example codes:
+3DD.0077772FE3; 3DD.0077797F5A; 3DD.00777E5B5D; 3DD.00778F0C1F; 3DD.007790B469; 3DD.007791C264; 3DD.0077996B66; 3DD.0077A5FFA0; 3DD.0077AD2A89
+
+
+
+3DD.007790B469 makes no sense
+- 7/11/19 2:31 AM: right bank ladder, then again the next day, but not in an order that makes sense
+
+
+
+3DD.00778F0C1F - ambiguous, but probably reascension
+- reascension - 0A in right bank 8/13/17 at 3:44 pm, then again 8/14/17 at 4:51 pm
+
+
+
+3DD.007791C264
+- 8/30/17 at 11:14 pm: 0B in right ladder; 8/31/17 at 5:17 am: middle ladder
+
+
+
+# Rocky Reach Dam
+# 308 fish
+# Just one ladder, with arrays by the exit, plus a trap (A0)
+
+# Example codes: 
+3D9.257C601BFE; 3D9.257C602E2C; 3D9.257C618E9E; 3D9.257C61B4AE; 3D9.257C61B8B4; 3D9.257C61DF41; 3D9.257C61F3DC; 3D9.257C61F694; 3D9.257C620D74
+
+3D9.257C601BFE - reascension, detections ar e a month apart
+
+3D9.257C618E9E - clear reascension
+
+3D9.257C61F3DC - reascended, I think
+- 7/6/08 8:13 pm
+- 7/7/08 6:15 pm
+
+# Other RRF examples:
+3D9.1C2C86126F; 3D9.1C2C86296A; 3D9.1C2C862F27; 3D9.1C2C86303D; 3D9.1C2C86318D; 3D9.1C2C863234; 3D9.1C2C863523; 3D9.1C2C863559; 3D9.1C2C863CD6; 3D9.1C2C863E9B
+
+3D9.1C2C86318D - four ascension attempts?
+3D9.1C2C86126F - ambiguous
+
+# Other RRF examples, after trap was installed:
+3DD.003BE1627B; 3DD.003BE1983F; 3DD.003BE2CFE3; 3DD.003C07EDA8; 3DD.00773B71F6; 3DD.00774298AD; 3DD.007749E44E; 3DD.0077645B38; 3DD.00776DF38F; 3DD.0077772FE3
+
+
+# Now, pick good examples from each dam to show example tag histories
+
+# Lower Granite: first demonstrates upper and lower parts of ladder, second shows slow ascension
+384.1B796A06FF; 384.1B796A2625
+
+# Priest Rapids: shows fish sampling area, then ambiguous detection history
+3D9.257C5AE879; 3D9.257C5B2AE5
+
+# Ice Harbor: shows ladder switching, four ascension attempts; then not fallback
+3D9.1C2D70163B; 3D9.1C2D74AD54; 3D9.1C2D749FB5
+
+# McNary: shows fallback, then one long ascension attempt
+3D9.1BF20DCBB3; 3D9.1BF20DC894
+
+# Wells: fish that got moved; Wells hatchery; adult hatchery handling facility; west trap
+3DD.003C07DF1C; 3DD.003C07EDA8; 3DD.003BE2E383; 3DD.003BE2EF9C
+
+# Rock Island: ambiguous attempt, ladder switching; absolute nonsense
+3DD.00778F0C1F; 3DD.007791C264; 3DD.007790B469
+
+# Rocky Reach: four ascensions, ambiguous detection history, trap detection; reascension but maybe trapped?
+3D9.1C2C86318D; 3D9.1C2C86126F; 3DD.00774298AD; 3DD.007749E44E
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
