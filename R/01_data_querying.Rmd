@@ -26,7 +26,7 @@ Once in Query Builder2, select the following filters:
   - These are all of the Bonneville adult fishways and therefore will allow you to identify all adult returns
 - 25 Species: Steelhead
 
-Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files
+Run Report, and download as a CSV. Save this in PTAGIS_queries > intermediate_files > all_adult_returns.csv
 
 ## Initial query - v2
 instead of an interrogation summary, let's run a tag detail query
@@ -737,10 +737,25 @@ as.data.frame(unique(adult_returns_for_analysis$tag_code)) -> unique_tags
     }
 ```
 
+For each of these, the reports "CTH_tag_codes_1/2/3/4/5/6/7" were run. Those reports have the following settings:
+Query Builder2:
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin, Event Site Latitude, Event Site Longitude, Event Site Info
+- 2 Metrics: Standard
+- 29 Tag Code: Import text file that you exported from R
+
+Run 2: 7/25/22
+
+For each of these, the reports "CTH_tag_codes_1/2/3/4/5/6/7" were run. Those reports have the following settings:
+Query Builder2:
+Report type: complete tag history
+- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually),
+event date time antenna, antenna group, antenna group configuration
+- 2 Metrics: Standard
+- 29 Tag Code: Import text file that you exported from R
 
 
 
-# PTAGIS workflow - single tributary
+# OLD/DEFUNCT - PTAGIS workflow - single tributary
 PTAGIS querying has been set up to work in two steps:
 
 
@@ -812,11 +827,7 @@ ID_adult_returns <- function(input_CSV, output_txt, river_system){
 }
 ```
 
-For each of these, the reports "CTH_tag_codes_1/2/3/4/5/6/7" were run. Those reports have the following settings:
-Query Builder2:
-- 1 Attributes: Tag, Event Type, Event Site, Event Date, Event Release Site, Event Release Date, (these first six are all standard, the rest you have to add manually) Event Date Time, Event Site Basin, Event Site Info, Event Site Code, Event Site Subbasin, Event Site Latitude, Event Site Longitude, Event Site Info
-- 2 Metrics: Standard
-- 29 Tag Code: Import text file that you exported from R
+
 
 ### Step 3 (in PTAGIS): Get complete tag histories for adult returns
 - On the PTAGIS website once you have logged in, navigate to Advanced Reporting Home Page > Home > Create Query Builder2 Report > Complete Tag History
