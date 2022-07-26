@@ -126,6 +126,9 @@ subset(BO4_fish, last_event_site_name == "BO1 - Bonneville Bradford Is. Ladder")
 
 subset(BO4_fish, last_event_site_name == "DRM - Deschutes River mouth")$tag_code -> DRM_BO4s
 
+# Let's look at fish that were released into the adult fish ladder
+subset(CTH_adult, event_site_name == "LGRLDR - LGR - Release into the Adult Fish Ladder")$tag_code -> LGR_ladder_held_fish
+
 # Okay, some edits:
 # BHL is the Bonneville Hatchery ladder, which was only active 2012-2014, and is actually before the dam itself (and is not part of the adult fishways)
 CTH_adult %>% 
