@@ -238,6 +238,57 @@ BON_fallback_fish <- subset(states_complete, tag_code %in% BON_fallback_tag_code
 transitions %>% 
   left_join(., origin_metadata, by = "tag_code") -> transitions_meta
 
+
+# Check on repeat ascensions at different dams
+
+# Lower Granite
+transitions_meta %>% 
+  subset(state == "mainstem, ICH to LGR" & lag(state)== "mainstem, upstream of LGR" & lead(state)== "mainstem, upstream of LGR") -> LGR_repeat_ascensions
+
+unique(LGR_repeat_ascensions$tag_code)
+
+# Priest Rapids
+transitions_meta %>% 
+  subset(state == "mainstem, MCN to ICH or PRA" & lag(state)== "mainstem, PRA to RIS" & lead(state) == "mainstem, PRA to RIS") -> PRA_repeat_ascensions
+
+unique(PRA_repeat_ascensions$tag_code)
+
+
+# Ice Harbor
+transitions_meta %>% 
+  subset(state == "mainstem, MCN to ICH or PRA" & lag(state)== "mainstem, ICH to LGR" & lead(state)== "mainstem, ICH to LGR") -> ICH_repeat_ascensions
+
+unique(ICH_repeat_ascensions$tag_code)
+
+
+# McNary
+transitions_meta %>% 
+  subset(state == "mainstem, BON to MCN" & lag(state)== "mainstem, MCN to ICH or PRA" & lead(state)== "mainstem, MCN to ICH or PRA" & tag_code == lead(tag_code) & tag_code == lag(tag_code)) -> MCN_repeat_ascensions
+
+unique(MCN_repeat_ascensions$tag_code)
+
+# Wells Dam
+transitions_meta %>% 
+  subset(state == "mainstem, RRE to WEL" & lag(state)== "mainstem, upstream of WEL" & lead(state)== "mainstem, upstream of WEL" & tag_code == lead(tag_code) & tag_code == lag(tag_code)) -> WEL_repeat_ascensions
+
+unique(WEL_repeat_ascensions$tag_code)
+
+# Rock Island Dam
+transitions_meta %>% 
+  subset(state == "mainstem, PRA to RIS" & lag(state)== "mainstem, RIS to RRE" & lead(state)== "mainstem, RIS to RRE" & tag_code == lead(tag_code) & tag_code == lag(tag_code)) -> RIS_repeat_ascensions
+
+unique(RIS_repeat_ascensions$tag_code)
+
+# Rocky Reach Dam
+transitions_meta %>% 
+  subset(state == "mainstem, RIS to RRE" & lag(state)== "mainstem, RRE to WEL" & lead(state)== "mainstem, RRE to WEL" & tag_code == lead(tag_code) & tag_code == lag(tag_code)) -> RRE_repeat_ascensions
+
+transitions_meta %>% 
+  subset(state == "mainstem, RIS to RRE" & lag(state)== "mainstem, RRE to WEL" & lead(state)== "mainstem, RRE to WEL" & tag_code == lead(tag_code) & tag_code == lag(tag_code) & year_numeric > 14) -> RRE_repeat_ascensions
+
+unique(RRE_repeat_ascensions$tag_code)
+
+
 write.csv(transitions_meta, here::here("figures", "transitions_table_2022-07-21.csv"))
 # write.csv(transitions_meta, here::here("figures", "transitions_table_testpart1.csv"))
 
