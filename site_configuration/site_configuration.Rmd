@@ -1,0 +1,119 @@
+---
+title: "site_configuration"
+author: "Markus Min"
+date: '2022-07-25'
+output: html_document
+---
+
+### Description
+This R markdown file will go through the different dams and the configuration of antennas at each through time.
+
+All information contained within this document comes from the Interrogation Site Metadata on PTAGIS (https://www.ptagis.org/Sites/InterrogationSites) and the CBR site configuration file (https://www.cbr.washington.edu/paramest/docs/pitpro/updates/sites_config.txt). It is partially based on Susannah Iltis' work on identifying fallback (https://www.cbr.washington.edu/dart/query/pitadult_fallback).
+
+# Bonneville
+
+### Overview
+Bonneville Dam has four separate interrogation sites:
+1. BO1: Bonneville Bradford Island Ladder
+2. BO2: Bonneville Cascades Island Fish Ladder
+3. BO3: Bonneville Washington Shore Ladder and AFF
+4. BO4: Bonneville Washington Shore Vertical slots
+
+![](./configuration_diagrams/BON/Bon_Int_Sites.png){width=100%}
+
+Together, they represent two primary routes of passage:
+1) The BO1 route
+2) The BO2-BO3-BO4 route
+
+![](./configuration_diagrams/BON/BO2-BO3-BO4 Overview.jpg){width=100%}
+
+## BO1: Bonneville Bradford Island Ladder
+
+
+### Antenna group configuration 100
+![](./configuration_diagrams/BON/BO1/BO1 Configuration 100.jpg){width=100%}
+
+```{r}
+BO1_100_upper
+```
+
+
+  range: 7-Mar-02 24-Feb-06
+  {
+    R: U : 8 : LEFT BRANCH WEIR 50 : 01 02
+    R: U : 7 : LEFT BRANCH WEIR 49 : 03 04
+    R: U : 6 : LEFT BRANCH WEIR 48 : 05 06
+    R: U : 5 : LEFT BRANCH WEIR 47 : 07 08
+    R: U : 4 : LEFT BRANCH WEIR 46 : 09 0A
+    R: U : 3 : LEFT BRANCH WEIR 45 : 0B 0C
+    R: U : 2 : LEFT BRANCH WEIR 44 : 0D 0E
+    R: U : 1 : LEFT BRANCH WEIR 43 : 0F 10
+    R: U : 8 : RIGHT BRANCH WEIR 50 : 11 12
+    R: U : 7 : RIGHT BRANCH WEIR 49 : 13 14
+    R: U : 6 : RIGHT BRANCH WEIR 48 : 15 16
+    R: U : 5 : RIGHT BRANCH WEIR 47 : 17 18
+    R: U : 4 : RIGHT BRANCH WEIR 46 : 19 1A
+    R: U : 3 : RIGHT BRANCH WEIR 45 : 1B 1C
+    R: U : 2 : RIGHT BRANCH WEIR 44 : 1D 1E
+    R: U : 1 : RIGHT BRANCH WEIR 43 : 1F 20
+  }
+
+
+### Antenna group configuration 110
+![](./configuration_diagrams/BON/BO1/BO1 Configuration 110.jpg){width=100%}
+
+  range: 24-Feb-06 30-Apr-18
+  {
+    R: U : 9 : VERTICAL SLOT DETECTORS : 01 02 03 04
+    R: U : 8 : A-BRANCH WEIR 50 : 05 06
+    R: U : 7 : A-BRANCH WEIR 49 : 07 08
+    R: U : 6 : A-BRANCH WEIR 48 : 09 0A
+    R: U : 5 : A-BRANCH WEIR 47 : 0B 0C
+    R: U : 4 : A-BRANCH WEIR 46 : 0D 0E
+    R: U : 3 : A-BRANCH WEIR 45 : 0F 10
+    R: U : 2 : A-BRANCH WEIR 44 : 11 12
+    R: U : 1 : A-BRANCH WEIR 43 : 13 14
+    R: U : 8 : B-BRANCH WEIR 50 : 15 16
+    R: U : 7 : B-BRANCH WEIR 49 : 17 18
+    R: U : 6 : B-BRANCH WEIR 48 : 19 1A
+    R: U : 5 : B-BRANCH WEIR 47 : 1B 1C
+    R: U : 4 : B-BRANCH WEIR 46 : 1D 1E
+    R: U : 3 : B-BRANCH WEIR 45 : 1F 20
+    R: U : 2 : B-BRANCH WEIR 44 : 21 22
+    R: U : 1 : B-BRANCH WEIR 43 : 23 24
+  }
+
+### Antenna group configuration 120
+
+![](./configuration_diagrams/BON/BO1/BO1 Configuration 120.jpg){width=100%}
+range: 30-Apr-18 Present
+  {
+    R: U : 9 : VERTICAL SLOT DETECTORS : 01 02 03 04
+    R: U : 8 : A-BRANCH WEIR 50 : 05 06
+    R: U : 7 : A-BRANCH WEIR 49 : 07 08
+    R: U : 6 : A-BRANCH WEIR 48 : 09 0A
+    R: U : 5 : A-BRANCH WEIR 47 : 0B 0C
+    R: U : 4 : A-BRANCH WEIR 46 : 0D 0E
+    R: U : 3 : A-BRANCH WEIR 45 : 0F 10
+    R: U : 2 : A-BRANCH WEIR 44 : 11 12
+    R: U : 1 : A-BRANCH WEIR 43 : 13 14
+    R: U : 8 : B-BRANCH WEIR 50 : 15 16
+    R: U : 7 : B-BRANCH WEIR 49 : 17 18
+    R: U : 6 : B-BRANCH WEIR 48 : 19 1A
+    R: U : 5 : B-BRANCH WEIR 47 : 1B 1C
+    R: U : 4 : B-BRANCH WEIR 46 : 1D 1E
+    R: U : 3 : B-BRANCH WEIR 45 : 1F 20
+    R: U : 2 : B-BRANCH WEIR 44 : 21 22
+    R: U : 1 : B-BRANCH WEIR 43 : 23 24
+    U: U : 0 : Lamprey Passage : F1 F2
+  }
+
+
+
+
+
+
+
+
+
+
