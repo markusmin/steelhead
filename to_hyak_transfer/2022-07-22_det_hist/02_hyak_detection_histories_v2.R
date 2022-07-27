@@ -220,10 +220,6 @@ unique_tag_IDs <- unique(CTH_adult$tag_code)
 #                            event_site_basin_name = character(), event_site_subbasin_name = character(),
 #                            event_site_latitude = numeric(), event_site_longitude = numeric())
 
-det_hist <- data.frame(tag_code = character(), event_type_name = character(), event_site_name = character(), 
-                       start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
-                       # antenna_group_name = character(), antenna_id = character(), ant_config = numeric())
-                       start_antenna = character(), end_antenna = character(), ant_config = numeric(), aborted = character())
 
 
 # Make a function to store all of the fields we want
@@ -294,6 +290,12 @@ det_hist <- data.frame(tag_code = character(), event_type_name = character(), ev
 #   return(list(value_vec, end_time))
 #   
 # }
+
+
+det_hist <- data.frame(tag_code = character(), event_type_name = character(), event_site_name = character(), 
+                       start_time = as.POSIXct(character()), end_time = as.POSIXct(character()), 
+                       # antenna_group_name = character(), antenna_id = character(), ant_config = numeric())
+                       start_antenna = character(), end_antenna = character(), ant_config = numeric(), aborted = character())
 
 
 # Loop through the unique tags
@@ -425,7 +427,10 @@ for (j in 1:nrow(tag_hist)){
     
     # See if this event site name is different than the one ahead and behind
     else if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
-             tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name']){
+             tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
+             # Need to make sure they're not in the BO2-BO3-BO4 complex
+             !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
       
       # store the tag code
       ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -470,10 +475,21 @@ for (j in 1:nrow(tag_hist)){
       # This one only has a single array
       if(tag_hist[j, 'event_site_name'] == "BO1 - Bonneville Bradford Is. Ladder"){
         
+        # If it's the first detection in this route, store the start time and antenna
+        if (tag_hist[j-1, 'event_site_name'] != "BO1 - Bonneville Bradford Is. Ladder") {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+        }
+        
+        
         # Different if statements for varying antenna configurations
         
         # BO1 100
-        if(tag_hist[j, 'ant_config'] == 100){
+        else if(tag_hist[j, 'ant_config'] == 100){
           
           # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
           if (tag_hist[j+1, 'event_site_name'] != "BO1 - Bonneville Bradford Is. Ladder" | # If it's at a different site
@@ -582,12 +598,23 @@ for (j in 1:nrow(tag_hist)){
       else if(tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                     "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
         
+        # if it's the first detection in this complex, store the start time 
+        if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                       "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- 'BO2-BO3-BO4'
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+        }
+        
         # If the next detection is at a site not in BO2, BO3, or BO4,
         # or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        else if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
             tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
         
           # store the info
           # store the tag code
@@ -630,7 +657,9 @@ for (j in 1:nrow(tag_hist)){
           }
         
         
-      }
+        }
+        
+        
       
       }
       
