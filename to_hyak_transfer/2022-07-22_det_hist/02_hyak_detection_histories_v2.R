@@ -373,7 +373,10 @@ for (j in 1:nrow(tag_hist)){
       # SPECIAL CASE: If there is only one detection at the first site, store the 
       # end time as well
 
-      else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name']){
+      else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
+               # Need to make sure they're not in the BO2-BO3-BO4 complex
+               !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
         
         # Store the end time
         ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
@@ -640,13 +643,10 @@ for (j in 1:nrow(tag_hist)){
           # Store the end antenna
           ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
           
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          # BUT - change the event_site name to BO2-BO3-BO4
+          # Save event site name
           ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
+          
+
 
           # However, if the last antenna seen is not in BO4, then note it was an aborted attempt
           if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
@@ -655,6 +655,11 @@ for (j in 1:nrow(tag_hist)){
             ind_det_hist[counter,'aborted'] <- "aborted"
             
           }
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
         
         
         }
