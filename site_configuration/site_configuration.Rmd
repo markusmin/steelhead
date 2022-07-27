@@ -32,6 +32,7 @@ Together, they represent two primary routes of passage:
 
 ## BO1: Bonneville Bradford Island Ladder
 
+Starting with configuration 110, BO1 has upper and lower coils
 
 ### Antenna group configuration 100
 ![](./configuration_diagrams/BON/BO1/BO1 Configuration 100.jpg){width=100%}
