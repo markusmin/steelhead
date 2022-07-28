@@ -213,6 +213,14 @@ sampling area in east shore ladder, 9/14/09 at 2:50, then in east shore ladder 9
 
 # Priest Rapids: shows fish sampling area, then ambiguous detection history
 3D9.257C5AE879; 3D9.257C5B2AE5
+- looks like a second ascent, because it's a different ladder
+- try to track down capture procedures - contact coordinator site configuration 
+- time difference for discerning new events: look at distribution of time gaps and make a decision based on that?
+- reascent or delay - how to describe the effect of the dam on upstream migration - could be fallback + having to reascend, or stopping migration temporarily
+	- if we allowed ascension events to take longer, then we would be missing the delay effects
+	- just need to be explicit about our decisions and their potential consequences
+- trying to distinguish good fallback (getting back to home) vs bad fallback - post-overshooting fallback vs. delay fallback
+- 24 hours seems reasonable
 
 # Ice Harbor: shows ladder switching, four ascension attempts; then not fallback
 3D9.1C2D70163B; 3D9.1C2D74AD54; 3D9.1C2D749FB5
@@ -222,6 +230,8 @@ sampling area in east shore ladder, 9/14/09 at 2:50, then in east shore ladder 9
 
 # Wells: fish that got moved; Wells hatchery; adult hatchery handling facility; west trap
 3DD.003C07DF1C; 3DD.003C07EDA8; 3DD.003BE2E383; 3DD.003BE2EF9C
+- bypass to methow - possible that it missed given that detection probability is not 100% - check complete tag history along with capture/recapture events
+- In Wells Dam hatchery, in volunteer channel, so it just went up and then came back down
 
 # Rock Island: ambiguous attempt, ladder switching; absolute nonsense
 3DD.00778F0C1F; 3DD.007791C264; 3DD.007790B469
@@ -230,18 +240,37 @@ sampling area in east shore ladder, 9/14/09 at 2:50, then in east shore ladder 9
 3D9.1C2C86318D; 3D9.1C2C86126F; 3DD.00774298AD; 3DD.007749E44E
 
 
+### 7-26-22 ###
+
+BO1 notes:
+This fish clearly aborted an ascension attempt at BO1: 384.1B796A1CE2
+- It tried BO1, didn't make it up all the way, then ascended BO3-BO4 successfully
+
+This fish made it to the vertical slot detectors at the top, but didn't make it fully out:
+384.1B796A4D5F
+- took four full days to make the ascent
+
+# Made it all the way to the exit coil, but not out of the ladder: 384.1B796A5B59
+
+
+### 7-27-22 ###
+
+this fish: 384.1B796A06FF
+- Not seen at the counting window antennas at MC1, but clearly ascended because the next place it was seen was ICH
+
+this guy went down through MC1...
+384.1B796A0B67
+
+
+This guy went down through MC2: 384.1B796A4EB3
 
 
 
+# Let's look at fish that went through the PRA trap
+> CTH_adult %>% group_by(tag_code) %>% filter(any(antenna_group_name == "LEFT [EAST] LADDER ADULT TRAP")) -> PRA_trap_fish
+> unique(PRA_trap_fish$tag_code)
+
+384.3B23B1C5BD; 384.3B23B1CBCB; 384.3B23B1D62A; 384.3B23B1E708; 384.3B23B1E783; 384.3B23B1EFFE; 384.3B23B1FDB0; 384.3B23B201D6; 384.3B23B229DD; 3D6.000B38B2AD
 
 
-
-
-
-
-
-
-
-
-
-
+The trap at PRA seems to delay fish, but they just get returned to the ladder. So just make sure we give them enough time to make it up.
