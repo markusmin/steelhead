@@ -290,6 +290,10 @@ The antenna configuration at MC1 has not changed. MC1 has two sets of coils, one
 MC1_upper <- c("01", "02")
 MC1_lower <- c("03", "04", "05", "06", "07", "08", "09",
                "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12)
+
+# we are also going to note entrance coils, similar to Susannah Iltis's work, at MCN, since the upper coils seem to not have the best detection efficiency
+MC1_entrance <- c("0D", "0E", "0F", 10, 11, 12)
+
 ```
 
 ```{r eval = FALSE}
@@ -339,6 +343,7 @@ MC2 120 has antennas in the lower weirs, and then at the top at the counting win
 MC2_120_upper <- c("01", "02", "03")
 MC2_120_lower <- c("04", "05", "06", "07", "08", "09",
                "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12, 13)
+MC2_120_entrance <- c("0E", "0F", 10, 11, 12, 13)
 ```
 
 ```{r eval = FALSE}
