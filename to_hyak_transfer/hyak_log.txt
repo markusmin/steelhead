@@ -1210,13 +1210,38 @@ we say that for sure. Need to stick with the assumption that for adults, the lad
 Made the edits, reupload to mox hyak & run:
 scp -r ./2022-07-21-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
 
+# Pull run
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-21-complete_det_hist/ ./
 
+### 7-27-22 ###
 
+I would estimate that with the new script and its additional components, running the full detection history in
+one run would take about 7 hours. That could easily be run overnight, but would have to be on STF.
+There's no reason why we couldn't run the chunks of it separately, and that would allow us to run it
+on ckpt. We could run CTH 1-4, 5-8, and 9-11, and 12-14. Each individually should take no more
+than 2 hours.
 
+# SO: we are going to take the files in 2022-07-27_det_hist, split them up into four runs, and put
+an R script and a bash script in each.
 
+We can then do the same thing with the implicit site visit code later. The implicit site visit
+code will obviously have to be updated, given that some things have changed, particularly
+the addition of non-ascents at the adult ladders. We'll also have to concatenate the other output
+files, but that's not a big deal.
 
+### 7-28-22 ###
 
+So I think we now have our det hist script working. copy over the folders:
+scp -r ./2022-07-27_det_hist/CTH1-4/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/
+scp -r ./2022-07-27_det_hist/CTH5-8/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/
+scp -r ./2022-07-27_det_hist/CTH9-11/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/
+scp -r ./2022-07-27_det_hist/CTH12-14/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/
 
+for fixing the R scripts:
+scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
+scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
+scp ./2022-07-27_det_hist/CTH9-11/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
 
 
 
