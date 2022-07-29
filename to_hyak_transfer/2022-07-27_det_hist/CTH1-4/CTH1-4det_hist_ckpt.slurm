@@ -21,4 +21,4 @@
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-02_hyak_detection_histories_v2_CTH1-4.R
+Rscript CTH1-4_02_hyak_detection_histories_v2.R
