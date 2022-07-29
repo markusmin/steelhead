@@ -274,7 +274,7 @@ For our purposes, the antenna configuration at BO4 has not changed over time, si
 ![](./configuration_diagrams/BON/BO4/BO4 Configuration 110.jpg){width=100%}
 
 
-# McNary Dam
+## McNary Dam
 
 ### Overview
 McNary Dam has two ladders which are separate event sites in PTAGIS - MC1 (Oregon Ladder) and MC2 (Washington Ladder)
