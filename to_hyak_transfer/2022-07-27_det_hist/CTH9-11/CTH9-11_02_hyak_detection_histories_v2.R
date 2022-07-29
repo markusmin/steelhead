@@ -449,8 +449,8 @@ det_hist <- data.frame(tag_code = character(), event_type_name = character(), ev
 
 # Loop through the unique tags
 for (i in 1:length(unique_tag_IDs)){
-# Need to run the loop for longer to actual get observations at certain dams
-# for (i in 2000:2200){
+  # Need to run the loop for longer to actual get observations at certain dams
+  # for (i in 2000:2200){
   # Get the start time
   if (i == 1){
     start_time <- Sys.time() 
@@ -476,19 +476,19 @@ for (i in 1:length(unique_tag_IDs)){
   tag_hist <- subset(CTH_adult, tag_code == unique_tag_IDs[i])
   
   
-# Loop through the rows of the tag history
-for (j in 1:nrow(tag_hist)){
-  # for (j in 1:36){
+  # Loop through the rows of the tag history
+  for (j in 1:nrow(tag_hist)){
+    # for (j in 1:36){
     
     ### For the first entry, just store these values plus the time as the start time
     if (j == 1){
       # store the tag code
       ind_det_hist[1,'tag_code'] <- unique_tag_IDs[i]
-        
+      
       # store the event type name
       ind_det_hist[1,'event_type_name'] <- tag_hist[j,'event_type_name']
- 
-
+      
+      
       # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
       ind_det_hist[1,'ant_config'] <- tag_hist[j,'ant_config']
       
@@ -524,7 +524,7 @@ for (j in 1:nrow(tag_hist)){
           # store the start antenna ID
           ind_det_hist[1,'start_antenna_id'] <- paste0("BO4-", tag_hist[j,'antenna_id'])
         }
-
+        
       }
       # otherwise, store the site name like normal
       else {
@@ -543,7 +543,7 @@ for (j in 1:nrow(tag_hist)){
       
       # SPECIAL CASE: If there is only one detection at the first site, store the 
       # end time as well
-
+      
       else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
                # Need to make sure they're not in the BO2-BO3-BO4 complex
                !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
@@ -562,7 +562,7 @@ for (j in 1:nrow(tag_hist)){
         counter <- counter + 1
       }
       
-
+      
     }
     
     ### If it's the last entry, store those values
@@ -651,52 +651,52 @@ for (j in 1:nrow(tag_hist)){
           
           tag_hist[j-1, 'event_site_name'] == tag_hist[j, 'event_site_name'] & tag_hist[j, 'event_date_time_value'] -
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
-      
+        
         
         # FIRST: If it's in the BO2-BO3-BO4 complex, we need to treat it differently
         
         # But - we need to treat BO4 differently from BO2 and BO3, since BO4 basically
         # functions as antennas at the top of a ladder
         if (tag_hist[j, 'event_site_name'] %in% c("BO4 - Bonneville WA Ladder Slots")){
-
+          
           # store the tag code
           ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-
+          
           # store the event type name
           ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-
-
+          
+          
           # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-
+          
           # store the location field
           ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
-
+          
           # Don't overwrite what was already added - this way we keep the start time and antenna
           # that we previously recorded
-
+          
           # Store the start time
           # ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
           # Store the start antenna
           # ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
           # store the start antenna info
           # ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-
+          
           # now, apply the same non-descent rules as below
           # If the last antenna seen is not in BO4, then note it was an aborted attempt
           # This now can't be true, since we took these out using the above if statement
           if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                     "BONAFF - BON - Adult Fish Facility")){
-
+            
             ind_det_hist[counter,'non_ascent'] <- "aborted"
-
+            
           }
-
-
+          
+          
         }
         
         else if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                        "BONAFF - BON - Adult Fish Facility")){
+                                                       "BONAFF - BON - Adult Fish Facility")){
           
           # store the tag code
           ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -784,76 +784,76 @@ for (j in 1:nrow(tag_hist)){
         # END OLD CODE
         
         else {
-        
-        # Here we are using 48 hours to be in line with the dams.
-        
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location field
-        ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-        
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the start antenna info
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # If it's at RIA, then replace the event site name with the correct ladder
-        if(tag_hist[j, 'event_site_name'] %in% RIS_arrays){
-          if(tag_hist[j, 'antenna_id'] %in% RIA_left){
-            ind_det_hist[counter,'event_site_name'] <- 'RIA1 - Rock Island Adult Left Ladder'
-          }
-          else if(tag_hist[j, 'antenna_id'] %in% RIA_middle){
-            ind_det_hist[counter,'event_site_name'] <- 'RIA2 - Rock Island Adult Middle Ladder'
-          }
-          else if(tag_hist[j, 'antenna_id'] %in% RIA_right){
-            ind_det_hist[counter,'event_site_name'] <- 'RIA3 - Rock Island Adult Right Ladder'
+          
+          # Here we are using 48 hours to be in line with the dams.
+          
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location field
+          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the start antenna info
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # If it's at RIA, then replace the event site name with the correct ladder
+          if(tag_hist[j, 'event_site_name'] %in% RIS_arrays){
+            if(tag_hist[j, 'antenna_id'] %in% RIA_left){
+              ind_det_hist[counter,'event_site_name'] <- 'RIA1 - Rock Island Adult Left Ladder'
+            }
+            else if(tag_hist[j, 'antenna_id'] %in% RIA_middle){
+              ind_det_hist[counter,'event_site_name'] <- 'RIA2 - Rock Island Adult Middle Ladder'
+            }
+            else if(tag_hist[j, 'antenna_id'] %in% RIA_right){
+              ind_det_hist[counter,'event_site_name'] <- 'RIA3 - Rock Island Adult Right Ladder'
+            }
+            
           }
           
-        }
-        
-        # If it's at ICH, then replace the event site name with the correct ladder
-        if(tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)"){
-          if(tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder){
-            ind_det_hist[counter,'event_site_name'] <- 'ICH1 - Ice Harbor Dam North Ladder'
-          }
-          else if(tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)){
-            ind_det_hist[counter,'event_site_name'] <- 'ICH2 - Ice Harbor Dam South Ladder'
-          }
-          
-        }
-        
-        # If it's at PRA, then replace the event site name with the correct ladder
-        if(tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult"){
-          if(tag_hist[j, 'antenna_id'] %in% PRA_110_west){
-            ind_det_hist[counter,'event_site_name'] <- 'PRA1 - Priest Rapids Adult West Ladder'
-          }
-          else if(tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east)){
-            ind_det_hist[counter,'event_site_name'] <- 'PRA2 - Priest Rapids Adult East Ladder'
+          # If it's at ICH, then replace the event site name with the correct ladder
+          if(tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)"){
+            if(tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder){
+              ind_det_hist[counter,'event_site_name'] <- 'ICH1 - Ice Harbor Dam North Ladder'
+            }
+            else if(tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)){
+              ind_det_hist[counter,'event_site_name'] <- 'ICH2 - Ice Harbor Dam South Ladder'
+            }
+            
           }
           
-        }
-        
-        # If it's at WEA, then replace the event site name with the correct ladder
-        if(tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders"){
-          if(tag_hist[j, 'antenna_id'] %in% WEL_left){
-            ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'
-          }
-          else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
-            ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder'
+          # If it's at PRA, then replace the event site name with the correct ladder
+          if(tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult"){
+            if(tag_hist[j, 'antenna_id'] %in% PRA_110_west){
+              ind_det_hist[counter,'event_site_name'] <- 'PRA1 - Priest Rapids Adult West Ladder'
+            }
+            else if(tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east)){
+              ind_det_hist[counter,'event_site_name'] <- 'PRA2 - Priest Rapids Adult East Ladder'
+            }
+            
           }
           
-        }
-        
+          # If it's at WEA, then replace the event site name with the correct ladder
+          if(tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders"){
+            if(tag_hist[j, 'antenna_id'] %in% WEL_left){
+              ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'
+            }
+            else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
+              ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder'
+            }
+            
+          }
+          
         }
       }
     }
@@ -865,7 +865,10 @@ for (j in 1:nrow(tag_hist)){
              tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
              # Need to make sure they're not in the BO2-BO3-BO4 complex
              !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
+                                                      "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
+      # Excluding BO2-BO3-BO4 here is problematic if we have a single detection in this whole complex, which I feel like
+      # must have a very low probability of happening. I think with the old script it happened a single time, but that'll
+      # be fixed in another part of the script.
       
       
       # store the tag code
@@ -874,7 +877,7 @@ for (j in 1:nrow(tag_hist)){
       # store the event type name
       ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
       
-
+      
       # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
       ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
       
@@ -959,7 +962,7 @@ for (j in 1:nrow(tag_hist)){
     else if (tag_hist[j, 'event_site_name'] %in% BON_arrays){
       
       # BON ROUTE 1 - BO1
-
+      
       if(tag_hist[j, 'event_site_name'] == "BO1 - Bonneville Bradford Is. Ladder"){
         
         # If it's the first detection in this route, or it hasn't been seen in this route for at least 48 hours, store the start time and antenna
@@ -996,7 +999,7 @@ for (j in 1:nrow(tag_hist)){
             # store the event type name
             ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
             
-
+            
             # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
             ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
             
@@ -1013,20 +1016,20 @@ for (j in 1:nrow(tag_hist)){
             ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
             # store the end antenna ID
             ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-
+            
             # UPDATE THE COUNTER
             # every time we store an end time, we update the counter. This allows
             # us to move through the detection history df
             counter <- counter + 1
-          
-          
+            
+            
           }
           
           # if it's within 48 hours at BO1, then don't record it
           else {
             
           }
-        
+          
         }
         
         # BO1 110 & 120
@@ -1047,7 +1050,7 @@ for (j in 1:nrow(tag_hist)){
             # store the event type name
             ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
             
-
+            
             # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
             ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
             
@@ -1069,7 +1072,7 @@ for (j in 1:nrow(tag_hist)){
             if (tag_hist[j, 'antenna_id'] %in% BO1_110_lower & !(ind_det_hist[counter,'start_antenna_id'] %in% BO1_110_upper)){
               
               ind_det_hist[counter,'non_ascent'] <- "aborted"
-            
+              
             }
             
             # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
@@ -1095,18 +1098,28 @@ for (j in 1:nrow(tag_hist)){
         
       } 
       # ROUTE 2 - BO2-BO3-BO4 complex
-        # For this route, we need to make sure that the fish came out through BO4, otherwise it's an aborted attempt.
-        # We will use the same code as for BO1, but use BO2 and BO3 as the "lower" portions of the ladder
+      # For this route, we need to make sure that the fish came out through BO4, otherwise it's an aborted attempt.
+      # We will use the same code as for BO1, but use BO2 and BO3 as the "lower" portions of the ladder
       else if(tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                     "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
         
         # if it's the first detection in this complex, or it hasn't been seen in more than 48 hours, store the start time 
+        # edit 07-29-22 - because we're observing fish spending a lot of time in this complex (in some cases, over 100 days), 
+        # we need to remove the time component for transit to BO4
         if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
             tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                    "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility") &
-            tag_hist[j, 'event_date_time_value'] - 
+                                                    "BONAFF - BON - Adult Fish Facility") &
+            tag_hist[j, 'event_date_time_value'] -
             tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          
+          # old if statement
+          # if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+          #                                                "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
+          #     tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+          #                                             "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility") &
+          #     tag_hist[j, 'event_date_time_value'] - 
+          #     tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
           # Store the event site name
           ind_det_hist[counter, 'event_site_name'] <- 'BO2-BO3-BO4'
           # Store the start time
@@ -1138,11 +1151,20 @@ for (j in 1:nrow(tag_hist)){
         
         # If the next detection is at a site not in BO2, BO3, or BO4,
         # or is more than 48 hours later, store the current time as the end time
+        # EDIT 2022-07-29 #
+        # again, we need to remove the time component in the movement to BO4 because we're seeing them spent 100+ days in here
         else if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                       "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
-        
+                                                            "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
+                 tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF") & # exclude BO4 from the time component here
+                 tag_hist[j+1, 'event_date_time_value'] -
+                 tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+          
+          # old else if
+          # else if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+          #                                                "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
+          #     tag_hist[j+1, 'event_date_time_value'] - 
+          #     tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+          
           # store the info
           # store the tag code
           ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -1150,7 +1172,7 @@ for (j in 1:nrow(tag_hist)){
           # store the event type name
           ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
           
-
+          
           # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
@@ -1190,8 +1212,8 @@ for (j in 1:nrow(tag_hist)){
           # Save event site name
           ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
           
-
-
+          
+          
           # However, if the last antenna seen is not in BO4, then note it was an aborted attempt
           if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                     "BONAFF - BON - Adult Fish Facility")){
@@ -1208,31 +1230,710 @@ for (j in 1:nrow(tag_hist)){
           # every time we store an end time, we update the counter. This allows
           # us to move through the detection history df
           counter <- counter + 1
-        
-        
+          
+          
         }
         
         
-      
+        
       }
       
     }
     
     
-  ##### McNary #####
-  
-  else if (tag_hist[j, 'event_site_name'] %in% MCN_arrays){
+    ##### McNary #####
     
-    # MCN route 1 - MC1, Oregon Shore Ladder
-    
-    if(tag_hist[j, 'event_site_name'] == "MC1 - McNary Oregon Shore Ladder"){
+    else if (tag_hist[j, 'event_site_name'] %in% MCN_arrays){
       
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (tag_hist[j-1, 'event_site_name'] != "MC1 - McNary Oregon Shore Ladder" |
-          tag_hist[j-1, 'event_site_name'] == "MC1 - McNary Oregon Shore Ladder" &
+      # MCN route 1 - MC1, Oregon Shore Ladder
+      
+      if(tag_hist[j, 'event_site_name'] == "MC1 - McNary Oregon Shore Ladder"){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (tag_hist[j-1, 'event_site_name'] != "MC1 - McNary Oregon Shore Ladder" |
+            tag_hist[j-1, 'event_site_name'] == "MC1 - McNary Oregon Shore Ladder" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        # Antenna configuration has not changed at MC1, so no need for different statements
+        
+        # MC1 has antennas in the lower weirs, and 2 at the counting windows
+        # However, a quick look reveals fish that weren't seen at the counting window antennas but clearly ascended (384.1B796A06FF)
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (tag_hist[j+1, 'event_site_name'] != "MC1 - McNary Oregon Shore Ladder" | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          
+          
+          # However, if the last antenna seen is an entrance coil (and we didn't see it enter at an exit coil), note that it was an aborted attempt
+          if (tag_hist[j, 'antenna_id'] %in% MC1_entrance & !(ind_det_hist[counter,'start_antenna_id'] %in% MC1_upper)){
+            
+            ind_det_hist[counter,'non_ascent'] <- "aborted"
+            
+          }
+          
+          # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
+          else if (tag_hist[j, 'antenna_id'] %in% MC1_entrance & ind_det_hist[counter,'start_antenna_id'] %in% MC1_upper){
+            ind_det_hist[counter,'non_ascent'] <- "descent"
+          }
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at MC1, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      # MCN route 2 - MC2 - McNary Washington Shore Ladder
+      else if(tag_hist[j, 'event_site_name'] == "MC2 - McNary Washington Shore Ladder"){
+        
+        # if it's the first detection in this route, or it hasn't been seen in this route for more than 48 hours, store the start time 
+        if (!(tag_hist[j-1, 'event_site_name']  %in% c("MC2 - McNary Washington Shore Ladder")) |
+            tag_hist[j-1, 'event_site_name'] == "MC2 - McNary Washington Shore Ladder" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        # Antenna configuration 110
+        # there are no counting window coils in this configuration, so we'll just 
+        
+        else if(tag_hist[j, 'ant_config'] == 110){
+          
+          # If the next detection is not at MC2
+          # or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'event_site_name']  == "MC2 - McNary Washington Shore Ladder") | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # Save event site name
+            ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+            
+            
+            
+            # With this configuration of coils, we're not going to look for any strange behavior; it's also only in use for the first 9 months of our study
+            
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          
+        }
+        
+        # Antenna configuration 120
+        
+        else if(tag_hist[j, 'ant_config'] == 120){
+          
+          # If the next detection is not at MC2
+          # or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'event_site_name']  == "MC2 - McNary Washington Shore Ladder") | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # Save event site name
+            ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+            
+            # However, if the last antenna seen is an entrance coil (but it was never seen at the exit coil), note that it was an aborted attempt
+            if (tag_hist[j, 'antenna_id'] %in% MC2_120_entrance & !(ind_det_hist[counter,'start_antenna_id'] %in% MC2_120_upper)){
+              
+              ind_det_hist[counter,'non_ascent'] <- "aborted"
+              
+            }
+            
+            # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
+            else if (tag_hist[j, 'antenna_id'] %in% MC2_120_entrance & ind_det_hist[counter,'start_antenna_id'] %in% MC2_120_upper){
+              ind_det_hist[counter,'non_ascent'] <- "descent"
+            }
+            
+            
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          
+        }
+        
+        
+        
+        
+        
+      }
+      
+    }
+    
+    ##### Priest Rapids #####
+    
+    else if (tag_hist[j, 'event_site_name'] %in% PRA_arrays){
+      
+      # For priest rapids, we are just going to treat the AFF antennas as antennas in the lower ladder (for the east/left ladder).
+      # configuration 110, which started in June 2007, introduced these arrays
+      
+      # PRA route 1 - the west (right) ladder
+      # In this route, the configuration has not changed through time, so no ifelse based on configuration
+      
+      if(tag_hist[j, 'antenna_id'] %in% PRA_110_west){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% PRA_110_west & tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult") |
+            tag_hist[j-1, 'antenna_id'] %in% PRA_110_west & 
+            tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "PRA1 - Priest Rapids Adult West Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'antenna_id'] %in% PRA_110_west) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "PRA1 - Priest Rapids Adult West Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at PRA west, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      # PRA route 2 - the east (left) ladder
+      # config 110 (June 2007) introduced antennas in the AFF
+      else if(tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east)){
+        
+        
+        # If it's the first detection in this route in at least 48 hours,
+        if (!(tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF) & tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult") |
+            tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF) &
+            tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        # If it's not the first detection in this route
+        
+        # config 100 - nothing in the AFF, so we can't identify non-ascents
+        else if (tag_hist[j, 'ant_config'] == 100){ 
+          
+          # If the next detection is not at PRA, east
+          # or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'event_site_name']  == "PRA - Priest Rapids Adult") & !(tag_hist[j+1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF)) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            ind_det_hist[counter,'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+        }
+        
+        else if (tag_hist[j, 'ant_config'] == 110){ 
+          
+          # If the next detection is not at PRA, east
+          # or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'event_site_name']  == "PRA - Priest Rapids Adult") & !(tag_hist[j+1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF)) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # Save event site name
+            ind_det_hist[counter,'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
+            
+            
+            
+            # Now, if it was only seen in the AFF but not the exit coils, call it aborted
+            if (tag_hist[j, 'antenna_id'] %in% PRA_110_AFF){
+              
+              ind_det_hist[counter,'non_ascent'] <- "aborted"
+              
+            }
+            
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          
+        }
+        
+        
+      }
+      
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    ##### Rock Island #####
+    
+    # Rock Island has there separate routes - a left, middle, and right ladder
+    # In each of these routes, antennas are only by the exits, in each configuration,
+    # but the names of the specific antennas have changed. However, if we just concatenate
+    # the antennas for each configuration, we should be fine.
+    
+    # All antennas are only at the exit, so we cannot distinguish direction in the ladders or aborted attempts.
+    
+    else if (tag_hist[j, 'event_site_name'] %in% RIS_arrays){
+      
+      # For RIA, we are not going to worry about configurations, because they have not changed much.
+      
+      # RIA route 1 - the left bank ladder
+      if(tag_hist[j, 'antenna_id'] %in% RIA_left){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_left & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
+            tag_hist[j-1, 'antenna_id'] %in% RIA_left & 
+            tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name (RIA1 - Rock Island Adult Left Ladder)
+          ind_det_hist[counter, 'event_site_name'] <- 'RIA1 - Rock Island Adult Left Ladder'
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_left) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "RIA1 - Rock Island Adult Left Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at RIA left, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      # RIA route 2 - the middle bank ladder
+      else if(tag_hist[j, 'antenna_id'] %in% RIA_middle){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_middle & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
+            tag_hist[j-1, 'antenna_id'] %in% RIA_middle & 
+            tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_middle) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at RIA middle, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      
+      # RIA route 3 - the right bank ladder
+      
+      else if(tag_hist[j, 'antenna_id'] %in% RIA_right){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_right & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
+            tag_hist[j-1, 'antenna_id'] %in% RIA_right & 
+            tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_right) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at RIA right, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      
+    }
+    
+    ##### Rocky Reach Dam #####
+    
+    # Rocky Reach Dam has only one ladder, with a set of 4 antennas (a fifth was added in April 2014, config 110) at the exit.
+    # Given this, we will not be able to identify aborted ascension attempts or descent through the ladder.
+    
+    # All antennas are only at the exit, so we cannot distinguish direction in the ladders or aborted attempts.
+    
+    else if (tag_hist[j, 'event_site_name'] %in% RRE_arrays){
+      
+      # For RRE, we are not going to do anything special, except that we are going to have a 48 hour window.
+      
+      # If it's the first detection at RRE, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+      if (!(tag_hist[j-1, 'antenna_id'] == "RRF - Rocky Reach Fishway") |
+          tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway" &
           tag_hist[j, 'event_date_time_value'] - 
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
         # Store the event site name
+        # ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
         ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
         # Store the start time
         ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
@@ -1243,15 +1944,11 @@ for (j in 1:nrow(tag_hist)){
       }
       
       
-      # Antenna configuration has not changed at MC1, so no need for different statements
-      
-      # MC1 has antennas in the lower weirs, and 2 at the counting windows
-      # However, a quick look reveals fish that weren't seen at the counting window antennas but clearly ascended (384.1B796A06FF)
       
       # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (tag_hist[j+1, 'event_site_name'] != "MC1 - McNary Oregon Shore Ladder" | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+      else if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
+               tag_hist[j+1, 'event_date_time_value'] - 
+               tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
         
         # store the info
         # store the tag code
@@ -1260,7 +1957,7 @@ for (j in 1:nrow(tag_hist)){
         # store the event type name
         ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
         
-
+        
         # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
         ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
         
@@ -1278,19 +1975,7 @@ for (j in 1:nrow(tag_hist)){
         # store the end antenna ID
         ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
         
-
-        
-        # However, if the last antenna seen is an entrance coil (and we didn't see it enter at an exit coil), note that it was an aborted attempt
-        if (tag_hist[j, 'antenna_id'] %in% MC1_entrance & !(ind_det_hist[counter,'start_antenna_id'] %in% MC1_upper)){
-          
-          ind_det_hist[counter,'non_ascent'] <- "aborted"
-          
-        }
-        
-        # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-        else if (tag_hist[j, 'antenna_id'] %in% MC1_entrance & ind_det_hist[counter,'start_antenna_id'] %in% MC1_upper){
-          ind_det_hist[counter,'non_ascent'] <- "descent"
-        }
+        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
         
         # UPDATE THE COUNTER
         # every time we store an end time, we update the counter. This allows
@@ -1300,42 +1985,538 @@ for (j in 1:nrow(tag_hist)){
         
       }
       
-      # if it's within 48 hours at MC1, then don't record it
+      # if it's within 48 hours at RRF, then don't record it
       
       else {
         
       }
       
       
-    } 
-    # MCN route 2 - MC2 - McNary Washington Shore Ladder
-    else if(tag_hist[j, 'event_site_name'] == "MC2 - McNary Washington Shore Ladder"){
+    }
+    
+    
+    
+    ##### Wells Dam #####
+    
+    # Wells Dam has a left and a right ladder. Each of these has a trap, with a note
+    # that "Trap fish are removed to the hatchery or trucked off site"
+    
+    # If the last antenna a fish is seen at at Wells is a trap antenna, then we
+    # note that it was trapped in the non-ascent field
+    # This occurs earlier in the script, in the j == nrow(tag_hist)
+    
+    # Wells has gone through many configurations; 110 and 120 have detections near the exit and in the traps.
+    # 130 additionally has antennas in the lower part of the right ladder;
+    # 140 and onwards have antennas in the lower parts of the left and right ladders
+    
+    else if (tag_hist[j, 'event_site_name'] %in% WEL_arrays){
       
-      # if it's the first detection in this route, or it hasn't been seen in this route for more than 48 hours, store the start time 
-      if (!(tag_hist[j-1, 'event_site_name']  %in% c("MC2 - McNary Washington Shore Ladder")) |
-          tag_hist[j-1, 'event_site_name'] == "MC2 - McNary Washington Shore Ladder" &
+      # Wells route 1: Left ladder
+      if(tag_hist[j, 'antenna_id'] %in% WEL_left){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% WEL_left & tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders") |
+            tag_hist[j-1, 'antenna_id'] %in% WEL_left & 
+            tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'  # tag_hist[j,'event_site_name']
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        # If it's not the first detection in this route
+        
+        # config 110, 120, and 130 are functionally the same for the left ladder - antennas in the trap and in the upper ladder
+        # We don't have to deal with the trap sites here because they're dealt with earlier in the script
+        else if (tag_hist[j, "ant_config"] %in% c(110, 120, 130)){
+          # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_left) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          # if it's within 48 hours at PRA west, then don't record it
+          
+          else {
+            
+          }
+          
+          
+        }
+        
+        # antenna configs 140, 150, 160, and 170 all have antennas in the lower ladder
+        # they're functionally the same
+        else if (tag_hist[j, "ant_config"] %in% c(140, 150, 160, 170)){
+          # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_left) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # Now, if it was only seen in the lower ladder but not the exit coils, (and wasn't first seen in the exit coils) call it aborted
+            if (tag_hist[j, 'antenna_id'] %in% c(WEA_140_left_lower, WEA_150_left_lower,
+                                                 WEA_160_left_lower, WEA_170_left_lower) &
+                !(ind_det_hist[counter,'start_antenna_id'] %in% c(WEA_170_left_upper))){ # the names of these coils didn't change, so just need one config
+              
+              ind_det_hist[counter,'non_ascent'] <- "aborted"
+            }
+            
+            # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
+            else if (tag_hist[j, 'antenna_id'] %in% c(WEA_140_left_lower, WEA_150_left_lower,
+                                                      WEA_160_left_lower, WEA_170_left_lower) & 
+                     ind_det_hist[counter,'start_antenna_id'] %in% WEA_170_left_upper){
+              ind_det_hist[counter,'non_ascent'] <- "descent"
+            }
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          # if it's within 48 hours at PRA west, then don't record it
+          
+          else {
+            
+          }
+          
+          
+        }
+        
+        
+        
+      } 
+      # WEL route 2 - the right ladder
+      else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% WEL_right & tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders") |
+            tag_hist[j-1, 'antenna_id'] %in% WEL_right & 
+            tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        # If it's not the first detection in this route
+        
+        # config 110 and 120 are functionally the same for the right ladder - antennas in the trap and in the upper ladder
+        # We don't have to deal with the trap sites here because they're dealt with earlier in the script
+        else if (tag_hist[j, "ant_config"] %in% c(110, 120)){
+          # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_right) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          # if it's within 48 hours at PRA west, then don't record it
+          
+          else {
+            
+          }
+          
+          
+        }
+        
+        # antenna configs 130, 140, 150, 160, and 170 all have antennas in the lower ladder
+        # they're functionally the same
+        else if (tag_hist[j, "ant_config"] %in% c(130, 140, 150, 160, 170)){
+          # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+          if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_right) | # If it's at a different site
+              tag_hist[j+1, 'event_date_time_value'] - 
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+            
+            # store the info
+            # store the tag code
+            ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+            
+            # store the event type name
+            ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+            
+            
+            # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+            
+            # store the location fields
+            ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
+            # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+            # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+            # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+            # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+            
+            # store the end time
+            ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+            # Store the end antenna
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # Now, if it was only seen in the lower ladder but not the exit coils, (and wasn't first seen in the exit coils) call it aborted
+            if (tag_hist[j, 'antenna_id'] %in% c(WEA_130_right_lower, WEA_140_right_lower, WEA_150_right_lower,
+                                                 WEA_160_right_lower, WEA_170_right_lower) &
+                !(ind_det_hist[counter,'start_antenna_id'] %in% c(WEA_170_right_upper))){ # the names of these coils didn't change, so just need one config
+              
+              ind_det_hist[counter,'non_ascent'] <- "aborted"
+            }
+            
+            # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
+            else if (tag_hist[j, 'antenna_id'] %in% c(WEA_130_right_lower, WEA_140_right_lower, WEA_150_right_lower,
+                                                      WEA_160_right_lower, WEA_170_right_lower) & 
+                     ind_det_hist[counter,'start_antenna_id'] %in% WEA_170_right_upper){
+              ind_det_hist[counter,'non_ascent'] <- "descent"
+            }
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+          # if it's within 48 hours at PRA west, then don't record it
+          
+          else {
+            
+          }
+          
+          
+        }
+        
+        
+        
+      } 
+      
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ##### Ice Harbor Dam #####
+    
+    # Ice Harbor dam has a north and a south shore ladder. 
+    # Two configurations, 100 and 110. 110 only added a trap entrance detector in the south shore, which doesn't really matter.
+    
+    # ICH (combined) originally included the juvenile bypass as well. I have made an edit
+    # earlier in the script to rename all of these as the bypass, so they're not dealt with here
+    
+    # In each case, we only have antennas at the exit, so we can't monitor non-ascensions
+    
+    else if (tag_hist[j, 'event_site_name'] %in% ICH_arrays){
+      
+      # ICH route 1 - the north shore ladder
+      # In this route, the configuration has not changed through time, so no ifelse based on configuration
+      
+      if(tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder){
+        
+        # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
+        if (!(tag_hist[j-1, 'antenna_id'] %in% ICH_110_north_ladder & tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)") |
+            tag_hist[j-1, 'antenna_id'] %in% ICH_110_north_ladder & 
+            tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "ICH1 - Ice Harbor Dam North Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'antenna_id'] %in% ICH_110_north_ladder) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "ICH1 - Ice Harbor Dam North Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at ICH1 north, then don't record it
+        
+        else {
+          
+        }
+        
+        
+      } 
+      # ICH route 2 - the south ladder
+      else if(tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)){
+        
+        
+        # If it's the first detection in this route in at least 48 hours,
+        if (!(tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) & tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)") |
+            tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) &
+            tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" &
+            tag_hist[j, 'event_date_time_value'] - 
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+          # Store the event site name
+          ind_det_hist[counter, 'event_site_name'] <- "ICH2 - Ice Harbor Dam South Ladder"
+          # Store the start time
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # Store the start antenna id
+          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        }
+        
+        
+        # If it's not the first detection in this route
+        
+        # If the next detection is not at ICH2 south
+        # or is more than 48 hours later, store the current time as the end time
+        if (!(tag_hist[j+1, 'event_site_name']  == "ICH - Ice Harbor Dam (Combined)") & !(tag_hist[j+1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)) | # If it's at a different site
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
+          ind_det_hist[counter,'event_site_name'] <- "ICH2 - Ice Harbor Dam South Ladder"
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
+          
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        
+        
+      }
+      
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ##### Lower Granite Dam #####
+    
+    # Lower Granite Dam has a single ladder, with arrays in the bottom of the ladder before the AFF,
+    # and arrays near the ladder exit.
+    
+    # Also note that there are recapture/release events in the ladder, where event_type_name == recapture &
+    # event_site_name == LGRLDR - LGR - Release into the Adult Fish Ladder
+    
+    # It has two configurations, 140 and 150. 150 added additional arrays in
+    # the entrance and exit of the ladder.
+    
+    # Based on a quick inspection, I don't really see any evidence of aborted ascension
+    # attempts or descents through the ladder. But the code will still allow for it.
+    # detection probability at the entrance seems far from 100%. I think we'll just group 
+    # the entrance antennas with the lower ones and the exit antennas with the upper ones
+    
+    else if(tag_hist[j, 'event_site_name'] %in% LGR_arrays){
+      
+      # If it's the first detection in this route, or if the last detection was in
+      # the upper antennas at least 48 hours ago
+      if (!(tag_hist[j-1, 'event_site_name'] %in% LGR_arrays) |
+          tag_hist[j-1, 'event_site_name'] %in% LGR_arrays &
+          # tag_hist[j-1, 'antenna_id'] %in% c(GRA_150_exit, GRA_150_upper) &
           tag_hist[j, 'event_date_time_value'] - 
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
         # Store the event site name
         ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
         # Store the start time
         ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
+        # Store the start antenna group
         ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
+        # Store the start antenna ID
         ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
       }
       
-      # Antenna configuration 110
-      # there are no counting window coils in this configuration, so we'll just 
       
-      else if(tag_hist[j, 'ant_config'] == 110){
+      # Different if statements for varying antenna configurations
+      
+      # GRA 140 - upper and lower
+      else if(tag_hist[j, 'ant_config'] == 140 ){
         
-        # If the next detection is not at MC2
-        # or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'event_site_name']  == "MC2 - McNary Washington Shore Ladder") | # If it's at a different site
+        
+        # If the next detection is at a different site, or is more than 48 hours later
+        # and is in the lower ladder, store the current time as the end time
+        if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
+            tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
             tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
           
           # store the info
           # store the tag code
@@ -1344,66 +2525,12 @@ for (j in 1:nrow(tag_hist)){
           # store the event type name
           ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
           
-
+          
           # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # Save event site name
           ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-          
-          
-          
-          # With this configuration of coils, we're not going to look for any strange behavior; it's also only in use for the first 9 months of our study
-          
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        
-      }
-      
-      # Antenna configuration 120
-      
-      else if(tag_hist[j, 'ant_config'] == 120){
-        
-        # If the next detection is not at MC2
-        # or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'event_site_name']  == "MC2 - McNary Washington Shore Ladder") | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
@@ -1416,697 +2543,84 @@ for (j in 1:nrow(tag_hist)){
           # store the end antenna ID
           ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
           
-          # Save event site name
+          
+          
+          # However, if the last antenna seen is not an exit coil, note that it was an aborted attempt
+          if (tag_hist[j, 'antenna_id'] %in% GRA_140_lower & !(ind_det_hist[counter,'start_antenna_id'] %in% GRA_140_upper)){
+            
+            ind_det_hist[counter,'non_ascent'] <- "aborted"
+            
+          }
+          
+          # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
+          else if (tag_hist[j, 'antenna_id'] %in% GRA_140_lower & ind_det_hist[counter,'start_antenna_id'] %in% GRA_140_upper){
+            ind_det_hist[counter,'non_ascent'] <- "descent"
+          }
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+          
+        }
+        
+        # if it's within 48 hours at GRA, then don't record it
+        
+        else {
+          
+        }
+        
+      }
+      
+      
+      # GRA 150 - upper, lower, entrance, exit
+      # Include the recapture possibility here
+      else if(tag_hist[j, 'ant_config'] == 150 | tag_hist[j, 'event_site_name'] == "LGRLDR - LGR - Release into the Adult Fish Ladder"){
+        
+        
+        # If the next detection is at a different site, or is more than 48 hours later
+        # and is in the lower ladder, store the current time as the end time
+        if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
+            tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
+            tag_hist[j+1, 'event_date_time_value'] - 
+            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
+          
+          # store the info
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+          
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+          
+          
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+          
+          # store the location fields
           ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
+          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
+          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
+          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
           
-          # However, if the last antenna seen is an entrance coil (but it was never seen at the exit coil), note that it was an aborted attempt
-          if (tag_hist[j, 'antenna_id'] %in% MC2_120_entrance & !(ind_det_hist[counter,'start_antenna_id'] %in% MC2_120_upper)){
+          # store the end time
+          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
+          # Store the end antenna
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the end antenna ID
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          
+          # However, if the last antenna seen is not an exit coil, note that it was an aborted attempt
+          if (tag_hist[j, 'antenna_id'] %in% c(GRA_150_lower, GRA_150_entrance) & !(ind_det_hist[counter,'start_antenna_id'] %in% c(GRA_150_upper, GRA_150_exit))){
             
             ind_det_hist[counter,'non_ascent'] <- "aborted"
             
           }
           
           # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-          else if (tag_hist[j, 'antenna_id'] %in% MC2_120_entrance & ind_det_hist[counter,'start_antenna_id'] %in% MC2_120_upper){
-            ind_det_hist[counter,'non_ascent'] <- "descent"
-          }
-          
-          
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        
-      }
-      
-      
-      
-      
-      
-    }
-    
-  }
-  
-  ##### Priest Rapids #####
-  
-  else if (tag_hist[j, 'event_site_name'] %in% PRA_arrays){
-    
-    # For priest rapids, we are just going to treat the AFF antennas as antennas in the lower ladder (for the east/left ladder).
-    # configuration 110, which started in June 2007, introduced these arrays
-    
-    # PRA route 1 - the west (right) ladder
-    # In this route, the configuration has not changed through time, so no ifelse based on configuration
-    
-    if(tag_hist[j, 'antenna_id'] %in% PRA_110_west){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% PRA_110_west & tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult") |
-          tag_hist[j-1, 'antenna_id'] %in% PRA_110_west & 
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "PRA1 - Priest Rapids Adult West Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'antenna_id'] %in% PRA_110_west) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "PRA1 - Priest Rapids Adult West Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at PRA west, then don't record it
-      
-      else {
-        
-      }
-      
-      
-    } 
-    # PRA route 2 - the east (left) ladder
-    # config 110 (June 2007) introduced antennas in the AFF
-    else if(tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east)){
-      
-      
-      # If it's the first detection in this route in at least 48 hours,
-      if (!(tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF) & tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult") |
-          tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF) &
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      # If it's not the first detection in this route
-      
-      # config 100 - nothing in the AFF, so we can't identify non-ascents
-      else if (tag_hist[j, 'ant_config'] == 100){ 
-        
-        # If the next detection is not at PRA, east
-        # or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'event_site_name']  == "PRA - Priest Rapids Adult") & !(tag_hist[j+1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF)) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-      }
-      
-      else if (tag_hist[j, 'ant_config'] == 110){ 
-        
-        # If the next detection is not at PRA, east
-        # or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'event_site_name']  == "PRA - Priest Rapids Adult") & !(tag_hist[j+1, 'antenna_id'] %in% c(PRA_110_east, PRA_110_AFF)) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          # ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # Save event site name
-          ind_det_hist[counter,'event_site_name'] <- "PRA2 - Priest Rapids Adult East Ladder"
-          
-          
-          
-          # Now, if it was only seen in the AFF but not the exit coils, call it aborted
-          if (tag_hist[j, 'antenna_id'] %in% PRA_110_AFF){
-            
-            ind_det_hist[counter,'non_ascent'] <- "aborted"
-            
-          }
-          
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        
-      }
-      
-      
-    }
-    
-  }
-  
-  
-  
-    
-    
-    
-    
-  
-  ##### Rock Island #####
-  
-  # Rock Island has there separate routes - a left, middle, and right ladder
-  # In each of these routes, antennas are only by the exits, in each configuration,
-  # but the names of the specific antennas have changed. However, if we just concatenate
-  # the antennas for each configuration, we should be fine.
-  
-  # All antennas are only at the exit, so we cannot distinguish direction in the ladders or aborted attempts.
-  
-  else if (tag_hist[j, 'event_site_name'] %in% RIS_arrays){
-    
-    # For RIA, we are not going to worry about configurations, because they have not changed much.
-    
-    # RIA route 1 - the left bank ladder
-    if(tag_hist[j, 'antenna_id'] %in% RIA_left){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_left & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
-          tag_hist[j-1, 'antenna_id'] %in% RIA_left & 
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name (RIA1 - Rock Island Adult Left Ladder)
-        ind_det_hist[counter, 'event_site_name'] <- 'RIA1 - Rock Island Adult Left Ladder'
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_left) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "RIA1 - Rock Island Adult Left Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at RIA left, then don't record it
-      
-      else {
-        
-      }
-      
-      
-    } 
-    # RIA route 2 - the middle bank ladder
-    else if(tag_hist[j, 'antenna_id'] %in% RIA_middle){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_middle & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
-          tag_hist[j-1, 'antenna_id'] %in% RIA_middle & 
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_middle) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at RIA middle, then don't record it
-      
-      else {
-        
-      }
-      
-      
-    } 
-    
-    # RIA route 3 - the right bank ladder
-    
-    else if(tag_hist[j, 'antenna_id'] %in% RIA_right){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% RIA_right & tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult") |
-          tag_hist[j-1, 'antenna_id'] %in% RIA_right & 
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'antenna_id'] %in% RIA_right) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at RIA right, then don't record it
-      
-      else {
-        
-      }
-      
-      
-    } 
-    
-  }
-  
-  ##### Rocky Reach Dam #####
-  
-  # Rocky Reach Dam has only one ladder, with a set of 4 antennas (a fifth was added in April 2014, config 110) at the exit.
-  # Given this, we will not be able to identify aborted ascension attempts or descent through the ladder.
-  
-  # All antennas are only at the exit, so we cannot distinguish direction in the ladders or aborted attempts.
-  
-  else if (tag_hist[j, 'event_site_name'] %in% RRE_arrays){
-    
-    # For RRE, we are not going to do anything special, except that we are going to have a 48 hour window.
-    
-    # If it's the first detection at RRE, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-    if (!(tag_hist[j-1, 'antenna_id'] == "RRF - Rocky Reach Fishway") |
-        tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway" &
-        tag_hist[j, 'event_date_time_value'] - 
-        tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-      # Store the event site name
-      # ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
-      ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
-      # Store the start time
-      ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-      # Store the start antenna
-      ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-      # Store the start antenna id
-      ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-    }
-    
-    
-    
-    # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-    else if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
-             tag_hist[j+1, 'event_date_time_value'] - 
-             tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-      
-      # store the info
-      # store the tag code
-      ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-      
-      # store the event type name
-      ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-      
-      
-      # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-      ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-      
-      # store the location fields
-      ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-      # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-      # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-      # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-      # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-      
-      # store the end time
-      ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-      # Store the end antenna
-      ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-      # store the end antenna ID
-      ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-      
-      # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-      
-      # UPDATE THE COUNTER
-      # every time we store an end time, we update the counter. This allows
-      # us to move through the detection history df
-      counter <- counter + 1
-      
-      
-    }
-    
-    # if it's within 48 hours at RRF, then don't record it
-    
-    else {
-      
-    }
-    
-    
-  }
-  
-  
- 
-  ##### Wells Dam #####
-  
-  # Wells Dam has a left and a right ladder. Each of these has a trap, with a note
-  # that "Trap fish are removed to the hatchery or trucked off site"
-  
-  # If the last antenna a fish is seen at at Wells is a trap antenna, then we
-  # note that it was trapped in the non-ascent field
-  # This occurs earlier in the script, in the j == nrow(tag_hist)
-  
-  # Wells has gone through many configurations; 110 and 120 have detections near the exit and in the traps.
-  # 130 additionally has antennas in the lower part of the right ladder;
-  # 140 and onwards have antennas in the lower parts of the left and right ladders
-  
-  else if (tag_hist[j, 'event_site_name'] %in% WEL_arrays){
-    
-    # Wells route 1: Left ladder
-    if(tag_hist[j, 'antenna_id'] %in% WEL_left){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% WEL_left & tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders") |
-          tag_hist[j-1, 'antenna_id'] %in% WEL_left & 
-          tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'  # tag_hist[j,'event_site_name']
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      # If it's not the first detection in this route
-      
-      # config 110, 120, and 130 are functionally the same for the left ladder - antennas in the trap and in the upper ladder
-      # We don't have to deal with the trap sites here because they're dealt with earlier in the script
-      else if (tag_hist[j, "ant_config"] %in% c(110, 120, 130)){
-        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_left) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        # if it's within 48 hours at PRA west, then don't record it
-        
-        else {
-          
-        }
-        
-        
-      }
-      
-      # antenna configs 140, 150, 160, and 170 all have antennas in the lower ladder
-      # they're functionally the same
-      else if (tag_hist[j, "ant_config"] %in% c(140, 150, 160, 170)){
-        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_left) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # Now, if it was only seen in the lower ladder but not the exit coils, (and wasn't first seen in the exit coils) call it aborted
-          if (tag_hist[j, 'antenna_id'] %in% c(WEA_140_left_lower, WEA_150_left_lower,
-                                               WEA_160_left_lower, WEA_170_left_lower) &
-              !(ind_det_hist[counter,'start_antenna_id'] %in% c(WEA_170_left_upper))){ # the names of these coils didn't change, so just need one config
-            
-            ind_det_hist[counter,'non_ascent'] <- "aborted"
-          }
-          
-          # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-          else if (tag_hist[j, 'antenna_id'] %in% c(WEA_140_left_lower, WEA_150_left_lower,
-                                                    WEA_160_left_lower, WEA_170_left_lower) & 
-                   ind_det_hist[counter,'start_antenna_id'] %in% WEA_170_left_upper){
+          else if (tag_hist[j, 'antenna_id'] %in% c(GRA_150_lower, GRA_150_entrance) & ind_det_hist[counter,'start_antenna_id'] %in% c(GRA_150_upper, GRA_150_exit)){
             ind_det_hist[counter,'non_ascent'] <- "descent"
           }
           
@@ -2118,509 +2632,17 @@ for (j in 1:nrow(tag_hist)){
           
         }
         
-        # if it's within 48 hours at PRA west, then don't record it
+        # if it's within 48 hours at GRA, then don't record it
         
         else {
           
         }
         
-        
       }
-      
-      
-      
-    } 
-    # WEL route 2 - the right ladder
-    else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% WEL_right & tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders") |
-          tag_hist[j-1, 'antenna_id'] %in% WEL_right & 
-          tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      # If it's not the first detection in this route
-      
-      # config 110 and 120 are functionally the same for the right ladder - antennas in the trap and in the upper ladder
-      # We don't have to deal with the trap sites here because they're dealt with earlier in the script
-      else if (tag_hist[j, "ant_config"] %in% c(110, 120)){
-        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_right) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        # if it's within 48 hours at PRA west, then don't record it
-        
-        else {
-          
-        }
-        
-        
-      }
-      
-      # antenna configs 130, 140, 150, 160, and 170 all have antennas in the lower ladder
-      # they're functionally the same
-      else if (tag_hist[j, "ant_config"] %in% c(130, 140, 150, 160, 170)){
-        # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-        if (!(tag_hist[j+1, 'antenna_id'] %in% WEL_right) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
-            tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-          
-          # store the info
-          # store the tag code
-          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-          
-          # store the event type name
-          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-          
-          
-          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-          
-          # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
-          # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-          # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-          # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-          # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-          
-          # store the end time
-          ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-          
-          # Now, if it was only seen in the lower ladder but not the exit coils, (and wasn't first seen in the exit coils) call it aborted
-          if (tag_hist[j, 'antenna_id'] %in% c(WEA_130_right_lower, WEA_140_right_lower, WEA_150_right_lower,
-                                               WEA_160_right_lower, WEA_170_right_lower) &
-              !(ind_det_hist[counter,'start_antenna_id'] %in% c(WEA_170_right_upper))){ # the names of these coils didn't change, so just need one config
-            
-            ind_det_hist[counter,'non_ascent'] <- "aborted"
-          }
-          
-          # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-          else if (tag_hist[j, 'antenna_id'] %in% c(WEA_130_right_lower, WEA_140_right_lower, WEA_150_right_lower,
-                                                    WEA_160_right_lower, WEA_170_right_lower) & 
-                   ind_det_hist[counter,'start_antenna_id'] %in% WEA_170_right_upper){
-            ind_det_hist[counter,'non_ascent'] <- "descent"
-          }
-          
-          # UPDATE THE COUNTER
-          # every time we store an end time, we update the counter. This allows
-          # us to move through the detection history df
-          counter <- counter + 1
-          
-          
-        }
-        
-        # if it's within 48 hours at PRA west, then don't record it
-        
-        else {
-          
-        }
-        
-        
-      }
-      
-      
       
     } 
     
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  ##### Ice Harbor Dam #####
-  
-  # Ice Harbor dam has a north and a south shore ladder. 
-  # Two configurations, 100 and 110. 110 only added a trap entrance detector in the south shore, which doesn't really matter.
-  
-  # ICH (combined) originally included the juvenile bypass as well. I have made an edit
-  # earlier in the script to rename all of these as the bypass, so they're not dealt with here
-  
-  # In each case, we only have antennas at the exit, so we can't monitor non-ascensions
-  
-  else if (tag_hist[j, 'event_site_name'] %in% ICH_arrays){
-    
-    # ICH route 1 - the north shore ladder
-    # In this route, the configuration has not changed through time, so no ifelse based on configuration
-    
-    if(tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder){
-      
-      # If it's the first detection in this route, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] %in% ICH_110_north_ladder & tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)") |
-          tag_hist[j-1, 'antenna_id'] %in% ICH_110_north_ladder & 
-          tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "ICH1 - Ice Harbor Dam North Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'antenna_id'] %in% ICH_110_north_ladder) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "ICH1 - Ice Harbor Dam North Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at ICH1 north, then don't record it
-      
-      else {
-        
-      }
-      
-      
-    } 
-    # ICH route 2 - the south ladder
-    else if(tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)){
-      
-      
-      # If it's the first detection in this route in at least 48 hours,
-      if (!(tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) & tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)") |
-          tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) &
-          tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" &
-          tag_hist[j, 'event_date_time_value'] - 
-          tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-        # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- "ICH2 - Ice Harbor Dam South Ladder"
-        # Store the start time
-        ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the start antenna
-        ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # Store the start antenna id
-        ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-      }
-      
-      
-      # If it's not the first detection in this route
-      
-      # If the next detection is not at ICH2 south
-      # or is more than 48 hours later, store the current time as the end time
-      if (!(tag_hist[j+1, 'event_site_name']  == "ICH - Ice Harbor Dam (Combined)") & !(tag_hist[j+1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)) | # If it's at a different site
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "ICH2 - Ice Harbor Dam South Ladder"
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      
-      
-    }
-    
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  ##### Lower Granite Dam #####
-  
-  # Lower Granite Dam has a single ladder, with arrays in the bottom of the ladder before the AFF,
-  # and arrays near the ladder exit.
-  
-  # Also note that there are recapture/release events in the ladder, where event_type_name == recapture &
-  # event_site_name == LGRLDR - LGR - Release into the Adult Fish Ladder
-  
-  # It has two configurations, 140 and 150. 150 added additional arrays in
-  # the entrance and exit of the ladder.
-  
-  # Based on a quick inspection, I don't really see any evidence of aborted ascension
-  # attempts or descents through the ladder. But the code will still allow for it.
-  # detection probability at the entrance seems far from 100%. I think we'll just group 
-  # the entrance antennas with the lower ones and the exit antennas with the upper ones
-  
-  else if(tag_hist[j, 'event_site_name'] %in% LGR_arrays){
-    
-    # If it's the first detection in this route, or if the last detection was in
-    # the upper antennas at least 48 hours ago
-    if (!(tag_hist[j-1, 'event_site_name'] %in% LGR_arrays) |
-        tag_hist[j-1, 'event_site_name'] %in% LGR_arrays &
-        # tag_hist[j-1, 'antenna_id'] %in% c(GRA_150_exit, GRA_150_upper) &
-        tag_hist[j, 'event_date_time_value'] - 
-        tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-      # Store the event site name
-      ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
-      # Store the start time
-      ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-      # Store the start antenna group
-      ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-      # Store the start antenna ID
-      ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-    }
-    
-    
-    # Different if statements for varying antenna configurations
-    
-    # GRA 140 - upper and lower
-    else if(tag_hist[j, 'ant_config'] == 140 ){
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later
-      # and is in the lower ladder, store the current time as the end time
-      if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
-          tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-
-        
-        # However, if the last antenna seen is not an exit coil, note that it was an aborted attempt
-        if (tag_hist[j, 'antenna_id'] %in% GRA_140_lower & !(ind_det_hist[counter,'start_antenna_id'] %in% GRA_140_upper)){
-          
-          ind_det_hist[counter,'non_ascent'] <- "aborted"
-          
-        }
-        
-        # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-        else if (tag_hist[j, 'antenna_id'] %in% GRA_140_lower & ind_det_hist[counter,'start_antenna_id'] %in% GRA_140_upper){
-          ind_det_hist[counter,'non_ascent'] <- "descent"
-        }
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at GRA, then don't record it
-      
-      else {
-        
-      }
-      
-    }
-    
-    
-    # GRA 150 - upper, lower, entrance, exit
-    # Include the recapture possibility here
-    else if(tag_hist[j, 'ant_config'] == 150 | tag_hist[j, 'event_site_name'] == "LGRLDR - LGR - Release into the Adult Fish Ladder"){
-      
-      
-      # If the next detection is at a different site, or is more than 48 hours later
-      # and is in the lower ladder, store the current time as the end time
-      if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
-          tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
-          tag_hist[j+1, 'event_date_time_value'] - 
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
-        
-        # store the info
-        # store the tag code
-        ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-        
-        # store the event type name
-        ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-        
-        
-        # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-        
-        # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-        # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-        # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-        # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-        # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-        
-        # store the end time
-        ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-        # Store the end antenna
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        # store the end antenna ID
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-      
-        
-        # However, if the last antenna seen is not an exit coil, note that it was an aborted attempt
-        if (tag_hist[j, 'antenna_id'] %in% c(GRA_150_lower, GRA_150_entrance) & !(ind_det_hist[counter,'start_antenna_id'] %in% c(GRA_150_upper, GRA_150_exit))){
-          
-          ind_det_hist[counter,'non_ascent'] <- "aborted"
-          
-        }
-        
-        # Other alternative - if the first detection was at an exit coil, and the last at an entrance coil, then it went downstream through the ladder
-        else if (tag_hist[j, 'antenna_id'] %in% c(GRA_150_lower, GRA_150_entrance) & ind_det_hist[counter,'start_antenna_id'] %in% c(GRA_150_upper, GRA_150_exit)){
-          ind_det_hist[counter,'non_ascent'] <- "descent"
-        }
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
-        
-        
-      }
-      
-      # if it's within 48 hours at GRA, then don't record it
-      
-      else {
-        
-      }
-      
-    }
-    
-  } 
-  
-  ##### non-dams #####   
+    ##### non-dams #####   
     
     # For every other entry that is not at a dam, look at the previous entry to see if it
     # was the same site < 48 hours ago
@@ -2654,7 +2676,7 @@ for (j in 1:nrow(tag_hist)){
           # store the event type name
           ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
           
-
+          
           # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
@@ -2682,7 +2704,7 @@ for (j in 1:nrow(tag_hist)){
       else if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
                tag_hist[j, 'event_date_time_value'] -
                tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
-      
+        
         
         # store the tag code
         ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -2690,7 +2712,7 @@ for (j in 1:nrow(tag_hist)){
         # store the event type name
         ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
         
-
+        
         # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
         ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
         
@@ -2713,8 +2735,8 @@ for (j in 1:nrow(tag_hist)){
       }
       
     }
-  
-  
+    
+    
   }
   
   # Cut out extra rows

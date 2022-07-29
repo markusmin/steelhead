@@ -1,4 +1,4 @@
-### 02 - Detection history generation
+### 02 - Detection history generation - MASTER SCRIPT
 
 ### Load libraries
 library(tidyverse)
@@ -7,45 +7,6 @@ library(janitor)
 
 # For testing - setwd
 # setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-07-27_det_hist/")
-
-##### All tributaries #####
-
-
-### Load complete detection history files
-# CTH_1 <- clean_names(read.csv("CTH_tag_codes_1.csv"))
-# CTH_2 <- clean_names(read.csv("CTH_tag_codes_2.csv"))
-# CTH_3 <- clean_names(read.csv("CTH_tag_codes_3.csv"))
-# CTH_4 <- clean_names(read.csv("CTH_tag_codes_4.csv"))
-# CTH_5 <- clean_names(read.csv("CTH_tag_codes_5.csv"))
-# CTH_6 <- clean_names(read.csv("CTH_tag_codes_6.csv"))
-# CTH_7 <- clean_names(read.csv("CTH_tag_codes_7.csv"))
-# CTH_8 <- clean_names(read.csv("CTH_tag_codes_8.csv"))
-# CTH_9 <- clean_names(read.csv("CTH_tag_codes_9.csv"))
-# CTH_10 <- clean_names(read.csv("CTH_tag_codes_10.csv"))
-# CTH_11 <- clean_names(read.csv("CTH_tag_codes_11.csv"))
-# CTH_12 <- clean_names(read.csv("CTH_tag_codes_12.csv"))
-# CTH_13 <- clean_names(read.csv("CTH_tag_codes_13.csv"))
-# CTH_14 <- clean_names(read.csv("CTH_tag_codes_14.csv"))
-
-
-### Combine files, fix some column data types, rename some columns with long names
-# CTH_1 %>% 
-#   # dplyr::select(-event_site_subbasin_code) %>% 
-#   bind_rows(., dplyr::select(CTH_2, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_3, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_4, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_5, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_6, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_7, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_8, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_9, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_10, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_11, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_12, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_13, -event_site_subbasin_code)) %>% 
-#   bind_rows(., dplyr::select(CTH_14, -event_site_subbasin_code)) %>% 
-#   mutate(event_date_time_value = mdy_hms(event_date_time_value)) %>% 
-#   dplyr::rename(ant_config = antenna_group_configuration_value) -> CTH_complete
 
 ##### Store the antenna configurations #####
 
@@ -470,9 +431,9 @@ det_hist <- data.frame(tag_code = character(), event_type_name = character(), ev
 
 
 # Loop through the unique tags
-# for (i in 1:length(unique_tag_IDs)){
+for (i in 1:length(unique_tag_IDs)){
 # Need to run the loop for longer to actual get observations at certain dams
-for (i in 2000:2200){
+# for (i in 2000:2200){
   # Get the start time
   if (i == 1){
     start_time <- Sys.time() 
@@ -888,6 +849,9 @@ for (j in 1:nrow(tag_hist)){
              # Need to make sure they're not in the BO2-BO3-BO4 complex
              !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                         "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
+      # Excluding BO2-BO3-BO4 here is problematic if we have a single detection in this whole complex, which I feel like
+      # must have a very low probability of happening. I think with the old script it happened a single time, but that'll
+      # be fixed in another part of the script.
       
       
       # store the tag code
@@ -1123,12 +1087,22 @@ for (j in 1:nrow(tag_hist)){
                                                     "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
         
         # if it's the first detection in this complex, or it hasn't been seen in more than 48 hours, store the start time 
+        # edit 07-29-22 - because we're observing fish spending a lot of time in this complex (in some cases, over 100 days), 
+        # we need to remove the time component for transit to BO4
         if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
             tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                    "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility") &
-            tag_hist[j, 'event_date_time_value'] - 
+                                                    "BONAFF - BON - Adult Fish Facility") &
+            tag_hist[j, 'event_date_time_value'] -
             tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+        
+        # old if statement
+        # if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        #                                                "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
+        #     tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        #                                             "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility") &
+        #     tag_hist[j, 'event_date_time_value'] - 
+        #     tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
           # Store the event site name
           ind_det_hist[counter, 'event_site_name'] <- 'BO2-BO3-BO4'
           # Store the start time
@@ -1160,10 +1134,19 @@ for (j in 1:nrow(tag_hist)){
         
         # If the next detection is at a site not in BO2, BO3, or BO4,
         # or is more than 48 hours later, store the current time as the end time
+        # EDIT 2022-07-29 #
+        # again, we need to remove the time component in the movement to BO4 because we're seeing them spent 100+ days in here
         else if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
-            tag_hist[j+1, 'event_date_time_value'] - 
+                 tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF") & # exclude BO4 from the time component here
+            tag_hist[j+1, 'event_date_time_value'] -
             tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
+        
+        # old else if
+        # else if (!(tag_hist[j+1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        #                                                "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) | # If it's at a different site
+        #     tag_hist[j+1, 'event_date_time_value'] - 
+        #     tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's over 48 hours later
         
           # store the info
           # store the tag code
