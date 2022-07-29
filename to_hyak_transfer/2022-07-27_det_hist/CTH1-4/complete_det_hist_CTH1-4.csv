@@ -1,0 +1,261 @@
+"","tag_code","event_type_name","event_site_name","start_time","end_time","start_antenna_id","end_antenna_id","start_ant_group","end_ant_group","ant_config","non_ascent"
+"1","384.3B23A134F8","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-18 07:05:39,2016-09-18 08:10:03,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"2","384.3B23A134F8","Observation","The Dalles Adult Fishways (combined)",2016-10-17 09:57:37,2016-10-17 09:57:41,"02","01","Counting Window","Counting Window",100,NA
+"3","384.3B23A134F8","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-20 06:39:04,2016-10-20 08:12:47,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"4","384.3B23A134F8","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-22 02:31:08,2016-10-22 03:02:50,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"5","384.3B23A134F8","Observation","LMA - Lower Monumental Adult Ladders",2016-10-24 13:29:48,2016-10-24 13:29:49,"02","01","Left Ladder","Left Ladder",100,NA
+"6","384.3B23A134F8","Observation","GOA - Little Goose Fish Ladder",2016-10-25 12:10:48,2016-10-25 12:10:50,"02","02","Counting Window","Counting Window",100,NA
+"7","384.3B23A134F8","Observation","GRA - Lower Granite Dam Adult",2016-10-27 15:14:18,2016-10-28 10:01:49,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"8","384.3B23A1358E","Observation","BO2-BO3-BO4",2016-09-13 10:22:39,2016-09-13 14:12:41,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"9","384.3B23A1358E","Observation","The Dalles Adult Fishways (combined)",2016-09-16 01:13:56,2016-09-16 01:14:03,"02","01","Counting Window","Counting Window",100,NA
+"10","384.3B23A1358E","Observation","MC2 - McNary Washington Shore Ladder",2016-09-25 08:00:27,2016-09-25 08:53:28,"13","01","WEIR 302","COUNTING WINDOW",120,NA
+"11","384.3B23A1358E","Observation","LMA - Lower Monumental Adult Ladders",2016-09-29 12:41:32,2016-09-29 12:41:36,"04","03","Right Ladder","Right Ladder",100,NA
+"12","384.3B23A1358E","Observation","GOA - Little Goose Fish Ladder",2016-10-02 17:56:41,2016-10-02 17:56:42,"02","01","Counting Window","Counting Window",100,NA
+"13","384.3B23A1358E","Observation","GRA - Lower Granite Dam Adult",2016-10-04 14:11:48,2016-10-05 10:54:57,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"14","384.3B23A135CF","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-06 15:00:39,2016-09-06 15:32:48,"04","01","VERTICAL SLOT DETECTORS","VERTICAL SLOT DETECTORS",110,NA
+"15","384.3B23A135CF","Observation","The Dalles Adult Fishways (combined)",2016-09-09 07:11:17,2016-09-09 07:11:21,"02","01","Counting Window","Counting Window",100,NA
+"16","384.3B23A135CF","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-15 05:40:11,2016-09-15 07:33:38,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"17","384.3B23A135CF","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-09-16 21:14:06,2016-09-16 21:38:28,"08","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"18","384.3B23A135CF","Observation","LMA - Lower Monumental Adult Ladders",2016-09-19 15:35:59,2016-09-19 15:36:03,"04","03","Right Ladder","Right Ladder",100,NA
+"19","384.3B23A135CF","Observation","GOA - Little Goose Fish Ladder",2016-09-21 01:30:58,2016-09-21 01:31:02,"02","01","Counting Window","Counting Window",100,NA
+"20","384.3B23A135CF","Observation","GRA - Lower Granite Dam Adult",2016-09-22 12:19:35,2016-09-23 11:45:13,"B1","02","Ladder Entrance","WEIR 733",150,NA
+"21","384.3B23A13682","Observation","BO2-BO3-BO4",2016-08-24 16:47:10,2016-08-25 05:11:00,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"22","384.3B23A13F59","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-23 09:10:07,2016-09-23 10:01:59,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"23","384.3B23A13F59","Observation","The Dalles Adult Fishways (combined)",2016-09-26 09:47:08,2016-09-26 09:47:10,"02","01","Counting Window","Counting Window",100,NA
+"24","384.3B23A13F59","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-21 09:13:05,2016-10-21 10:58:32,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"25","384.3B23A13F77","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-29 06:31:27,2016-09-29 07:42:12,"11","01","A-BRANCH WEIR 44","VERTICAL SLOT DETECTORS",110,NA
+"26","384.3B23A13F77","Observation","The Dalles Adult Fishways (combined)",2016-10-01 13:54:38,2016-10-01 13:54:43,"02","01","Counting Window","Counting Window",100,NA
+"27","384.3B23A13F77","Observation","MC2 - McNary Washington Shore Ladder",2016-10-06 21:56:06,2016-10-06 21:56:16,"03","01","COUNTING WINDOW","COUNTING WINDOW",120,NA
+"28","384.3B23A13F77","Observation","LMA - Lower Monumental Adult Ladders",2016-10-11 21:10:14,2016-10-11 21:14:49,"04","03","Right Ladder","Right Ladder",100,NA
+"29","384.3B23A13F77","Observation","GOA - Little Goose Fish Ladder",2016-10-14 07:27:08,2016-10-14 07:27:10,"02","01","Counting Window","Counting Window",100,NA
+"30","384.3B23A13F77","Observation","GRA - Lower Granite Dam Adult",2016-10-16 00:57:05,2016-10-16 10:55:40,"B2","A1","Ladder Entrance","Ladder Exit",150,NA
+"31","384.3B23A14172","Observation","BO2-BO3-BO4",2016-09-01 12:19:38,2016-09-01 13:30:57,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"32","384.3B23A14172","Observation","The Dalles Adult Fishways (combined)",2016-09-16 08:27:30,2016-09-16 08:27:37,"02","01","Counting Window","Counting Window",100,NA
+"33","384.3B23A14172","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-20 04:14:30,2016-09-20 06:02:15,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"34","384.3B23A14172","Observation","LMA - Lower Monumental Adult Ladders",2016-09-23 10:27:35,2016-09-23 10:27:41,"04","03","Right Ladder","Right Ladder",100,NA
+"35","384.3B23A14172","Observation","GOA - Little Goose Fish Ladder",2016-09-24 20:08:31,2016-09-24 20:08:34,"02","01","Counting Window","Counting Window",100,NA
+"36","384.3B23A14172","Observation","GRA - Lower Granite Dam Adult",2016-09-27 05:02:21,2016-09-27 08:30:44,"B2","A1","Ladder Entrance","Ladder Exit",150,NA
+"37","384.3B23A141E2","Observation","BO2-BO3-BO4",2016-08-19 19:12:50,2016-08-20 04:47:54,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"38","384.3B23A141E2","Observation","The Dalles Adult Fishways (combined)",2016-09-07 01:31:34,2016-09-07 01:31:43,"02","01","Counting Window","Counting Window",100,NA
+"39","384.3B23A141E2","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-09 18:39:17,2016-09-10 05:56:18,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"40","384.3B23A141E2","Observation","ICH1 - Ice Harbor Dam North Ladder",2016-09-12 02:35:56,2016-09-12 02:41:12,"10","09","RIGHT LADDER WEIR 435 [S/O]","RIGHT LADDER WEIR 438 [S/O]",110,NA
+"41","384.3B23A141E2","Observation","LMA - Lower Monumental Adult Ladders",2016-09-13 00:18:16,2016-09-13 00:18:27,"04","03","Right Ladder","Right Ladder",100,NA
+"42","384.3B23A141E2","Observation","GOA - Little Goose Fish Ladder",2016-09-14 13:35:48,2016-09-14 13:35:51,"02","01","Counting Window","Counting Window",100,NA
+"43","384.3B23A141E2","Observation","GRA - Lower Granite Dam Adult",2016-09-16 09:02:29,2016-09-16 15:19:57,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"44","384.3B23A14309","Observation","BO2-BO3-BO4",2016-09-13 10:30:13,2016-09-13 12:34:47,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"45","384.3B23A14309","Observation","The Dalles Adult Fishways (combined)",2016-09-16 10:37:09,2016-09-16 10:41:19,"02","01","Counting Window","Counting Window",100,NA
+"46","384.3B23A14309","Observation","MC2 - McNary Washington Shore Ladder",2016-09-20 08:19:13,2016-09-20 09:02:20,"13","01","WEIR 302","COUNTING WINDOW",120,NA
+"47","384.3B23A14309","Observation","LMA - Lower Monumental Adult Ladders",2016-09-24 07:50:53,2016-09-24 07:56:48,"04","03","Right Ladder","Right Ladder",100,NA
+"48","384.3B23A14309","Observation","GOA - Little Goose Fish Ladder",2016-09-25 15:52:28,2016-09-25 15:52:30,"02","01","Counting Window","Counting Window",100,NA
+"49","384.3B23A14309","Observation","GRA - Lower Granite Dam Adult",2016-09-27 13:35:47,2016-09-28 11:36:20,"B3","02","Ladder Entrance","WEIR 733",150,NA
+"50","384.3B23A14DDE","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-28 10:09:58,2016-09-29 06:24:34,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"51","384.3B23A14DDE","Observation","The Dalles Adult Fishways (combined)",2016-10-01 09:56:51,2016-10-01 09:56:56,"02","01","Counting Window","Counting Window",100,NA
+"52","384.3B23A14DDE","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-06 05:58:39,2016-10-06 07:25:17,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"53","384.3B23A14DDE","Observation","LMA - Lower Monumental Adult Ladders",2016-10-10 19:17:53,2016-10-10 19:17:57,"02","01","Left Ladder","Left Ladder",100,NA
+"54","384.3B23A14DDE","Observation","GOA - Little Goose Fish Ladder",2016-10-12 09:51:31,2016-10-12 09:51:33,"02","01","Counting Window","Counting Window",100,NA
+"55","384.3B23A14DDE","Observation","GRA - Lower Granite Dam Adult",2016-10-14 15:51:19,2016-10-15 10:47:00,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"56","384.3B23A14E18","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-10-01 13:06:40,2016-10-01 13:50:02,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"57","384.3B23A14E18","Observation","The Dalles Adult Fishways (combined)",2016-10-05 08:16:30,2016-10-05 08:18:16,"02","01","Counting Window","Counting Window",100,NA
+"58","384.3B23A14E18","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-11 12:10:19,2016-10-11 13:26:01,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"59","384.3B23A14E18","Observation","LMA - Lower Monumental Adult Ladders",2016-10-15 15:05:57,2016-10-15 15:06:01,"04","03","Right Ladder","Right Ladder",100,NA
+"60","384.3B23A14E18","Observation","GOA - Little Goose Fish Ladder",2016-10-18 07:14:23,2016-10-18 07:14:25,"02","01","Counting Window","Counting Window",100,NA
+"61","384.3B23A14E18","Observation","GRA - Lower Granite Dam Adult",2016-10-20 13:39:50,2016-10-21 10:27:46,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"62","384.3B23A14E28","Observation","BO2-BO3-BO4",2016-09-24 18:01:19,2016-09-25 06:38:25,"BO2-0F","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",100,NA
+"63","384.3B23A14E28","Observation","The Dalles Adult Fishways (combined)",2016-09-27 10:05:38,2016-09-27 10:05:41,"02","01","Counting Window","Counting Window",100,NA
+"64","384.3B23A14E28","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-01 10:30:46,2016-10-01 12:01:52,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"65","384.3B23A14E28","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-03 11:32:04,2016-10-03 11:34:31,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"66","384.3B23A14E28","Observation","LMA - Lower Monumental Adult Ladders",2016-10-05 12:45:39,2016-10-05 12:45:44,"04","03","Right Ladder","Right Ladder",100,NA
+"67","384.3B23A14E28","Observation","GOA - Little Goose Fish Ladder",2016-10-07 13:40:06,2016-10-07 13:40:08,"02","01","Counting Window","Counting Window",100,NA
+"68","384.3B23A14E28","Observation","GRA - Lower Granite Dam Adult",2016-10-09 10:46:48,2016-10-09 14:14:28,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"69","384.3B23A14EB1","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-08 11:49:31,2016-09-08 12:47:34,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"70","384.3B23A14EB1","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-13 14:06:26,2016-09-13 15:45:14,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"71","384.3B23A14EB1","Observation","LMA - Lower Monumental Adult Ladders",2016-09-17 00:23:49,2016-09-17 00:24:07,"04","03","Right Ladder","Right Ladder",100,NA
+"72","384.3B23A14EB1","Observation","GOA - Little Goose Fish Ladder",2016-09-18 15:34:25,2016-09-18 15:34:26,"02","01","Counting Window","Counting Window",100,NA
+"73","384.3B23A14EB1","Observation","GRA - Lower Granite Dam Adult",2016-09-20 12:30:29,2016-09-21 12:41:09,"B2","A1","Ladder Entrance","Ladder Exit",150,NA
+"74","384.3B23A150F4","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-18 13:21:37,2016-09-18 14:20:22,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"75","384.3B23A151B9","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-24 09:02:28,2016-09-24 10:10:44,"23","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"76","384.3B23A151B9","Observation","The Dalles Adult Fishways (combined)",2016-09-26 07:21:46,2016-09-26 07:21:49,"02","01","Counting Window","Counting Window",100,NA
+"77","384.3B23A151B9","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-01 06:45:14,2016-10-01 07:39:32,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"78","384.3B23A151B9","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-03 19:54:52,2016-10-03 19:58:21,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"79","384.3B23A151B9","Observation","LMA - Lower Monumental Adult Ladders",2016-10-06 15:26:03,2016-10-06 15:26:05,"02","01","Left Ladder","Left Ladder",100,NA
+"80","384.3B23A151B9","Observation","GOA - Little Goose Fish Ladder",2016-10-08 22:00:35,2016-10-08 22:05:06,"02","01","Counting Window","Counting Window",100,NA
+"81","384.3B23A151B9","Observation","GRA - Lower Granite Dam Adult",2016-10-11 13:55:07,2016-10-12 09:23:30,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"82","384.3B23A1520B","Observation","BO2-BO3-BO4",2016-10-07 21:08:34,2016-10-08 05:54:13,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"83","384.3B23A1520B","Observation","The Dalles Adult Fishways (combined)",2016-10-09 14:46:05,2016-10-09 14:46:12,"02","01","Counting Window","Counting Window",100,NA
+"84","384.3B23A1520B","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-13 11:41:30,2016-10-13 12:42:52,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"85","384.3B23A1520B","Observation","LMA - Lower Monumental Adult Ladders",2016-10-17 11:58:41,2016-10-17 11:58:47,"04","03","Right Ladder","Right Ladder",100,NA
+"86","384.3B23A1520B","Observation","GOA - Little Goose Fish Ladder",2016-10-19 02:57:23,2016-10-19 02:57:27,"02","01","Counting Window","Counting Window",100,NA
+"87","384.3B23A1520B","Observation","GRA - Lower Granite Dam Adult",2016-10-20 07:43:04,2016-10-20 10:17:38,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"88","384.3B23A15B56","Observation","BO1 - Bonneville Bradford Is. Ladder",2014-05-11 09:17:56,2014-05-11 09:27:58,"02","04","VERTICAL SLOT DETECTORS","VERTICAL SLOT DETECTORS",110,NA
+"89","384.3B23A15B8E","Observation","BO2-BO3-BO4",2016-09-16 10:10:14,2016-09-16 13:23:51,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"90","384.3B23A15B8E","Observation","The Dalles Adult Fishways (combined)",2016-09-18 10:11:22,2016-09-18 10:11:25,"02","01","Counting Window","Counting Window",100,NA
+"91","384.3B23A15B8E","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-22 15:33:16,2016-09-22 16:52:37,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"92","384.3B23A15B8E","Observation","LMA - Lower Monumental Adult Ladders",2016-09-27 06:09:17,2016-09-27 06:09:23,"04","03","Right Ladder","Right Ladder",100,NA
+"93","384.3B23A15B8E","Observation","GOA - Little Goose Fish Ladder",2016-09-28 17:35:54,2016-09-29 07:46:38,"02","02","Counting Window","Counting Window",100,NA
+"94","384.3B23A15B8E","Observation","GRA - Lower Granite Dam Adult",2016-10-01 09:13:47,2016-10-01 14:07:01,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"95","384.3B23A15B8E","Observation","SC1 - Lower SF Clearwater R at rkm 1",2016-10-19 19:49:52,2016-10-20 20:58:22,"B6","B3","INSTREAM ARRAY","INSTREAM ARRAY",100,NA
+"96","384.3B23A15E7E","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-06 13:16:23,2016-09-06 14:18:15,"13","01","A-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"97","384.3B23A15E7E","Observation","The Dalles Adult Fishways (combined)",2016-09-08 14:12:02,2016-09-08 14:16:37,"02","01","Counting Window","Counting Window",100,NA
+"98","384.3B23A15EDB","Observation","BO2-BO3-BO4",2016-09-14 09:29:18,2016-09-14 12:14:27,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"99","384.3B23A15EDB","Observation","The Dalles Adult Fishways (combined)",2016-09-24 07:53:59,2016-09-24 07:59:38,"02","01","Counting Window","Counting Window",100,NA
+"100","384.3B23A15EDB","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-02 08:09:21,2016-10-02 09:53:58,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"101","384.3B23A15EDB","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-13 13:07:59,2016-10-13 13:10:09,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"102","384.3B23A15EDB","Observation","LMA - Lower Monumental Adult Ladders",2016-10-16 09:23:55,2016-10-16 09:31:42,"04","03","Right Ladder","Right Ladder",100,NA
+"103","384.3B23A15EDB","Observation","GOA - Little Goose Fish Ladder",2016-10-18 05:45:39,2016-10-18 05:51:20,"02","01","Counting Window","Counting Window",100,NA
+"104","384.3B23A15EDB","Observation","GRA - Lower Granite Dam Adult",2016-10-20 09:29:50,2016-10-20 13:48:27,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"105","384.3B23A15FCC","Observation","BO2-BO3-BO4",2016-09-01 14:52:17,2016-09-01 16:23:27,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"106","384.3B23A15FCC","Observation","The Dalles Adult Fishways (combined)",2016-09-15 00:55:58,2016-09-15 00:59:01,"02","01","Counting Window","Counting Window",100,NA
+"107","384.3B23A15FCC","Observation","MC2 - McNary Washington Shore Ladder",2016-09-18 06:29:30,2016-09-18 07:21:47,"12","01","WEIR 302","COUNTING WINDOW",120,NA
+"108","384.3B23A15FCC","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-09-20 05:32:59,2016-09-20 05:37:20,"07","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"109","384.3B23A15FCC","Observation","LMA - Lower Monumental Adult Ladders",2016-09-22 08:03:28,2016-09-22 08:03:36,"04","03","Right Ladder","Right Ladder",100,NA
+"110","384.3B23A15FCC","Observation","GOA - Little Goose Fish Ladder",2016-09-23 14:34:19,2016-09-23 14:34:21,"02","01","Counting Window","Counting Window",100,NA
+"111","384.3B23A15FCC","Observation","GRA - Lower Granite Dam Adult",2016-09-25 06:01:37,2016-09-26 03:06:41,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"112","384.3B23A15FF2","Observation","BO2-BO3-BO4",2015-07-28 11:17:01,2015-07-28 13:32:52,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"113","384.3B23A168C4","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-20 07:23:31,2016-09-20 08:35:12,"23","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"114","384.3B23A168C4","Observation","The Dalles Adult Fishways (combined)",2016-09-23 10:27:48,2016-09-23 10:27:50,"02","01","Counting Window","Counting Window",100,NA
+"115","384.3B23A168C4","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-29 07:20:35,2016-09-29 08:22:08,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"116","384.3B23A168C4","Observation","ICH1 - Ice Harbor Dam North Ladder",2016-10-01 15:37:54,2016-10-01 15:42:00,"10","09","RIGHT LADDER WEIR 435 [S/O]","RIGHT LADDER WEIR 438 [S/O]",110,NA
+"117","384.3B23A168C4","Observation","LMA - Lower Monumental Adult Ladders",2016-10-04 13:31:51,2016-10-04 13:31:53,"02","01","Left Ladder","Left Ladder",100,NA
+"118","384.3B23A168C4","Observation","GOA - Little Goose Fish Ladder",2016-10-05 23:33:49,2016-10-05 23:33:52,"02","01","Counting Window","Counting Window",100,NA
+"119","384.3B23A168C4","Observation","GRA - Lower Granite Dam Adult",2016-10-07 14:12:00,2016-10-08 09:41:43,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"120","384.3B23A1693B","Observation","BO2-BO3-BO4",2016-09-21 09:47:17,2016-09-21 11:20:14,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"121","384.3B23A1693B","Observation","The Dalles Adult Fishways (combined)",2016-09-25 10:20:06,2016-09-25 10:20:11,"02","01","Counting Window","Counting Window",100,NA
+"122","384.3B23A1693B","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-02 11:47:19,2016-10-02 13:26:34,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"123","384.3B23A1693B","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-05 09:17:37,2016-10-05 09:19:18,"08","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"124","384.3B23A1698A","Observation","BO2-BO3-BO4",2016-09-18 17:09:28,2016-09-18 18:27:30,"BO3-16","BO4-01","BO3-WEIR 35","BO4-VERTICAL SLOT DETECTORS",100,NA
+"125","384.3B23A1698A","Observation","The Dalles Adult Fishways (combined)",2016-09-22 03:13:42,2016-09-22 03:17:31,"02","01","Counting Window","Counting Window",100,NA
+"126","384.3B23A1698A","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-27 09:10:39,2016-09-27 10:32:49,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"127","384.3B23A16A18","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-07-30 15:03:37,2016-07-30 16:08:44,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"128","384.3B23A16A18","Observation","The Dalles Adult Fishways (combined)",2016-08-29 09:17:52,2016-08-29 09:17:57,"02","01","Counting Window","Counting Window",100,NA
+"129","384.3B23A16A18","Observation","DRM - Deschutes River mouth",2016-08-31 06:01:44,2016-08-31 06:01:44,"01","01","Upstream Array","Upstream Array",100,NA
+"130","384.3B23A16A18","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-04 00:11:06,2016-09-04 03:00:37,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"131","384.3B23A16A18","Observation","ICH1 - Ice Harbor Dam North Ladder",2016-09-05 13:42:58,2016-09-05 13:46:11,"10","0A","RIGHT LADDER WEIR 435 [S/O]","RIGHT LADDER WEIR 438 [S/O]",110,NA
+"132","384.3B23A16A18","Observation","LMA - Lower Monumental Adult Ladders",2016-09-06 13:12:40,2016-09-06 13:13:40,"04","03","Right Ladder","Right Ladder",100,NA
+"133","384.3B23A16A18","Observation","GOA - Little Goose Fish Ladder",2016-09-08 19:01:36,2016-09-09 06:42:55,"02","01","Counting Window","Counting Window",100,NA
+"134","384.3B23A16A18","Observation","GRA - Lower Granite Dam Adult",2016-09-10 12:32:39,2016-09-10 14:48:54,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"135","384.3B23A16A18","Observation","LC1 - Lower Lolo Creek at rkm 21",2016-11-24 08:24:34,2016-11-24 08:24:34,"B1","B1","SINGLE ARRAY","SINGLE ARRAY",100,NA
+"136","384.3B23A16B2A","Observation","BO2-BO3-BO4",2015-09-16 13:26:54,2015-09-16 15:00:28,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"137","384.3B23A16B2A","Observation","The Dalles Adult Fishways (combined)",2015-09-20 10:49:56,2015-09-20 10:52:53,"02","01","Counting Window","Counting Window",100,NA
+"138","384.3B23A16B2A","Observation","MC1 - McNary Oregon Shore Ladder",2015-10-26 13:15:36,2015-10-29 09:24:35,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"139","384.3B23A16B2A","Observation","ICH2 - Ice Harbor Dam South Ladder",2015-11-01 14:48:03,2015-11-01 14:57:59,"07","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",100,NA
+"140","384.3B23A16B2A","Observation","LMA - Lower Monumental Adult Ladders",2015-11-06 19:55:10,2015-11-07 05:36:51,"04","03","Right Ladder","Right Ladder",100,NA
+"141","384.3B23A16B2A","Observation","GOA - Little Goose Fish Ladder",2015-11-13 10:59:44,2015-11-13 11:22:54,"02","01","Counting Window","Counting Window",100,NA
+"142","384.3B23A16B83","Observation","BO2-BO3-BO4",2016-09-27 00:59:50,2016-09-27 06:10:41,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"143","384.3B23A16B83","Observation","The Dalles Adult Fishways (combined)",2016-09-28 22:45:05,2016-09-28 22:54:23,"02","01","Counting Window","Counting Window",100,NA
+"144","384.3B23A16B83","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-03 11:30:47,2016-10-03 12:45:49,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"145","384.3B23A16B83","Observation","LMA - Lower Monumental Adult Ladders",2016-10-07 10:23:42,2016-10-07 10:28:38,"04","03","Right Ladder","Right Ladder",100,NA
+"146","384.3B23A16B83","Observation","GOA - Little Goose Fish Ladder",2016-10-08 12:57:36,2016-10-08 12:57:39,"02","01","Counting Window","Counting Window",100,NA
+"147","384.3B23A16B83","Observation","GRA - Lower Granite Dam Adult",2016-10-10 04:30:00,2016-10-10 13:13:48,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"148","384.3B23A16C09","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-13 08:13:38,2016-09-13 09:07:23,"23","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"149","384.3B23A16C09","Observation","The Dalles Adult Fishways (combined)",2016-09-15 16:52:26,2016-09-15 16:53:27,"02","01","Counting Window","Counting Window",100,NA
+"150","384.3B23A16C09","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-19 22:22:15,2016-09-20 05:28:23,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"151","384.3B23A16C09","Observation","LMA - Lower Monumental Adult Ladders",2016-09-22 15:59:37,2016-09-22 16:01:24,"02","01","Left Ladder","Left Ladder",100,NA
+"152","384.3B23A16C09","Observation","GOA - Little Goose Fish Ladder",2016-09-23 14:17:50,2016-09-23 14:17:52,"02","01","Counting Window","Counting Window",100,NA
+"153","384.3B23A16C09","Observation","GRA - Lower Granite Dam Adult",2016-09-26 06:39:25,2016-09-26 09:26:11,"B4","A1","Ladder Entrance","Ladder Exit",150,NA
+"154","384.3B23A16C94","Observation","BO2-BO3-BO4",2016-09-11 06:49:57,2016-09-11 08:08:02,"BO3-11","BO4-01","BO3-WEIR 37","BO4-VERTICAL SLOT DETECTORS",100,NA
+"155","384.3B23A16C94","Observation","The Dalles Adult Fishways (combined)",2016-09-12 17:39:29,2016-09-12 17:40:06,"02","01","Counting Window","Counting Window",100,NA
+"156","384.3B23A16C94","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-16 05:52:05,2016-09-16 07:15:12,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"157","384.3B23A16C94","Observation","LMA - Lower Monumental Adult Ladders",2016-09-19 04:12:59,2016-09-19 04:13:07,"04","03","Right Ladder","Right Ladder",100,NA
+"158","384.3B23A16C94","Observation","GOA - Little Goose Fish Ladder",2016-09-20 07:21:29,2016-09-20 07:25:08,"02","01","Counting Window","Counting Window",100,NA
+"159","384.3B23A16C94","Observation","GRA - Lower Granite Dam Adult",2016-09-22 06:37:01,2016-09-22 11:10:42,"B2","A1","Ladder Entrance","Ladder Exit",150,NA
+"160","384.3B23A16CD7","Observation","BO2-BO3-BO4",2016-09-24 14:43:53,2016-09-24 15:55:53,"BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",100,NA
+"161","384.3B23A16CD7","Observation","The Dalles Adult Fishways (combined)",2016-09-26 15:01:46,2016-09-26 15:01:50,"02","01","Counting Window","Counting Window",100,NA
+"162","384.3B23A16CD7","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-30 12:26:10,2016-09-30 13:44:17,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"163","384.3B23A16CD7","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-02 05:34:10,2016-10-02 05:35:01,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"164","384.3B23A176DF","Observation","BO2-BO3-BO4",2016-09-03 15:00:50,2016-09-03 16:47:22,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"165","384.3B23A176DF","Observation","The Dalles Adult Fishways (combined)",2016-09-05 08:16:59,2016-09-05 08:20:47,"02","01","Counting Window","Counting Window",100,NA
+"166","384.3B23A176DF","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-09 00:17:53,2016-09-09 04:20:47,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"167","384.3B23A176DF","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-09-10 13:57:31,2016-09-10 14:00:10,"07","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"168","384.3B23A176DF","Observation","LMA - Lower Monumental Adult Ladders",2016-09-12 15:22:43,2016-09-12 15:22:46,"02","01","Left Ladder","Left Ladder",100,NA
+"169","384.3B23A176DF","Observation","GOA - Little Goose Fish Ladder",2016-09-13 15:35:20,2016-09-13 15:36:31,"02","01","Counting Window","Counting Window",100,NA
+"170","384.3B23A176DF","Observation","GRA - Lower Granite Dam Adult",2016-09-16 04:09:42,2016-09-16 10:39:57,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"171","384.3B23A17770","Observation","BO2-BO3-BO4",2016-10-03 17:47:28,2016-10-04 03:35:42,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"172","384.3B23A17770","Observation","The Dalles Adult Fishways (combined)",2016-10-06 17:48:29,2016-10-06 17:49:21,"02","01","Counting Window","Counting Window",100,NA
+"173","384.3B23A17770","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-13 06:48:20,2016-10-13 08:23:48,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"174","384.3B23A17770","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-16 09:57:27,2016-10-16 10:02:17,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"175","384.3B23A17770","Observation","LMA - Lower Monumental Adult Ladders",2016-10-18 14:33:37,2016-10-18 14:33:43,"04","03","Right Ladder","Right Ladder",100,NA
+"176","384.3B23A17770","Observation","GOA - Little Goose Fish Ladder",2016-10-22 09:30:08,2016-10-22 09:30:09,"02","01","Counting Window","Counting Window",100,NA
+"177","384.3B23A17770","Observation","GRA - Lower Granite Dam Adult",2016-10-25 13:43:52,2016-10-26 09:56:41,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"178","384.3B23A17F0A","Observation","BO2-BO3-BO4",2015-09-22 06:11:38,2015-09-22 08:02:50,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"179","384.3B23A17F0A","Observation","The Dalles Adult Fishways (combined)",2015-09-24 08:22:56,2015-09-24 08:25:17,"02","01","Counting Window","Counting Window",100,NA
+"180","384.3B23A17F0A","Observation","MC1 - McNary Oregon Shore Ladder",2015-09-27 08:05:50,2015-09-27 09:31:55,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"181","384.3B23A17F0A","Observation","LMA - Lower Monumental Adult Ladders",2015-09-30 10:23:19,2015-09-30 10:29:20,"04","03","Right Ladder","Right Ladder",100,NA
+"182","384.3B23A17F0A","Observation","GOA - Little Goose Fish Ladder",2015-10-01 10:56:27,2015-10-01 10:56:29,"02","01","Counting Window","Counting Window",100,NA
+"183","384.3B23A17F0A","Observation","GRA - Lower Granite Dam Adult",2015-10-03 06:35:30,2015-10-03 09:41:01,"26","02","ISO EAST","WEIR 733",140,NA
+"184","384.3B23A17F0A","Observation","SC1 - Lower SF Clearwater R at rkm 1",2016-02-12 22:22:19,2016-02-12 22:22:19,"B5","B5","INSTREAM ARRAY","INSTREAM ARRAY",100,NA
+"185","384.3B23A18060","Observation","BO1 - Bonneville Bradford Is. Ladder",2015-09-25 13:08:44,2015-09-25 13:49:19,"14","01","A-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"186","384.3B23A18060","Observation","The Dalles Adult Fishways (combined)",2015-09-27 09:27:47,2015-09-27 09:27:53,"02","01","Counting Window","Counting Window",100,NA
+"187","384.3B23A18060","Observation","MC1 - McNary Oregon Shore Ladder",2015-09-30 16:06:37,2015-09-30 17:04:48,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"188","384.3B23A18060","Observation","LMA - Lower Monumental Adult Ladders",2015-10-04 05:16:16,2015-10-04 05:30:14,"04","03","Right Ladder","Right Ladder",100,NA
+"189","384.3B23A18060","Observation","GOA - Little Goose Fish Ladder",2015-10-05 14:54:16,2015-10-05 14:58:09,"02","01","Counting Window","Counting Window",100,NA
+"190","384.3B23A18060","Observation","GRA - Lower Granite Dam Adult",2015-10-07 18:17:36,2015-10-08 08:24:56,"18","02","ISO WEST","WEIR 733",140,NA
+"191","384.3B23A18060","Observation","DWL - Dworshak NFH adult trap",2015-10-14 10:41:11,2015-10-14 10:41:12,"A1","A2","UPSTREAM ANTENNA","DOWNSTREAM ANTENNA",100,NA
+"192","384.3B23A18060","Observation","DWL - Dworshak NFH adult trap",2015-10-23 08:11:49,2015-10-23 08:11:50,"A1","A2","UPSTREAM ANTENNA","DOWNSTREAM ANTENNA",100,NA
+"193","384.3B23A18060","Observation","DWL - Dworshak NFH adult trap",2015-10-28 10:07:33,2015-10-28 10:07:34,"A1","A2","UPSTREAM ANTENNA","DOWNSTREAM ANTENNA",100,NA
+"194","384.3B23A18071","Observation","BO2-BO3-BO4",2015-10-07 10:41:55,2015-10-07 12:26:48,"BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",100,NA
+"195","384.3B23A18071","Observation","The Dalles Adult Fishways (combined)",2015-10-09 10:52:19,2015-10-09 10:52:23,"02","01","Counting Window","Counting Window",100,NA
+"196","384.3B23A18071","Observation","MC2 - McNary Washington Shore Ladder",2015-10-14 07:15:29,2015-10-14 08:03:46,"13","01","WEIR 302","COUNTING WINDOW",120,NA
+"197","384.3B23A18071","Observation","ICH1 - Ice Harbor Dam North Ladder",2015-10-16 06:29:22,2015-10-16 07:10:17,"0F","0A","RIGHT LADDER WEIR 435 [S/O]","RIGHT LADDER WEIR 438 [S/O]",100,NA
+"198","384.3B23A18071","Observation","LMA - Lower Monumental Adult Ladders",2015-10-17 16:45:23,2015-10-17 16:53:31,"04","03","Right Ladder","Right Ladder",100,NA
+"199","384.3B23A18071","Observation","GOA - Little Goose Fish Ladder",2015-10-19 22:42:51,2015-10-19 22:42:55,"02","01","Counting Window","Counting Window",100,NA
+"200","384.3B23A18071","Observation","GRA - Lower Granite Dam Adult",2015-10-22 15:07:26,2015-10-23 10:35:18,"12","01","ISO WEST","WEIR 733",140,NA
+"201","384.3B23A18071","Observation","SC1 - Lower SF Clearwater R at rkm 1",2016-02-14 18:54:16,2016-02-14 19:55:19,"B6","B6","INSTREAM ARRAY","INSTREAM ARRAY",100,NA
+"202","384.3B23A18144","Observation","BO2-BO3-BO4",2016-09-24 07:49:58,2016-09-24 08:52:38,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"203","384.3B23A18144","Observation","The Dalles Adult Fishways (combined)",2016-09-26 09:45:24,2016-09-26 09:45:34,"02","01","Counting Window","Counting Window",100,NA
+"204","384.3B23A18144","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-02 10:11:45,2016-10-02 11:44:52,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"205","384.3B23A18144","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-05 06:13:52,2016-10-05 06:16:52,"07","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"206","384.3B23A18144","Observation","LMA - Lower Monumental Adult Ladders",2016-10-09 08:22:39,2016-10-09 08:26:48,"04","03","Right Ladder","Right Ladder",100,NA
+"207","384.3B23A18144","Observation","GOA - Little Goose Fish Ladder",2016-10-11 15:25:00,2016-10-11 15:25:02,"02","01","Counting Window","Counting Window",100,NA
+"208","384.3B23A18144","Observation","GRA - Lower Granite Dam Adult",2016-10-14 07:44:27,2016-10-15 08:47:15,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"209","384.3B23A18643","Observation","BO2-BO3-BO4",2016-09-27 11:12:27,2016-09-27 12:19:36,"BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",100,NA
+"210","384.3B23A18643","Observation","The Dalles Adult Fishways (combined)",2016-09-29 11:56:00,2016-09-29 11:56:06,"02","01","Counting Window","Counting Window",100,NA
+"211","384.3B23A18643","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-04 10:48:54,2016-10-04 12:03:51,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"212","384.3B23A18643","Observation","ICH2 - Ice Harbor Dam South Ladder",2016-10-07 09:16:43,2016-10-07 09:22:36,"07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"213","384.3B23A18643","Observation","LMA - Lower Monumental Adult Ladders",2016-10-17 12:42:26,2016-10-17 12:42:33,"04","03","Right Ladder","Right Ladder",100,NA
+"214","384.3B23A18643","Observation","GOA - Little Goose Fish Ladder",2016-10-19 13:46:16,2016-10-19 13:46:18,"02","01","Counting Window","Counting Window",100,NA
+"215","384.3B23A18643","Observation","GRA - Lower Granite Dam Adult",2016-10-23 20:36:16,2016-10-24 13:22:31,"22","A1","ISO EAST","Ladder Exit",150,NA
+"216","384.3B23A1883C","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-26 14:07:20,2016-09-26 14:56:38,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"217","384.3B23A1883C","Observation","The Dalles Adult Fishways (combined)",2016-09-28 10:11:44,2016-09-28 10:11:46,"02","01","Counting Window","Counting Window",100,NA
+"218","384.3B23A1883C","Observation","MC1 - McNary Oregon Shore Ladder",2016-10-02 06:45:13,2016-10-02 07:56:55,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"219","384.3B23A1883C","Observation","LMA - Lower Monumental Adult Ladders",2016-10-04 19:29:31,2016-10-04 19:29:32,"02","01","Left Ladder","Left Ladder",100,NA
+"220","384.3B23A1883C","Observation","GOA - Little Goose Fish Ladder",2016-10-07 06:14:46,2016-10-07 06:14:47,"02","01","Counting Window","Counting Window",100,NA
+"221","384.3B23A1883C","Observation","GRA - Lower Granite Dam Adult",2016-10-08 09:40:58,2016-10-08 11:34:59,"12","A1","ISO WEST","Ladder Exit",150,NA
+"222","384.3B23A19029","Observation","BO1 - Bonneville Bradford Is. Ladder",2015-07-26 06:20:51,2015-07-26 07:33:41,"13","01","A-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"223","384.3B23A19029","Observation","The Dalles Adult Fishways (combined)",2015-07-28 15:52:34,2015-07-28 15:52:38,"02","01","Counting Window","Counting Window",100,NA
+"224","384.3B23A19029","Observation","MC1 - McNary Oregon Shore Ladder",2015-08-02 06:25:09,2015-08-02 08:17:30,"11","01","WEIR 279","COUNTING WINDOW",100,NA
+"225","384.3B23A19029","Observation","LMA - Lower Monumental Adult Ladders",2015-08-05 16:24:52,2015-08-05 16:24:56,"04","03","Right Ladder","Right Ladder",100,NA
+"226","384.3B23A19029","Observation","GOA - Little Goose Fish Ladder",2015-08-07 09:02:27,2015-08-07 09:02:28,"02","01","Counting Window","Counting Window",100,NA
+"227","384.3B23A19029","Observation","GRA - Lower Granite Dam Adult",2015-08-12 07:09:20,2015-08-14 10:42:51,"12","02","ISO WEST","WEIR 733",140,NA
+"228","384.3B23A1904E","Observation","BO1 - Bonneville Bradford Is. Ladder",2016-09-10 17:26:33,2016-09-10 18:16:31,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"229","384.3B23A1904E","Observation","The Dalles Adult Fishways (combined)",2016-09-16 08:19:49,2016-09-16 08:19:54,"02","01","Counting Window","Counting Window",100,NA
+"230","384.3B23A1904E","Observation","MC1 - McNary Oregon Shore Ladder",2016-09-22 05:31:55,2016-09-22 06:42:42,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"231","384.3B23A1904E","Observation","LMA - Lower Monumental Adult Ladders",2016-09-25 12:32:15,2016-09-25 12:32:20,"04","03","Right Ladder","Right Ladder",100,NA
+"232","384.3B23A1904E","Observation","GOA - Little Goose Fish Ladder",2016-09-27 18:06:56,2016-09-28 06:43:56,"02","01","Counting Window","Counting Window",100,NA
+"233","384.3B23A1904E","Observation","GRA - Lower Granite Dam Adult",2016-09-30 06:21:06,2016-09-30 08:15:42,"B3","A1","Ladder Entrance","Ladder Exit",150,NA
+"234","384.3B23A1904E","Observation","USE - Upper Salmon River at rkm 437",2017-03-16 23:47:14,2017-03-16 23:47:14,"B6","B6","ARRAY","ARRAY",100,NA
+"235","384.3B23A1912E","Observation","BO1 - Bonneville Bradford Is. Ladder",2015-08-02 08:36:21,2015-08-02 09:49:09,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"236","384.3B23A1912E","Observation","The Dalles Adult Fishways (combined)",2015-09-11 18:24:40,2015-09-11 18:24:47,"02","01","Counting Window","Counting Window",100,NA
+"237","384.3B23A1913D","Observation","BO1 - Bonneville Bradford Is. Ladder",2015-09-02 12:17:19,2015-09-02 13:27:00,"24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"238","384.3B23A1913D","Observation","The Dalles Adult Fishways (combined)",2015-09-04 10:07:16,2015-09-04 10:07:20,"02","01","Counting Window","Counting Window",100,NA
+"239","384.3B23A1913D","Observation","MC1 - McNary Oregon Shore Ladder",2015-09-08 05:56:37,2015-09-08 07:12:26,"12","01","WEIR 279","COUNTING WINDOW",100,NA
+"240","384.3B23A1913D","Observation","LMA - Lower Monumental Adult Ladders",2015-09-12 07:14:17,2015-09-12 07:17:17,"02","02","Left Ladder","Left Ladder",100,NA
+"241","384.3B23A1913D","Observation","GOA - Little Goose Fish Ladder",2015-09-14 06:04:56,2015-09-14 06:04:57,"02","01","Counting Window","Counting Window",100,NA
+"242","384.3B23A1913D","Observation","GRA - Lower Granite Dam Adult",2015-09-16 10:05:52,2015-09-16 11:04:07,"18","01","ISO WEST","WEIR 733",140,NA
+"243","384.3B23A1913D","Observation","USE - Upper Salmon River at rkm 437",2016-04-03 13:07:21,2016-04-03 13:07:26,"B5","B4","ARRAY","ARRAY",100,NA
+"244","384.3B23A1916C","Observation","BO2-BO3-BO4",2014-09-04 10:45:20,2014-09-04 12:17:24,"BO3-18","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
+"245","384.3B23A1916C","Observation","The Dalles Adult Fishways (combined)",2014-09-07 10:30:22,2014-09-07 10:30:25,"02","01","Counting Window","Counting Window",100,NA
+"246","384.3B23A1916C","Observation","MC2 - McNary Washington Shore Ladder",2014-09-11 18:40:35,2014-09-12 05:02:50,"13","01","WEIR 302","COUNTING WINDOW",120,NA
+"247","384.3B23A1916C","Observation","ICH2 - Ice Harbor Dam South Ladder",2014-09-16 10:28:36,2014-09-16 10:38:17,"07","02","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",100,NA
+"248","384.3B23A1916C","Observation","LMA - Lower Monumental Adult Ladders",2014-09-20 14:23:15,2014-09-20 14:23:28,"02","01","Left Ladder","Left Ladder",100,NA
+"249","384.3B23A1916C","Observation","GOA - Little Goose Fish Ladder",2014-09-23 14:25:11,2014-09-23 14:25:12,"01","01","Counting Window","Counting Window",100,NA
+"250","384.3B23A1916C","Observation","GOA - Little Goose Fish Ladder",2014-10-01 06:41:17,2014-10-01 06:41:18,"02","01","Counting Window","Counting Window",100,NA
+"251","384.3B23A19532","Observation","BO1 - Bonneville Bradford Is. Ladder",2014-08-15 17:23:50,2014-08-16 08:16:23,"23","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA
+"252","384.3B23A19532","Observation","The Dalles Adult Fishways (combined)",2014-09-07 06:35:38,2014-09-07 06:37:59,"02","01","Counting Window","Counting Window",100,NA
+"253","384.3B23A19532","Observation","MC2 - McNary Washington Shore Ladder",2014-09-11 17:50:13,2014-09-12 03:18:41,"13","02","WEIR 302","COUNTING WINDOW",120,NA
+"254","384.3B23A19532","Observation","LMA - Lower Monumental Adult Ladders",2014-09-16 12:23:26,2014-09-16 12:23:37,"02","01","Left Ladder","Left Ladder",100,NA
+"255","384.3B23A19532","Observation","GOA - Little Goose Fish Ladder",2014-09-18 07:04:21,2014-09-18 07:04:23,"02","01","Counting Window","Counting Window",100,NA
+"256","384.3B23A19532","Observation","GRA - Lower Granite Dam Adult",2014-09-20 16:05:01,2014-09-20 17:50:59,"12","02","ISO WEST","WEIR 733",140,NA
+"257","384.3B23A19532","Observation","IR1 - Lower Imnaha River ISA @ km 7",2015-04-01 16:29:33,2015-04-01 16:29:38,"B4","B3","STREAM BANK RIGHT","STREAM CENTER RIGHT",100,NA
+"258","384.3B23A19532","Observation","IR2 - Lower Imnaha River ISA @ km 10",2015-04-02 15:23:46,2015-04-02 15:24:05,"A4","A3","STREAM CENTER RIGHT","STREAM CENTER",100,NA
+"259","384.3B23A19532","Observation","BSC - Big Sheep Creek ISA at km 6",2015-04-22 03:03:33,2015-04-22 03:03:33,"A3","A3","DOWNSTREAM LEFT","DOWNSTREAM LEFT",100,NA
+"260","384.3B23A19585","Observation","BO2-BO3-BO4",2016-07-31 14:15:14,2016-08-01 05:31:40,"BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
