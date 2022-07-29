@@ -8,30 +8,196 @@ library(janitor)
 # For testing - setwd
 # setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-07-27_det_hist/CTH12-14/")
 
-##### All tributaries #####
+##### Store the antenna configurations #####
+
+BO1_110_upper <- c("01", "02", "03", "04")
+
+BO1_110_lower <- c("05", "06", "07", "08", "09", "0A",
+                   "0B", "0C", "0D", "0E", "0F", "10",
+                   "11", "12", "13", "14",
+                   "15", "16", "17", "18", "19", 
+                   "1A","1B", "1C", "1D", "1E", "1F",
+                   "20", "21", "22", "23", "24")
+
+BO1_120_upper <- c("01", "02", "03", "04")
+
+BO1_120_lower <- c("05", "06", "07", "08", "09", "0A",
+                   "0B", "0C", "0D", "0E", "0F", "10",
+                   "11", "12", "13", "14",
+                   "15", "16", "17", "18", "19", 
+                   "1A","1B", "1C", "1D", "1E", "1F",
+                   "20", "21", "22", "23", "24")
+
+BO3_lower <- as.character(c(11, 12, 13, 14, 15, 16, 17, 18))
+
+BO3_upper <- c("01", "02", "03", "04", "05", "06", "07", "08" , "09", "0A",
+               "0B", "0C", "0D", "0E", "0F", 10)
+
+BO3_AFF <- as.character(c(22, 24, 26, 28, 32, 34, 36, 38))
+
+MC1_upper <- c("01", "02")
+MC1_lower <- c("03", "04", "05", "06", "07", "08", "09",
+               "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12)
+MC1_entrance <- c("0D", "0E", "0F", 10, 11, 12)
+
+MC2_120_upper <- c("01", "02", "03")
+MC2_120_lower <- c("04", "05", "06", "07", "08", "09",
+                   "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12, 13)
+MC2_120_entrance <- c("0E", "0F", 10, 11, 12, 13)
+
+PRA_100_east <- c("01", "02", "03", "04")
+PRA_100_west <- c("05", "06", "07", "08")
+
+PRA_110_east <- c("01", "02", "03", "04")
+PRA_110_west <- c("05", "06", "07", "08")
+PRA_110_AFF <- c("A1", "A2", "A3")
+
+RIA_100_left <- c("01", "02", "03", "04")
+RIA_100_middle <- c("05", "06", "07", "08")
+RIA_100_right <- c("09", "0A", "0B", "0C")
+
+RIA_110_left <- c("01", "02", "03", "04")
+RIA_110_middle <- c("05", "06", "07", "08")
+RIA_110_right <- c("09", "0A", "0B", "0C", "A1")
+
+RIA_120_left <- c("01", "02", "03", "04")
+RIA_120_middle <- c("05", "06", "07", "08")
+RIA_120_right <- c("09", "0A", "0B")
+
+RIA_130_left <- c("01", "02", "03", "04")
+RIA_130_middle <- c("05", "06", "07", "08")
+RIA_130_right <- c("09", "0A", "0B", "2C", "2D")
+
+RIA_140_left <- c("01", "02", "03", "04")
+RIA_140_middle <- c("05", "06", "07", "08")
+RIA_140_right <- c("09", "0A", "0B", "2A", "2B", "2C", "2D",
+                   31, 32, 33, 34, 35, 36, 37, 38)
+
+RRF_100 <- c("01", "02", "03", "04")
+
+RRF_110 <- c("A1", "A2", "A3", "A4")
+RRF_110_trap <- c("A0")
+
+WEA_110_left <- c("01", "02", "03", "04")
+WEA_110_right <- c("05", "06", "07", "08")
+WEA_110_left_trap <- c("09", "0A")
+WEA_110_right_trap <- c("0B", "0C")
+
+WEA_120_left <- c("01", "02", "03", "04")
+WEA_120_right <- c("05", "06", "07", "08")
+WEA_120_left_trap <- c("09", "0A")
+WEA_120_right_trap <- c("B1", "B2", "B3")
+
+WEA_130_left_upper <- c("01", "02", "03", "04")
+WEA_130_right_upper <- c("05", "06", "07", "08")
+WEA_130_right_lower <- c("F3", "F4")
+WEA_130_left_trap <- c("09", "0A")
+WEA_130_right_trap <- c("B1", "B2", "B3")
+
+WEA_140_left_upper <- c("01", "02", "03", "04")
+WEA_140_left_lower <- c("F1", "F2")
+WEA_140_right_upper <- c("05", "06", "07", "08")
+WEA_140_right_lower <- c("F3", "F4")
+WEA_140_left_trap <- c("09", "0A")
+WEA_140_right_trap <- c("B1", "B2", "B3")
+
+WEA_150_left_upper <- c("01", "02", "03", "04")
+WEA_150_left_lower <- c("A1", "A2")
+WEA_150_right_upper <- c("05", "06", "07", "08")
+WEA_150_right_lower <- c("A3", "A4")
+WEA_150_left_trap <- c("09", "0A")
+WEA_150_right_trap <- c("B1", "B2", "B3")
+
+WEA_160_left_upper <- c("01", "02", "03", "04")
+WEA_160_left_lower <- c("A1", "A2")
+WEA_160_right_upper <- c("05", "06", "07", "08")
+WEA_160_right_lower <- c("A3", "A4")
+WEA_160_left_trap <- c("09", "0A")
+WEA_160_right_trap <- c("B1", "B2", "B3")
+WEA_160_right_AFF <- c("C1", "C2")
+
+WEA_170_left_upper <- c("01", "02", "03", "04")
+WEA_170_left_lower <- c("A1", "A2")
+WEA_170_right_upper <- c("05", "06", "07", "08")
+WEA_170_right_lower <- c("A3", "A4")
+WEA_170_left_trap <- c("09", "0A")
+WEA_170_right_trap <- c("B1", "B2", "B3")
+
+ICH_100_north_ladder <- c("09", "0A", "0B", "0C", "0D", "0E", "0F", "10")
+ICH_100_south_ladder <- c("01", "02", "03", "04", "05", "06", "07", "08")
+ICH_100_bypass <- c("A1", "A2", "A3", "A4")
+
+ICH_110_north_ladder <- c("09", "0A", "0B", "0C", "0D", "0E", "0F", "10")
+ICH_110_south_ladder <- c("01", "02", "03", "04", "05", "06", "07", "08")
+ICH_110_bypass <- c("A1", "A2", "A3", "A4")
 
 
-### Load complete detection history files
-CTH_12 <- clean_names(read.csv("CTH_tag_codes_1.csv"))
-CTH_13 <- clean_names(read.csv("CTH_tag_codes_2.csv"))
-CTH_14 <- clean_names(read.csv("CTH_tag_codes_3.csv"))
-# CTH_4 <- clean_names(read.csv("CTH_tag_codes_4.csv"))
+ICH_110_south_trap <- c("F1")
+
+GRA_140_lower <- as.character(c(12, 14, 16, 18, 22, 24, 26, 28))
+GRA_140_upper <- c("01", "02", "03", "04", "05", "06", "07", "08")
+
+GRA_150_entrance <- c("B1", "B2", "B3", "B4")
+GRA_150_lower <- as.character(c(12, 14, 16, 18, 22, 24, 26, 28))
+GRA_150_upper <- c("01", "02", "03", "04", "05", "06", "07", "08")
+GRA_150_exit <- c("A1", "A2")
+
+# concatenate some of them
+
+RIA_left <- c(RIA_100_left, RIA_110_left, RIA_120_left,
+              RIA_130_left, RIA_140_left)
+RIA_middle <- c(RIA_100_middle, RIA_110_middle, RIA_120_middle,
+                RIA_130_middle, RIA_140_middle)
+RIA_right <- c(RIA_100_right, RIA_110_right, RIA_120_right,
+               RIA_130_right, RIA_140_right)
+
+WEL_left <- c(WEA_110_left, WEA_110_left_trap,
+              WEA_120_left, WEA_120_left_trap,
+              WEA_130_left_upper, WEA_130_left_trap,
+              WEA_140_left_upper, WEA_140_left_lower, WEA_140_left_trap,
+              WEA_150_left_upper, WEA_150_left_lower, WEA_150_left_trap,
+              WEA_160_left_upper, WEA_160_left_lower, WEA_160_left_trap,
+              WEA_170_left_upper, WEA_170_left_lower, WEA_170_left_trap)
+
+WEL_right <- c(WEA_110_right, WEA_110_right_trap,
+               WEA_120_right, WEA_120_right_trap,
+               WEA_130_right_upper, WEA_130_right_lower, WEA_130_right_trap,
+               WEA_140_right_upper, WEA_140_right_lower, WEA_140_right_trap,
+               WEA_150_right_upper, WEA_150_right_lower, WEA_150_right_trap,
+               WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap,
+               WEA_170_right_upper, WEA_170_right_lower, WEA_170_right_trap)
+
+WEA_traps <- unique(c(WEA_110_left_trap, WEA_120_left_trap, WEA_130_left_trap, 
+                      WEA_140_left_trap, WEA_150_left_trap, WEA_160_left_trap, WEA_170_left_trap,
+                      WEA_110_right_trap, WEA_120_right_trap, WEA_130_right_trap, 
+                      WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_170_right_trap))
+
+
+
+
+
+##### Load complete detection history files #####
+CTH_12 <- clean_names(read.csv("2022-07-28-CTH12.csv"))
+CTH_13 <- clean_names(read.csv("2022-07-28-CTH13.csv"))
+CTH_14 <- clean_names(read.csv("2022-07-28-CTH14.csv"))
+# CTH_5 <- clean_names(read.csv("CTH_tag_codes_5.csv"))
+# CTH_6 <- clean_names(read.csv("CTH_tag_codes_6.csv"))
+# CTH_7 <- clean_names(read.csv("CTH_tag_codes_7.csv"))
+# CTH_8 <- clean_names(read.csv("CTH_tag_codes_8.csv"))
+# CTH_9 <- clean_names(read.csv("CTH_tag_codes_9.csv"))
+# CTH_10 <- clean_names(read.csv("CTH_tag_codes_10.csv"))
+# CTH_11 <- clean_names(read.csv("CTH_tag_codes_11.csv"))
+# CTH_12 <- clean_names(read.csv("CTH_tag_codes_12.csv"))
+# CTH_13 <- clean_names(read.csv("CTH_tag_codes_13.csv"))
+# CTH_14 <- clean_names(read.csv("CTH_tag_codes_14.csv"))
 
 
 ### Combine files, fix some column data types, rename some columns with long names
-CTH_12 %>% 
-  # dplyr::select(-event_site_subbasin_code) %>% 
-  bind_rows(., dplyr::select(CTH_13, -event_site_subbasin_code)) %>% 
-  bind_rows(., dplyr::select(CTH_14, -event_site_subbasin_code)) %>% 
-  mutate(event_date_time_value = mdy_hms(event_date_time_value)) %>% 
+CTH_12 %>%
+  bind_rows(., CTH_13) %>% 
+  bind_rows(., CTH_14) %>% 
+  mutate(event_date_time_value = mdy_hms(event_date_time_value)) %>%
   dplyr::rename(ant_config = antenna_group_configuration_value) -> CTH_complete
-
-# FOR TESTING - read in just the first file
-# CTH_1 <- clean_names(read.csv(here::here("PTAGIS_queries", "complete_tag_histories", "antenna_info", "2022-07-25-CTH1.csv")))
-# CTH_1 %>% 
-#   mutate(event_date_time_value = mdy_hms(event_date_time_value)) %>% 
-#   dplyr::rename(ant_config = antenna_group_configuration_value) -> CTH_complete
-
 
 # Remove the Klickitat and Wind Rivers
 origin_table <- read.csv("natal_origin_table.csv")
@@ -183,168 +349,6 @@ PRA_arrays <- c("PRA - Priest Rapids Adult", "PRD - Priest Rapids Dam",
                 "PRDLD1 - PRD - Release into the Left Bank (facing downstream) Adult Fish Ladder")
 
 
-##### Store the antenna configurations #####
-
-BO1_110_upper <- c("01", "02", "03", "04")
-
-BO1_110_lower <- c("05", "06", "07", "08", "09", "0A",
-                   "0B", "0C", "0D", "0E", "0F", "10",
-                   "11", "12", "13", "14",
-                   "15", "16", "17", "18", "19", 
-                   "1A","1B", "1C", "1D", "1E", "1F",
-                   "20", "21", "22", "23", "24")
-
-BO1_120_upper <- c("01", "02", "03", "04")
-
-BO1_120_lower <- c("05", "06", "07", "08", "09", "0A",
-                   "0B", "0C", "0D", "0E", "0F", "10",
-                   "11", "12", "13", "14",
-                   "15", "16", "17", "18", "19", 
-                   "1A","1B", "1C", "1D", "1E", "1F",
-                   "20", "21", "22", "23", "24")
-
-BO3_lower <- as.character(c(11, 12, 13, 14, 15, 16, 17, 18))
-
-BO3_upper <- c("01", "02", "03", "04", "05", "06", "07", "08" , "09", "0A",
-               "0B", "0C", "0D", "0E", "0F", 10)
-
-BO3_AFF <- as.character(c(22, 24, 26, 28, 32, 34, 36, 38))
-
-MC1_upper <- c("01", "02")
-MC1_lower <- c("03", "04", "05", "06", "07", "08", "09",
-               "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12)
-
-MC2_120_upper <- c("01", "02", "03")
-MC2_120_lower <- c("04", "05", "06", "07", "08", "09",
-                   "0A", "0B", "0C", "0D", "0E", "0F", 10, 11, 12, 13)
-
-PRA_100_east <- c("01", "02", "03", "04")
-PRA_100_west <- c("05", "06", "07", "08")
-
-PRA_110_east <- c("01", "02", "03", "04")
-PRA_110_west <- c("05", "06", "07", "08")
-PRA_110_AFF <- c("A1", "A2", "A3")
-
-RIA_100_left <- c("01", "02", "03", "04")
-RIA_100_middle <- c("05", "06", "07", "08")
-RIA_100_right <- c("09", "0A", "0B", "0C")
-
-RIA_110_left <- c("01", "02", "03", "04")
-RIA_110_middle <- c("05", "06", "07", "08")
-RIA_110_right <- c("09", "0A", "0B", "0C", "A1")
-
-RIA_120_left <- c("01", "02", "03", "04")
-RIA_120_middle <- c("05", "06", "07", "08")
-RIA_120_right <- c("09", "0A", "0B")
-
-RIA_130_left <- c("01", "02", "03", "04")
-RIA_130_middle <- c("05", "06", "07", "08")
-RIA_130_right <- c("09", "0A", "0B", "2C", "2D")
-
-RIA_140_left <- c("01", "02", "03", "04")
-RIA_140_middle <- c("05", "06", "07", "08")
-RIA_140_right <- c("09", "0A", "0B", "2A", "2B", "2C", "2D",
-                   31, 32, 33, 34, 35, 36, 37, 38)
-
-RRF_100 <- c("01", "02", "03", "04")
-
-RRF_110 <- c("A1", "A2", "A3", "A4")
-RRF_110_trap <- c("A0")
-
-WEA_110_left <- c("01", "02", "03", "04")
-WEA_110_right <- c("05", "06", "07", "08")
-WEA_110_left_trap <- c("09", "0A")
-WEA_110_right_trap <- c("0B", "0C")
-
-WEA_120_left <- c("01", "02", "03", "04")
-WEA_120_right <- c("05", "06", "07", "08")
-WEA_120_left_trap <- c("09", "0A")
-WEA_120_right_trap <- c("B1", "B2", "B3")
-
-WEA_130_left_upper <- c("01", "02", "03", "04")
-WEA_130_right_upper <- c("05", "06", "07", "08")
-WEA_130_right_lower <- c("F3", "F4")
-WEA_130_left_trap <- c("09", "0A")
-WEA_130_right_trap <- c("B1", "B2", "B3")
-
-WEA_140_left_upper <- c("01", "02", "03", "04")
-WEA_140_left_lower <- c("F1", "F2")
-WEA_140_right_upper <- c("05", "06", "07", "08")
-WEA_140_right_lower <- c("F3", "F4")
-WEA_140_left_trap <- c("09", "0A")
-WEA_140_right_trap <- c("B1", "B2", "B3")
-
-WEA_150_left_upper <- c("01", "02", "03", "04")
-WEA_150_left_lower <- c("A1", "A2")
-WEA_150_right_upper <- c("05", "06", "07", "08")
-WEA_150_right_lower <- c("A3", "A4")
-WEA_150_left_trap <- c("09", "0A")
-WEA_150_right_trap <- c("B1", "B2", "B3")
-
-WEA_160_left_upper <- c("01", "02", "03", "04")
-WEA_160_left_lower <- c("A1", "A2")
-WEA_160_right_upper <- c("05", "06", "07", "08")
-WEA_160_right_lower <- c("A3", "A4")
-WEA_160_left_trap <- c("09", "0A")
-WEA_160_right_trap <- c("B1", "B2", "B3")
-WEA_160_right_AFF <- c("C1", "C2")
-
-WEA_170_left_upper <- c("01", "02", "03", "04")
-WEA_170_left_lower <- c("A1", "A2")
-WEA_170_right_upper <- c("05", "06", "07", "08")
-WEA_170_right_lower <- c("A3", "A4")
-WEA_170_left_trap <- c("09", "0A")
-WEA_170_right_trap <- c("B1", "B2", "B3")
-
-ICH_100_north_ladder <- c("09", "0A", "0B", "0C", "0D", "0E", "0F", "10")
-ICH_100_south_ladder <- c("01", "02", "03", "04", "05", "06", "07", "08")
-ICH_100_bypass <- c("A1", "A2", "A3", "A4")
-
-ICH_110_north_ladder <- c("09", "0A", "0B", "0C", "0D", "0E", "0F", "10")
-ICH_110_south_ladder <- c("01", "02", "03", "04", "05", "06", "07", "08")
-ICH_110_bypass <- c("A1", "A2", "A3", "A4")
-
-ICH_110_south_trap <- c("F1")
-
-GRA_140_lower <- as.character(c(12, 14, 16, 18, 22, 24, 26, 28))
-GRA_140_upper <- c("01", "02", "03", "04", "05", "06", "07", "08")
-
-GRA_150_entrance <- c("B1", "B2", "B3", "B4")
-GRA_150_lower <- as.character(c(12, 14, 16, 18, 22, 24, 26, 28))
-GRA_150_upper <- c("01", "02", "03", "04", "05", "06", "07", "08")
-GRA_150_exit <- c("A1", "A2")
-
-# concatenate some of them
-
-RIA_left <- c(RIA_100_left, RIA_110_left, RIA_120_left,
-              RIA_130_left, RIA_140_left)
-RIA_middle <- c(RIA_100_middle, RIA_110_middle, RIA_120_middle,
-                RIA_130_middle, RIA_140_middle)
-RIA_right <- c(RIA_100_right, RIA_110_right, RIA_120_right,
-               RIA_130_right, RIA_140_right)
-
-WEL_left <- c(WEA_110_left, WEA_110_left_trap,
-              WEA_120_left, WEA_120_left_trap,
-              WEA_130_left_upper, WEA_130_left_trap,
-              WEA_140_left_upper, WEA_140_left_lower, WEA_140_left_trap,
-              WEA_150_left_upper, WEA_150_left_lower, WEA_150_left_trap,
-              WEA_160_left_upper, WEA_160_left_lower, WEA_160_left_trap,
-              WEA_170_left_upper, WEA_170_left_lower, WEA_170_left_trap)
-
-WEL_right <- c(WEA_110_right, WEA_110_right_trap,
-              WEA_120_right, WEA_120_right_trap,
-              WEA_130_right_upper, WEA_130_right_lower, WEA_130_right_trap,
-              WEA_140_right_upper, WEA_140_right_lower, WEA_140_right_trap,
-              WEA_150_right_upper, WEA_150_right_lower, WEA_150_right_trap,
-              WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap,
-              WEA_170_right_upper, WEA_170_right_lower, WEA_170_right_trap)
-
-WEA_traps <- unique(c(WEA_110_left_trap, WEA_120_left_trap, WEA_130_left_trap, 
-               WEA_140_left_trap, WEA_150_left_trap, WEA_160_left_trap, WEA_170_left_trap,
-               WEA_110_right_trap, WEA_120_right_trap, WEA_130_right_trap, 
-               WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_170_right_trap))
-
-
 ##### Convert complete tag histories into history of detection events #####
 
 
@@ -446,7 +450,7 @@ det_hist <- data.frame(tag_code = character(), event_type_name = character(), ev
 # Loop through the unique tags
 for (i in 1:length(unique_tag_IDs)){
 # Need to run the loop for longer to actual get observations at certain dams
-# for (i in 4400:4500){
+# for (i in 2000:2200){
   # Get the start time
   if (i == 1){
     start_time <- Sys.time() 
@@ -474,7 +478,7 @@ for (i in 1:length(unique_tag_IDs)){
   
 # Loop through the rows of the tag history
 for (j in 1:nrow(tag_hist)){
-    
+  # for (j in 1:36){
     
     ### For the first entry, just store these values plus the time as the start time
     if (j == 1){
@@ -483,23 +487,10 @@ for (j in 1:nrow(tag_hist)){
         
       # store the event type name
       ind_det_hist[1,'event_type_name'] <- tag_hist[j,'event_type_name']
-    
-      
+ 
 
       # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
       ind_det_hist[1,'ant_config'] <- tag_hist[j,'ant_config']
-      
-      # If it's BO2-BO3-BO4, store the site name that way
-      if (tag_hist[j,'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                               "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
-        ind_det_hist[1,'event_site_name'] <- 'BO2-BO3-BO4' 
-        
-      }
-      # otherwise, store the site name like normal
-      else {
-        ind_det_hist[1,'event_site_name'] <- tag_hist[j,'event_site_name']
-      }  
-      
       
       
       # Store the start time
@@ -508,6 +499,37 @@ for (j in 1:nrow(tag_hist)){
       ind_det_hist[1,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
       # store the start antenna ID
       ind_det_hist[1,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+      
+      # If it's BO2-BO3-BO4, store the site name that way, as well as the antennas
+      if (tag_hist[j,'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                               "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
+        # site name
+        ind_det_hist[1,'event_site_name'] <- 'BO2-BO3-BO4' 
+        
+        if (tag_hist[j,'event_site_name'] == "BO2 - Bonneville Cascades Is. Ladder"){
+          # Store the start antenna group
+          ind_det_hist[1,'start_ant_group'] <- paste0("BO2-", tag_hist[j,'antenna_group_name'])
+          # store the start antenna ID
+          ind_det_hist[1,'start_antenna_id'] <- paste0("BO2-", tag_hist[j,'antenna_id'])
+        }
+        else if (tag_hist[j,'event_site_name'] %in% c("BO3 - Bonneville WA Shore Ladder/AFF", "BONAFF - BON - Adult Fish Facility")){
+          # Store the start antenna group
+          ind_det_hist[1,'start_ant_group'] <- paste0("BO3-", tag_hist[j,'antenna_group_name'])
+          # store the start antenna ID
+          ind_det_hist[1,'start_antenna_id'] <- paste0("BO3-", tag_hist[j,'antenna_id'])
+        }
+        else if (tag_hist[j,'event_site_name'] == "BO4 - Bonneville WA Ladder Slots"){
+          # Store the start antenna group
+          ind_det_hist[1,'start_ant_group'] <- paste0("BO4-", tag_hist[j,'antenna_group_name'])
+          # store the start antenna ID
+          ind_det_hist[1,'start_antenna_id'] <- paste0("BO4-", tag_hist[j,'antenna_id'])
+        }
+
+      }
+      # otherwise, store the site name like normal
+      else {
+        ind_det_hist[1,'event_site_name'] <- tag_hist[j,'event_site_name']
+      }  
       
       # START THE COUNTER
       counter <- 1
@@ -527,6 +549,7 @@ for (j in 1:nrow(tag_hist)){
                !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                         "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
         
+        
         # Store the end time
         ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
         # Store the end antenna group and ID
@@ -545,13 +568,42 @@ for (j in 1:nrow(tag_hist)){
     ### If it's the last entry, store those values
     
     else if (j == nrow(tag_hist)){
+      # Store the tag code
+      ind_det_hist[counter, 'tag_code'] <- tag_hist[j,'tag_code']
+      # store the event type name
+      ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
       # Store the end time
       ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
       # Store the end antenna group
       ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
       # store the end antenna ID
       ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+      # store the antenna config
+      ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+      
+      
       # don't need to update the counter here because it's the last observation for the fish
+      
+      # Change the BO2, BO3, BO4 antenna names
+      if (tag_hist[j,'event_site_name'] == "BO2 - Bonneville Cascades Is. Ladder"){
+        # Store the end antenna group
+        ind_det_hist[counter,'end_ant_group'] <- paste0("BO2-", tag_hist[j,'antenna_group_name'])
+        # store the end antenna ID
+        ind_det_hist[counter,'end_antenna_id'] <- paste0("BO2-", tag_hist[j,'antenna_id'])
+      }
+      else if (tag_hist[j,'event_site_name'] %in% c("BO3 - Bonneville WA Shore Ladder/AFF", "BONAFF - BON - Adult Fish Facility")){
+        # Store the end antenna group
+        ind_det_hist[counter,'end_ant_group'] <- paste0("BO3-", tag_hist[j,'antenna_group_name'])
+        # store the end antenna ID
+        ind_det_hist[counter,'end_antenna_id'] <- paste0("BO3-", tag_hist[j,'antenna_id'])
+      }
+      else if (tag_hist[j,'event_site_name'] == "BO4 - Bonneville WA Ladder Slots"){
+        # Store the end antenna group
+        ind_det_hist[counter,'end_ant_group'] <- paste0("BO4-", tag_hist[j,'antenna_group_name'])
+        # store the end antenna ID
+        ind_det_hist[counter,'end_antenna_id'] <- paste0("BO4-", tag_hist[j,'antenna_id'])
+      }
+      
       
       # SPECIAL CASE: Terminal trap detections
       # note in the non-ascent category that these were not ascents
@@ -566,14 +618,85 @@ for (j in 1:nrow(tag_hist)){
       
       
       # SPECIAL CASE: If it's the last entry AND the only detection at a site
+      # if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
+      #     tag_hist[j-1, 'event_site_name'] == tag_hist[j, 'event_site_name'] & tag_hist[j, 'event_date_time_value'] -
+      #     tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
+      # Second version of this - because we're changing the names of some sites in
+      # the ind_det_hist file (e.g., ICH1 and ICH2, WEA1 and WEA2), we need
+      # to note multiple routes of passage here. So it's just going to expand the
+      # if statement quite a bit
       if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
-          tag_hist[j, 'event_date_time_value'] -
+          # Wells Dam
+          tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" & tag_hist[j-1, 'antenna_id'] %in% WEL_left &
+          tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" & tag_hist[j, 'antenna_id'] %in% WEL_right |
+          tag_hist[j-1, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" & tag_hist[j-1, 'antenna_id'] %in% WEL_right &
+          tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders" & tag_hist[j, 'antenna_id'] %in% WEL_left |
+          # ICH
+          tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j-1, 'antenna_id'] %in% ICH_110_north_ladder &
+          tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) |
+          tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) &
+          tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder |
+          # PRA
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% PRA_110_west &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% PRA_110_west |
+          # RIA
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_left &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_middle, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_middle &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_right &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_middle) |
+          
+          tag_hist[j-1, 'event_site_name'] == tag_hist[j, 'event_site_name'] & tag_hist[j, 'event_date_time_value'] -
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
+      
         
         # FIRST: If it's in the BO2-BO3-BO4 complex, we need to treat it differently
         
-        if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                  "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
+        # But - we need to treat BO4 differently from BO2 and BO3, since BO4 basically
+        # functions as antennas at the top of a ladder
+        if (tag_hist[j, 'event_site_name'] %in% c("BO4 - Bonneville WA Ladder Slots")){
+
+          # store the tag code
+          ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+
+          # store the event type name
+          ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+
+
+          # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+
+          # store the location field
+          ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
+
+          # Don't overwrite what was already added - this way we keep the start time and antenna
+          # that we previously recorded
+
+          # Store the start time
+          # ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the start antenna
+          # ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # store the start antenna info
+          # ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+
+          # now, apply the same non-descent rules as below
+          # If the last antenna seen is not in BO4, then note it was an aborted attempt
+          # This now can't be true, since we took these out using the above if statement
+          if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                    "BONAFF - BON - Adult Fish Facility")){
+
+            ind_det_hist[counter,'non_ascent'] <- "aborted"
+
+          }
+
+
+        }
+        
+        else if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                        "BONAFF - BON - Adult Fish Facility")){
           
           # store the tag code
           ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -588,18 +711,28 @@ for (j in 1:nrow(tag_hist)){
           # store the location field
           ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
           
-          # Don't overwrite what was already added - this way we keep the start time and antenna 
-          # that we previously recorded
+          # In this case, we do want to store the start time, because if we're back
+          # at BO2 or BO3, then it means we've started a new ascent attempt
           
           # Store the start time
-          # ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-          # Store the start antenna
-          # ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the start antenna info
-          # ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+          ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+          
+          if (tag_hist[j,'event_site_name'] == "BO2 - Bonneville Cascades Is. Ladder"){
+            # Store the start antenna group
+            ind_det_hist[counter,'start_ant_group'] <- paste0("BO2-", tag_hist[j,'antenna_group_name'])
+            # store the start antenna ID
+            ind_det_hist[counter,'start_antenna_id'] <- paste0("BO2-", tag_hist[j,'antenna_id'])
+          }
+          else if (tag_hist[j,'event_site_name'] %in% c("BO3 - Bonneville WA Shore Ladder/AFF", "BONAFF - BON - Adult Fish Facility")){
+            # Store the start antenna group
+            ind_det_hist[counter,'start_ant_group'] <- paste0("BO3-", tag_hist[j,'antenna_group_name'])
+            # store the start antenna ID
+            ind_det_hist[counter,'start_antenna_id'] <- paste0("BO3-", tag_hist[j,'antenna_id'])
+          }
           
           # now, apply the same non-descent rules as below
           # If the last antenna seen is not in BO4, then note it was an aborted attempt
+          # This is by default true for this section because of the above else if statement
           if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                     "BONAFF - BON - Adult Fish Facility")){
             
@@ -609,6 +742,46 @@ for (j in 1:nrow(tag_hist)){
           
           
         }
+        
+        # OLD CODE
+        # if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        #                                           "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
+        #   
+        #   # store the tag code
+        #   ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
+        #   
+        #   # store the event type name
+        #   ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
+        #   
+        #   
+        #   # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
+        #   ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
+        #   
+        #   # store the location field
+        #   ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
+        #   
+        #   # Don't overwrite what was already added - this way we keep the start time and antenna 
+        #   # that we previously recorded
+        #   
+        #   # Store the start time
+        #   # ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
+        #   # Store the start antenna
+        #   # ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+        #   # store the start antenna info
+        #   # ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+        #   
+        #   # now, apply the same non-descent rules as below
+        #   # If the last antenna seen is not in BO4, then note it was an aborted attempt
+        #   if (tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+        #                                             "BONAFF - BON - Adult Fish Facility")){
+        #     
+        #     ind_det_hist[counter,'non_ascent'] <- "aborted"
+        #     
+        #   }
+        #   
+        #   
+        # }
+        # END OLD CODE
         
         else {
         
@@ -669,6 +842,18 @@ for (j in 1:nrow(tag_hist)){
           }
           
         }
+        
+        # If it's at WEA, then replace the event site name with the correct ladder
+        if(tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders"){
+          if(tag_hist[j, 'antenna_id'] %in% WEL_left){
+            ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'
+          }
+          else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
+            ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder'
+          }
+          
+        }
+        
         }
       }
     }
@@ -742,6 +927,17 @@ for (j in 1:nrow(tag_hist)){
         }
         else if(tag_hist[j, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap)){
           ind_det_hist[counter,'event_site_name'] <- 'ICH2 - Ice Harbor Dam South Ladder'
+        }
+        
+      }
+      
+      # If it's at WEA, then replace the event site name with the correct ladder
+      if(tag_hist[j, 'event_site_name'] == "WEA - Wells Dam, DCPUD Adult Ladders"){
+        if(tag_hist[j, 'antenna_id'] %in% WEL_left){
+          ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'
+        }
+        else if(tag_hist[j, 'antenna_id'] %in% WEL_right){
+          ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder'
         }
         
       }
@@ -842,7 +1038,7 @@ for (j in 1:nrow(tag_hist)){
           # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
           if (tag_hist[j+1, 'event_site_name'] != "BO1 - Bonneville Bradford Is. Ladder" | # If it's at a different site
               tag_hist[j+1, 'event_date_time_value'] - 
-              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
+              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
             
             # store the info
             # store the tag code
@@ -915,10 +1111,29 @@ for (j in 1:nrow(tag_hist)){
           ind_det_hist[counter, 'event_site_name'] <- 'BO2-BO3-BO4'
           # Store the start time
           ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-          # Store the start antenna
-          ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # Store the start antenna id
-          ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+          # # Store the start antenna
+          # ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # # Store the start antenna id
+          # ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          if (tag_hist[j,'event_site_name'] == "BO2 - Bonneville Cascades Is. Ladder"){
+            # Store the start antenna group
+            ind_det_hist[counter,'start_ant_group'] <- paste0("BO2-", tag_hist[j,'antenna_group_name'])
+            # store the start antenna ID
+            ind_det_hist[counter,'start_antenna_id'] <- paste0("BO2-", tag_hist[j,'antenna_id'])
+          }
+          else if (tag_hist[j,'event_site_name'] %in% c("BO3 - Bonneville WA Shore Ladder/AFF", "BONAFF - BON - Adult Fish Facility")){
+            # Store the start antenna group
+            ind_det_hist[counter,'start_ant_group'] <- paste0("BO3-", tag_hist[j,'antenna_group_name'])
+            # store the start antenna ID
+            ind_det_hist[counter,'start_antenna_id'] <- paste0("BO3-", tag_hist[j,'antenna_id'])
+          }
+          else if (tag_hist[j,'event_site_name'] == "BO4 - Bonneville WA Ladder Slots"){
+            # Store the start antenna group
+            ind_det_hist[counter,'start_ant_group'] <- paste0("BO4-", tag_hist[j,'antenna_group_name'])
+            # store the start antenna ID
+            ind_det_hist[counter,'start_antenna_id'] <- paste0("BO4-", tag_hist[j,'antenna_id'])
+          }
         }
         
         # If the next detection is at a site not in BO2, BO3, or BO4,
@@ -948,10 +1163,29 @@ for (j in 1:nrow(tag_hist)){
           
           # store the end time
           ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-          # Store the end antenna
-          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-          # store the end antenna ID
-          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          # # Store the end antenna
+          # ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          # # store the end antenna ID
+          # ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          if (tag_hist[j,'event_site_name'] == "BO2 - Bonneville Cascades Is. Ladder"){
+            # Store the end antenna group
+            ind_det_hist[counter,'end_ant_group'] <- paste0("BO2-", tag_hist[j,'antenna_group_name'])
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- paste0("BO2-", tag_hist[j,'antenna_id'])
+          }
+          else if (tag_hist[j,'event_site_name'] %in% c("BO3 - Bonneville WA Shore Ladder/AFF", "BONAFF - BON - Adult Fish Facility")){
+            # Store the end antenna group
+            ind_det_hist[counter,'end_ant_group'] <- paste0("BO3-", tag_hist[j,'antenna_group_name'])
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- paste0("BO3-", tag_hist[j,'antenna_id'])
+          }
+          else if (tag_hist[j,'event_site_name'] == "BO4 - Bonneville WA Ladder Slots"){
+            # Store the end antenna group
+            ind_det_hist[counter,'end_ant_group'] <- paste0("BO4-", tag_hist[j,'antenna_group_name'])
+            # store the end antenna ID
+            ind_det_hist[counter,'end_antenna_id'] <- paste0("BO4-", tag_hist[j,'antenna_id'])
+          }
           
           # Save event site name
           ind_det_hist[counter,'event_site_name'] <- 'BO2-BO3-BO4'
@@ -1677,7 +1911,8 @@ for (j in 1:nrow(tag_hist)){
         tag_hist[j, 'event_date_time_value'] - 
         tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
       # Store the event site name
-      ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
+      # ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
+      ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
       # Store the start time
       ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
       # Store the start antenna
@@ -1737,82 +1972,6 @@ for (j in 1:nrow(tag_hist)){
     
   }
   
-  ##### Rocky Reach Dam #####
-  
-  # Rocky Reach Dam has only one ladder, with a set of 4 antennas (a fifth was added in April 2014, config 110) at the exit.
-  # Given this, we will not be able to identify aborted ascension attempts or descent through the ladder.
-  
-  # All antennas are only at the exit, so we cannot distinguish direction in the ladders or aborted attempts.
-  
-  else if (tag_hist[j, 'event_site_name'] %in% RRE_arrays){
-    
-    # For RRE, we are not going to do anything special, except that we are going to have a 48 hour window.
-    
-    # If it's the first detection at RRE, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-    if (!(tag_hist[j-1, 'antenna_id'] == "RRF - Rocky Reach Fishway") |
-        tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway" &
-        tag_hist[j, 'event_date_time_value'] - 
-        tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
-      # Store the event site name
-      ind_det_hist[counter, 'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
-      # Store the start time
-      ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
-      # Store the start antenna
-      ind_det_hist[counter,'start_ant_group'] <- tag_hist[j,'antenna_group_name']
-      # Store the start antenna id
-      ind_det_hist[counter,'start_antenna_id'] <- tag_hist[j,'antenna_id']
-    }
-    
-    
-    
-    # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-    else if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
-             tag_hist[j+1, 'event_date_time_value'] - 
-             tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
-      
-      # store the info
-      # store the tag code
-      ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
-      
-      # store the event type name
-      ind_det_hist[counter,'event_type_name'] <- tag_hist[j,'event_type_name']
-      
-      
-      # ind_det_hist[counter,'antenna_group_name'] <- tag_hist[j,'antenna_group_name']
-      ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
-      
-      # store the location fields
-      ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
-      # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
-      # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
-      # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
-      # ind_det_hist[counter,'event_site_longitude'] <- tag_hist[j,'event_site_longitude_value']
-      
-      # store the end time
-      ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
-      # Store the end antenna
-      ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-      # store the end antenna ID
-      ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-      
-      # With only four antennas at the exit here, we don't have the ability to identify any non-ascent movements
-      
-      # UPDATE THE COUNTER
-      # every time we store an end time, we update the counter. This allows
-      # us to move through the detection history df
-      counter <- counter + 1
-      
-      
-    }
-    
-    # if it's within 48 hours at RRF, then don't record it
-    
-    else {
-      
-    }
-    
-    
-  }
   
  
   ##### Wells Dam #####
@@ -1840,7 +1999,7 @@ for (j in 1:nrow(tag_hist)){
           tag_hist[j, 'event_date_time_value'] - 
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
         # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
+        ind_det_hist[counter, 'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder'  # tag_hist[j,'event_site_name']
         # Store the start time
         ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
         # Store the start antenna
@@ -1871,7 +2030,7 @@ for (j in 1:nrow(tag_hist)){
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
@@ -1923,7 +2082,7 @@ for (j in 1:nrow(tag_hist)){
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          ind_det_hist[counter,'event_site_name'] <- 'WEA1 - Wells Dam, DCPUD Left Adult Ladder' # tag_hist[j,'event_site_name']
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
@@ -1981,7 +2140,7 @@ for (j in 1:nrow(tag_hist)){
           tag_hist[j, 'event_date_time_value'] - 
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
         # Store the event site name
-        ind_det_hist[counter, 'event_site_name'] <- tag_hist[j,'event_site_name']
+        ind_det_hist[counter, 'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
         # Store the start time
         ind_det_hist[counter, 'start_time'] <- tag_hist[j,'event_date_time_value']
         # Store the start antenna
@@ -2012,7 +2171,7 @@ for (j in 1:nrow(tag_hist)){
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
@@ -2064,7 +2223,7 @@ for (j in 1:nrow(tag_hist)){
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- tag_hist[j,'event_site_name']
+          ind_det_hist[counter,'event_site_name'] <- 'WEA2 - Wells Dam, DCPUD Right Adult Ladder' # tag_hist[j,'event_site_name']
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
@@ -2293,6 +2452,9 @@ for (j in 1:nrow(tag_hist)){
   # Lower Granite Dam has a single ladder, with arrays in the bottom of the ladder before the AFF,
   # and arrays near the ladder exit.
   
+  # Also note that there are recapture/release events in the ladder, where event_type_name == recapture &
+  # event_site_name == LGRLDR - LGR - Release into the Adult Fish Ladder
+  
   # It has two configurations, 140 and 150. 150 added additional arrays in
   # the entrance and exit of the ladder.
   
@@ -2303,9 +2465,11 @@ for (j in 1:nrow(tag_hist)){
   
   else if(tag_hist[j, 'event_site_name'] %in% LGR_arrays){
     
-    # If it's the first detection in this route, or it hasn't been seen in this route for at least 48 hours, store the start time and antenna
-    if (tag_hist[j-1, 'event_site_name'] != "GRA - Lower Granite Dam Adult" |
-        tag_hist[j-1, 'event_site_name'] == "GRA - Lower Granite Dam Adult" &
+    # If it's the first detection in this route, or if the last detection was in
+    # the upper antennas at least 48 hours ago
+    if (!(tag_hist[j-1, 'event_site_name'] %in% LGR_arrays) |
+        tag_hist[j-1, 'event_site_name'] %in% LGR_arrays &
+        # tag_hist[j-1, 'antenna_id'] %in% c(GRA_150_exit, GRA_150_upper) &
         tag_hist[j, 'event_date_time_value'] - 
         tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
       # Store the event site name
@@ -2322,11 +2486,13 @@ for (j in 1:nrow(tag_hist)){
     # Different if statements for varying antenna configurations
     
     # GRA 140 - upper and lower
-    else if(tag_hist[j, 'ant_config'] == 140){
+    else if(tag_hist[j, 'ant_config'] == 140 ){
       
       
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (tag_hist[j+1, 'event_site_name'] != "GRA - Lower Granite Dam Adult" | # If it's at a different site
+      # If the next detection is at a different site, or is more than 48 hours later
+      # and is in the lower ladder, store the current time as the end time
+      if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
+          tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
           tag_hist[j+1, 'event_date_time_value'] - 
           tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
         
@@ -2387,11 +2553,14 @@ for (j in 1:nrow(tag_hist)){
     
     
     # GRA 150 - upper, lower, entrance, exit
-    else if(tag_hist[j, 'ant_config'] == 150){
+    # Include the recapture possibility here
+    else if(tag_hist[j, 'ant_config'] == 150 | tag_hist[j, 'event_site_name'] == "LGRLDR - LGR - Release into the Adult Fish Ladder"){
       
       
-      # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      if (tag_hist[j+1, 'event_site_name'] != "GRA - Lower Granite Dam Adult" | # If it's at a different site
+      # If the next detection is at a different site, or is more than 48 hours later
+      # and is in the lower ladder, store the current time as the end time
+      if (!(tag_hist[j+1, 'event_site_name'] %in% LGR_arrays) | # If it's at a different site
+          tag_hist[j+1, 'antenna_id'] %in% c(GRA_150_entrance, GRA_150_lower) &
           tag_hist[j+1, 'event_date_time_value'] - 
           tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's within 48 hours
         
@@ -2454,14 +2623,14 @@ for (j in 1:nrow(tag_hist)){
   ##### non-dams #####   
     
     # For every other entry that is not at a dam, look at the previous entry to see if it
-    # was the same site < 6 hours ago
+    # was the same site < 48 hours ago
     else {
       
-      # If the next entry isn't the same site OR is >=6 hours ahead, store
+      # If the next entry isn't the same site OR is >=48 hours ahead, store
       # the current time as the end time
       if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
           tag_hist[j+1, 'event_date_time_value'] -
-          tag_hist[j, 'event_date_time_value'] >= hours(x = 6)){
+          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){
         
         # store the end time
         ind_det_hist[counter,'end_time'] <- tag_hist[j,'event_date_time_value']  
@@ -2477,7 +2646,7 @@ for (j in 1:nrow(tag_hist)){
         # store the start time
         if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
             tag_hist[j, 'event_date_time_value'] -
-            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 6)){
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
           
           # store the tag code
           ind_det_hist[counter,'tag_code'] <- unique_tag_IDs[i]
@@ -2512,7 +2681,7 @@ for (j in 1:nrow(tag_hist)){
       # start a new entry and start time
       else if (tag_hist[j-1, 'event_site_name'] != tag_hist[j, 'event_site_name'] |
                tag_hist[j, 'event_date_time_value'] -
-               tag_hist[j-1, 'event_date_time_value'] >= hours(x = 6)){
+               tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
       
         
         # store the tag code
@@ -2567,9 +2736,14 @@ for (j in 1:nrow(tag_hist)){
   print(paste0("Tag ", i))
 }
 
+# Change the timezone back to PST, with a correction for DST
+det_hist %>% 
+  mutate(start_time = force_tz(start_time, "PST") - dhours(1)) %>% 
+  mutate(end_time = force_tz(end_time, "PST") - dhours(1)) -> det_hist_PST
+
 # Export this detection history
-write.csv(det_hist, "complete_det_hist_CTH12-14.csv")
-# write.csv(det_hist, "test_hist_2.csv")
+write.csv(det_hist_PST, "complete_det_hist_CTH12-14.csv")
+# write.csv(det_hist_PST, "test_hist_2.csv")
 
 
 ##### 
