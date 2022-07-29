@@ -1,0 +1,227 @@
+"","event_type_name","event_site_name","start_antenna_id","end_antenna_id","start_ant_group","end_ant_group","ant_config","non_ascent"
+"1","Observation","BO2-BO3-BO4","BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",110,NA
+"2","Observation","The Dalles Adult Fishways (combined)","02","01","Counting Window","Counting Window",100,NA
+"3","Observation","John Day Dam Adult Fishways (combined)","08","04","WEIR 180","WEIR 181",100,NA
+"4","Observation","LMA - Lower Monumental Adult Ladders","02","02","Left Ladder","Left Ladder",100,NA
+"5","Observation","GOA - Little Goose Fish Ladder","02","01","Counting Window","Counting Window",100,NA
+"6","Observation","GRA - Lower Granite Dam Adult","B3","A2","Ladder Entrance","Ladder Exit",150,NA
+"7","Observation","DWL - Dworshak NFH adult trap","A1","A2","UPSTREAM ANTENNA","DOWNSTREAM ANTENNA",100,NA
+"8","Observation","BO1 - Bonneville Bradford Is. Ladder","24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",120,NA
+"9","Observation","MC1 - McNary Oregon Shore Ladder","12","01","WEIR 279","COUNTING WINDOW",100,NA
+"10","Observation","ICH2 - Ice Harbor Dam South Ladder","07","01","LEFT LADDER WEIR 435 [O/S]","LEFT LADDER WEIR 438 [O/S]",110,NA
+"11","Observation","ICH1 - Ice Harbor Dam North Ladder","10","0A","RIGHT LADDER WEIR 435 [S/O]","RIGHT LADDER WEIR 438 [S/O]",110,NA
+"12","Observation","MC2 - McNary Washington Shore Ladder","12","01","WEIR 302","COUNTING WINDOW",120,NA
+"13","Observation","SC1 - Lower SF Clearwater R at rkm 1","B1","B1","INSTREAM ARRAY","INSTREAM ARRAY",110,NA
+"14","Observation","SC2 - Lower SF Clearwater R at rkm 2","A1","A1","INSTREAM ARRAY","INSTREAM ARRAY",100,NA
+"15","Observation","LAP - Lapwai Creek, near its mouth","01","01","Array","Array",130,NA
+"16","Observation","PRA2 - Priest Rapids Adult East Ladder","04","01","LEFT [EAST] LADDER WEIR 7","LEFT [EAST] LADDER WEIR 3",110,NA
+"17","Observation","RIA1 - Rock Island Adult Left Ladder","04","02","LEFT LADDER BAFFLE 2","LEFT LADDER BAFFLE 4",140,NA
+"18","Observation","WEA1 - Wells Dam, DCPUD Left Adult Ladder","04","02","Left Ladder Pool 67","Left Ladder Pool 68",170,NA
+"19","Observation","LMR - Lower Methow River at Pateros","06","06","Upstream Array","Upstream Array",120,NA
+"20","Observation","MRC - Methow River at Carlton","06","06","Single Array","Single Array",100,NA
+"21","Observation","MSH - Methow Fish Hatchery Outfall","00","00","Trap","Trap",110,NA
+"22","Observation","CRW - Chewuch River above Winthrop","02","05","UPSTREAM ARRAY","DOWNSTREAM ARRAY",100,NA
+"23","Observation","SWT - Sweetwater Cr. near its mouth","B3","B1","LOWER INSTREAM ARRAY","UPPER INSTREAM ARRAY",110,NA
+"24","Observation","WEB - Webb Creek","D2","D1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA
+"25","Observation","RIA2 - Rock Island Adult Middle Ladder","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA
+"26","Observation","WEA2 - Wells Dam, DCPUD Right Adult Ladder","A3","05","Right Ladder Pool 19","Right Ladder Pool 68",170,NA
+"27","Observation","TWR - Lwr Twisp Rvr near MSRF Ponds","B6","B3","LOWER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"28","Observation","RRJ - Rocky Reach Dam Juvenile","01","01","DSM Bypass Surface Collector","DSM Bypass Surface Collector",160,NA
+"29","Observation","GRJ - Lower Granite Dam Juvenile","01","F2","FULL FLOW BYPASS","ADULT FISH RETURN",150,NA
+"30","Observation","LTR - Lower Tucannon River","03","01","MIDDLE LEFT ANTENNA","UPSTREAM LEFT ANTENNA",160,NA
+"31","Observation","MTR - Middle Tucannon River","03","01","MIDDLE ARRAY","UPSTREAM ARRAY",110,NA
+"32","Observation","PRV - Walla Walla R at Pierce RV Prk","A1","A1","ARRAY","ARRAY",100,NA
+"33","Observation","DRM - Deschutes River mouth","0B","0B","Downstream Array","Downstream Array",100,NA
+"34","Observation","BBT - Touchet River at Bolles Bridge","F6","F6","Downstream Array","Downstream Array",110,NA
+"35","Observation","HST - Touchet River at Harvey Shaw","02","02","Upstream Array","Upstream Array",100,NA
+"36","Observation","JPT - Juvenile Pond Touchet","D3","D1","Downstream Array","Upstream Array",110,NA
+"37","Observation","UTR - Upper Tucannon River","A4","A2","Downstream Array","Upstream Array",110,NA
+"38","Observation","TFH - Tucannon Fish Hatchery","0B","08","Downstream Array D","Ladder Array",110,NA
+"39","Observation","GOJ - Little Goose Dam Juvenile","01","04","FULL FLOW BYPASS","FULL FLOW BYPASS",150,NA
+"40","Observation","BGM - Burlingame Dam and Canal","F4","F3","ADULT FISHWAY","ADULT FISHWAY",110,NA
+"41","Observation","PRA1 - Priest Rapids Adult West Ladder","07","05","RIGHT [WEST] LADDER WEIR 5","RIGHT [WEST] LADDER WEIR 3",110,NA
+"42","Observation","LWE - Lower Wenatchee River","0C","05","DOWNSTREAM ANTENNA ARRAY","UPSTREAM ANTENNA ARRAY",120,NA
+"43","Observation","ICL - Lower Icicle Instream Array","0A","09","Downstream Array","Downstream Array",110,NA
+"44","Observation","ICM - Middle Icicle Instream Array","05","01","Downstream Array","Upstream Array",100,NA
+"45","Observation","PES - Peshastin Creek","14","15","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",100,NA
+"46","Observation","ACM - Asotin Creek near mouth","03","03","MIDDLE ARRAY","MIDDLE ARRAY",110,NA
+"47","Observation","ACB - Asotin Cr. at Cloverland Brdg.","04","02","Downstream Array","Upstream Array",120,NA
+"48","Observation","RIA3 - Rock Island Adult Right Ladder","0B","0B","Right Ladder Exit Channel","Right Ladder Exit Channel",130,NA
+"49","Observation","GRS - Lower Granite Dam Spillway","03","06","Upstream","Middle",100,NA
+"50","Observation","MRW - Methow River at Winthrop","B5","B5","DOWNSTREAM ARRAY","DOWNSTREAM ARRAY",100,NA
+"51","Observation","GLC - Gold Creek, Methow River","03","03","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",120,NA
+"52","Observation","MVP - Mid-Valley Acclimation Pond","03","01","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA
+"53","Observation","SCP - Spring Creek Acclimation Pond","01","03","Upstream Antenna","Downstream Antenna",140,NA
+"54","Observation","DSF - Deschutes Sherars Falls","02","02","Main Fishway","Main Fishway",100,NA
+"55","Observation","OKL - Lower Okanogan Instream Array","06","05","Upstream Array","Upstream Array",100,NA
+"56","Observation","ZSL - Zosel Dam Combined","A2","A1","Left Ladder Weir 3","Left Ladder Weir 2",130,NA
+"57","Observation","OKC - Okanagan Channel at VDS-3","A8","A4","Downstream Array","Upstream Array",110,NA
+"58","Observation","OKV - Vasuex Creek, BC, Canada","05","02","Downstream Array","Upstream Array",100,NA
+"59","Observation","WSR - Warm Springs River PIT Array","01","01","PIT Tag Array","PIT Tag Array",100,NA
+"60","Observation","JDJ - John Day Dam Juvenile","01","04","FULL FLOW BYPASS","FULL FLOW BYPASS",160,NA
+"61","Observation","LC1 - Lower Lolo Creek at rkm 21","B4","B4","SINGLE ARRAY","SINGLE ARRAY",100,NA
+"62","Observation","LC2 - Upper Lolo Creek at rkm 25","A4","A4","SINGLE ARRAY","SINGLE ARRAY",100,NA
+"63","Observation","WEJ - Wells Dam Bypass Bay Sample","A1","A1","Baffle Section 1","Baffle Section 1",110,NA
+"64","Observation","BCC - BON PH2 Corner Collector","01","01","15X15 FULL-FLOW ANTENNA","15X15 FULL-FLOW ANTENNA",100,NA
+"65","Observation","MJ1 - Middle Fork John Day Array","F3","F3","Upstream Array","Upstream Array",120,NA
+"66","Observation","JD1 - John Day River, McDonald Ferry","0A","0A","Downstream Array","Downstream Array",110,NA
+"67","Observation","WFC - Wolf Creek, Methow River","11","11","SINGLE IN-STREAM ANTENNA","SINGLE IN-STREAM ANTENNA",100,NA
+"68","Observation","WEH - Wells Dam Hatchery","A2","C6","Volunteer Channel","Adult Fish Handling Facility Return to River",110,NA
+"69","Observation","TNK - Tunk Creek Instream Array","A1","A1","Single Antenna","Single Antenna",100,NA
+"70","Observation","OMK - Omak Creek Instream Array","04","04","Downstream Array","Downstream Array",120,NA
+"71","Observation","LLC - Loup Loup Creek Instream Array","03","03","Downstream Antenna","Downstream Antenna",110,NA
+"72","Observation","RRF - Rocky Reach Fishway","A1","A0","Upper Weir","Trap",110,NA
+"73","Observation","CWP - Chewuch Acclimation Pond","03","01","Pond Outlet","Release Chamber",100,NA
+"74","Observation","MCJ - McNary Dam Juvenile","01","F2","FULL FLOW BYPASS","ADULT FISH RETURN",170,NA
+"75","Observation","LBC - Libby Creek, Methow River","02","01","Downstream Antenna","Upstream Antenna",110,NA
+"76","Observation","EBO - East Bank Hatchery Outfall","02","01","Downstream Antenna","Upstream Antenna",110,NA
+"77","Observation","CRU - Upper Chewuch Instream Array","06","06","Downstream Array","Downstream Array",100,NA
+"78","Observation","PRO - Prosser Diversion Dam Combined","04","03","MIDDLE LDR COUNTING WINDOW","MIDDLE LDR COUNTING WINDOW",110,NA
+"79","Observation","SUN - Sunnyside Instream Array","09","09","Downstream Array","Downstream Array",110,NA
+"80","Observation","30M - Thirtymile Crk John Day Basin","02","01","Downstream Array","Upstream Array",100,NA
+"81","Observation","TUF - Tumwater Dam Adult Fishway","A4","A1","Low Flow Ladder Entrance","WEIR 17",110,NA
+"82","Observation","UWE - Upper Wenatchee River","B6","B6","IN-STREAM ARRAY","IN-STREAM ARRAY",110,NA
+"83","Observation","NAL - Lower Nason Creek","64","61","LOWER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"84","Observation","NAU - Upper Nason Creek","41","43","UPPER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"85","Observation","MTP - Twisp Acclimation Pond","A3","A3","Outlet Channel","Outlet Channel",100,NA
+"86","Observation","USI - Upper Salmon River at rkm 460","A1","A1","ARRAY","ARRAY",100,NA
+"87","Observation","USE - Upper Salmon River at rkm 437","B6","B6","ARRAY","ARRAY",100,NA
+"88","Observation","IR1 - Lower Imnaha River ISA @ km 7","B2","B2","STREAM CENTER LEFT","STREAM CENTER LEFT",100,NA
+"89","Observation","IR2 - Lower Imnaha River ISA @ km 10","A2","A2","STREAM CENTER LEFT","STREAM CENTER LEFT",100,NA
+"90","Observation","WR1 - Wallowa River at river km 14","A3","A3","Left Center","Left Center",100,NA
+"91","Observation","WR2 - Wallowa River at rkm 32","05","05","Downstream Array","Downstream Array",100,NA
+"92","Observation","MR1 - Minam River at river km 0.5","0A","01","Downstream Array","Upstream Array",100,NA
+"93","Observation","WSH - Warm Springs Hatchery","01","02","ADULT FISHWAY","ADULT FISHWAY",120,NA
+"94","Observation","HRM - Hood River Mouth","05","05","Upstream Array","Upstream Array",130,NA
+"95","Observation","EFD - East Fork Diversion Fishway","01","01","Upstream Antenna","Upstream Antenna",100,NA
+"96","Observation","FID - Farmer's Diversion, Hood River","01","01","Single Antenna","Single Antenna",100,NA
+"97","Observation","TWX - Estuary Towed Array (Exp.)","C1","C5","MATRIX TRAWL [CURRENT]","MATRIX TRAWL [CURRENT]",210,NA
+"98","Observation","BSC - Big Sheep Creek ISA at km 6","A4","A2","DOWNSTREAM RIGHT","UPSTREAM RIGHT",100,NA
+"99","Observation","B2J - Bonneville PH2 Juvenile","01","04","FULL FLOW BYPASS","FULL FLOW BYPASS",150,NA
+"100","Observation","IR3 - Upper Imnaha River ISA @ km 41","C5","C3","DOWNSTREAM ARRAY","UPSTREAM ARRAY",100,NA
+"101","Observation","IR4 - Imnaha Weir Downstream Array","04","04","Downstream Array","Downstream Array",100,NA
+"102","Observation","IR5 - Imnaha Weir Upstream Array","05","01","Downstream Array","Upstream Array",100,NA
+"103","Observation","CML - Chewuch River Middle Lower","01","01","Single Array","Single Array",100,NA
+"104","Observation","CMU - Chewuch River Middle Upper","04","04","Single Array","Single Array",100,NA
+"105","Observation","AFC - No./So. Fk Asotin Cr. Jct. ISA","06","01","Mainstem Asotin Creek Array","North Fork Asotin Creek Array",110,NA
+"106","Observation","WWB - Walla Walla River Barge Array","B6","B1","Downstream Barge","Downstream Barge",110,NA
+"107","Observation","COP - Lower Coppei Instream Array","02","01","Downstream Array","Upstream Array",110,NA
+"108","Observation","PAT - Pattit Creek Instream Site","02","01","Downstream Array","Upstream Array",100,NA
+"109","Observation","TMF - Three Mile Falls Dam Combined","02","01","Weir 5","Counting Window",130,NA
+"110","Observation","UMW - Umatilla R Recycled Water Fac","03","03","Streamwidth array","Streamwidth array",100,NA
+"111","Observation","FDC - Feed Canal","01","01","Bypass Outfall","Bypass Outfall",110,NA
+"112","Observation","LLR - Lower Lemhi River","04","01","DOWNSTREAM ARRAY","UPSTREAM ARRAY",120,NA
+"113","Observation","EVL - Eagle Valley Ranch - Lower","06","01","Downstream Array","Upstream Array",100,NA
+"114","Observation","EVU - Eagle Valley Ranch - Upper","06","02","Downstream Array","Upstream Array",100,NA
+"115","Observation","LFF - Lyle Falls Fishway","A1","F2","WET LAB TANK 1","Exit to Channel",110,NA
+"116","Observation","TAY - Big Creek at Taylor Ranch","06","06","Upstream Array","Upstream Array",110,NA
+"117","Observation","VC2 - Valley Creek, Downstream Site","B4","B4","DOWNSTREAM 3-ANTENNA ARRAY","DOWNSTREAM 3-ANTENNA ARRAY",130,NA
+"118","Observation","MAR - Marsh Cr at Lola Cr Campground","05","02","Downstream Array","Upstream Array",100,NA
+"119","Observation","SC3 - South Fork Clearwater Site 3","01","01","Single Array","Single Array",100,NA
+"120","Observation","MEM - Eightmile Acclimation Pond","B2","B2","Outlet to River","Outlet to River",100,NA
+"121","Observation","FST - Foster Creek","01","01","Single Antenna","Single Antenna",110,NA
+"122","Observation","ANT - Antoine Creek Instream Array","13","13","Downstream Antenna","Downstream Antenna",110,NA
+"123","Observation","BPC - Bonaparte Creek Instream Array","C3","C1","Three Antenna Series","Three Antenna Series",100,NA
+"124","Observation","BVC - Beaver Creek, Methow River","B3","B1","Downstream Antenna","Upstream Antenna",110,NA
+"125","Observation","ICB - Ice Harbor Bypass","A1","A4","FULL FLOW BYPASS","FULL FLOW BYPASS",110,NA
+"126","Observation","JOC - Joseph Creek ISA @ km 3","02","02","Upstream Array","Upstream Array",120,NA
+"127","Observation","ENL - Lower Entiat River","06","02","Downstream Array","Upstream Array",110,NA
+"128","Observation","RCT - Roaring Creek Temporary Array","01","01","Upstream Antenna","Upstream Antenna",110,NA
+"129","Observation","UGR - Upper Grande Ronde at rkm 155","A6","A6","SINGLE ARRAY","SINGLE ARRAY",100,NA
+"130","Observation","UGS - Upper Grande Ronde Starkey","E7","E3","Downstream Array","Upstream Array",100,NA
+"131","Observation","ENA - Upper Entiat River at rkm 17.1","44","41","DOWNSTREAM ANTENNA ARRAY","UPSTREAM ANTENNA ARRAY",100,NA
+"132","Observation","MAD - Mad River, Entiat River Basin","36","34","LOWER IN-STREAM ARRAY","MIDDLE IN-STREAM ARRAY",100,NA
+"133","Observation","LRU - Lochsa River Upper Site","A2","A2","Instream Array","Instream Array",100,NA
+"134","Observation","LRL - Lower Lochsa River Array Site","BA","BA","Instream Array","Instream Array",100,NA
+"135","Observation","MVF - Moving Falls Fish Ladder","02","01","Downstream Antenna","Upstream Antenna",110,NA
+"136","Observation","158 - Fifteenmile Ck at Eightmile Ck","D5","D4","Middle Fifteenmile Ck","Upstream Fifteenmile Ck",100,NA
+"137","Observation","15D - Fifteenmile Ck at Dry Ck","C1","C1","Upstream Fifteenmile Ck","Upstream Fifteenmile Ck",100,NA
+"138","Observation","DBH - Buck Hollow Ck Deschutes Trib","96","96","Downstream","Downstream",100,NA
+"139","Observation","15R - Fifteenmile Ck at Ramsey Ck","E5","E1","Downstream Fifteenmile Ck","Upstream Ramsey Ck",100,NA
+"140","Observation","DBO - Bakeoven Ck Deschutes Trib","A6","A6","Downstream","Downstream",100,NA
+"141","Observation","MTD - Mill Creek at The Dalles","B1","B1","Upstream Array","Upstream Array",100,NA
+"142","Observation","85M - Eightmile Ck at Fivemile Ck","F5","F6","Middle Eightmile Ck","Downstream Eightmile Ck",100,NA
+"143","Observation","STL - Sawtooth Hatchery Adult Trap","A2","A4","KEYWAY 3 - OVERFLOW","KEYWAY 1 - OVERFLOW",100,NA
+"144","Observation","YFK - Yankee Fork Salmon River","A4","A1","DOWNSTREAM ARRAY","UPSTREAM ARRAY",100,NA
+"145","Observation","CZY - Crazyman Creek at 0.6 km","A3","A1","Downstream Array","Upstream Array",100,NA
+"146","Observation","IML - Imnaha River Weir Adult Ladder","F2","F1","Bottom Ladder Antenna","Top Ladder Antenna",110,NA
+"147","Observation","CEY - Cearley Creek Side Channel","03","03","Downstream Array","Downstream Array",100,NA
+"148","Observation","COC - Cow Creek ISA @ stream mouth","A2","A1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA
+"149","Observation","LMJ - Lower Monumental Dam Juvenile","01","F2","FULL FLOW BYPASS","ADULT FISH RETURN",150,NA
+"150","Observation","CHL - Lower Chiwawa River","85","82","LOWER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"151","Observation","CHU - Upper Chiwawa River","95","95","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",100,NA
+"152","Observation","CRC - Carmen Creek, Salmon R. Basin","04","04","Middle Array","Middle Array",100,NA
+"153","Observation","RCJ - Rock Creek John Day Basin","01","02","Upstream Array","Downstream Array",100,NA
+"154","Observation","BHC - Bohannon Creek Lemhi R Basin","03","03","Downstream Array","Downstream Array",110,NA
+"155","Observation","RCL - Rock Creek (WA) at rkm 5","A1","A1","UPPER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"156","Observation","RCS - Rock Creek (WA) at rkm 14","B2","B2","UPPER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"157","Observation","MWC - Maxwell Canal","A2","B2","HEADGATE","DIVERSION SCREEN",120,NA
+"158","Observation","FDD - Feed Diversion Dam","B3","B3","ADULT LADDER RIGHT, FACING D/S","ADULT LADDER RIGHT, FACING D/S",100,NA
+"159","Observation","JDM - Upper John Day River Array","05","04","Downstream Array","Downstream Array",120,NA
+"160","Observation","UMF - Umatilla R below Feed Dam","03","03","Streamwidth array","Streamwidth array",100,NA
+"161","Observation","SJ2 - SF John Day (Murderer's)","D3","D3","Downstream SF John Day","Downstream SF John Day",100,NA
+"162","Observation","ROZ - Roza Diversion Dam (Combined)","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA
+"163","Observation","TAN - Taneum Creek Instream","03","02","Downstream Antenna","Middle Antenna",150,NA
+"164","Observation","SSJ - SUNNYSIDE JUVENILE","03","04","Trash Rack Bays","Bypass Entrance",110,NA
+"165","Observation","SJ1 - SF John Day (Mid)","E4","E4","Downstream","Downstream",100,NA
+"166","Observation","MDR - McDonald Road Bridge","01","01","Single Array","Single Array",100,NA
+"167","Observation","LNR - Lower Naches River","03","03","Single Array","Single Array",100,NA
+"168","Observation","MCL - Lower Mission Creek Instream","B4","B1","DOWNSTREAM ARRAY","UPSTREAM ARRAY",100,NA
+"169","Observation","SAT - Lower Satus Creek","11","11","Upstream","Upstream",100,NA
+"170","Observation","RSH - Ringold Springs Hatch. Outfall","03","01","Downstream Array","Upstream Array",100,NA
+"171","Observation","CLC - Clear Creek near Kooskia NFH","02","02","Clear Creek Array","Clear Creek Array",100,NA
+"172","Observation","SWC - Swale Creek Array","05","01","Downstream Array","Upstream Array",100,NA
+"173","Observation","MCD - Mill Creek Diversion Project","A2","A3","DIVISION WORKS FISH LADDER","DIVISION WORKS SPILLWAY BASIN",170,NA
+"174","Observation","YHC - Yellowhawk Creek","A1","A1","INSTREAM ANTENNA AT HEADGATE","INSTREAM ANTENNA AT HEADGATE",110,NA
+"175","Observation","SFG - SF Salmon at Guard Station Br.","A4","A4","IN-STREAM ARRAY","IN-STREAM ARRAY",100,NA
+"176","Observation","ZEN - Secesh River at Zena Cr. Ranch","B4","B4","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",110,NA
+"177","Observation","ESS - EFSF Salmon River at Parks Cr.","B1","A3","LOWER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"178","Observation","KRS - SF Salmon River at Krassel Cr.","A2","A2","Upstream Array","Upstream Array",120,NA
+"179","Observation","KHS - Big Bear Cr. @ Kendrick HS","04","04","Upstream Array","Upstream Array",140,NA
+"180","Observation","WEN - Wenaha River Mouth","03","03","Upstream Array","Upstream Array",100,NA
+"181","Observation","HYC - Hayden Creek In-stream Array","A6","A1","DOWNSTREAM ARRAY","UPSTREAM ARRAY",120,NA
+"182","Observation","BR0 - Bridge Creek Gauge","B2","B2","Downstream","Downstream",100,NA
+"183","Observation","BR1 - Bridge Creek Kiosk","F2","F1","Downstream","Upstream",100,NA
+"184","Observation","ENM - Middle Entiat River","51","51","UPPER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
+"185","Observation","KEN - Kenney Creek In-stream Arrays","02","02","Downstream Antenna","Downstream Antenna",120,NA
+"186","Observation","AH1 - Ahtanum at Lasalle HS","02","01","Downstream Antenna","Upstream Antenna",100,NA
+"187","Observation","NBA - Nursery Bridge Adult","02","01","EAST [NEW] LADDER","EAST [NEW] LADDER",160,NA
+"188","Observation","WW1 - Harris Bridge S F Walla Walla","01","02","LEFT","RIGHT",140,NA
+"189","Observation","RFL - Redfish Lake Creek","02","03","Instream Array","Instream Array",100,NA
+"190","Observation","BBA - Big Bear Creek Array","02","02","Single Span","Single Span",100,NA
+"191","Observation","ENS - Upper Entiat River at rkm 35.7","66","62","DOWNSTREAM ARRAY","UPSTREAM ARRAY",100,NA
+"192","Observation","ENF - Upper Entiat River at rkm 40.6","81","81","UPSTREAM ARRAY","UPSTREAM ARRAY",100,NA
+"193","Observation","TR1 - Lower Trout Cr - Deschutes","01","01","Upstream Array","Upstream Array",100,NA
+"194","Observation","CCA - Lower Charley Creek ISA","05","03","Downstream Antenna","Upstream Antenna",130,NA
+"195","Observation","LKR - Little Klickitat River Array","04","03","Downstream Array","Downstream Array",100,NA
+"196","Observation","PCA - Panther Creek Array","05","03","Downstream Array","Upstream Array",100,NA
+"197","Observation","NFS - North Fork Salmon River","02","02","Upstream Array","Upstream Array",100,NA
+"198","Observation","CCW - Catherine Creek Ladder/Weir","C2","C2","Bottom Ladder Antenna","Bottom Ladder Antenna",100,NA
+"199","Observation","S2I - Lemhi Sub-reach 2 SC Inlet","01","01","Single Antenna","Single Antenna",100,NA
+"200","Observation","S2O - Lemhi Sub-reach 2 SC Outlet","01","01","Single Antenna","Single Antenna",100,NA
+"201","Observation","WPC - Wimpey Creek, Lemhi R. Basin","02","02","Downstream Antenna","Downstream Antenna",110,NA
+"202","Observation","TOP - Lower Toppenish Creek","25","22","Downstream","Upstream",100,NA
+"203","Observation","TP2 - Toppenish Creek at Simcoe Ck","03","01","Downstream Array","Upstream Array",100,NA
+"204","Observation","GCM - Grouse Creek Mouth","02","01","Downstream Antenna","Upstream Antenna",100,NA
+"205","Observation","SM1 - Simcoe Creek at Stephensen Rd","02","01","Downstream Antenna","Upstream Antenna",100,NA
+"206","Observation","LMT - Lower Mainstem Teanaway River","01","01","Upstream Array","Upstream Array",110,NA
+"207","Observation","VC1 - Valley Creek, Upstream Site","A2","A2","UPSTREAM ARRAY","UPSTREAM ARRAY",120,NA
+"208","Observation","SND - Sandtrap Acclimation Site","02","02","Middle Antenna","Middle Antenna",100,NA
+"209","Observation","SHK - Shitike Creek PIT Array","02","02","PIT Tag Array","PIT Tag Array",100,NA
+"210","Observation","CHP - Chiwawa Acc. Pond","02","02","Outlet Pipe","Outlet Pipe",120,NA
+"211","Observation","CHM - Chumstick Creek","F3","F1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA
+"212","Observation","WTL - White River, Wenatchee Basin","06","06","UPPER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",120,NA
+"213","Observation","CCU - Catherine Creek at Union","03","01","Downstream Array","Upstream Array",100,NA
+"214","Observation","PRH - Priest Rapids Hatchery Outfall","F6","F1","OUTFALL CHANNEL","OUTFALL CHANNEL",110,NA
+"215","Observation","SWK - Lower Swauk Creek","01","04","Upstream Series","Downstream Series",130,NA
+"216","Observation","EPR - East Fork Potlatch Array","01","01","Upstream Antenna","Upstream Antenna",100,NA
+"217","Observation","LRW - Lemhi River Weir","A6","A3","DOWNSTREAM ARRAY","UPSTREAM ARRAY",110,NA
+"218","Observation","LBS - Big Springs Creek","02","02","Downstream Antenna","Downstream Antenna",120,NA
+"219","Observation","CMP - Camp Creek at rkm 2 - Imnaha","C4","C2","Downstream Array","Upstream Array",100,NA
+"220","Observation","PEL - Pelton Dam Ladder - Deschutes","04","04","Adult Weir","Adult Weir",110,NA
+"221","Observation","SA1 - Salmon Creek Instream Array","03","03","Downstream Array","Downstream Array",130,NA
+"222","Observation","LMC - Lower Manastash Creek","01","01","Upstream Array","Upstream Array",110,NA
+"223","Observation","UMC - Upper Manastash Creek","01","02","Upstream Array","Downstream Array",100,NA
+"224","Observation","JDC - Cottonwood Creek, NF John Day","02","01","Downstream Antenna","Upstream Antenna",100,NA
+"225","Observation","TON - Tonasket Creek","A1","A1","Single Antenna","Single Antenna",100,NA
+"226","Observation","KLR - Klickitat Riv. Floating Array","04","04","Downstream Array","Downstream Array",100,NA
