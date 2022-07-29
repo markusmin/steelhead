@@ -274,3 +274,60 @@ This guy went down through MC2: 384.1B796A4EB3
 
 
 The trap at PRA seems to delay fish, but they just get returned to the ladder. So just make sure we give them enough time to make it up.
+
+
+
+
+# Let's look at fish that went are seen in the Wells Dam traps
+> CTH_adult %>% group_by(tag_code) %>% filter(any(event_site_name == "WEA - Wells Dam, DCPUD Adult Ladders")) %>%
+ filter(any(antenna_group_name %in% c("East Trap", "EAST TRAP", "West Trap", "WEST TRAP"))) -> WEL_trap_fish
+> unique(WEL_trap_fish$tag_code)
+
+3D9.1BF15CBBE0; 3D9.1BF15D8147; 3D9.1BF15D8BB8; 3D9.1BF15D9C42; 3D9.1BF15DFA21; 3D9.1BF15DFBB1; 3D9.1BF15E29E9; 3D9.1BF15E4EDD; 3D9.1BF15E5654; 3D9.1BF15E76DB
+384.36F2B36ADF; 384.36F2B48A39; 384.36F2B4913D; 384.36F2B49608; 384.36F2B4EB6E; 384.3B2399B7A3; 384.3B239A3B02; 384.3B239A3C9D; 384.3B23A51311; 384.3B23A64EB8
+
+This guy went into the trap, but then continued upstream and was seen in the Methow and Twisp: 384.36F2B48A39
+- presumably, fish can swim back out of the trap
+
+
+# Let's look at individuals seen in the Ice Harbor trap
+
+CTH_adult %>% group_by(tag_code) %>% filter(any(event_site_name == "ICH - Ice Harbor Dam (Combined)")) %>%
+filter(any(antenna_group_name == "Trap Entrance")) -> ICH_trap_fish
+unique(ICH_trap_fish$tag_code)
+# just one fish in this file
+384.3B23A81B34
+
+# This fish just kept going upstream. I don't think that at ICH they remove any fish, it's just for sampling/tagging
+
+
+
+384.3B2396935C - this fish not seen in any of the vertical slot detectors at BO1
+
+384.36F2B4E9CC - this fish was seen in the traps at PRA, then seen ascending four days later.
+I do think that it didn't make it all the way up the first time and when released just fell back down the ladder.
+Script currently calls it aborted, which I think is right
+384.3B23A3A9AF - this guy was seen in the trap, then next seen at ICH. homie decided screw that I'm going the other way
+
+# Double check that the LGR observations are okay
+
+CTH_adult %>% group_by(tag_code) %>% filter(any(event_site_name == "GRA - Lower Granite Dam Adult")) -> CTH_GRA
+CTH_GRA_tags <- unique(CTH_GRA$tag_code)
+
+det_hist %>% group_by(tag_code) %>% filter(any(event_site_name == "GRA - Lower Granite Dam Adult")) -> det_hist_GRA
+det_hist_GRA_tags <- unique(det_hist_GRA$tag_code)
+
+setdiff(det_hist_GRA_tags, CTH_GRA_tags)
+setdiff(CTH_GRA_tags, det_hist_GRA_tags)
+- no differences, which is good!
+
+setdiff(CTH_GRA_tags, det_hist_GRA_tags)
+
+
+
+
+
+
+
+
+
