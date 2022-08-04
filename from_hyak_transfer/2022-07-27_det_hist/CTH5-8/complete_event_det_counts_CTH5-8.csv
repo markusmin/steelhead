@@ -16,7 +16,7 @@
 "BHC - Bohannon Creek Lemhi R Basin",1,"Observation","02","01","Downstream Antenna","Upstream Antenna",120,NA,"in stream",NA
 "BMT - Big Meadow Temporary Array",7,"Observation","01","01","Single Antenna","Single Antenna",100,NA,"in stream",NA
 "BO1 - Bonneville Bradford Is. Ladder",8221,"Observation","22","01","B-BRANCH WEIR 44","VERTICAL SLOT DETECTORS",110,NA,"in stream",NA
-"BO2-BO3-BO4",11930,"Observation","BO3-17","BO3-01","BO3-WEIR 34","BO3-WEIR 59",110,"aborted","in stream",NA
+"BO2-BO3-BO4",11725,"Observation","BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA,"in stream",NA
 "BPC - Bonaparte Creek Instream Array",2,"Observation","C3","C1","Three Antenna Series","Three Antenna Series",100,NA,"in stream",NA
 "BR0 - Bridge Creek Gauge",46,"Observation","B2","B2","Downstream","Downstream",100,NA,"in stream",NA
 "BR1 - Bridge Creek Kiosk",17,"Observation","F2","F1","Downstream","Upstream",100,NA,"in stream",NA

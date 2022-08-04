@@ -1,5 +1,5 @@
 "","event_type_name","event_site_name","start_antenna_id","end_antenna_id","start_ant_group","end_ant_group","ant_config","non_ascent"
-"1","Observation","BO2-BO3-BO4","BO3-17","BO3-01","BO3-WEIR 34","BO3-WEIR 59",110,"aborted"
+"1","Observation","BO2-BO3-BO4","BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA
 "2","Observation","BCC - BON PH2 Corner Collector","01","01","15X15 FULL-FLOW ANTENNA","15X15 FULL-FLOW ANTENNA",100,NA
 "3","Observation","BO1 - Bonneville Bradford Is. Ladder","22","01","B-BRANCH WEIR 44","VERTICAL SLOT DETECTORS",110,NA
 "4","Observation","TWX - Estuary Towed Array (Exp.)","C6","C3","MATRIX TRAWL [CURRENT]","MATRIX TRAWL [CURRENT]",170,NA
