@@ -1105,13 +1105,28 @@ for (i in 1:length(unique_tag_IDs)){
         
         # if it's the first detection in this complex, or it hasn't been seen in more than 48 hours, store the start time 
         # edit 07-29-22 - because we're observing fish spending a lot of time in this complex (in some cases, over 100 days), 
-        # we need to remove the time component for transit to BO4
+        # it needs to have last been seen in BO4 in order for it to be a new event based on time difference (BUT NOT CONSECUTIVE BO4 events - see tag code 384.3B23AD9276 for example)
+        
+        # Need specific rule for each
         if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                        "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
-            tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
-                                                    "BONAFF - BON - Adult Fish Facility") &
+            # If it's currently at BO2, then call it a new event if the last attempt was any of BO2, BO3, or BO4
+            # If it's currently at BO3, then call it a new event if the last attempt was any of BO2, BO3, or BO4
+            tag_hist[j, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                  "BONAFF - BON - Adult Fish Facility") &
             tag_hist[j, 'event_date_time_value'] -
-            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
+            tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
+          # BUT - if it's currently at BO4, don't call it a new event if any of the last detections were at any of BO2, BO3, or BO4
+          # this is covered by the beginning of the if statement, so we don't need to re-write it
+          # if statement attempt 2
+          # if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+          #                                                "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")) |
+          #     # tag_hist[j-1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+          #     #                                         "BONAFF - BON - Adult Fish Facility") &
+          #     tag_hist[j-1, 'event_site_name'] %in% c("BO4 - Bonneville WA Ladder Slots") & 
+          #     tag_hist[j, 'event_site_name'] != "BO4 - Bonneville WA Ladder Slots" & 
+          #     tag_hist[j, 'event_date_time_value'] -
+          #     tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
           
           # old if statement
           # if (!(tag_hist[j-1, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
