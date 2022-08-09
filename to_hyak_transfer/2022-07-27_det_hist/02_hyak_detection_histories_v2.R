@@ -1928,7 +1928,7 @@ for (j in 1:nrow(tag_hist)){
     # For RRE, we are not going to do anything special, except that we are going to have a 48 hour window.
     
     # If it's the first detection at RRE, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-    if (!(tag_hist[j-1, 'antenna_id'] == "RRF - Rocky Reach Fishway") |
+    if (!(tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway") |
         tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway" &
         tag_hist[j, 'event_date_time_value'] - 
         tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
@@ -1946,7 +1946,7 @@ for (j in 1:nrow(tag_hist)){
     
     
     # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-    else if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
+    if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
              tag_hist[j+1, 'event_date_time_value'] - 
              tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
       
