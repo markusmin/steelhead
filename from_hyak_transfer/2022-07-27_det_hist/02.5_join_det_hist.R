@@ -91,8 +91,8 @@ for (i in 1:(nrow(complete_det_hist)-1)){
   if (complete_det_hist[i, 'tag_code'] == complete_det_hist[i+1, 'tag_code'] &  # 1) two rows are from the same fish 
       complete_det_hist[i, 'event_site_name'] == "BO1 - Bonneville Bradford Is. Ladder" & # 2) and are both at BO1
       complete_det_hist[i+1, 'event_site_name'] == "BO1 - Bonneville Bradford Is. Ladder" &
-      complete_det_hist[i, 'end_ant_group'] %in% c("A-BRANCH WEIR 50", "A-BRANCH WEIR 49", # 3) and the first event is in the lower weirs
-                                                   "B-BRANCH WEIR 50", "B-BRANCH WEIR 49") &
+      complete_det_hist[i, 'end_ant_group'] %in% c("A-BRANCH WEIR 50", "A-BRANCH WEIR 49", "A-BRANCH WEIR 48", # 3) and the first event is in the lower weirs
+                                                   "B-BRANCH WEIR 50", "B-BRANCH WEIR 49", "B-BRANCH WEIR 48") &
       complete_det_hist[i+1, 'end_ant_group'] == "VERTICAL SLOT DETECTORS") { # 4) and the second is in the upper weirs
     
     # Change non-ascent to not aborted
@@ -112,8 +112,8 @@ for (i in 1:(nrow(complete_det_hist)-1)){
   # Fix 4: Fish that are missed detections in vertical slot detectors at exit of BO1
   else if (complete_det_hist[i, 'tag_code'] == complete_det_hist[i+1, 'tag_code'] &  # 1) two rows are from the same fish 
            complete_det_hist[i, 'event_site_name'] == "BO1 - Bonneville Bradford Is. Ladder" & # the first is at BO1 and 
-           complete_det_hist[i, 'end_ant_group'] %in% c("A-BRANCH WEIR 50", "A-BRANCH WEIR 49", # the detection is in the upper portion of the lower weir
-                                                        "B-BRANCH WEIR 50", "B-BRANCH WEIR 49") &
+           complete_det_hist[i, 'end_ant_group'] %in% c("A-BRANCH WEIR 50", "A-BRANCH WEIR 49", "A-BRANCH WEIR 48", # the detection is in the upper portion of the lower weir
+                                                        "B-BRANCH WEIR 50", "B-BRANCH WEIR 49", "B-BRANCH WEIR 48") &
            complete_det_hist[i+1, 'event_site_name'] %in% c(BON_MCN_inriver, "MC1 - McNary Oregon Shore Ladder",  "MC2 - McNary Washington Shore Ladder")){ # and the next row is upstream of BON
     
     # Change non-ascent to not aborted
@@ -129,7 +129,7 @@ for (i in 1:(nrow(complete_det_hist)-1)){
                                                         "B-BRANCH WEIR 50", "B-BRANCH WEIR 49", "B-BRANCH WEIR 48") & # 3) the first row ends in the upper portion of the lower weir
            complete_det_hist[i+1, 'start_ant_group'] %in% c("A-BRANCH WEIR 50", "A-BRANCH WEIR 49", "A-BRANCH WEIR 48", 
                                                             "B-BRANCH WEIR 50", "B-BRANCH WEIR 49", "B-BRANCH WEIR 48") & # 4) the second detection starts in the upper portion of the lower weir and ends in the exit
-           complete_det_hist[i+1, 'end_ant_group'] %in% c("A-BRANCH WEIR 43", "A-BRANCH WEIR 44", "A-BRANCH WEIR 43", 
+           complete_det_hist[i+1, 'end_ant_group'] %in% c("A-BRANCH WEIR 43", "A-BRANCH WEIR 44", "A-BRANCH WEIR 45", 
                                                             "B-BRANCH WEIR 43", "B-BRANCH WEIR 44", "B-BRANCH WEIR 45")){
     
     # Make sure it's aborted
@@ -165,7 +165,8 @@ complete_det_hist %>%
 
 # Now, remove those rows
 complete_det_hist %>% 
-  subset(to_remove == "no") -> complete_det_hist
+  subset(to_remove == "no") %>% 
+  dplyr::select(-to_remove) -> complete_det_hist_postprocessed
 
 
 
@@ -176,8 +177,25 @@ complete_det_hist %>%
 
 # Export this file
 
-write.csv(complete_det_hist, here::here("from_hyak_transfer", "2022-07-27_det_hist", "complete_det_hist_postprocessed.csv"))
+write.csv(complete_det_hist_postprocessed, here::here("from_hyak_transfer", "2022-07-27_det_hist", "complete_det_hist_postprocessed.csv"))
 
+
+# Join the other files
+
+# complete event site metadata
+complete_event_site_metadata1_4 <- read.csv(here::here("from_hyak_transfer", "2022-07-27_det_hist", "CTH1-4", "complete_event_site_metadata_CTH1-4.csv"), row.names = 1)
+complete_event_site_metadata5_8 <- read.csv(here::here("from_hyak_transfer", "2022-07-27_det_hist", "CTH5-8", "complete_event_site_metadata_CTH5-8.csv"), row.names = 1)
+complete_event_site_metadata9_11 <- read.csv(here::here("from_hyak_transfer", "2022-07-27_det_hist", "CTH9-11", "complete_event_site_metadata_CTH9-11.csv"), row.names = 1)
+complete_event_site_metadata12_14 <- read.csv(here::here("from_hyak_transfer", "2022-07-27_det_hist", "CTH12-14", "complete_event_site_metadata_CTH12-14.csv"), row.names = 1)
+
+complete_event_site_metadata1_4 %>% 
+  bind_rows(., complete_event_site_metadata5_8) %>% 
+  bind_rows(., complete_event_site_metadata9_11) %>% 
+  bind_rows(., complete_event_site_metadata12_14) -> complete_event_site_metadata
+
+write.csv(complete_event_site_metadata, here::here("from_hyak_transfer", "2022-07-27_det_hist", "complete_event_site_metadata.csv"))
+
+##### Output inspection #####
 
 # There are some clearly weird things happening here - these fixes are then incorporated above.
 
