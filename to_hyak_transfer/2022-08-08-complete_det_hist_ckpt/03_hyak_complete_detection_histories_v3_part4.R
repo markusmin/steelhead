@@ -5950,7 +5950,7 @@ stepwise_states_noNA  %>%
 # Compare them to original detection histories
 
 # Export this for fitting multistate
-write.csv(stepwise_states_noNA, "states_complete_part1.csv")
+write.csv(stepwise_states_noNA, "states_complete_part4.csv")
 
 ##### Sort individuals into run years #####
 run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
