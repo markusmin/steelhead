@@ -1,6 +1,6 @@
 # 01_stan_actual_int_only
 
-# This script will fit an intercept only model using stan to the actual model.
+# This script will fit an intercept only model using stan to the actual dataset
 
 # FOR TESTING: setwd
 setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/01_int_only/")
@@ -239,6 +239,118 @@ not_movements <- which(transition_matrix[,1:(nstates-1)] == 0, arr.ind = TRUE)
 n_notmovements <- dim(not_movements)[1]
 
 
+##### LOAD and REFORMAT DATA #####
+
+# Load states complete
+states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
+
+# first, get the maximum number of visits by any fish
+states_complete %>% 
+  group_by(tag_code) %>% 
+  count() %>% 
+  as.data.frame() -> site_visits_by_tag_code
+
+max_visits <- max(site_visits_by_tag_code$n)
+
+unique_tag_codes <- unique(states_complete$tag_code)
+nfish <- length(unique_tag_codes)
+
+# second, create an array with the dimensions number of fish, maximum number of site visits, number of states
+state_data <- array(data = 0, dim = c(nstates, max_visits, nfish))
+
+# third, populate the state data
+
+# Add a column for the observation
+states_complete %>% 
+  group_by(tag_code) %>% 
+  mutate(order = row_number()) -> states_complete
+
+# add a column to index by fish
+states_complete %>% 
+  group_by(tag_code) %>% 
+  mutate(tag_code_number = cur_group_id()) -> states_complete
+
+
+
+# for (i in 1:nrow(states_complete)){
+# Note: this loop will take about 3-4 hours to complete. It's primarily due to the which statement, since it has to search through and find a match
+print(Sys.time())
+for (i in 1:100){
+  # index by 1) which state, 2) which visit, 3) which fish
+  state_data[which(model_states == states_complete[i, "state", drop = TRUE]),states_complete[i, "order", drop = TRUE], states_complete[i, "tag_code_number", drop = TRUE]] <- 1 
+  
+}
+print(Sys.time())
+
+# Convert the dates into a numeric index
+
+# First, populate the dates for implicit site visits
+# Create a column to indicate if the date_time was interpolated
+# Note the arrival date
+states_complete %>% 
+  mutate(date_source = ifelse(!is.na(date_time), "known_arrival", "interpolated")) %>% 
+  mutate(date = NA) -> states_complete
+
+# I think we have to loop this
+
+# First, figure out indices of missing date_time
+missing_date_time <- is.na(states_complete$date_time)
+date_times <- states_complete$date_time
+
+# For efficiency, only loop through the missing dates
+missing_date_time_indices <- which(missing_date_time == TRUE)
+
+# Extract date for all known date times
+states_complete %>% 
+  mutate(date =  format(as.Date(date(states_complete[i,"date_time", drop = TRUE]), origin = "1970-01-01"))) -> states_complete
+
+# Loop to get arrival dates in state
+# takes about 90 minutes to run
+for (j in 1:length(missing_date_time_indices)){
+# for (i in 1:100){
+  i <- missing_date_time_indices[j]
+
+    # Figure out how far back the last known time was
+    # Truncate the missing date times to only ones prior to current state
+    missing_date_time_subset <- missing_date_time[1:(i-1)]
+    prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
+    
+    # Truncate the missing date times to only ones after current state
+    missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
+    next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
+    
+    # Now, interpolate the missing time
+    # First, figure out how long between the two known times
+    prev_time <- ymd_hms(date_times[prev_time_index])
+    next_time <- ymd_hms(date_times[next_time_index])
+    time_diff <- next_time - prev_time
+    
+    # Get the missing time - add the time difference divided by the number 
+    # of missing steps plus 1, multiply by which number step it is
+    missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
+    
+    # Extract just the date
+    missing_date <- date(missing_time)
+    
+    # populate the missing date_time
+    states_complete[i, "date"] <- format(as.Date(missing_date, origin = "1970-01-01"))
+}
+  
+
+# create an empty matrix
+transition_date_matrix <- matrix(data = NA, nrow = nfish, ncol = max_visits)
+# populate it with the dates
+for (i in 1:nrow(states_complete)){
+  transition_date_matrix[states_complete[i,"tag_code_number", drop = TRUE], states_complete[i, "order", drop = TRUE]] <- states_complete[i, "date_time", drop = TRUE]
+}
+
+# We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
+date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(x) - ymd("2005-05-31"))
+transition_date_matrix %>% 
+  as_tibble() %>% 
+  mutate_all(date_numeric) -> transition_date_numeric
+
+
 
 sim_1200_hist_list <- readRDS("sim_1200_hist_list.rds")
 sim_1200_dates_list <- readRDS("sim_1200_dates_list.rds")
@@ -350,7 +462,9 @@ for (z in 1:1){
     
     
   
-  ##### Data #####
+  ##### Run stan model #####
+  
+  # step 0: data in a list #
   data <- list(y = sim_data_2, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
                states_mat = states_mat, max_visits = dim(sim_data_2)[2],
                movements = movements, not_movements = not_movements,
