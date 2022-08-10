@@ -165,13 +165,13 @@ WEL_right <- c(WEA_110_right, WEA_110_right_trap,
                WEA_130_right_upper, WEA_130_right_lower, WEA_130_right_trap,
                WEA_140_right_upper, WEA_140_right_lower, WEA_140_right_trap,
                WEA_150_right_upper, WEA_150_right_lower, WEA_150_right_trap,
-               WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap,
+               WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap, WEA_160_right_AFF,
                WEA_170_right_upper, WEA_170_right_lower, WEA_170_right_trap)
 
 WEA_traps <- unique(c(WEA_110_left_trap, WEA_120_left_trap, WEA_130_left_trap, 
                       WEA_140_left_trap, WEA_150_left_trap, WEA_160_left_trap, WEA_170_left_trap,
                       WEA_110_right_trap, WEA_120_right_trap, WEA_130_right_trap, 
-                      WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_170_right_trap))
+                      WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_160_right_AFF, WEA_170_right_trap))
 
 
 
