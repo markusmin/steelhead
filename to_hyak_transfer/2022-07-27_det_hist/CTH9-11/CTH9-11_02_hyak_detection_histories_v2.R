@@ -544,22 +544,49 @@ for (i in 1:length(unique_tag_IDs)){
       # SPECIAL CASE: If there is only one detection at the first site, store the 
       # end time as well
       
-      else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
-               # Need to make sure they're not in the BO2-BO3-BO4 complex
-               !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+      # else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name'] &
+      #          # Need to make sure they're not in the BO2-BO3-BO4 complex
+      #          !(tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+      #                                                   "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
+      else if (tag_hist[j+1, 'event_site_name'] != tag_hist[j, 'event_site_name']){
+        
+        # edit 2022-08-10: Excluding BO2-BO3-BO4 here entirely leads to problems. need to instead expand the if statement
+        if (tag_hist[j, 'event_site_name']  %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
+                                                   "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility")){
+          
+          # So if it's seen at BO2-BO3-BO4, then we only store the end time and update the counter IF the next site is not at BO2-BO3-BO4
+          if (!(tag_hist[j+1, 'event_site_name'] %in% c("BO2 - Bonneville Cascades Is. Ladder", "BO3 - Bonneville WA Shore Ladder/AFF",
                                                         "BO4 - Bonneville WA Ladder Slots", "BONAFF - BON - Adult Fish Facility"))){
+            # Store the end time
+            ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
+            # Store the end antenna group and ID
+            ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+            ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+            
+            # UPDATE THE COUNTER
+            # every time we store an end time, we update the counter. This allows
+            # us to move through the detection history df
+            counter <- counter + 1
+            
+            
+          }
+          
+        } 
         
+        else {
+          # Store the end time
+          ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
+          # Store the end antenna group and ID
+          ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
+          ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
+          
+          # UPDATE THE COUNTER
+          # every time we store an end time, we update the counter. This allows
+          # us to move through the detection history df
+          counter <- counter + 1
+          
+        }
         
-        # Store the end time
-        ind_det_hist[counter, 'end_time'] <- tag_hist[j,'event_date_time_value']
-        # Store the end antenna group and ID
-        ind_det_hist[counter,'end_ant_group'] <- tag_hist[j,'antenna_group_name']
-        ind_det_hist[counter,'end_antenna_id'] <- tag_hist[j,'antenna_id']
-        
-        # UPDATE THE COUNTER
-        # every time we store an end time, we update the counter. This allows
-        # us to move through the detection history df
-        counter <- counter + 1
       }
       
       
@@ -637,17 +664,17 @@ for (i in 1:length(unique_tag_IDs)){
           tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) &
           tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder |
           # PRA
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% PRA_110_west &
-          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) |
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) &
-          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% PRA_110_west |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% PRA_110_west &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% PRA_110_west |
           # RIA
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_left &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_middle, RIA_140_right) |
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_middle &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_right) |
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_right &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_middle) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_left &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_middle, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_middle &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_right &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult"  & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_middle) |
           
           tag_hist[j-1, 'event_site_name'] == tag_hist[j, 'event_site_name'] & tag_hist[j, 'event_date_time_value'] -
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
@@ -1897,7 +1924,7 @@ for (i in 1:length(unique_tag_IDs)){
           ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
           
           # store the location fields
-          ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
+          ind_det_hist[counter,'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
           # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
           # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
           # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
