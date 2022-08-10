@@ -747,11 +747,11 @@ first_quarter_tag_codes <- det_hist_tag_codes[1:round(length(det_hist_tag_codes)
 
 # Take the second quarter
 second_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes)+1):round(length(det_hist_tag_codes)*0.5,0)]
-det_hist <- subset(det_hist, tag_code %in% second_quarter_tag_codes)
+# det_hist <- subset(det_hist, tag_code %in% second_quarter_tag_codes)
 
 # Take the third quarter
 third_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes) + length(first_quarter_tag_codes) +1):round(length(det_hist_tag_codes)*0.75,0)]
-# det_hist <- subset(det_hist, tag_code %in% third_quarter_tag_codes)
+det_hist <- subset(det_hist, tag_code %in% third_quarter_tag_codes)
 
 # Take the fourth quarter
 # det_hist <- subset(det_hist, !(tag_code %in% c(first_quarter_tag_codes, second_quarter_tag_codes, third_quarter_tag_codes)))
@@ -5950,7 +5950,7 @@ stepwise_states_noNA  %>%
 # Compare them to original detection histories
 
 # Export this for fitting multistate
-write.csv(stepwise_states_noNA, "states_complete_part2.csv")
+write.csv(stepwise_states_noNA, "states_complete_part3.csv")
 
 ##### Sort individuals into run years #####
 run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
@@ -5969,5 +5969,5 @@ stepwise_states_noNA %>%
   left_join(., tag_codes_run_year, by = "tag_code") -> stepwise_states_noNA
 
 # Export this for fitting multistate
-write.csv(stepwise_states_noNA, "states_complete_part2.csv")
+write.csv(stepwise_states_noNA, "states_complete_part3.csv")
 

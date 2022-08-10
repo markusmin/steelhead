@@ -746,15 +746,15 @@ first_quarter_tag_codes <- det_hist_tag_codes[1:round(length(det_hist_tag_codes)
 det_hist <- subset(det_hist, tag_code %in% first_quarter_tag_codes)
 
 # Take the second quarter
-second_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes)+1):round(length(det_hist_tag_codes)*0.5,0)]
-det_hist <- subset(det_hist, tag_code %in% second_quarter_tag_codes)
+# second_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes)+1):round(length(det_hist_tag_codes)*0.5,0)]
+# det_hist <- subset(det_hist, tag_code %in% second_quarter_tag_codes)
 
 # Take the third quarter
-third_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes) + length(first_quarter_tag_codes) +1):round(length(det_hist_tag_codes)*0.75,0)]
-det_hist <- subset(det_hist, tag_code %in% third_quarter_tag_codes)
+# third_quarter_tag_codes <- det_hist_tag_codes[(length(first_quarter_tag_codes) + length(first_quarter_tag_codes) +1):round(length(det_hist_tag_codes)*0.75,0)]
+# det_hist <- subset(det_hist, tag_code %in% third_quarter_tag_codes)
 
 # Take the fourth quarter
-det_hist <- subset(det_hist, !(tag_code %in% c(first_quarter_tag_codes, second_quarter_tag_codes, third_quarter_tag_codes)))
+# det_hist <- subset(det_hist, !(tag_code %in% c(first_quarter_tag_codes, second_quarter_tag_codes, third_quarter_tag_codes)))
 
 
 # Start a counter for which tag code
