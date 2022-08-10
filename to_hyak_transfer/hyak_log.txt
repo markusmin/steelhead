@@ -1240,25 +1240,59 @@ scp -r ./2022-07-27_det_hist/CTH12-14/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2
 for fixing the R scripts:
 scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
 scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
-scp ./2022-07-27_det_hist/CTH9-11/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
-scp ./2022-07-27_det_hist/CTH12-14/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
+scp ./2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
+
+### 7-29-22 ###
+
+# Pull the scripts off mox, and join them
+
+current directory: from_hyak_transfer/
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/ ./
+
+# okay, made some fixes to the R script, reupload:
+scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
+scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
+scp ./2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
+
+# re-run the slurm scripts
+
+# pull the runs
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/ ./
+
+# Bug fixes
+scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
+scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
+scp ./2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
 
 
+### 8-4-2022 ###
+
+Pull the runs with the latest scripts
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/ ./
 
 
+### 8-8-2022 ###
+Fixed a pretty silly typo, reupload and re-run R scripts
+scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
+scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
+scp ./2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
 
+# pull runs off hyak
 
+# run the implicit site visit script
+scp -r ./2022-08-08-complete_det_hist/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+sbatch complete_det_hist_stf.slurm
 
+# stf nodes are down for maintenance, split the detection history in two and run with two separate R and slurm scripts
 
-
-
-
-
-
-
-
-
-
+scp -r ./2022-08-08-complete_det_hist_ckpt/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+sbatch complete_det_hist_stf_part1.slurm
+sbatch complete_det_hist_stf_part2.slurm
 
 
 
