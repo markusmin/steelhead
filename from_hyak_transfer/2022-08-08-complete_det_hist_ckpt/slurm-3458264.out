@@ -1,0 +1,3 @@
+Error in as.vector(x) : object 'site_classification_new' not found
+Calls: setdiff -> as.vector
+Execution halted
