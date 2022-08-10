@@ -11,7 +11,8 @@ library(janitor)
 
 # Import data
 # temporarily load old data to test script
-states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
+# states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
+states_complete <- read.csv(here::here("stan_actual", "adults_states_complete.csv"), row.names = 1)
 
 # load tag code metadata
 tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
@@ -133,7 +134,9 @@ site_order_notrib_columbia_snake <- c("mainstem, upstream of WEL",
 states_complete %>% 
   left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") %>% 
   left_join(., overshoot_mainstem_sites, by = "natal_origin") %>% 
-  mutate(overshoot = ifelse(state %in% c(overshoot_state, other_branch_state), "overshoot", "not_overshoot")) -> states_complete_overshoot
+  # mutate(overshoot = ifelse(state %in% c(overshoot_state, other_branch_state), "overshoot", "not_overshoot")) -> states_complete_overshoot
+  mutate(overshoot = ifelse(state == overshoot_state | state == other_branch_state, "overshoot", "not_overshoot")) %>% 
+  mutate(overshoot = ifelse(is.na(overshoot), "not_overshoot", overshoot)) -> states_complete_overshoot
 
 # Let's count how many fish overshot at all
 states_complete_overshoot %>% 
@@ -180,6 +183,51 @@ states_complete %>%
 
 # count the total number of fallback movements
 table(fallback_movements$fallback)
+
+fallback_movements %>% 
+  group_by(tag_code) %>% 
+  count(fallback) %>% 
+  subset(fallback == "fallback") -> fallback_counts_by_tag_code
+
+table(fallback_counts_by_tag_code$n)
+
+subset(fallback_counts_by_tag_code, n == 15)
+
+subset(fallback_movements, tag_code == "3D9.1BF18CAC92") -> fallguy
+# This is clearly a bug
+# Actually it's not - this guy keeps switching ladders at Rock Island. bizarre
+
+# 3D9.1BF2463473: did some crazy stuff around MCN
+# Legitimately like 8 ascents + fallbacks at MCN
+
+subset(fallback_counts_by_tag_code, n == 9)
+
+subset(fallback_movements, tag_code == "3DD.003C02E3AA") -> fallguy2
+# some of these are real, but there is some kelt movement in here as well that wasn't removed
+
+# check on all of those that have >= 7 fallback movements
+tag_codes_7ormore_fallbacks <- subset(fallback_counts_by_tag_code, n >= 7)$tag_code
+
+subset(fallback_movements, tag_code %in% tag_codes_7ormore_fallbacks) -> fallguys
+
+# dates for implicit states look off for this fish: 384.3B23AB763C
+# So I think this is in the interpolating dates code. It's off by 8 hours, so I think it's a time zone issue.
+# But it's also off by 7 hours in some cases
+
+# Looks like a kelt: 384.3B23AB763C
+# kelt: 3D9.1BF1896393
+# kelt: 3D9.1BF207252D
+# kelt: 3D9.1C2CB10926
+# Kelt: 3D9.1C2D3D8D9D
+# kelt: 3D9.1C2D756E9F
+# kelt: 3D9.1C2D937BC6
+# kelt: 3D9.257C62AE2D
+# kelt: 3DD.003C02E3AA
+# probably a kelt: 3DD.0077908190
+# kelt: 3DD.00779FA9E8
+# kelt: 3DD.0077A534EF
+# kelt: 3DD.0077D68DE8
+misIDedkelt_tag_codes <- c("384.3B23AB763C", "3D9.1BF1896393", "3D9.1BF207252D", "3D9.1C2CB10926", "3D9.1C2D3D8D9D")
 
 
 # Distinguishing between post-overshoot fallback and delay fallback
