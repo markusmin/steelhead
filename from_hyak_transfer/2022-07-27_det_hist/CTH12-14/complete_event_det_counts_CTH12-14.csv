@@ -159,7 +159,7 @@
 "RIA2 - Rock Island Adult Middle Ladder",406,"Observation","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA,"in stream",NA
 "RIA3 - Rock Island Adult Right Ladder",39,"Observation","0B","0B","Right Ladder Exit Channel","Right Ladder Exit Channel",130,NA,"in stream",NA
 "ROZ - Roza Diversion Dam (Combined)",72,"Observation","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA,"in stream",NA
-"RRF - Rocky Reach Fishway",10,"Observation","A1","A0","Upper Weir","Trap",110,NA,"dam","RRE"
+"RRF - Rocky Reach Fishway",392,"Observation","A3","A0","Lower Weir","Trap",110,NA,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",73,"Observation","01","01","DSM Bypass Surface Collector","DSM Bypass Surface Collector",160,NA,"in stream",NA
 "RSH - Ringold Springs Hatch. Outfall",1,"Observation","03","01","Downstream Array","Upstream Array",100,NA,"in stream",NA
 "S2I - Lemhi Sub-reach 2 SC Inlet",1,"Observation","01","01","Single Antenna","Single Antenna",100,NA,"in stream",NA
@@ -207,7 +207,7 @@
 "VC1 - Valley Creek, Upstream Site",1,"Observation","A2","A2","UPSTREAM ARRAY","UPSTREAM ARRAY",120,NA,"in stream",NA
 "VC2 - Valley Creek, Downstream Site",7,"Observation","B4","B4","DOWNSTREAM 3-ANTENNA ARRAY","DOWNSTREAM 3-ANTENNA ARRAY",130,NA,"in stream",NA
 "WEA1 - Wells Dam, DCPUD Left Adult Ladder",203,"Observation","04","02","Left Ladder Pool 67","Left Ladder Pool 68",170,NA,"in stream",NA
-"WEA2 - Wells Dam, DCPUD Right Adult Ladder",153,"Observation","A3","05","Right Ladder Pool 19","Right Ladder Pool 68",170,NA,"in stream",NA
+"WEA2 - Wells Dam, DCPUD Right Adult Ladder",154,"Observation","A3","05","Right Ladder Pool 19","Right Ladder Pool 68",170,NA,"in stream",NA
 "WEB - Webb Creek",4,"Observation","D2","D1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA,"in stream",NA
 "WEH - Wells Dam Hatchery",49,"Observation","A2","C6","Volunteer Channel","Adult Fish Handling Facility Return to River",110,NA,"in stream",NA
 "WEJ - Wells Dam Bypass Bay Sample",50,"Observation","A1","A1","Baffle Section 1","Baffle Section 1",110,NA,"in stream",NA

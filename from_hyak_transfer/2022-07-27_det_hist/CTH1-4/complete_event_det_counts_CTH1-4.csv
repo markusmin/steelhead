@@ -134,7 +134,7 @@
 "RIA2 - Rock Island Adult Middle Ladder",3207,"Observation","0A","0A","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",100,NA,"in stream",NA
 "RIA3 - Rock Island Adult Right Ladder",1334,"Observation","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",100,NA,"in stream",NA
 "ROZ - Roza Diversion Dam (Combined)",19,"Observation","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA,"in stream",NA
-"RRF - Rocky Reach Fishway",425,"Observation","04","02","WEIR 4","WEIR 6",100,NA,"dam","RRE"
+"RRF - Rocky Reach Fishway",3794,"Observation","04","01","WEIR 4","WEIR 6",100,NA,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",58,"Observation","B4","B3","DSM BYPASS SURFACE COLLECTOR","DSM BYPASS SURFACE COLLECTOR",150,NA,"in stream",NA
 "RZF - Roza Dam Fishway",16,"Observation","03","03","DOWNSTREAM WEIR","DOWNSTREAM WEIR",100,NA,"in stream",NA
 "SA1 - Salmon Creek Instream Array",4,"Observation","B3","B1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA,"in stream",NA
@@ -175,7 +175,7 @@
 "VC1 - Valley Creek, Upstream Site",8,"Observation","A2","A4","UPSTREAM ARRAY","DOWNSTREAM ARRAY",120,NA,"in stream",NA
 "VC2 - Valley Creek, Downstream Site",10,"Observation","B6","B3","Downstream 3-antenna Array","Upstream 3-antenna Array",130,NA,"in stream",NA
 "WEA1 - Wells Dam, DCPUD Left Adult Ladder",2368,"Observation","04","02","LEFT LADDER POOL 67","LEFT LADDER POOL 68",130,NA,"in stream",NA
-"WEA2 - Wells Dam, DCPUD Right Adult Ladder",2567,"Observation","F3","05","RIGHT LADDER POOL 19","RIGHT LADDER POOL 68",140,NA,"in stream",NA
+"WEA2 - Wells Dam, DCPUD Right Adult Ladder",2571,"Observation","F3","05","RIGHT LADDER POOL 19","RIGHT LADDER POOL 68",140,NA,"in stream",NA
 "WEB - Webb Creek",3,"Observation","D2","D1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA,"in stream",NA
 "WEJ - Wells Dam Bypass Bay Sample",2,"Observation","B7","B7","Baffle Section 6","Baffle Section 6",110,NA,"in stream",NA
 "WFC - Wolf Creek, Methow River",4,"Observation","11","11","SINGLE IN-STREAM ANTENNA","SINGLE IN-STREAM ANTENNA",100,NA,"in stream",NA

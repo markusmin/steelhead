@@ -167,7 +167,7 @@
 "RIA2 - Rock Island Adult Middle Ladder",1540,"Observation","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",110,NA,"in stream",NA
 "RIA3 - Rock Island Adult Right Ladder",462,"Observation","A1","A1","Temporary Antenna","Temporary Antenna",110,NA,"in stream",NA
 "ROZ - Roza Diversion Dam (Combined)",108,"Observation","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA,"in stream",NA
-"RRF - Rocky Reach Fishway",178,"Observation","03","02","WEIR 4","WEIR 6",100,NA,"dam","RRE"
+"RRF - Rocky Reach Fishway",2028,"Observation","03","02","WEIR 4","WEIR 6",100,NA,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",150,"Observation","B3","B4","DSM BYPASS SURFACE COLLECTOR","DSM BYPASS SURFACE COLLECTOR",150,NA,"in stream",NA
 "SA0 - Salmon Creek below OID Div.",22,"Observation","E4","E2","Downstream Array","Upstream Array",100,NA,"in stream",NA
 "SA1 - Salmon Creek Instream Array",28,"Observation","B3","B1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA,"in stream",NA
@@ -212,7 +212,7 @@
 "VC2 - Valley Creek, Downstream Site",7,"Observation","B4","B1","DOWNSTREAM 3-ANTENNA ARRAY","Upstream 3-antenna Array",130,NA,"in stream",NA
 "WAN - Wanacut Creek",2,"Observation","A1","A1","Single Antenna","Single Antenna",100,NA,"in stream",NA
 "WEA1 - Wells Dam, DCPUD Left Adult Ladder",872,"Observation","F1","02","LEFT LADDER POOL 19","Left Ladder Pool 68",140,NA,"in stream",NA
-"WEA2 - Wells Dam, DCPUD Right Adult Ladder",805,"Observation","F4","F4","RIGHT LADDER POOL 19","RIGHT LADDER POOL 19",140,NA,"in stream",NA
+"WEA2 - Wells Dam, DCPUD Right Adult Ladder",819,"Observation","F4","F4","RIGHT LADDER POOL 19","RIGHT LADDER POOL 19",140,NA,"in stream",NA
 "WEB - Webb Creek",2,"Observation","D2","D1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA,"in stream",NA
 "WEH - Wells Dam Hatchery",16,"Observation","A2","A2","Volunteer Channel","Volunteer Channel",100,NA,"in stream",NA
 "WEJ - Wells Dam Bypass Bay Sample",12,"Observation","B4","B4","Baffle Section 5","Baffle Section 5",110,NA,"in stream",NA
