@@ -622,17 +622,17 @@ for (j in 1:nrow(tag_hist)){
           tag_hist[j-1, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j-1, 'antenna_id'] %in% c(ICH_110_south_ladder, ICH_110_south_trap) &
           tag_hist[j, 'event_site_name'] == "ICH - Ice Harbor Dam (Combined)" & tag_hist[j, 'antenna_id'] %in% ICH_110_north_ladder |
           # PRA
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% PRA_110_west &
-          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) |
-          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) &
-          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% PRA_110_west |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% PRA_110_west &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) |
+          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% c(PRA_110_AFF, PRA_110_east) &
+          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% PRA_110_west |
           # RIA
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_left &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_middle, RIA_140_right) |
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_middle &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_right) |
-          tag_hist[j-1, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_right &
-          tag_hist[j, 'event_site_name'] == "PRA - Priest Rapids Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_middle) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_left &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_middle, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_middle &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_right) |
+          tag_hist[j-1, 'event_site_name'] == "RIA - Rock Island Adult" & tag_hist[j-1, 'antenna_id'] %in% RIA_140_right &
+          tag_hist[j, 'event_site_name'] == "RIA - Rock Island Adult"  & tag_hist[j, 'antenna_id'] %in% c(RIA_140_left, RIA_140_middle) |
           
           tag_hist[j-1, 'event_site_name'] == tag_hist[j, 'event_site_name'] & tag_hist[j, 'event_date_time_value'] -
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)){
@@ -1882,7 +1882,7 @@ for (j in 1:nrow(tag_hist)){
         ind_det_hist[counter,'ant_config'] <- tag_hist[j,'ant_config']
         
         # store the location fields
-        ind_det_hist[counter,'event_site_name'] <- "RIA2 - Rock Island Adult Middle Ladder"
+        ind_det_hist[counter,'event_site_name'] <- "RIA3 - Rock Island Adult Right Ladder"
         # ind_det_hist[counter,'event_site_basin_name'] <- tag_hist[j,'event_site_basin_name']
         # ind_det_hist[counter,'event_site_subbasin_name'] <- tag_hist[j,'event_site_subbasin_name']
         # ind_det_hist[counter,'event_site_latitude'] <- tag_hist[j,'event_site_latitude_value']
