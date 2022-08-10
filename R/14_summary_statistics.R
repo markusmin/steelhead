@@ -52,6 +52,52 @@ overshoot_mainstem_sites <- data.frame(natal_origin = sort(unique(tag_code_metad
                                                            "mainstem, PRA to RIS" # Yakima River
                                                            ))
 
+# V2 - Add another column so that if a fish enters the other river OR overshoots by ascending dam upstream, then it's overshoot
+# For yakima and Walla Walla, here we use the other river as the other_branch state
+overshoot_mainstem_sites <- data.frame(natal_origin = sort(unique(tag_code_metadata$natal_origin)),
+                                       overshoot_state = c(NA, # Asotin Creek
+                                                           NA, # Clearwater
+                                                           "mainstem, MCN to ICH or PRA", # Deschutes River
+                                                           "mainstem, upstream of WEL", #Entiat
+                                                           "mainstem, MCN to ICH or PRA", # Fifteenmile Creek
+                                                           NA, # Grande Ronde River
+                                                           "mainstem, MCN to ICH or PRA", # Hood River
+                                                           NA, # Imnaha River
+                                                           "mainstem, MCN to ICH or PRA", # John Day River
+                                                           "mainstem, MCN to ICH or PRA",  # Klickitat River
+                                                           NA, # Methow River
+                                                           NA,  # Okanogan River
+                                                           NA, # Salmon River
+                                                           "mainstem, upstream of LGR", # Tucannon River
+                                                           "mainstem, MCN to ICH or PRA", # Umatilla River
+                                                           "mainstem, PRA to RIS", # Walla Walla River
+                                                           "mainstem, RRE to WEL", # Wenatchee River
+                                                           "mainstem, MCN to ICH or PRA",  # Wind River
+                                                           "mainstem, PRA to RIS" # Yakima River
+                                       ),
+                                       other_branch_state = c("mainstem, PRA to RIS", # Asotin Creek
+                                                           "mainstem, PRA to RIS", # Clearwater
+                                                           NA, # Deschutes River
+                                                           "mainstem, ICH to LGR", #Entiat
+                                                           NA, # Fifteenmile Creek
+                                                           "mainstem, PRA to RIS", # Grande Ronde River
+                                                           NA, # Hood River
+                                                           "mainstem, PRA to RIS", # Imnaha River
+                                                           NA, # John Day River
+                                                           NA,  # Klickitat River
+                                                           "mainstem, ICH to LGR", # Methow River
+                                                           "mainstem, ICH to LGR",  # Okanogan River
+                                                           "mainstem, PRA to RIS", # Salmon River
+                                                           "mainstem, PRA to RIS", # Tucannon River
+                                                           NA, # Umatilla River
+                                                           "mainstem, ICH to LGR", # Walla Walla River
+                                                           "mainstem, ICH to LGR", # Wenatchee River
+                                                           NA,  # Wind River
+                                                           "mainstem, ICH to LGR" # Yakima River
+                                       ))
+
+# Need to add overshoot as going into the wrong river, as well
+
 # # add additional overshoot states for Yakima and Walla Walla, since they're at the branch
 # overshoot_mainstem_sites %>% 
 #   bind_rows(., data.frame(natal_origin = c("Yakima River", "Walla Walla River"),
@@ -87,8 +133,7 @@ site_order_notrib_columbia_snake <- c("mainstem, upstream of WEL",
 states_complete %>% 
   left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") %>% 
   left_join(., overshoot_mainstem_sites, by = "natal_origin") %>% 
-  mutate(overshoot = ifelse(is.na(overshoot_state), "not_overshoot",
-    ifelse(state == overshoot_state, "overshoot", "not_overshoot"))) -> states_complete_overshoot
+  mutate(overshoot = ifelse(state %in% c(overshoot_state, other_branch_state), "overshoot", "not_overshoot")) -> states_complete_overshoot
 
 # Let's count how many fish overshot at all
 states_complete_overshoot %>% 
@@ -101,6 +146,7 @@ states_complete_overshoot %>%
 states_complete %>% 
   left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") %>% 
   distinct(tag_code, .keep_all = TRUE) %>% 
+  ungroup() %>% 
   count(natal_origin) %>% 
   as.data.frame() %>% 
   dplyr::rename(total = n) -> natal_origin_fish_counts
@@ -118,9 +164,27 @@ natal_origin_fish_counts %>%
   left_join(., natal_origin_overshooting_fish_counts, by = "natal_origin") %>% 
   mutate(percent_overshoot = round(n_overshot/total,3)*100) -> overshoot_natal_origin_table
   
-  
-  
-  
+# Count the number of fallback events, total
+# first, create a df with the state order for mainstem sites
+
+site_order_combined <- data.frame(state = c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                                            "mainstem, MCN to ICH or PRA", "mainstem, PRA to RIS",
+                                            "mainstem, RIS to RRE", "mainstem, RRE to WEL", 
+                                            "mainstem, upstream of WEL", "mainstem, ICH to LGR",
+                                            "mainstem, upstream of LGR"), state_order = c(1,2,3,4,5,6,7,4,5))
+states_complete %>% 
+  left_join(., site_order_combined, by = "state") %>% 
+  mutate(fallback = ifelse(is.na(state_order), "tributary movement",
+                           ifelse(tag_code == lag(tag_code) & state_order < lag(state_order),
+                           "fallback", "ascent"))) -> fallback_movements
+
+# count the total number of fallback movements
+table(fallback_movements$fallback)
+
+
+# Distinguishing between post-overshoot fallback and delay fallback
+
+
   
   
 
