@@ -5969,5 +5969,5 @@ stepwise_states_noNA %>%
   left_join(., tag_codes_run_year, by = "tag_code") -> stepwise_states_noNA
 
 # Export this for fitting multistate
-write.csv(stepwise_states_noNA, "states_complete_part1.csv")
+write.csv(stepwise_states_noNA, "states_complete_part2.csv")
 
