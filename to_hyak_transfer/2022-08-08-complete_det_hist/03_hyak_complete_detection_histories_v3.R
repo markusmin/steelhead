@@ -4,8 +4,8 @@
 # setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-08-08-complete_det_hist/")
 
 # compare new and old sites
-site_classification_old <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "site_classification.csv"))
-site_classification_new <- read.csv("test_complete_det_hist.csv")
+# site_classification_old <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "site_classification.csv"))
+# site_classification_new <- read.csv("test_complete_det_hist.csv")
 setdiff(site_classification_new$Var1, site_classification_old$event_site_name)
 setdiff(site_classification_old$event_site_name, site_classification_new$Var1)
 
