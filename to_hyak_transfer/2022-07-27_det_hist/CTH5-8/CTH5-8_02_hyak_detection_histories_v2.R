@@ -164,13 +164,13 @@ WEL_right <- c(WEA_110_right, WEA_110_right_trap,
                WEA_130_right_upper, WEA_130_right_lower, WEA_130_right_trap,
                WEA_140_right_upper, WEA_140_right_lower, WEA_140_right_trap,
                WEA_150_right_upper, WEA_150_right_lower, WEA_150_right_trap,
-               WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap,
+               WEA_160_right_upper, WEA_160_right_lower, WEA_160_right_trap, WEA_160_right_AFF,
                WEA_170_right_upper, WEA_170_right_lower, WEA_170_right_trap)
 
 WEA_traps <- unique(c(WEA_110_left_trap, WEA_120_left_trap, WEA_130_left_trap, 
                       WEA_140_left_trap, WEA_150_left_trap, WEA_160_left_trap, WEA_170_left_trap,
                       WEA_110_right_trap, WEA_120_right_trap, WEA_130_right_trap, 
-                      WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_170_right_trap))
+                      WEA_140_right_trap, WEA_150_right_trap, WEA_160_right_trap, WEA_160_right_AFF, WEA_170_right_trap))
 
 
 
@@ -1945,7 +1945,7 @@ for (i in 1:length(unique_tag_IDs)){
       # For RRE, we are not going to do anything special, except that we are going to have a 48 hour window.
       
       # If it's the first detection at RRE, or it hasn't been seen at this route in at least 48 hours store the start time and antenna
-      if (!(tag_hist[j-1, 'antenna_id'] == "RRF - Rocky Reach Fishway") |
+      if (!(tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway") |
           tag_hist[j-1, 'event_site_name'] == "RRF - Rocky Reach Fishway" &
           tag_hist[j, 'event_date_time_value'] - 
           tag_hist[j-1, 'event_date_time_value'] >= hours(x = 48)) {
@@ -1963,9 +1963,9 @@ for (i in 1:length(unique_tag_IDs)){
       
       
       # If the next detection is at a different site, or is more than 48 hours later, store the current time as the end time
-      else if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
-               tag_hist[j+1, 'event_date_time_value'] - 
-               tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
+      if (!(tag_hist[j+1, 'event_site_name'] == "RRF - Rocky Reach Fishway") | # If it's at a different site
+          tag_hist[j+1, 'event_date_time_value'] - 
+          tag_hist[j, 'event_date_time_value'] >= hours(x = 48)){ # or it's more than 48 hours later
         
         # store the info
         # store the tag code
