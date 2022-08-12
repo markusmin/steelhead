@@ -83,8 +83,6 @@ complete_det_hist %>%
   subset(to_remove != "yes") -> complete_det_hist
 
 
-# this for loop doesn't work yet
-
 for (i in 1:(nrow(complete_det_hist)-1)){
   # Fix 3: Fish that are taking a very long time to pass through BO1
   # if:
@@ -148,6 +146,12 @@ for (i in 1:(nrow(complete_det_hist)-1)){
   }
 }
 
+# Fix 7: Fix rows that are incorrectly assigned at BO1 descents, that are really aborts
+complete_det_hist %>% 
+  mutate(non_ascent = ifelse(event_site_name == "BO1 - Bonneville Bradford Is. Ladder" & non_ascent == "descent" & 
+                         start_antenna_id == "04" & end_ant_group %in% c("A-BRANCH WEIR 43", "A-BRANCH WEIR 44", "A-BRANCH WEIR 45", 
+                                                                       "B-BRANCH WEIR 43", "B-BRANCH WEIR 44", "B-BRANCH WEIR 45"),
+                       "aborted", non_ascent)) -> complete_det_hist
   
 
 
