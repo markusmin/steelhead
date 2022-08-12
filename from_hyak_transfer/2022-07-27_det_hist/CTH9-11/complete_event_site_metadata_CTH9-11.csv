@@ -31,14 +31,14 @@
 "30","Observation","JDJ - John Day Dam Juvenile","01","04","FULL FLOW BYPASS","FULL FLOW BYPASS",160,NA
 "31","Observation","WEA1 - Wells Dam, DCPUD Left Adult Ladder","F1","02","LEFT LADDER POOL 19","Left Ladder Pool 68",140,NA
 "32","Observation","LMR - Lower Methow River at Pateros","A4","A4","UPSTREAM FULL-WIDTH ARRAY","UPSTREAM FULL-WIDTH ARRAY",110,NA
-"33","Observation","RIA2 - Rock Island Adult Middle Ladder","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",110,NA
+"33","Observation","RIA3 - Rock Island Adult Right Ladder","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",110,NA
 "34","Observation","WEA2 - Wells Dam, DCPUD Right Adult Ladder","F4","F4","RIGHT LADDER POOL 19","RIGHT LADDER POOL 19",140,NA
 "35","Observation","SCP - Spring Creek Acclimation Pond","F5","F6","Downstream Antennas","Downstream Antennas",120,NA
 "36","Observation","LWE - Lower Wenatchee River","B3","C4","UPSTREAM ANTENNA ARRAY","DOWNSTREAM ANTENNA ARRAY",110,NA
-"37","Observation","GOA - Little Goose Fish Ladder","02","01","Counting Window","Counting Window",100,NA
-"38","Observation","ICB - Ice Harbor Bypass","A1","A4","FULL FLOW BYPASS","FULL FLOW BYPASS",100,NA
-"39","Observation","PRA1 - Priest Rapids Adult West Ladder","07","06","RIGHT [WEST] LADDER WEIR 5","RIGHT [WEST] LADDER WEIR 3",110,NA
-"40","Observation","RIA3 - Rock Island Adult Right Ladder","A1","A1","Temporary Antenna","Temporary Antenna",110,NA
+"37","Observation","RIA2 - Rock Island Adult Middle Ladder","08","06","MIDDLE LADDER BAFFLE 2","MIDDLE LADDER BAFFLE 4",100,NA
+"38","Observation","GOA - Little Goose Fish Ladder","02","01","Counting Window","Counting Window",100,NA
+"39","Observation","ICB - Ice Harbor Bypass","A1","A4","FULL FLOW BYPASS","FULL FLOW BYPASS",100,NA
+"40","Observation","PRA1 - Priest Rapids Adult West Ladder","07","06","RIGHT [WEST] LADDER WEIR 5","RIGHT [WEST] LADDER WEIR 3",110,NA
 "41","Observation","SFG - SF Salmon at Guard Station Br.","A1","A1","IN-STREAM ARRAY","IN-STREAM ARRAY",100,NA
 "42","Observation","KRS - SF Salmon River at Krassel Cr.","A4","A4","IN-RIVER PASS-OVER MUX ARRAY","IN-RIVER PASS-OVER MUX ARRAY",110,NA
 "43","Observation","BBT - Touchet River at Bolles Bridge","F6","F6","DOWNSTREAM ARRAY","DOWNSTREAM ARRAY",100,NA

@@ -16,7 +16,7 @@
 "BGM - Burlingame Dam and Canal",18,"Observation","F4","F3","ADULT FISHWAY","ADULT FISHWAY",110,NA,"in stream",NA
 "BHC - Bohannon Creek Lemhi R Basin",9,"Observation","03","03","Downstream Array","Downstream Array",110,NA,"in stream",NA
 "BO1 - Bonneville Bradford Is. Ladder",2909,"Observation","24","01","B-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",120,NA,"in stream",NA
-"BO2-BO3-BO4",6555,"Observation","BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",110,NA,"in stream",NA
+"BO2-BO3-BO4",6558,"Observation","BO2-10","BO4-01","BO2-WEIR 45","BO4-VERTICAL SLOT DETECTORS",110,NA,"in stream",NA
 "BPC - Bonaparte Creek Instream Array",9,"Observation","C3","C1","Three Antenna Series","Three Antenna Series",100,NA,"in stream",NA
 "BR0 - Bridge Creek Gauge",49,"Observation","B2","B2","Downstream","Downstream",100,NA,"in stream",NA
 "BR1 - Bridge Creek Kiosk",12,"Observation","F2","F1","Downstream","Upstream",100,NA,"in stream",NA
@@ -156,8 +156,8 @@
 "RCT - Roaring Creek Temporary Array",4,"Observation","01","01","Upstream Antenna","Upstream Antenna",110,NA,"in stream",NA
 "RFL - Redfish Lake Creek",3,"Observation","02","03","Instream Array","Instream Array",100,NA,"in stream",NA
 "RIA1 - Rock Island Adult Left Ladder",33,"Observation","04","02","LEFT LADDER BAFFLE 2","LEFT LADDER BAFFLE 4",140,NA,"in stream",NA
-"RIA2 - Rock Island Adult Middle Ladder",406,"Observation","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA,"in stream",NA
-"RIA3 - Rock Island Adult Right Ladder",39,"Observation","0B","0B","Right Ladder Exit Channel","Right Ladder Exit Channel",130,NA,"in stream",NA
+"RIA2 - Rock Island Adult Middle Ladder",60,"Observation","08","06","MIDDLE LADDER BAFFLE 2","MIDDLE LADDER BAFFLE 4",140,NA,"in stream",NA
+"RIA3 - Rock Island Adult Right Ladder",385,"Observation","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA,"in stream",NA
 "ROZ - Roza Diversion Dam (Combined)",72,"Observation","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA,"in stream",NA
 "RRF - Rocky Reach Fishway",392,"Observation","A3","A0","Lower Weir","Trap",110,NA,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",73,"Observation","01","01","DSM Bypass Surface Collector","DSM Bypass Surface Collector",160,NA,"in stream",NA

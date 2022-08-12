@@ -24,7 +24,7 @@
 "23","Observation","CRW - Chewuch River above Winthrop","02","05","UPSTREAM ARRAY","DOWNSTREAM ARRAY",100,NA
 "24","Observation","SWT - Sweetwater Cr. near its mouth","B3","B1","LOWER INSTREAM ARRAY","UPPER INSTREAM ARRAY",110,NA
 "25","Observation","WEB - Webb Creek","D2","D1","DOWNSTREAM ANTENNA","UPSTREAM ANTENNA",100,NA
-"26","Observation","RIA2 - Rock Island Adult Middle Ladder","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA
+"26","Observation","RIA3 - Rock Island Adult Right Ladder","37","0A","Right Ladder Weir 32","Right Ladder Exit Channel",140,NA
 "27","Observation","WEA2 - Wells Dam, DCPUD Right Adult Ladder","A3","05","Right Ladder Pool 19","Right Ladder Pool 68",170,NA
 "28","Observation","TWR - Lwr Twisp Rvr near MSRF Ponds","B6","B3","LOWER IN-STREAM ARRAY","UPPER IN-STREAM ARRAY",100,NA
 "29","Observation","RRJ - Rocky Reach Dam Juvenile","01","01","DSM Bypass Surface Collector","DSM Bypass Surface Collector",160,NA
@@ -44,10 +44,10 @@
 "43","Observation","LWE - Lower Wenatchee River","0C","05","DOWNSTREAM ANTENNA ARRAY","UPSTREAM ANTENNA ARRAY",120,NA
 "44","Observation","ICL - Lower Icicle Instream Array","0A","09","Downstream Array","Downstream Array",110,NA
 "45","Observation","ICM - Middle Icicle Instream Array","05","01","Downstream Array","Upstream Array",100,NA
-"46","Observation","PES - Peshastin Creek","14","15","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",100,NA
-"47","Observation","ACM - Asotin Creek near mouth","03","03","MIDDLE ARRAY","MIDDLE ARRAY",110,NA
-"48","Observation","ACB - Asotin Cr. at Cloverland Brdg.","04","02","Downstream Array","Upstream Array",120,NA
-"49","Observation","RIA3 - Rock Island Adult Right Ladder","0B","0B","Right Ladder Exit Channel","Right Ladder Exit Channel",130,NA
+"46","Observation","RIA2 - Rock Island Adult Middle Ladder","08","06","MIDDLE LADDER BAFFLE 2","MIDDLE LADDER BAFFLE 4",140,NA
+"47","Observation","PES - Peshastin Creek","14","15","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",100,NA
+"48","Observation","ACM - Asotin Creek near mouth","03","03","MIDDLE ARRAY","MIDDLE ARRAY",110,NA
+"49","Observation","ACB - Asotin Cr. at Cloverland Brdg.","04","02","Downstream Array","Upstream Array",120,NA
 "50","Observation","GRS - Lower Granite Dam Spillway","03","06","Upstream","Middle",100,NA
 "51","Observation","MRW - Methow River at Winthrop","B5","B5","DOWNSTREAM ARRAY","DOWNSTREAM ARRAY",100,NA
 "52","Observation","GLC - Gold Creek, Methow River","03","03","LOWER IN-STREAM ARRAY","LOWER IN-STREAM ARRAY",120,NA
