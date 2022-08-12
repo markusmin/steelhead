@@ -184,12 +184,13 @@ for (i in 1:nrow(states_complete)){
 
     # Get the missing time - add the time difference divided by the number
     # of missing steps plus 1, multiply by which number step it is
-    missing_time <- next_time
+    missing_time <- ymd_hms(next_time)
 
     # populate the missing date_time
     # Edit - force PST
-    # states_complete[i, "date_time"] <- missing_time
-    states_complete[i, "date_time"] <- force_tz(missing_time, "PST")
+    # apparently it's not actually necessary
+    states_complete[i, "date_time"] <- missing_time
+    # states_complete[i, "date_time"] <- force_tz(missing_time, "PST")
 
   }
   # If it's not, leave it alone (do nothing)
@@ -264,9 +265,11 @@ states_complete %>%
 # Looks good now!
 
 # Let's figure out the first ADULT arrival at BON
+
+# EDIT 08-11-2022: We need to allow the adult arrival to NOT be an ascent - if the first attempt is aborted, it's still when they arrive
 states_complete %>% 
   group_by(tag_code) %>% 
-  subset(pathway == "BON (adult)") %>% 
+  subset(pathway %in% c("BON (adult)", "BON_aborted")) %>% 
   subset(life_stage != "Juvenile") %>% 
   filter(date_time == min(date_time)) %>% 
   dplyr::select(tag_code, date_time) %>% 
@@ -281,6 +284,7 @@ states_complete %>%
 #   mutate(BON_arrival = ymd_hms(BON_arrival)) -> states_complete
 
 # calculate time after adult arrival
+# this line takes quite a while
 states_complete %>% 
   mutate(time_after_arrival = date_time - as.POSIXct(BON_arrival)) -> states_complete
 
@@ -294,9 +298,17 @@ states_complete %>%
 states_complete %>% 
   mutate(life_stage = ifelse(pathway == "implicit" & lag(life_stage) == "Juvenile", "Juvenile", life_stage)) -> states_complete
 
+checkpoint_states_complete <- states_complete
+
 # Another correction: if mouth to BON follows a juvenile movement, it also has to be a juvenile movement. We want all fish starting when they reach BON (adult)
+# Edit 2022-08-11: exclude mouth to BON that shows up because of an aborted BON attempt
+# Second fix - make sure there are no NAs, so keep all juveniles as juveniles here
 states_complete %>% 
-  mutate(life_stage = ifelse(state == "mainstem, mouth to BON" & lag(life_stage) == "Juvenile", "Juvenile", life_stage)) -> states_complete
+  mutate(life_stage = ifelse(life_stage == "Juvenile", "Juvenile", 
+                             # Make a fix here, so that any detections prior to arrival date at BON are juvenile. This will fix individuals seen at BHL
+                             ifelse(time_after_arrival < 0, "Juvenile",
+                             ifelse(state == "mainstem, mouth to BON" & lag(life_stage) == "Juvenile" & pathway != "BON_aborted", "Juvenile", life_stage)))) -> states_complete
+
 
 
 # Let's look for juveniles
@@ -312,7 +324,7 @@ states_complete %>%
   subset(order_2 == 1) -> first_adult_states
 
 table(first_adult_states$pathway)
-# Looks good!
+# This looks good! They're all starting either with BON (adult) or BON (aborted)
 
 ##### Identify kelt movements #####
 
@@ -508,7 +520,6 @@ states_complete %>%
                                event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "kelt", 
                               life_stage))) -> states_complete
 
-subset(states_complete, tag_code %in% misIDedkelt_tag_codes) -> kelt_misIDs
 
 # TEMPORARY CALL: Any terminal downstream movement is kelt movement
 
@@ -684,29 +695,43 @@ adults_only_states %>%
 
 length(unique(adults_first_states$tag_code_2))
 
-# Looks good!
-# does not look good. what is happening
+# Some start downsteram of BON because they're aborted ascent attempts. I think that's okay? Or we could just remove it.
+# BUT in all honesty, I don't think that movements from the mouth to BON state are all that interesting to us
 table(adults_first_states$state)
+subset(adults_first_states, state == "mainstem, mouth to BON") -> BON_abort_starts
+subset(adults_first_states, pathway == "BON_fallback_arrays")
+table(subset(adults_first_states, state != "mainstem, BON to MCN")$time_after_arrival)
+subset(adults_first_states, time_after_arrival < 0) -> early_fish
+# 7 fish: 5 are clearly juveniles, 2 were seen at BHL first
+
 
 subset(adults_first_states, state != "mainstem, BON to MCN")$tag_code -> problem_tags
 table(subset(adults_first_states, state != "mainstem, BON to MCN")$pathway)
 table(subset(adults_first_states, state != "mainstem, BON to MCN")$life_stage)
 
-# 10 adult, the rest NA
-
-# Look into the NA:
-table(subset(adults_first_states, state != "mainstem, BON to MCN")$time_after_arrival)
-# Literally are all juvenile movements that are misIDed
-
-# Let's look into the adult:
-
-subset(adults_first_states, state != "mainstem, BON to MCN" & life_stage == "Adult")$tag_code -> adult_start_issues
-subset(adults_only_states, tag_code %in% adult_start_issues) -> adult_start_issues_states
-# Okay, check the earlier file
-subset(states_complete, tag_code %in% adult_start_issues) -> adult_start_issues_states_full
-# So for these, it's happening earlier - actually all the way back in the det hist script. They're just not starting at BON
+# Literally are all juvenile movements that are misIDed because time after arrival is negative (meaning we know they happened before arrival)
 
 table(subset(adults_first_states, state != "mainstem, BON to MCN")$pathway)
+
+# Look into the ones we last saw at fallback arrays
+subset(adults_first_states, pathway == "BON_fallback_arrays")$tag_code ->BFA_tags
+
+subset(adults_only_states, tag_code %in% BFA_tags) -> BFA_firststates_adult_only
+subset(states_complete, tag_code %in% BFA_tags) -> BFA_firststates_complete
+
+# they're all BO1 descents
+# descent at BO1 as juvenile: 3D9.1BF22DF252
+# This guy gets called a descent, when really it's an aborted attempt: 3D9.1BF2350747
+# let's just manually change this, because it's so unusual - first seen in the vertical slot detectors, then makes it to the very top, then slides all the way back down and out
+# Exact same story for this tag: 3D9.1BF24A4EFF
+# descent as juvenile: 3D9.1C2CCD36F8
+# descent as juvenile, then misIDed aborted: 3D9.1C2DF09C30
+# exact same story with aborted BO1: 3D9.257C61E76B
+# descent as juvenile: 3D9.257C634620 
+# descent as juvenile: 3DD.007743DC75
+
+# BO1 misIDed as descent that are actually aborted have been fixed.
+# Descents as juveniles
 
 subset(adults_only_states, tag_code %in% problem_tags) -> adult_only_issues
 setdiff(adults_first_states$tag_code_2, adults_only_states$tag_code_2)
