@@ -238,11 +238,33 @@ nmovements <- dim(movements)[1]
 not_movements <- which(transition_matrix[,1:(nstates-1)] == 0, arr.ind = TRUE)
 n_notmovements <- dim(not_movements)[1]
 
+# Paste movements to name parameters
+movements %>% 
+  as.data.frame() %>% 
+  mutate(b0_matrix_name = paste0("b0_matrix_", row, "_", col)) -> b0_matrix_names
+
+for (i in 1:(nrow(b0_matrix_names))){
+  # Paste the numerator
+  cat("real ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
+}
+
+# write it out for the transformed parameters section
+for (i in 1:(nrow(b0_matrix_names))){
+  # Paste the numerator
+  cat("b0_matrix[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
+}
+
+# write out the priors
+for (i in 1:(nrow(b0_matrix_names))){
+  # Paste the numerator
+  cat("b0_matrix[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
+}
 
 ##### LOAD and REFORMAT DATA #####
 
 # Load states complete
-states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
+# states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
+states_complete <- read.csv(here::here("stan_actual", "adults_states_complete.csv"), row.names = 1)
 
 # first, get the maximum number of visits by any fish
 states_complete %>% 
@@ -272,15 +294,18 @@ states_complete %>%
 
 
 
-# for (i in 1:nrow(states_complete)){
+
 # Note: this loop will take about 3-4 hours to complete. It's primarily due to the which statement, since it has to search through and find a match
 print(Sys.time())
-for (i in 1:100){
+for (i in 1:nrow(states_complete)){
+# for (i in 1:100){
   # index by 1) which state, 2) which visit, 3) which fish
   state_data[which(model_states == states_complete[i, "state", drop = TRUE]),states_complete[i, "order", drop = TRUE], states_complete[i, "tag_code_number", drop = TRUE]] <- 1 
   
 }
 print(Sys.time())
+
+write.csv(state_data, here::here("stan_actual", "state_data.csv"))
 
 # Convert the dates into a numeric index
 
@@ -305,6 +330,7 @@ states_complete %>%
   mutate(date =  format(as.Date(date(states_complete[i,"date_time", drop = TRUE]), origin = "1970-01-01"))) -> states_complete
 
 # Loop to get arrival dates in state
+# We currently don't need this, because we interpolated the time earlier
 # takes about 90 minutes to run
 for (j in 1:length(missing_date_time_indices)){
 # for (i in 1:100){
@@ -344,6 +370,7 @@ for (i in 1:nrow(states_complete)){
   transition_date_matrix[states_complete[i,"tag_code_number", drop = TRUE], states_complete[i, "order", drop = TRUE]] <- states_complete[i, "date_time", drop = TRUE]
 }
 
+
 # We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
 date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(x) - ymd("2005-05-31"))
 transition_date_matrix %>% 
@@ -351,30 +378,58 @@ transition_date_matrix %>%
   mutate_all(date_numeric) -> transition_date_numeric
 
 
+##### Reformat origin and rear information #####
+tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
+# keep only the fish that are in the dataset
+tag_code_metadata <- subset(tag_code_metadata, tag_code %in% states_complete$tag_code)
 
-sim_1200_hist_list <- readRDS("sim_1200_hist_list.rds")
-sim_1200_dates_list <- readRDS("sim_1200_dates_list.rds")
-fish_sim_cat_data_1200 <- as.data.frame(as.matrix(read.csv("origin_rear_1200.csv")))
+# Convert origins into numbers
+# All relative to Yakima, since it's the last one alphabetically
+origin_numeric <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+                             natal_origin_numeric = seq(1,17,1))
 
+natal_origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
+tag_code_metadata %>% 
+  left_join(., natal_origin_table, by = "release_site_name") %>% 
+  left_join(., origin_numeric, by = "natal_origin") %>% 
+  mutate(rear_type_numeric = ifelse(rear_type_code == "W", 1, 2))-> tag_code_metadata
 
-# Create a list to store JAGS objects
-stan_1200_list <- list()
-# Loop it
-# for (z in 2:length(sim_1200_hist_list)){
-for (z in 1:1){
-  dates <- sim_1200_dates_list[[z]]
-  sim_data <- sim_1200_hist_list[[z]]
+# reformat this into origin_rear info
+tag_code_metadata %>% 
+  dplyr::select(tag_code, natal_origin_numeric, rear_type_numeric) %>% 
+  dplyr::rename(natal_origin = natal_origin_numeric, rear_type = rear_type_numeric) -> origin_rear_actual
+
+write.csv(origin_rear_actual, here::here("stan_actual", "origin_rear_actual.csv"))
+  
+
+fish_sim_cat_data_actual <- origin_rear_actual
   
   
-  # Store quantities for loop
-  # Store the total number of individuals
-  n.ind <- dim(sim_data)[3]
+# Store quantities for loop
+# Store the total number of individuals
+n.ind <- dim(state_data)[3]
   
   # Store the number of observations per individual
   # -1 because the last state is loss, which isn't actually an observation
   n.obs <- vector(length = n.ind)
   for (i in 1:n.ind){
-    n.obs[i] <- sum(sim_data[,,i]) - 1
+    n.obs[i] <- sum(state_data[,,i]) - 1
   }
   
   
@@ -394,8 +449,8 @@ for (z in 1:1){
   # Store with the states
   for (i in 1:n.ind){
     for (j in 1:(n.obs[i])){
-      # states_list[[i]][j] <- rownames(as.data.frame(which(sim_data[[i]][,j] == 1)))
-      states_list[[i]][j] <- which(sim_data[,j,i] == 1) # Get the index of the site instead of the name
+      # states_list[[i]][j] <- rownames(as.data.frame(which(state_data[[i]][,j] == 1)))
+      states_list[[i]][j] <- which(state_data[,j,i] == 1) # Get the index of the site instead of the name
     }
   }
   
@@ -407,32 +462,73 @@ for (z in 1:1){
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_1200 <- matrix(0, nrow = n.ind, ncol = 3)
+  cat_X_mat_1200 <- matrix(0, nrow = n.ind, ncol = 19)
+  # Start it so that they're all 0s
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_1200[,1] <- 1
   
+  # This is for origin + rear
   for (i in 1:n.ind){
     # Rear type
-    # if (fish_sim_cat_data_1200$rear_type[i] == 1){
-    #   cat_X_mat_1200[i,2] <- 1
-    # }
-    # else {
-    #   cat_X_mat_1200[i,2] <- -1
-    # }
-    
-    
-    # Natal origin
-    if (fish_sim_cat_data_1200$natal_origin[i] == 1){
+    if (fish_sim_cat_data_1200$rear_type[i] == 1){
       cat_X_mat_1200[i,2] <- 1
-      cat_X_mat_1200[i,3] <- 0
-    }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){
-      cat_X_mat_1200[i,2] <- 0
-      cat_X_mat_1200[i,3] <- 1
     }
     else {
       cat_X_mat_1200[i,2] <- -1
-      cat_X_mat_1200[i,3] <- -1
+    }
+    
+    
+    # Natal origin
+    if (fish_sim_cat_data_1200$natal_origin[i] == 1){ # Asotin Creek
+      cat_X_mat_1200[i,3] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Clearwater River
+      cat_X_mat_1200[i,4] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Deschutes River
+      cat_X_mat_1200[i,5] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Entiat River
+      cat_X_mat_1200[i,6] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Fifteenmile Creek
+      cat_X_mat_1200[i,7] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Grande Ronde River
+      cat_X_mat_1200[i,8] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Hood River
+      cat_X_mat_1200[i,9] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Imnaha River
+      cat_X_mat_1200[i,10] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # John Day River
+      cat_X_mat_1200[i,11] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Methow River
+      cat_X_mat_1200[i,12] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Okanogan River
+      cat_X_mat_1200[i,13] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Salmon River
+      cat_X_mat_1200[i,14] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Tucannon River
+      cat_X_mat_1200[i,15] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Umatilla River
+      cat_X_mat_1200[i,16] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Walla Walla River
+      cat_X_mat_1200[i,17] <- 1
+    }
+    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Wenatchee River
+      cat_X_mat_1200[i,18] <- 1
+    }
+    else { # for Yakima
+      cat_X_mat_1200[i,3:19] <- -1
     }
   }
   
@@ -445,17 +541,17 @@ for (z in 1:1){
   # not visited and 1s for visited
   
   # First, create an empty matrix to store the newly formatted detection histories
-  sim_data_2 <- matrix(0, nrow = dim(sim_data)[3], ncol = dim(sim_data)[2])
+  state_data_2 <- matrix(0, nrow = dim(state_data)[3], ncol = dim(state_data)[2])
   
   # Now fill it in
-  for (i in 1:dim(sim_data)[3]){
-    det_hist <- sim_data[,,i]
+  for (i in 1:dim(state_data)[3]){
+    det_hist <- state_data[,,i]
     
     # Count the number of site visits
     nsite_visits <- sum(det_hist)
     
     for (j in 1:nsite_visits){
-      sim_data_2[i,j] <- which(det_hist[,j] == 1, arr.ind = TRUE)
+      state_data_2[i,j] <- which(det_hist[,j] == 1, arr.ind = TRUE)
     }
     
   }
@@ -465,8 +561,8 @@ for (z in 1:1){
   ##### Run stan model #####
   
   # step 0: data in a list #
-  data <- list(y = sim_data_2, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
-               states_mat = states_mat, max_visits = dim(sim_data_2)[2],
+  data <- list(y = state_data_2, n_ind = n.ind, n_obs = n.obs, possible_movements = possible_movements,
+               states_mat = states_mat, max_visits = dim(state_data_2)[2],
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_1200)
