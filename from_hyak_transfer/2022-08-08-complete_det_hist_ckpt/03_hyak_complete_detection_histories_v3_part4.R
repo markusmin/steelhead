@@ -272,10 +272,18 @@ WEL_upstream_other_trib_sites <- WEL_upstream_other_trib_sites_df$event_site_nam
 
 # The aborted ascents are going to be classified as in river detections, downstream of the dam
 
+# pre_BON_inriver <- c("ESANIS - East Sand Island, Columbia River", "TWX - Estuary Towed Array (Exp.)",
+#                      "BONH - Bonneville Hatchery","PD7 - Columbia River Estuary rkm 70", "BO1 - Bonneville Bradford Is. Ladder - ABORTED",
+#                      "BO2-BO3-BO4 - ABORTED",
+#                      "BHL - Adult Fishway at BONH")
+# edit 2022-08-11: adding a new category for aborted ascents at BON. This will allow us to better ID BON arrival
 pre_BON_inriver <- c("ESANIS - East Sand Island, Columbia River", "TWX - Estuary Towed Array (Exp.)",
-                     "BONH - Bonneville Hatchery","PD7 - Columbia River Estuary rkm 70", "BO1 - Bonneville Bradford Is. Ladder - ABORTED",
-                     "BO2-BO3-BO4 - ABORTED",
+                     "BONH - Bonneville Hatchery","PD7 - Columbia River Estuary rkm 70",
                      "BHL - Adult Fishway at BONH")
+
+BON_aborted <- c("BO1 - Bonneville Bradford Is. Ladder - ABORTED", "BO2-BO3-BO4 - ABORTED")
+
+
 # This includes some dams that we are ignoring
 BON_MCN_inriver <- c("COLR4 - Columbia River - Bonneville Dam to John Day Dam (km 234-347)",
                      "The Dalles Adult Fishways (combined)", "JDJ - John Day Dam Juvenile",
@@ -334,7 +342,7 @@ setdiff(complete_event_site_metadata$event_site_name,
           origin_sites, # Natal origins
           LGR_upstream_other_trib_sites, ICH_LGR_other_trib_sites, # Other tributary sitses
           BON_MCN_other_trib_sites, WEL_upstream_other_trib_sites, # Other tributary sites continued
-          pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, 
+          pre_BON_inriver, BON_aborted, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, 
           upstream_WEL_inriver, RRE_WEL_inriver, upstream_LGR_inriver, #in river arrays
           BON_fallback_arrays, MCN_fallback_arrays, ICH_fallback_arrays, LGR_fallback_arrays, 
           RIS_fallback_arrays, RRE_fallback_arrays, WEL_fallback_arrays)) # fallback arrays
@@ -364,7 +372,7 @@ site_classification <- data.frame(event_site_name = c(BON_adult, MCN_adult, PRA_
                                                       YAK_sites,
                                                       LGR_upstream_other_trib_sites, ICH_LGR_other_trib_sites, # other trib sites
                                                       BON_MCN_other_trib_sites, WEL_upstream_other_trib_sites,
-                                                      pre_BON_inriver, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, #in river arrays
+                                                      pre_BON_inriver, BON_aborted, BON_MCN_inriver, MCN_ICH_PRA_inriver, ICH_LGR_inriver, #in river arrays
                                                       upstream_WEL_inriver, upstream_LGR_inriver, RRE_WEL_inriver,
                                                       BON_fallback_arrays, MCN_fallback_arrays, ICH_fallback_arrays, LGR_fallback_arrays, # fallback arrays
                                                       RRE_fallback_arrays, RIS_fallback_arrays, WEL_fallback_arrays,
@@ -382,43 +390,44 @@ site_classification <- data.frame(event_site_name = c(BON_adult, MCN_adult, PRA_
                                     rep("WEL (adult)", length(WEL_adult)),
                                     rep("ICH (adult)", length(ICH_adult)),
                                     rep("LGR (adult)", length(LGR_adult)),
-                                                 rep("ASO_sites", length(ASO_sites)),
-                                                 rep("CLE_sites", length(CLE_sites)),
-                                                 rep("DES_sites", length(DES_sites)),
-                                                 rep("ENT_sites", length(ENT_sites)),
-                                                 rep("FIF_sites", length(FIF_sites)),
-                                                 rep("GRRO_sites", length(GRRO_sites)),
-                                                 rep("HOOD_sites", length(HOOD_sites)),
-                                                 rep("IMN_sites", length(IMN_sites)),
-                                                 rep("JDR_sites", length(JDR_sites)),
-                                                 rep("MET_sites", length(MET_sites)),
-                                                 rep("OKA_sites", length(OKA_sites)),
-                                                 rep("SAL_sites", length(SAL_sites)),
-                                                 rep("TUC_sites", length(TUC_sites)),
-                                                 rep("UMA_sites", length(UMA_sites)),
-                                                 rep("WAWA_sites", length(WAWA_sites)),
-                                                 rep("WEN_sites", length(WEN_sites)),
-                                                 rep("YAK_sites", length(YAK_sites)),
-                                                 rep("LGR_upstream_other_trib_sites", length(LGR_upstream_other_trib_sites)),
-                                                 rep("ICH_LGR_other_trib_sites", length(ICH_LGR_other_trib_sites)),
-                                                 rep("BON_MCN_other_trib_sites", length(BON_MCN_other_trib_sites)),
-                                                 rep("WEL_upstream_other_trib_sites", length(WEL_upstream_other_trib_sites)),
-                                                 rep("pre_BON_inriver", length(pre_BON_inriver)), 
-                                                 rep("BON_MCN_inriver", length(BON_MCN_inriver)),
-                                                 rep("MCN_ICH_PRA_inriver", length(MCN_ICH_PRA_inriver)),
-                                                 rep("ICH_LGR_inriver", length(ICH_LGR_inriver)), 
-                                                 rep("upstream_WEL_inriver", length(upstream_WEL_inriver)), 
-                                                 rep("upstream_LGR_inriver", length(upstream_LGR_inriver)), 
-                                                 rep("RRE_WEL_inriver", length(RRE_WEL_inriver)), 
-                                                 rep("BON_fallback_arrays", length(BON_fallback_arrays)),
-                                                 rep("MCN_fallback_arrays", length(MCN_fallback_arrays)),
-                                                 rep("ICH_fallback_arrays", length(ICH_fallback_arrays)),
-                                                 rep("LGR_fallback_arrays", length(LGR_fallback_arrays)),
-                                                 rep("RRE_fallback_arrays", length(RRE_fallback_arrays)),
-                                                 rep("RIS_fallback_arrays", length(RIS_fallback_arrays)),
-                                                 rep("WEL_fallback_arrays", length(WEL_fallback_arrays)),
-                                                 rep("WEL_trap_arrays", length(WEL_trap_arrays)),
-                                                 "lost"))
+                                    rep("ASO_sites", length(ASO_sites)),
+                                    rep("CLE_sites", length(CLE_sites)),
+                                    rep("DES_sites", length(DES_sites)),
+                                    rep("ENT_sites", length(ENT_sites)),
+                                    rep("FIF_sites", length(FIF_sites)),
+                                    rep("GRRO_sites", length(GRRO_sites)),
+                                    rep("HOOD_sites", length(HOOD_sites)),
+                                    rep("IMN_sites", length(IMN_sites)),
+                                    rep("JDR_sites", length(JDR_sites)),
+                                    rep("MET_sites", length(MET_sites)),
+                                    rep("OKA_sites", length(OKA_sites)),
+                                    rep("SAL_sites", length(SAL_sites)),
+                                    rep("TUC_sites", length(TUC_sites)),
+                                    rep("UMA_sites", length(UMA_sites)),
+                                    rep("WAWA_sites", length(WAWA_sites)),
+                                    rep("WEN_sites", length(WEN_sites)),
+                                    rep("YAK_sites", length(YAK_sites)),
+                                    rep("LGR_upstream_other_trib_sites", length(LGR_upstream_other_trib_sites)),
+                                    rep("ICH_LGR_other_trib_sites", length(ICH_LGR_other_trib_sites)),
+                                    rep("BON_MCN_other_trib_sites", length(BON_MCN_other_trib_sites)),
+                                    rep("WEL_upstream_other_trib_sites", length(WEL_upstream_other_trib_sites)),
+                                    rep("pre_BON_inriver", length(pre_BON_inriver)), 
+                                    rep("BON_aborted", length(BON_aborted)), 
+                                    rep("BON_MCN_inriver", length(BON_MCN_inriver)),
+                                    rep("MCN_ICH_PRA_inriver", length(MCN_ICH_PRA_inriver)),
+                                    rep("ICH_LGR_inriver", length(ICH_LGR_inriver)), 
+                                    rep("upstream_WEL_inriver", length(upstream_WEL_inriver)), 
+                                    rep("upstream_LGR_inriver", length(upstream_LGR_inriver)), 
+                                    rep("RRE_WEL_inriver", length(RRE_WEL_inriver)), 
+                                    rep("BON_fallback_arrays", length(BON_fallback_arrays)),
+                                    rep("MCN_fallback_arrays", length(MCN_fallback_arrays)),
+                                    rep("ICH_fallback_arrays", length(ICH_fallback_arrays)),
+                                    rep("LGR_fallback_arrays", length(LGR_fallback_arrays)),
+                                    rep("RRE_fallback_arrays", length(RRE_fallback_arrays)),
+                                    rep("RIS_fallback_arrays", length(RIS_fallback_arrays)),
+                                    rep("WEL_fallback_arrays", length(WEL_fallback_arrays)),
+                                    rep("WEL_trap_arrays", length(WEL_trap_arrays)),
+                                    "lost"))
 
 # Create a new dataframe for state (location in the system)
 site_classification %>%
@@ -455,69 +464,71 @@ site_classification %>%
                                 ifelse(
                                   site_class == "HOOD_sites", "Hood River",
                                   ifelse(
-                                  site_class == "IMN_sites", "Imnaha River",
-                                  ifelse(
-                                    site_class == "JDR_sites", "John Day River",
+                                    site_class == "IMN_sites", "Imnaha River",
                                     ifelse(
-                                      site_class == "MET_sites", "Methow River",
+                                      site_class == "JDR_sites", "John Day River",
                                       ifelse(
-                                        site_class == "OKA_sites", "Okanogan River",
+                                        site_class == "MET_sites", "Methow River",
                                         ifelse(
-                                          site_class == "SAL_sites", "Salmon River",
+                                          site_class == "OKA_sites", "Okanogan River",
                                           ifelse(
-                                            site_class == "TUC_sites", "Tucannon River",
+                                            site_class == "SAL_sites", "Salmon River",
                                             ifelse(
-                                              site_class == "UMA_sites", "Umatilla River",
+                                              site_class == "TUC_sites", "Tucannon River",
                                               ifelse(
-                                                site_class == "WAWA_sites", "Walla Walla River",
+                                                site_class == "UMA_sites", "Umatilla River",
                                                 ifelse(
-                                                  site_class == "WEN_sites", "Wenatchee River",
+                                                  site_class == "WAWA_sites", "Walla Walla River",
                                                   ifelse(
-                                                    site_class == "YAK_sites", "Yakima River",
+                                                    site_class == "WEN_sites", "Wenatchee River",
                                                     ifelse(
-                                                      
-                                                      # Other tributaries
-                                                      site_class == "LGR_upstream_other_trib_sites", "Upstream LGR other tributaries",
+                                                      site_class == "YAK_sites", "Yakima River",
                                                       ifelse(
-                                                        site_class == "ICH_LGR_other_trib_sites", "ICH to LGR other tributaries",
+                                                        
+                                                        # Other tributaries
+                                                        site_class == "LGR_upstream_other_trib_sites", "Upstream LGR other tributaries",
                                                         ifelse(
-                                                          site_class == "BON_MCN_other_trib_sites", "BON to MCN other tributaries",
+                                                          site_class == "ICH_LGR_other_trib_sites", "ICH to LGR other tributaries",
                                                           ifelse(
-                                                            site_class == "WEL_upstream_other_trib_sites", "Upstream WEL other tributaries",
+                                                            site_class == "BON_MCN_other_trib_sites", "BON to MCN other tributaries",
                                                             ifelse(
-                                                              
-                                                              # In river sites
-                                                              site_class == "pre_BON_inriver", "mainstem, mouth to BON",
+                                                              site_class == "WEL_upstream_other_trib_sites", "Upstream WEL other tributaries",
                                                               ifelse(
-                                                                site_class == "BON_MCN_inriver", "mainstem, BON to MCN",
+                                                                
+                                                                # In river sites
+                                                                site_class == "pre_BON_inriver", "mainstem, mouth to BON",
                                                                 ifelse(
-                                                                  site_class == "MCN_ICH_PRA_inriver", "mainstem, MCN to ICH or PRA",
+                                                                  site_class == "BON_aborted", "mainstem, mouth to BON",
                                                                   ifelse(
-                                                                    site_class == "ICH_LGR_inriver", "mainstem, ICH to LGR",
+                                                                    site_class == "BON_MCN_inriver", "mainstem, BON to MCN",
                                                                     ifelse(
-                                                                      site_class == "upstream_WEL_inriver", "mainstem, upstream of WEL",
+                                                                      site_class == "MCN_ICH_PRA_inriver", "mainstem, MCN to ICH or PRA",
                                                                       ifelse(
-                                                                        site_class == "upstream_LGR_inriver", "mainstem, upstream of LGR",
+                                                                        site_class == "ICH_LGR_inriver", "mainstem, ICH to LGR",
                                                                         ifelse(
-                                                                          site_class == "RRE_WEL_inriver", "mainstem, RRE to WEL", 
+                                                                          site_class == "upstream_WEL_inriver", "mainstem, upstream of WEL",
                                                                           ifelse(
-                                                                          site_class == "BON_fallback_arrays", "mainstem, mouth to BON",
-                                                                          ifelse(
-                                                                            site_class == "MCN_fallback_arrays", "mainstem, BON to MCN",
+                                                                            site_class == "upstream_LGR_inriver", "mainstem, upstream of LGR",
                                                                             ifelse(
-                                                                              site_class == "ICH_fallback_arrays", "mainstem, MCN to ICH or PRA",
-                                                                            ifelse(
-                                                                              site_class == "LGR_fallback_arrays", "mainstem, ICH to LGR", 
+                                                                              site_class == "RRE_WEL_inriver", "mainstem, RRE to WEL", 
                                                                               ifelse(
-                                                                                site_class == "RRE_fallback_arrays", "mainstem, RIS to RRE", 
+                                                                                site_class == "BON_fallback_arrays", "mainstem, mouth to BON",
                                                                                 ifelse(
-                                                                                  site_class == "RIS_fallback_arrays", "mainstem, PRA to RIS", 
+                                                                                  site_class == "MCN_fallback_arrays", "mainstem, BON to MCN",
                                                                                   ifelse(
-                                                                                    site_class == "WEL_fallback_arrays", "mainstem, RRE to WEL", 
+                                                                                    site_class == "ICH_fallback_arrays", "mainstem, MCN to ICH or PRA",
                                                                                     ifelse(
-                                                                                      site_class == "WEL_trap_arrays", "WEL traps",
-                                                                                    ifelse(site_class == "lost", "lost", NA)
-                                                                                  ))))))))))))))))))))))))))))))))))))))))))))) -> site_classification
+                                                                                      site_class == "LGR_fallback_arrays", "mainstem, ICH to LGR", 
+                                                                                      ifelse(
+                                                                                        site_class == "RRE_fallback_arrays", "mainstem, RIS to RRE", 
+                                                                                        ifelse(
+                                                                                          site_class == "RIS_fallback_arrays", "mainstem, PRA to RIS", 
+                                                                                          ifelse(
+                                                                                            site_class == "WEL_fallback_arrays", "mainstem, RRE to WEL", 
+                                                                                            ifelse(
+                                                                                              site_class == "WEL_trap_arrays", "WEL traps",
+                                                                                              ifelse(site_class == "lost", "lost", NA)
+                                                                                            )))))))))))))))))))))))))))))))))))))))))))))) -> site_classification
 
 # Export site classification
 write.csv(site_classification, "site_classification.csv")
