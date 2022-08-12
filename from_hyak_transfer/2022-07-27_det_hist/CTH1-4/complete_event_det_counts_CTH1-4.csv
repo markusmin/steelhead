@@ -12,7 +12,7 @@
 "BGM - Burlingame Dam and Canal",24,"Observation","F5","F5","BYPASS SLOT","BYPASS SLOT",110,NA,"in stream",NA
 "BHC - Bohannon Creek Lemhi R Basin",2,"Observation","03","01","Downstream Array","Upstream Array",110,NA,"in stream",NA
 "BO1 - Bonneville Bradford Is. Ladder",7210,"Observation","13","01","A-BRANCH WEIR 43","VERTICAL SLOT DETECTORS",110,NA,"in stream",NA
-"BO2-BO3-BO4",13045,"Observation","BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA,"in stream",NA
+"BO2-BO3-BO4",13049,"Observation","BO3-17","BO4-01","BO3-WEIR 34","BO4-VERTICAL SLOT DETECTORS",100,NA,"in stream",NA
 "BPC - Bonaparte Creek Instream Array",16,"Observation","C3","C1","Three Antenna Series","Three Antenna Series",100,NA,"in stream",NA
 "BR0 - Bridge Creek Gauge",21,"Observation","B2","B2","Downstream","Downstream",100,NA,"in stream",NA
 "BR1 - Bridge Creek Kiosk",18,"Observation","F2","F2","Downstream","Downstream",100,NA,"in stream",NA
@@ -131,8 +131,8 @@
 "RCS - Rock Creek (WA) at rkm 14",5,"Observation","B4","B3","MIDDLE IN-STREAM ARRAY","MIDDLE IN-STREAM ARRAY",100,NA,"in stream",NA
 "RCT - Roaring Creek Temporary Array",2,"Observation","01","01","Instream Array","Instream Array",100,NA,"in stream",NA
 "RIA1 - Rock Island Adult Left Ladder",96,"Observation","04","01","LEFT LADDER BAFFLE 2","LEFT LADDER BAFFLE 4",130,NA,"in stream",NA
-"RIA2 - Rock Island Adult Middle Ladder",3207,"Observation","0A","0A","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",100,NA,"in stream",NA
-"RIA3 - Rock Island Adult Right Ladder",1334,"Observation","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",100,NA,"in stream",NA
+"RIA2 - Rock Island Adult Middle Ladder",568,"Observation","07","06","MIDDLE LADDER BAFFLE 2","MIDDLE LADDER BAFFLE 4",100,NA,"in stream",NA
+"RIA3 - Rock Island Adult Right Ladder",3973,"Observation","09","09","RIGHT LADDER BAFFLE 4","RIGHT LADDER BAFFLE 4",100,NA,"in stream",NA
 "ROZ - Roza Diversion Dam (Combined)",19,"Observation","03","01","DOWNSTREAM WEIR","UPSTREAM WEIR",110,NA,"in stream",NA
 "RRF - Rocky Reach Fishway",3794,"Observation","04","01","WEIR 4","WEIR 6",100,NA,"dam","RRE"
 "RRJ - Rocky Reach Dam Juvenile",58,"Observation","B4","B3","DSM BYPASS SURFACE COLLECTOR","DSM BYPASS SURFACE COLLECTOR",150,NA,"in stream",NA
