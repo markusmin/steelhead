@@ -1,13 +1,13 @@
 ### 03 - Complete Detection histories - VERSION 2 - FOR HYAK - master script
 
 # For testing:
-# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-08-08-complete_det_hist/")
+setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-08-08-complete_det_hist_ckpt/")
 
 # compare new and old sites
 # site_classification_old <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "site_classification.csv"))
 # site_classification_new <- read.csv("test_complete_det_hist.csv")
-setdiff(site_classification_new$Var1, site_classification_old$event_site_name)
-setdiff(site_classification_old$event_site_name, site_classification_new$Var1)
+# setdiff(site_classification_new$Var1, site_classification_old$event_site_name)
+# setdiff(site_classification_old$event_site_name, site_classification_new$Var1)
 
 
 # This R script adds "implicit site usage" for individuals, i.e., adds in sites
@@ -753,8 +753,7 @@ nfish <- length(unique(det_hist$tag_code))
 # Remove fields that we aren't interested in
 det_hist %>% 
   dplyr::select(-c(start_antenna_id, end_antenna_id,
-                   ant_config,
-                   to_remove)) -> det_hist
+                   ant_config)) -> det_hist
 
 # Append a dummy fish
 
@@ -807,9 +806,10 @@ stepwise_states <- data.frame(tag_code = character(),
                               date_time = as.POSIXct(character()),
                               pathway = character())
 # This tag code 384.1B796A520E is rows 780 - 795 of det hist
-# for (i in 1:round(1.5 * nrow(det_hist), 0)) {
-for (i in 1:10000){
-# for (i in 7200:7300) {
+for (i in 1:round(1.5 * nrow(det_hist), 0)) {
+# for (i in 1:10000){
+# for (i in 162363:162368) {
+# for (i in 162363:162369) {
 # for (i in 22500:23000){
 # for (i in 31900:32500) {
 # for (i in (nrow(det_hist)-20):(nrow(det_hist) + 20)) { # Test to see if dummy fish solution works
@@ -4632,6 +4632,8 @@ for (i in 1:10000){
           }
         }
         
+        
+        # If it wasn't in a tributary previously:
         
         # Zeroth: Jumping between Snake and Columbia, without visiting
         # shared sites in between. We see this with some fish, if they are
