@@ -514,7 +514,7 @@ states_complete %>%
 # also only allow it if it's been at least 90 days and movement is occurring when we'd expect it to (following spring spawning)
 # states_complete_orig <- states_complete
 
-states_complete %>% 
+states_complete %>%
   mutate(life_stage = ifelse(order == max_order & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream", "kelt",
                              ifelse(event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lag(direction) == "downstream" | # if two consecutive downstream movements, then they're possible kelt movements
                                event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & direction == "downstream" & lead(direction) == "downstream", "kelt", 
@@ -561,6 +561,7 @@ states_complete %>%
 
 # Okay, I think we can use group_by(tag_code) and max(direction index) to see if it still changes direction for the same tag code
 # BUT - we need to make sure it's not a repeat spawner. But then theoretically this would exclude fallback by repeat spawners
+# So it definitely does exclude fallback by repeat spawners, which is an issue, but it looks like only for tag code 3D9.1C2D7EBE8B, which seems to be the only affected individual
 states_complete %>% 
   group_by(tag_code) %>% 
   mutate(max_direction_index = max(direction_index)) -> states_complete
@@ -575,9 +576,18 @@ states_complete %>%
   mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & order >= repeat_start, "repeat", life_stage)) -> states_complete
 
 # Now change those kelt life stage events that are not actually kelts (because they're followed by upstream movement) back to Adult
+# edit 2022-08-12 - make the fix for tag code 3D9.1C2D7EBE8B, which is the only repeat spawner with fallback that's not kelt movement
 states_complete %>% 
-  mutate(life_stage = ifelse(life_stage == "kelt" & next_direction == "upstream" & direction_index != max_direction_index & eventual_repeat == "single", 
+  mutate(life_stage = ifelse(life_stage == "kelt" & next_direction == "upstream" & direction_index != max_direction_index & eventual_repeat == "single",
                              "Adult", life_stage)) -> states_complete
+
+# edit 2022-08-12 - make the fix for tag code 3D9.1C2D7EBE8B, which is the only repeat spawner with fallback that's not kelt movement
+states_complete %>% 
+  mutate(life_stage = ifelse(tag_code == "3D9.1C2D7EBE8B" & event_year == 2012 & event_month == 4 & event_day == 11, "Adult", life_stage)) -> states_complete
+
+# states_complete_ckpt <- states_complete
+
+
 
 # Let's check on our repeat spawners
 states_complete %>% 
@@ -642,13 +652,18 @@ states_complete %>%
                                life_stage == "repeat" & event_month >= 3 & event_month <= 7 & time_after_arrival > days(x = 90) & 
                                direction == "downstream" & lead(direction) == "downstream", "repeat_kelt", life_stage))) -> states_complete
   
-  
-# ?? I think that the below code now works
-# CHECKPOINT 07-21-2022 - the below block doesn't work, leads to lots of NA life stages #
+# states_complete_ckpt <- states_complete
 
 # Quick fix for individuals (e.g., 3D9.1C2CCDA88C) with an upstream movement that's clearly a kelt (sandwiched between downstream movements)
+# This is introducing a lot of NAs because if it's the last line in the history, then there's no lead, and if it's the first, there's no lag
+# fixed!
 states_complete %>% 
-  mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & lag(life_stage == "kelt") & lead(life_stage == "kelt"), "kelt", life_stage)) -> states_complete
+  mutate(life_stage = ifelse(eventual_repeat == "eventual_repeat" & order == max_order | eventual_repeat == "eventual_repeat" & order == 1, life_stage,
+                             ifelse(eventual_repeat == "eventual_repeat" & lag(life_stage == "kelt") & lead(life_stage == "kelt"), "kelt", life_stage))) -> states_complete
+
+states_complete %>% 
+  group_by(tag_code) %>% 
+  filter(any(is.na(life_stage))) -> NA_life_stages
 
 # Look into our repeat kelts
 states_complete %>% 
@@ -671,13 +686,30 @@ NA_life_stages %>%
   dplyr::rename(days_after_arrival = time_after_arrival, days_after_release = time_after_release) %>% 
   mutate(days_after_arrival = round(days_after_arrival, 1), days_after_release = round(days_after_release, 1)) ->possible_kelts_for_export
 
-write.csv(possible_kelts_for_export, "possible_kelts_for_export.csv")
+# write.csv(possible_kelts_for_export, "possible_kelts_for_export.csv")
 
 # We want to model adult movement, but not kelt movement, and note when an adult has become a repeat spawner.
 # For that, we will create a new field based on tag code, with repeat appended for those individuals
 
+# Edit 2022-08-12 - sometimes if there are repeat repeats, then we need to append a number.
+# This might be the only fish that's a repeat repeat: 3D9.1BF27BDC8D
+# So we can see if it was a repeat kelt, and if it was, then the next repeat after it is another repeat
+
 states_complete %>% 
-  mutate(tag_code_2 = ifelse(eventual_repeat == "eventual_repeat" & order >= repeat_start, paste0(tag_code, "_repeat"), tag_code)) -> states_complete
+  group_by(tag_code) %>% 
+  subset(life_stage == "repeat_kelt") %>% 
+  mutate(repeat_kelt_end = max(order)) %>% 
+  distinct(tag_code, .keep_all = TRUE)-> repeat_kelts
+
+# states_complete %>% 
+#   subset(tag_code %in% repeat_kelts$tag_code) -> repeat_kelts_test
+
+states_complete %>% 
+  left_join(., dplyr::select(repeat_kelts, c(tag_code, repeat_kelt_end)), by = "tag_code") %>% 
+  # need to make this edit so that we aren't left with NA tag_code_2
+  mutate(repeat_kelt_end = ifelse(is.na(repeat_kelt_end), 999, repeat_kelt_end)) %>% 
+  mutate(tag_code_2 = ifelse(eventual_repeat == "eventual_repeat" & order > repeat_kelt_end, paste0(tag_code, "_repeat_2"),
+    ifelse(eventual_repeat == "eventual_repeat" & order >= repeat_start, paste0(tag_code, "_repeat"), tag_code))) -> states_complete
 
 # Check to make sure our new tag codes make sense
 states_complete %>% 
