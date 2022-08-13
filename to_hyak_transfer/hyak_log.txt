@@ -1318,3 +1318,138 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/ ./
 # run implicit site visit code
 somehow this is running really fast
 
+Looks good, but in the future I might want to preserve more information in the states complete file
+
+### 08-10-2022 ###
+
+Once again, fixed a couple of typos and reuploaded scripts:
+
+scp ./2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH1-4/
+scp ./2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH5-8/
+scp ./2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH9-11/
+scp ./2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/CTH12-14/
+
+# pull it:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-07-27_det_hist/ ./
+
+### 8-11-2022 ###
+
+rerun implicit site visit code
+scp -r ./2022-08-08-complete_det_hist_ckpt/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+sbatch complete_det_hist_ckpt_part1.slurm
+sbatch complete_det_hist_ckpt_part2.slurm
+sbatch complete_det_hist_ckpt_part3.slurm
+sbatch complete_det_hist_ckpt_part4.slurm
+
+# pull it
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-08-08-complete_det_hist_ckpt/ ./
+
+### 8-12-2022 ###
+
+# 1 more minor fix to implicit site visit code
+
+scp -r ./2022-08-08-complete_det_hist_ckpt/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+sbatch complete_det_hist_ckpt_part1.slurm
+sbatch complete_det_hist_ckpt_part2.slurm
+sbatch complete_det_hist_ckpt_part3.slurm
+sbatch complete_det_hist_ckpt_part4.slurm
+
+# pull it
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/2022-08-08-complete_det_hist_ckpt/ ./
+
+# getting stan up on mox - attempt 3?
+
+So far, we've found that we can't install cmdstan because the compiler is too old. 
+
+# my last notes:
+
+# OKAY - let's see if we can get stan running on mox
+- So cmdstanr package will load, but then the stan model completely explodes
+- I'm not sure we have cmdstan (no r) installed, which is required - https://mc-stan.org/cmdstanr/articles/cmdstanr.html
+- So it sounds like our compiler is too old? I think we ran into this issue before
+	- can we load any of the available gcc modules?
+		- yes we can, but just using module load doesn't fix it
+
+gcc/6.3.1                                                           
+           gcc/8.2.1                                                           
+                                gcc/10.1.0                                                          
+                        gcc_4.8.5-impi_2017                                                 
+                            gcc_8.2.1-ompi_3.1.4                                                
+                          gcc_8.2.1-ompi_4.0.1  
+                          
+                          contrib/gcc-8.3.0                                                      
+contrib/gcc-9.3.0                                  
+contrib/gcc/6.2.0                                  
+contrib/gcc/6.2.0_impi                             
+contrib/gcc/6.2.0_mpich-3.2                        
+contrib/gcc/6.3.0                                  
+contrib/gcc49/4.9.4                                
+contrib/gcc_9.3.0_ompi_4.0.7                       
+contrib/gcc_10.1.0                                 
+contrib/gcc_10.1.0_ompi_4.0.3                      
+contrib/gcc_cesg/9.1.0   
+
+# okay, so today:
+#first, get a build node:
+
+# then, load R
+> module load contrib/R-4.2.0/4.2.0
+R
+
+# then, load cmdstanr
+> library(cmdstanr)
+This is cmdstanr version 0.5.2
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.0
+- CmdStan version: 2.30.0
+
+A newer version of CmdStan is available. See ?install_cmdstan() to install it.
+To disable this check set option or environment variable CMDSTANR_NO_VER_CHECK=TRUE.
+
+# try installing cmdstan
+> install_cmdstan()
+The C++ toolchain required for CmdStan is setup properly!
+* Latest CmdStan release is v2.30.1
+* Installing CmdStan v2.30.1 in /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+* Downloading cmdstan-2.30.1.tar.gz from GitHub...
+* Download complete
+* Unpacking archive...
+* Building CmdStan binaries...
+
+# it then starts printing tons of stuff, which ends with:
+Warning message:
+There was a problem during installation. See the error message(s) above. 
+# there are a ton of different errors listed
+
+So GCC compiler is too old: https://discourse.mc-stan.org/t/cmdstan-installation-error/20329/4
+[mmin@mox1 /]$ gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+
+and we need at minimum gcc/g++ 4.9.3
+
+# try and load those modules
+module load contrib/gcc-9.3.0 
+[mmin@mox1 /]$ gcc --version
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+
+# so this doesn't update the version
+module load contrib/gcc/6.2.0 
+[mmin@n2233 /]$ gcc --version
+gcc (GCC) 6.2.0
+
+# this appears to have worked!
+
+# try installing stan again
+R
+library(cmdstanr)
+install_cmdstan(overwrite = TRUE) # this is necessary because of our past failed installation attempts
+
+
+
+
+
+
+
+
+
+
