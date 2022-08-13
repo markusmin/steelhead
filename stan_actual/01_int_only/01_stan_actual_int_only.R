@@ -104,10 +104,10 @@ transition_matrix["mainstem, RIS to RRE", "Wenatchee River"] <- 1
 
 
 # 6: mainstem, RRE to WEL
-transition_matrix["mainstem, RIS to RRE", "loss"] <- 1
-transition_matrix["mainstem, RIS to RRE", "mainstem, RIS to RRE"] <- 1
-transition_matrix["mainstem, RIS to RRE", "mainstem, upstream of WEL"] <- 1
-transition_matrix["mainstem, RIS to RRE", "Entiat River"] <- 1
+transition_matrix["mainstem, RRE to WEL", "loss"] <- 1
+transition_matrix["mainstem, RRE to WEL", "mainstem, RIS to RRE"] <- 1
+transition_matrix["mainstem, RRE to WEL", "mainstem, upstream of WEL"] <- 1
+transition_matrix["mainstem, RRE to WEL", "Entiat River"] <- 1
 
 
 # 7: mainstem, upstream of WEL
@@ -225,7 +225,7 @@ transition_matrix["BON to MCN other tributaries", "mainstem, BON to MCN"] <- 1
 
 # 28: Upstream WEL other tributaries
 transition_matrix["Upstream WEL other tributaries", "loss"] <- 1
-transition_matrix["Upstream WEL other tributaries", "mainstem, BON to MCN"] <- 1
+transition_matrix["Upstream WEL other tributaries", "mainstem, upstream of WEL"] <- 1
 
 
 # Use the transition matrix to calculate the possible movements
@@ -257,7 +257,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 # write out the priors
 for (i in 1:(nrow(b0_matrix_names))){
   # Paste the numerator
-  cat("b0_matrix[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
+  cat(b0_matrix_names$b0_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
 }
 
 ##### LOAD and REFORMAT DATA #####
@@ -266,15 +266,20 @@ for (i in 1:(nrow(b0_matrix_names))){
 # states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
 states_complete <- read.csv(here::here("stan_actual", "adults_states_complete.csv"), row.names = 1)
 
+unique_tag_code_2s <- unique(states_complete$tag_code_2)
+
 # first, get the maximum number of visits by any fish
 states_complete %>% 
-  group_by(tag_code) %>% 
+  # group_by(tag_code) %>% 
+  # We need to use tag_code_2 because this splits apart repeat spawners
+  group_by(tag_code_2) %>% 
   count() %>% 
   as.data.frame() -> site_visits_by_tag_code
 
-max_visits <- max(site_visits_by_tag_code$n)
+# + 1 here because we don't yet have a loss state
+max_visits <- max(site_visits_by_tag_code$n) + 1
 
-unique_tag_codes <- unique(states_complete$tag_code)
+unique_tag_codes <- unique(states_complete$tag_code_2)
 nfish <- length(unique_tag_codes)
 
 # second, create an array with the dimensions number of fish, maximum number of site visits, number of states
@@ -284,18 +289,19 @@ state_data <- array(data = 0, dim = c(nstates, max_visits, nfish))
 
 # Add a column for the observation
 states_complete %>% 
-  group_by(tag_code) %>% 
+  # group_by(tag_code) %>% 
+  group_by(tag_code_2) %>% 
   mutate(order = row_number()) -> states_complete
 
 # add a column to index by fish
 states_complete %>% 
-  group_by(tag_code) %>% 
+  # group_by(tag_code) %>% 
+  group_by(tag_code_2) %>% 
   mutate(tag_code_number = cur_group_id()) -> states_complete
 
 
 
-
-# Note: this loop will take about 3-4 hours to complete. It's primarily due to the which statement, since it has to search through and find a match
+# Loop through to convert df to array
 print(Sys.time())
 for (i in 1:nrow(states_complete)){
 # for (i in 1:100){
@@ -305,9 +311,32 @@ for (i in 1:nrow(states_complete)){
 }
 print(Sys.time())
 
-write.csv(state_data, here::here("stan_actual", "state_data.csv"))
+# Now, add the loss state
+# First, get the number of non-loss states
+n_not_loss_states <- vector(length = nfish)
+# Now, get the indices of the fish that already have a loss state
+states_complete %>% 
+  subset(state == "loss") -> trapped_fish
 
-# Convert the dates into a numeric index
+trapped_fish_tags <- trapped_fish$tag_code_2
+# Get the indices of these
+which(unique_tag_codes %in% trapped_fish_tags) -> trapped_fish_indices
+
+for (i in 1:nfish){
+  # 29 is the loss state
+  n_not_loss_states[i] <- sum(state_data[,,i])
+  state_data[29, n_not_loss_states[i]+1,i] <- 1
+}
+
+# remove the extra loss state for the trapped fish
+for (i in 1:length(trapped_fish_indices)){
+  j <- trapped_fish_indices[i]
+  state_data[29, n_not_loss_states[j]+1,j] <-0
+}
+
+saveRDS(state_data, here::here("stan_actual", "state_data.csv"))
+
+##### Convert the dates into a numeric index #####
 
 # First, populate the dates for implicit site visits
 # Create a column to indicate if the date_time was interpolated
@@ -332,35 +361,35 @@ states_complete %>%
 # Loop to get arrival dates in state
 # We currently don't need this, because we interpolated the time earlier
 # takes about 90 minutes to run
-for (j in 1:length(missing_date_time_indices)){
-# for (i in 1:100){
-  i <- missing_date_time_indices[j]
-
-    # Figure out how far back the last known time was
-    # Truncate the missing date times to only ones prior to current state
-    missing_date_time_subset <- missing_date_time[1:(i-1)]
-    prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
-    
-    # Truncate the missing date times to only ones after current state
-    missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
-    next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
-    
-    # Now, interpolate the missing time
-    # First, figure out how long between the two known times
-    prev_time <- ymd_hms(date_times[prev_time_index])
-    next_time <- ymd_hms(date_times[next_time_index])
-    time_diff <- next_time - prev_time
-    
-    # Get the missing time - add the time difference divided by the number 
-    # of missing steps plus 1, multiply by which number step it is
-    missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
-    
-    # Extract just the date
-    missing_date <- date(missing_time)
-    
-    # populate the missing date_time
-    states_complete[i, "date"] <- format(as.Date(missing_date, origin = "1970-01-01"))
-}
+# for (j in 1:length(missing_date_time_indices)){
+# # for (i in 1:100){
+#   i <- missing_date_time_indices[j]
+# 
+#     # Figure out how far back the last known time was
+#     # Truncate the missing date times to only ones prior to current state
+#     missing_date_time_subset <- missing_date_time[1:(i-1)]
+#     prev_time_index <- max(which(missing_date_time_subset %in% FALSE))
+#     
+#     # Truncate the missing date times to only ones after current state
+#     missing_date_time_subset <- missing_date_time[(i+1):nrow(states_complete)]
+#     next_time_index <- min(which(missing_date_time_subset %in% FALSE)) + i
+#     
+#     # Now, interpolate the missing time
+#     # First, figure out how long between the two known times
+#     prev_time <- ymd_hms(date_times[prev_time_index])
+#     next_time <- ymd_hms(date_times[next_time_index])
+#     time_diff <- next_time - prev_time
+#     
+#     # Get the missing time - add the time difference divided by the number 
+#     # of missing steps plus 1, multiply by which number step it is
+#     missing_time <- prev_time + (time_diff/(next_time_index - prev_time_index) * (i - prev_time_index))
+#     
+#     # Extract just the date
+#     missing_date <- date(missing_time)
+#     
+#     # populate the missing date_time
+#     states_complete[i, "date"] <- format(as.Date(missing_date, origin = "1970-01-01"))
+# }
   
 
 # create an empty matrix
@@ -372,7 +401,7 @@ for (i in 1:nrow(states_complete)){
 
 
 # We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(x) - ymd("2005-05-31"))
+date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(date(x)) - ymd("2005-05-31"))
 transition_date_matrix %>% 
   as_tibble() %>% 
   mutate_all(date_numeric) -> transition_date_numeric
@@ -393,7 +422,7 @@ origin_numeric <- data.frame(natal_origin = c("Asotin_Creek",
                                         "Grande_Ronde_River", 
                                         "Hood_River",
                                         "Imnaha_River",
-                                        "John Day_River", 
+                                        "John_Day_River", 
                                         "Methow_River", 
                                         "Okanogan_River", 
                                         "Salmon_River", 
@@ -408,12 +437,18 @@ natal_origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.
 tag_code_metadata %>% 
   left_join(., natal_origin_table, by = "release_site_name") %>% 
   left_join(., origin_numeric, by = "natal_origin") %>% 
-  mutate(rear_type_numeric = ifelse(rear_type_code == "W", 1, 2))-> tag_code_metadata
+  mutate(rear_type_numeric = ifelse(rear_type_code %in% c("H", "U"), 2, 1))-> tag_code_metadata
+
+# At this point, we need to recreate tag_code_metadata but with the tag_code_2 field
+states_complete %>% 
+  distinct(tag_code_2, .keep_all = TRUE) %>% 
+  dplyr::select(tag_code, tag_code_2) -> tag_codes_2
 
 # reformat this into origin_rear info
-tag_code_metadata %>% 
-  dplyr::select(tag_code, natal_origin_numeric, rear_type_numeric) %>% 
-  dplyr::rename(natal_origin = natal_origin_numeric, rear_type = rear_type_numeric) -> origin_rear_actual
+tag_codes_2 %>%
+  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin_numeric, rear_type_numeric), by = "tag_code") %>% 
+  dplyr::rename(natal_origin = natal_origin_numeric, rear_type = rear_type_numeric) %>% 
+  dplyr::select(-tag_code) -> origin_rear_actual
 
 write.csv(origin_rear_actual, here::here("stan_actual", "origin_rear_actual.csv"))
   
@@ -454,7 +489,7 @@ n.ind <- dim(state_data)[3]
     }
   }
   
-  # Turn into matrix for JAGS
+  # Turn into matrix for stan
   states_mat <- matrix(nrow = n.ind, ncol = max(n.obs))
   for (i in 1:n.ind){
     states_mat[i,1:(n.obs[i])] <- states_list[[i]]
@@ -462,73 +497,73 @@ n.ind <- dim(state_data)[3]
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_1200 <- matrix(0, nrow = n.ind, ncol = 19)
+  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 19)
   # Start it so that they're all 0s
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
-  cat_X_mat_1200[,1] <- 1
+  cat_X_mat_actual[,1] <- 1
   
   # This is for origin + rear
   for (i in 1:n.ind){
     # Rear type
-    if (fish_sim_cat_data_1200$rear_type[i] == 1){
-      cat_X_mat_1200[i,2] <- 1
+    if (fish_sim_cat_data_actual$rear_type[i] == 1){
+      cat_X_mat_actual[i,2] <- 1
     }
     else {
-      cat_X_mat_1200[i,2] <- -1
+      cat_X_mat_actual[i,2] <- -1
     }
     
     
     # Natal origin
-    if (fish_sim_cat_data_1200$natal_origin[i] == 1){ # Asotin Creek
-      cat_X_mat_1200[i,3] <- 1
+    if (fish_sim_cat_data_actual$natal_origin[i] == 1){ # Asotin Creek
+      cat_X_mat_actual[i,3] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Clearwater River
-      cat_X_mat_1200[i,4] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 2){ # Clearwater River
+      cat_X_mat_actual[i,4] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Deschutes River
-      cat_X_mat_1200[i,5] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 3){ # Deschutes River
+      cat_X_mat_actual[i,5] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Entiat River
-      cat_X_mat_1200[i,6] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 4){ # Entiat River
+      cat_X_mat_actual[i,6] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Fifteenmile Creek
-      cat_X_mat_1200[i,7] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 5){ # Fifteenmile Creek
+      cat_X_mat_actual[i,7] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Grande Ronde River
-      cat_X_mat_1200[i,8] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 6){ # Grande Ronde River
+      cat_X_mat_actual[i,8] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Hood River
-      cat_X_mat_1200[i,9] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 7){ # Hood River
+      cat_X_mat_actual[i,9] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Imnaha River
-      cat_X_mat_1200[i,10] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 8){ # Imnaha River
+      cat_X_mat_actual[i,10] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # John Day River
-      cat_X_mat_1200[i,11] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 9){ # John Day River
+      cat_X_mat_actual[i,11] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Methow River
-      cat_X_mat_1200[i,12] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 10){ # Methow River
+      cat_X_mat_actual[i,12] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Okanogan River
-      cat_X_mat_1200[i,13] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 11){ # Okanogan River
+      cat_X_mat_actual[i,13] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Salmon River
-      cat_X_mat_1200[i,14] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 12){ # Salmon River
+      cat_X_mat_actual[i,14] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Tucannon River
-      cat_X_mat_1200[i,15] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 13){ # Tucannon River
+      cat_X_mat_actual[i,15] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Umatilla River
-      cat_X_mat_1200[i,16] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 14){ # Umatilla River
+      cat_X_mat_actual[i,16] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Walla Walla River
-      cat_X_mat_1200[i,17] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 15){ # Walla Walla River
+      cat_X_mat_actual[i,17] <- 1
     }
-    else if (fish_sim_cat_data_1200$natal_origin[i] == 2){ # Wenatchee River
-      cat_X_mat_1200[i,18] <- 1
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 16){ # Wenatchee River
+      cat_X_mat_actual[i,18] <- 1
     }
     else { # for Yakima
-      cat_X_mat_1200[i,3:19] <- -1
+      cat_X_mat_actual[i,3:19] <- -1
     }
   }
   
@@ -565,10 +600,9 @@ n.ind <- dim(state_data)[3]
                states_mat = states_mat, max_visits = dim(state_data_2)[2],
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
-               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_1200)
+               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual)
   
   
-  print(paste0("Run: ", z))
   print(Sys.time())
   
   # Fit stan model
@@ -578,7 +612,7 @@ n.ind <- dim(state_data)[3]
   # Fit stan model using cmdstan
   # Step 1: load the model
   # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
-  mod <- cmdstan_model("01_stan_sim_int_only_v2.stan", compile = FALSE)
+  mod <- cmdstan_model("01_stan_actual_int_only.stan", compile = FALSE)
   
   # Step 2: Compile the model, set up to run in parallel
   mod$compile(cpp_options = list(stan_threads = TRUE))
@@ -586,15 +620,50 @@ n.ind <- dim(state_data)[3]
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
-    seed = 123, 
+    # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
+    # seed = 456,
     chains = 1, 
     parallel_chains = 1,
-    refresh = 100, # print update every 10 iters
+    refresh = 1, # print update every iter
     iter_sampling = 1000,
     iter_warmup = 1000,
     threads_per_chain = 7,
     init = 1,
   )
+  
+  
+  
+  
+  ##### Troubleshoot the stan model #####
+  
+  # Question 1: Is it an issue with our input data?
+  # If our input data has issues where non-allowable transitions are observed, that would break the model
+  states_exam <- as.vector(t(state_data_2))
+  states_exam <- states_exam[!(states_exam == 0)]
+  states_exam <- data.frame(state = states_exam)
+  states_exam %>% 
+    mutate(last_state = lag(state)) %>% 
+    mutate(transition = paste0(last_state, " - ", state)) -> states_exam
+  
+  table(states_exam$transition)
+  # So now, these all look okay
+  
+  # Current issues:
+  # 1 observed Walla Walla to BON to MCN transition
+  # Interestingly, not a single fish returns from the Grande Ronde to the mainstem? I think every time this happens, it's called a kelt
+  # 1 observed Upstream WEL to ICH to LGR transition
+  # 1 go from NA to BON to MCN - this is just the first fish, since there's no lag state
+  subset(states_complete, state == "Walla Walla River" & lead(state == "mainstem, BON to MCN") &
+           tag_code_2 == lead(tag_code_2))
+  # They're all repeat spawners? Which should be fine
+  # ah - 3D9.1BF27BDC8D is a **repeat repeat** spawner. We need to append a repeat # 2 to the tag code
+  # should be fixed now
+  subset(states_complete, state == "mainstem, upstream of WEL" & lead(state == "mainstem, ICH to LGR") &
+           tag_code_2 == lead(tag_code_2))
+  # 3D9.1C2D7EBE8B makes this illegal transition
+  # ah, it's because the intervening states got called kelt movements and removed
+  # should be fixed now
+
  
 stan_1200_list[[z]] <- fit$summary(variables = c("b0_matrix_2_1", 
                                                "b0_matrix_1_2",
@@ -612,7 +681,6 @@ stan_1200_list[[z]] <- fit$summary(variables = c("b0_matrix_2_1",
                                                "b0_matrix_2_7",
                                                "b0_matrix_5_8",
                                                "b0_matrix_3_9")) 
-}
 
 
 
