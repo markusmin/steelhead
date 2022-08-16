@@ -1444,7 +1444,83 @@ R
 library(cmdstanr)
 install_cmdstan(overwrite = TRUE) # this is necessary because of our past failed installation attempts
 
+# didn't work:
 
+> install_cmdstan(overwrite = TRUE)
+The C++ toolchain required for CmdStan is setup properly!
+* Latest CmdStan release is v2.30.1
+* Installing CmdStan v2.30.1 in /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+* Downloading cmdstan-2.30.1.tar.gz from GitHub...
+* Removing the existing installation of CmdStan...
+* Download complete
+* Unpacking archive...
+* Building CmdStan binaries...
+cp bin/linux-stanc bin/stanc
+/sw/contrib/gcc-9.3.0/install/bin/g++ -pipe   -pthread -D_REENTRANT  -O3 -I stan/lib/stan_math/lib/sundials_6.1.1/include -I stan/lib/stan_math/lib/sundials_6.1.1/src/sundials -DNO_FPRINTF_OUTPUT     -O3  -c -x c -include stan/lib/stan_math/lib/sundials_6.1.1/include/stan_sundials_printf_override.hpp stan/lib/stan_math/lib/sundials_6.1.1/src/nvector/serial/nvector_serial.c -o stan/lib/stan_math/lib/sundials_6.1.1/src/nvector/serial/nvector_serial.o
+bash: /sw/contrib/gcc-9.3.0/install/bin/g++: Permission denied
+chmod +x bin/stanc
+make: *** [stan/lib/stan_math/lib/sundials_6.1.1/src/nvector/serial/nvector_serial.o] Error 126
+make: *** Waiting for unfinished jobs....
+
+Warning message:
+There was a problem during installation. See the error message(s) above. 
+# let's try unloading the other gcc version
+module unload contrib/gcc-9.3.0 
+
+# now try same installation as before:
+# installation worked!
+* Finished installing CmdStan to /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+
+CmdStan path set to: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+
+# Will this be an issue given that it's not on gscratch?
+
+# Let's try running our stan actual model
+# from within the stan_actual folder:
+scp -r ./01_int_only_mox/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+sbatch job_01_stan_actual_int_only_mox.slurm
+
+# upload a ckpt version to see if it'll run, since we have to wait on stf
+scp ./01_int_only_mox/job_ckpt_01_stan_actual_int_only_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/01_int_only_mox/
+# fixes to R script:
+scp ./01_int_only_mox/01_stan_actual_int_only_mox.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/01_int_only_mox/
+
+### 8-14-2022 ###
+
+# 1000 warmup, 1000 sampling didn't finish in 24 hours. Resubmitted job with 48 hour time limit, but to
+make sure I have some results by tomorrow, ran it again with 500 warmup and 500 sampling
+scp ./01_int_only_mox/01_stan_actual_int_only_mox_500iter.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/01_int_only_mox/
+scp ./01_int_only_mox/job_01_500iter_stan_actual_int_only_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/01_int_only_mox/
+
+# Okay, trying to get the origin model to run. We have 16*54 + 54 parameters, and when we try to compile it says this:
+
+To get around this, we need to try and change a flag, see this post: https://github.com/stan-dev/rstan/issues/395
+
+cd ../../../../../../../../Users/markusmin/.cmdstan
+
+(base) markusmin@Markuss-MBP .cmdstan % make CC="clang++ -O1 -fbracket-depth=2048" ~/var/folders/8c/vz24vqzd2nzfvknzmfcybj0m0000gn/T/RtmpyH5D8E/model-285540e6d8c
+
+# this doesn't work
+
+Instead, navigate to: Users/markusmin/.R
+
+sudo nano Makevars.bck
+
+Edit the text: 
+CC=clang
+CXX=clang++
+change to: 
+CC=clang -O1 -fbracket-depth=2048
+CXX=clang++ -O1 -fbracket-depth=2048
+
+This didn't work, changed it back
+
+### 8-15-2022 ###
+
+Moving ESU models to hyak and running:
+
+# upper columbia
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
 
 
 
