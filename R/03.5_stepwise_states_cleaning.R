@@ -776,6 +776,40 @@ adults_only_states %>%
 write.csv(adults_only_states_for_export, here::here("stan_actual", "adults_states_complete.csv"))
 
 
+# Export four more files, by each ESU
+# Snake: everything above ICH
+# Upper Columbia: Everything above PRA
+# Middle Columbia: Everything above BON, except Hood River
+
+# load natal origins
+natal_origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.csv"))
+
+# match natal origin to tag codes
+tag_code_metadata %>% 
+  left_join(natal_origin_table, by = "release_site_name") -> tag_code_metadata
+
+tag_code_metadata %>% 
+  mutate(ESU = ifelse(natal_origin %in% c("Tucannon_River", "Asotin_Creek", "Clearwater_River", "Salmon_River", "Grande_Ronde_River", "Imnaha_River"), "snake",
+                      ifelse(natal_origin %in% c("Wenatchee_River", "Entiat_River", "Okanogan_River","Methow_River"), "upper_columbia",
+                             ifelse(natal_origin %in% c("Deschutes_River", "Fifteenmile_Creek", "John_Day_River", "Umatilla_River", "Yakima_River", "Walla_Walla_River"), "middle_columbia",
+                                    ifelse(natal_origin %in% c("Hood_River"), "lower_columbia", "ERROR"))))) -> tag_code_metadata
+
+snake_tags <- subset(tag_code_metadata, ESU == "snake")$tag_code
+upper_columbia_tags <- subset(tag_code_metadata, ESU == "upper_columbia")$tag_code
+middle_columbia_tags <- subset(tag_code_metadata, ESU == "middle_columbia")$tag_code
+lower_columbia_tags <- subset(tag_code_metadata, ESU == "lower_columbia")$tag_code
+
+subset(adults_only_states_for_export, tag_code %in% snake_tags) -> snake_adults_only_states
+subset(adults_only_states_for_export, tag_code %in% upper_columbia_tags) -> upper_columbia_adults_only_states
+subset(adults_only_states_for_export, tag_code %in% middle_columbia_tags) -> middle_columbia_adults_only_states
+subset(adults_only_states_for_export, tag_code %in% lower_columbia_tags) -> lower_columbia_adults_only_states
+write.csv(snake_adults_only_states, here::here("stan_actual", "ESU_models", "snake", "snake_adults_states_complete.csv"))
+write.csv(upper_columbia_adults_only_states, here::here("stan_actual", "ESU_models", "upper_columbia", "upper_columbia_adults_states_complete.csv"))
+write.csv(middle_columbia_adults_only_states, here::here("stan_actual", "ESU_models", "middle_columbia", "middle_columbia_adults_states_complete.csv"))
+write.csv(lower_columbia_adults_only_states, here::here("stan_actual", "ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"))
+
+
+
 # Some summary statistics:
 
 # How many repeat spawners do we have?
