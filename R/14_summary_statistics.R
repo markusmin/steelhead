@@ -59,19 +59,19 @@ overshoot_mainstem_sites <- data.frame(natal_origin = sort(unique(tag_code_metad
 overshoot_mainstem_sites <- data.frame(natal_origin = sort(unique(tag_code_metadata$natal_origin)),
                                        natal_origin_region = c("Snake", # Asotin Creek
                                                                "Snake", # Clearwater
-                                                               "Lower Columbia", # Deschutes River
+                                                               "Middle Columbia", # Deschutes River
                                                                "mainstem, upstream of WEL", #Entiat
-                                                               "Lower Columbia", # Fifteenmile Creek
+                                                               "Middle Columbia", # Fifteenmile Creek
                                                                "Snake", # Grande Ronde River
                                                                "Lower Columbia", # Hood River
                                                                "Snake", # Imnaha River
-                                                               "Lower Columbia", # John Day River
-                                                               "Lower Columbia",  # Klickitat River
+                                                               "Middle Columbia", # John Day River
+                                                               "Middle Columbia",  # Klickitat River
                                                                "Upper Columbia", # Methow River
                                                                "Upper Columbia",  # Okanogan River
                                                                "Snake", # Salmon River
                                                                "Snake", # Tucannon River
-                                                               "Lower Columbia", # Umatilla River
+                                                               "Middle Columbia", # Umatilla River
                                                                "Middle Columbia", # Walla Walla River
                                                                "Upper Columbia", # Wenatchee River
                                                                "Lower Columbia",  # Wind River
@@ -197,7 +197,46 @@ states_complete_overshoot %>%
 
 table(states_complete_overshoot$overshoot_status)
 
+# How often did fish visit an ESU that they don't belong in?
+# Snake in the upper Columbia
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Snake") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region == "Upper Columbia")) -> snake_origin_upper_columbia
 
+length(unique(snake_origin_upper_columbia$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Snake")$tag_code_2))
+460/33761
+
+# Upper columbia in the Snake
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Upper Columbia") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region == "Snake")) -> upper_columbia_origin_snake
+
+length(unique(upper_columbia_origin_snake$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Upper Columbia")$tag_code_2))
+7/14093
+
+# Middle Columbia in the Snake or upper Columbia
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Middle Columbia") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region %in% c("Snake", "Upper Columbia"))) -> middle_columbia_origin_snake_upper_columbia
+
+length(unique(middle_columbia_origin_snake_upper_columbia$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Middle Columbia")$tag_code_2))
+ 2163/9185
+ 
+ # Lower Columbia in the Snake or middle Colubmia or upper Columbia
+ states_complete_overshoot %>% 
+   subset(., natal_origin_region == "Lower Columbia") %>% 
+   group_by(tag_code) %>% 
+   filter(any(state_region %in% c("Snake", "Upper Columbia", "Middle Columbia"))) -> lower_columbia_origin_snake_upper_columbia_middle_columbia
+ 
+ length(unique(lower_columbia_origin_snake_upper_columbia_middle_columbia$tag_code_2))
+ length(unique(subset(states_complete_overshoot, natal_origin_region == "Lower Columbia")$tag_code_2))
+ 3/3007
 
 # Let's count how many fish overshot at all
 states_complete_overshoot %>% 
@@ -227,6 +266,11 @@ overshooting_fish %>%
 natal_origin_fish_counts %>% 
   left_join(., natal_origin_overshooting_fish_counts, by = "natal_origin") %>% 
   mutate(percent_overshoot = round(n_overshot/total,3)*100) -> overshoot_natal_origin_table
+
+sum(overshoot_natal_origin_table$n_overshot)/sum(overshoot_natal_origin_table$total)
+
+# calculate a standard error around this
+sqrt(sum(overshoot_natal_origin_table$n_overshot)/sum(overshoot_natal_origin_table$total) * (1 - sum(overshoot_natal_origin_table$n_overshot)/sum(overshoot_natal_origin_table$total))/sum(overshoot_natal_origin_table$total))
 
 # How many individuals overshot at least one dam?
 length(unique(overshooting_fish$tag_code_2))
