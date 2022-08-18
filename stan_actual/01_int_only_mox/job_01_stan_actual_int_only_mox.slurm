@@ -7,7 +7,7 @@
 
 ## Partition and Allocation
 #SBATCH -p stf
-#SBATCH -A stf
+#SBATCH -A stf-ckpt
 
 ## Resources
 #SBATCH --nodes=3
