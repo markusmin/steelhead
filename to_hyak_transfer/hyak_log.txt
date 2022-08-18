@@ -1521,6 +1521,44 @@ Moving ESU models to hyak and running:
 
 # upper columbia
 scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+# snake
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+# middle columbia
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+### 8-16-2022 ###
+
+The ESU models are still stuck in the stf queue. Let's try running middle columbia on ckpt, since it's thee smallest file
+scp ./middle_columbia/middle_columbia_ckpt_job_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/middle_columbia/
+
+# This got 1% through in 4 hours. That's really bad - moving to parallelize
+
+# Models in parallel
+So I wrote the model to run using reduce-sum. This will, theoretically, allow our model to run in about 1/28 the time by using all 28 available cores on a mox node.
+HOWEVER - using the parallel-chains flag doesn't actually run different chains on different nodes, but rather only on the same node.
+So we will have to figure out how to get the chains to run on separate nodes, or alternatively, to just run one chain at a time. One chain at a time
+might be the move for now.
+
+# Try running snake ESU model, with a single chain
+scp ./snake/parallel_snake_02_stan_actual_int_origin_mox.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+scp ./snake/parallel_snake_02_stan_actual_int_origin.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+scp ./snake/job_stf_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+scp ./snake/job_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+- only got through 30 iter on ckpt with 4 hours
+- could try running this with 100 iter on stf with 24 hours... but that probably wouldn't finish in time for AFS talk recording
+
+# Try running parallel middle columbia
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+- only got through 110 iter on ckpt with 4 hours
+- let's try this one to make sure we get some results
+
+
+# Try running parallel upper columbia
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+- only got through 70 iter on ckpt with 4 hours
+
+
+
 
 
 
