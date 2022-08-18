@@ -639,12 +639,12 @@ n.ind <- dim(state_data)[3]
     chains = 3, 
     parallel_chains = 3,
     refresh = 10, # print update every iter
-    iter_sampling = 1000,
-    iter_warmup = 1000,
-    # iter_warmup = 10,
-    # iter_sampling = 10,
-    threads_per_chain = 28,
-    # threads_per_chain = 7,
+    # iter_sampling = 1000,
+    # iter_warmup = 1000,
+    iter_warmup = 10,
+    iter_sampling = 10,
+    # threads_per_chain = 28,
+    threads_per_chain = 7,
     init = 1,
   )
   
