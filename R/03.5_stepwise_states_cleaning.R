@@ -774,6 +774,7 @@ setdiff(adults_first_states$tag_code_2, adults_only_states$tag_code_2)
 adults_only_states %>% 
   dplyr::select(tag_code, state, date_time, pathway, life_stage, tag_code_2) -> adults_only_states_for_export
 write.csv(adults_only_states_for_export, here::here("stan_actual", "adults_states_complete.csv"))
+# adults_only_states_for_export <- read.csv(here::here("stan_actual", "adults_states_complete.csv"))
 
 
 # Export four more files, by each ESU
@@ -799,7 +800,27 @@ upper_columbia_tags <- subset(tag_code_metadata, ESU == "upper_columbia")$tag_co
 middle_columbia_tags <- subset(tag_code_metadata, ESU == "middle_columbia")$tag_code
 lower_columbia_tags <- subset(tag_code_metadata, ESU == "lower_columbia")$tag_code
 
+length(unique(adults_only_states_for_export$tag_code_2))
+length(unique(snake_adults_only_states$tag_code_2))
+
+snake_adults_only_states
+
 subset(adults_only_states_for_export, tag_code %in% snake_tags) -> snake_adults_only_states
+
+# export with metadata
+snake_adults_only_states %>% 
+  left_join(., dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") -> snake_adults_only_states_metadata
+
+write.csv(snake_adults_only_states_metadata, here::here("stan_actual", "ESU_models", "snake", "snake_adults_states_complete_metadata.csv"))
+
+# check distribution of snake adults by origin
+snake_adults_only_states %>% 
+  distinct(tag_code_2, .keep_all = TRUE) %>% 
+  left_join(., tag_code_metadata, by = "tag_code") -> snake_tag_code_2_distinct
+
+  table(snake_tag_code_2_distinct$natal_origin)
+
+
 subset(adults_only_states_for_export, tag_code %in% upper_columbia_tags) -> upper_columbia_adults_only_states
 subset(adults_only_states_for_export, tag_code %in% middle_columbia_tags) -> middle_columbia_adults_only_states
 subset(adults_only_states_for_export, tag_code %in% lower_columbia_tags) -> lower_columbia_adults_only_states
