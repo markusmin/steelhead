@@ -19,6 +19,7 @@
 #SBATCH --chdir=.
 
 ## Import any modules here
+module load contrib/gcc/6.2.0 
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
