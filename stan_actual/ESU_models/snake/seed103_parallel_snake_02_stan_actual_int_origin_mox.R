@@ -635,8 +635,7 @@ n.ind <- dim(state_data)[3]
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
-    # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
-    # seed = 456,
+    seed = 103,
     # chains = 3, 
     chains = 1,
     parallel_chains = 1,
@@ -651,7 +650,7 @@ n.ind <- dim(state_data)[3]
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
-fit$save_object(file = "200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "seed103_200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented

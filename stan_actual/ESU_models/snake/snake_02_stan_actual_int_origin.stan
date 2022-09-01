@@ -351,6 +351,45 @@ borigin5_matrix[9,24] = borigin5_matrix_9_24;
 borigin5_matrix[9,25] = borigin5_matrix_9_25;
 borigin5_matrix[9,26] = borigin5_matrix_9_26;
 
+#### Calculate movement probabilities as derived parameters
+matrix[29,29] origin1_probs;
+origin1_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin2_probs;
+origin2_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin3_probs;
+origin3_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin4_probs;
+origin4_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin5_probs;
+origin5_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin6_probs;
+origin6_probs = rep_matrix(0, 29, 29);
+
+  # for each of the non-loss states:
+for (i in 1:28){
+  for (j in 1:28){
+    origin1_probs[i,j] = exp(b0_matrix[i,j]+ borigin1_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin1_matrix[i,]))));
+    origin2_probs[i,j] = exp(b0_matrix[i,j]+ borigin2_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin2_matrix[i,]))));
+    origin3_probs[i,j] = exp(b0_matrix[i,j]+ borigin3_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin3_matrix[i,]))));
+    origin4_probs[i,j] = exp(b0_matrix[i,j]+ borigin4_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin4_matrix[i,]))));
+    origin5_probs[i,j] = exp(b0_matrix[i,j]+ borigin5_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin5_matrix[i,]))));
+    origin6_probs[i,j] = exp(b0_matrix[i,j]- borigin1_matrix[i,j] - borigin2_matrix[i,j] - borigin3_matrix[i,j] - borigin4_matrix[i,j] - borigin5_matrix[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix[i,]) - to_row_vector(borigin1_matrix[i,]) - to_row_vector(borigin2_matrix[i,]) - to_row_vector(borigin3_matrix[i,]) - 
+    to_row_vector(borigin4_matrix[i,]) - to_row_vector(borigin5_matrix[i,]))));
+  }
+}
+
+# calculate loss states
+for (i in 1:28){
+  origin1_probs[i,29] = 1 - sum(origin1_probs[i,1:28]);
+  origin2_probs[i,29] = 1 - sum(origin2_probs[i,1:28]);
+  origin3_probs[i,29] = 1 - sum(origin3_probs[i,1:28]);
+  origin4_probs[i,29] = 1 - sum(origin4_probs[i,1:28]);
+  origin5_probs[i,29] = 1 - sum(origin5_probs[i,1:28]);
+  origin6_probs[i,29] = 1 - sum(origin6_probs[i,1:28]);
+  
+}
+
 }
 
 
