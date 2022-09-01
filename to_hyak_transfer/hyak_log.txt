@@ -1557,10 +1557,83 @@ scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
 scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
 - only got through 70 iter on ckpt with 4 hours
 
+### 8-18-2022 ###
+
+For some reason, running these models in parallel on my laptop was faster than running them on mox. I think it might have to do with the seed - I should do 
+a benchmark test at some point to make sure mox is faster as it should be.
+
+# Try running parallel middle columbia on ckpt, 100 iter, with new derived movement probabilities in the stan code itsel.
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+sbatch job_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+
+# whoops, looks like I saved the cmdstan files wrong. Need to change that code, and then re-run so that I can actually access the files 
+- see https://discourse.mc-stan.org/t/saving-of-cmdstanmodel-objects-from-cmdstanr/16220/3
+
+# Try running all files on ckpt
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+sbatch job_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+sbatch job_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+sbatch job_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
 
 
 
+# wow, okay so I think my slurm scripts were preventing my script from running in parallel:
+https://wiki.cac.washington.edu/display/hyakusers/Mox_scheduler
+the -ntasks flag needs to be the number of cores you want to use. I had it at 1. Dumb. Changed it to 28 (max cores). Also changed
+MEM to 120 GB, which is the recommended memory for 128GB nodes
 
+# These are so much faster. Some models finished in under an hour with 100 warmup and 100 sampling.
+Middle Columbia model, with same seed - on mox with 28 cores, 4018 seconds. on laptop with 7 cores, 9510 seconds
+
+Snake finished in 6605 seconds, which is a huge improvement over not finishing :)
+
+upper columbia is the fastest, then middle, then snake
+
+# pull runs off mox:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/middle_columbia/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/upper_columbia/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/ ./
+
+# Reupload all with 200 burn in and 200 sampling, about the max of what will run on ckpt
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+sbatch job_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
+sbatch job_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+sbatch job_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
+
+# also, remove all old binary stan files
+
+# now pull them:
+
+OKAY - so if you ever change the stan script, you have to remove the old binary file in the same folder. Otherwise, stan will look at the old file
+and think oh cool, it's already compiled, no need to do that again! And then you'll run the old model executable, even though the code for the 
+new model is in the same folder.
+
+I'm going to also change the seeds, and run three chains of 200 iter + 200 warmup for each of the three models.
+# move the new scripts with different seeds to run different chains to mox:
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+# run all 9 scripts:
+# snake
+sbatch job_seed101_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed102_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed103_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
+
+# middle columbia
+sbatch job_seed101_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed102_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed103_ckpt_parallel_middle_columbia_02_stan_actual_int_origin_mox.slurm
+
+# upper columbia
+sbatch job_seed101_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed102_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
+sbatch job_seed103_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
 
 
 
