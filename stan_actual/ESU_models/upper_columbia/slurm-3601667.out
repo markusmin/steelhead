@@ -1,0 +1,5 @@
+This is cmdstanr version 0.5.2
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+- CmdStan version: 2.30.1
+slurmstepd: error: *** JOB 3601667 ON n2358 CANCELLED AT 2022-08-18T21:59:24 ***

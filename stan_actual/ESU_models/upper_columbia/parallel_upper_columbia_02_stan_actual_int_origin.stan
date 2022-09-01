@@ -386,6 +386,37 @@ borigin3_matrix[7,19] = borigin3_matrix_7_19;
 borigin3_matrix[7,20] = borigin3_matrix_7_20;
 borigin3_matrix[7,28] = borigin3_matrix_7_28;
 
+#### Calculate movement probabilities as derived parameters
+matrix[29,29] origin1_probs;
+origin1_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin2_probs;
+origin2_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin3_probs;
+origin3_probs = rep_matrix(0, 29, 29);
+matrix[29,29] origin4_probs;
+origin4_probs = rep_matrix(0, 29, 29);
+
+
+  # for each of the non-loss states:
+for (i in 1:28){
+  for (j in 1:28){
+    origin1_probs[i,j] = exp(b0_matrix[i,j]+ borigin1_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin1_matrix[i,]))));
+    origin2_probs[i,j] = exp(b0_matrix[i,j]+ borigin2_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin2_matrix[i,]))));
+    origin3_probs[i,j] = exp(b0_matrix[i,j]+ borigin3_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin3_matrix[i,]))));
+    origin4_probs[i,j] = exp(b0_matrix[i,j]- borigin1_matrix[i,j] - borigin2_matrix[i,j] - borigin3_matrix[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix[i,]) - to_row_vector(borigin1_matrix[i,]) - to_row_vector(borigin2_matrix[i,]) - to_row_vector(borigin3_matrix[i,]))));
+  }
+}
+
+# calculate loss states
+for (i in 1:28){
+  origin1_probs[i,29] = 1 - sum(origin1_probs[i,1:28]);
+  origin2_probs[i,29] = 1 - sum(origin2_probs[i,1:28]);
+  origin3_probs[i,29] = 1 - sum(origin3_probs[i,1:28]);
+  origin4_probs[i,29] = 1 - sum(origin4_probs[i,1:28]);
+  
+}
+
 }
 
 
