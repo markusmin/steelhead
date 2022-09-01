@@ -645,21 +645,23 @@ n.ind <- dim(state_data)[3]
   fit <- mod$sample(
     data = data, 
     # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
-    # seed = 456,
+    seed = 2,
     # chains = 3, 
     chains = 1,
     parallel_chains = 1,
     # parallel_chains = 3,
     refresh = 10, # print update every iter
-    iter_sampling = 1000,
-    iter_warmup = 1000,
-    # iter_warmup = 10,
-    # iter_sampling = 10,
+    # iter_sampling = 1000,
+    # iter_warmup = 1000,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    # threads_per_chain = 8,
     threads_per_chain = 28,
     init = 1
   )
   
-saveRDS(fit, "parallel_middle_columbia_stan_actual_int_origin_stan_fit.rds")
+# saveRDS(fit, "200_iter_parallel_middle_columbia_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "200_iter_parallel_middle_columbia_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented

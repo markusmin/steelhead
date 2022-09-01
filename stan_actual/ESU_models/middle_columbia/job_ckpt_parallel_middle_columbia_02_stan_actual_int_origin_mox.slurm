@@ -12,7 +12,7 @@
 ## Resources
 #SBATCH --nodes=1
 #SBATCH --time=4:00:00
-#SBATCH --ntasks=1
+#SBATCH --ntasks=28
 #SBATCH --mem=100G
 
 ## Specify the working directory for this job
