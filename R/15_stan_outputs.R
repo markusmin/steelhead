@@ -6,7 +6,51 @@ library(cmdstanr)
 library(rstan)
 library(bayesplot)
 library(posterior)
+library(tidyverse)
+library(here)
 # library(rstan)
+
+# create df of state names
+model_states = c(
+  # Mainstem states (9)
+  "mainstem, mouth to BON",
+  "mainstem, BON to MCN",
+  "mainstem, MCN to ICH or PRA",
+  "mainstem, PRA to RIS",
+  "mainstem, RIS to RRE",
+  "mainstem, RRE to WEL",
+  "mainstem, upstream of WEL",
+  "mainstem, ICH to LGR",
+  "mainstem, upstream of LGR",
+  
+  # Tributary sites (19)
+  "Deschutes River",
+  "John Day River",
+  "Hood River",
+  "Fifteenmile Creek",
+  "Umatilla River",
+  "Yakima River",
+  "Walla Walla River",
+  "Wenatchee River",
+  "Entiat River",
+  "Okanogan River",
+  "Methow River",
+  "Tucannon River",
+  "Asotin Creek",
+  "Clearwater River",
+  "Salmon River",
+  "Grande Ronde River",
+  "Imnaha River",
+  "BON to MCN other tributaries",
+  "Upstream WEL other tributaries",
+  
+  # Loss
+  "loss"
+)
+
+from_state_number_names <- data.frame(from = seq(1,29,1), from_name = model_states)
+to_state_number_names <- data.frame(to = seq(1,29,1), to_name = model_states)
+
 
 ##### Snake River #####
 
@@ -336,6 +380,38 @@ Grande_Ronde_River_probability_matrix[9,]
 Imnaha_River_probability_matrix[9,]
 
 
+
+##### Export tables of parameters for report #####
+
+
+snake_derived_probabilities %>% 
+  left_join(., from_state_number_names, by = "from") %>% 
+  left_join(., to_state_number_names, by = "to") %>% 
+  dplyr::select(mean, q5, q95, origin, from_name, to_name) %>% 
+  relocate(to_name) %>% 
+  relocate(from_name) %>% 
+  dplyr::rename(from = from_name, to = to_name) -> snake_prob_table
+
+# subset the probabilities shared across the DPS
+snake_prob_table %>% 
+  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
+                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
+                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
+                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                      "BON to MCN other tributaries")) %>% 
+  distinct(from, to, .keep_all = TRUE) %>% 
+  dplyr::select(-origin) -> snake_DPS_probs
+
+snake_prob_table %>% 
+  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
+                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
+                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
+                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                       "BON to MCN other tributaries"))) -> snake_origin_probs
+
+# export both tables
+write.csv(snake_DPS_probs, here::here("stan_actual", "ESU_models", "output_tables", "snake_DPS_probs.csv"))
+write.csv(snake_origin_probs, here::here("stan_actual", "ESU_models", "output_tables", "snake_origin_probs.csv"))
 ##### Upper Columbia #####
 
 # Plot the traceplots
@@ -412,6 +488,35 @@ dplyr::select(wen_mean_probabilities, "1", "3", "10", "11", "12", "13", "14", "2
 dplyr::select(ent_mean_probabilities, "1", "3", "10", "11", "12", "13", "14", "27", "29")[2,]
 dplyr::select(oka_mean_probabilities, "1", "3", "10", "11", "12", "13", "14", "27", "29")[2,]
 dplyr::select(met_mean_probabilities, "1", "3", "10", "11", "12", "13", "14", "27", "29")[2,]
+
+##### Export tables of parameters for report #####
+
+
+upper_columbia_derived_probabilities %>% 
+  left_join(., from_state_number_names, by = "from") %>% 
+  left_join(., to_state_number_names, by = "to") %>% 
+  dplyr::select(mean, q5, q95, origin, from_name, to_name) %>% 
+  relocate(to_name) %>% 
+  relocate(from_name) %>% 
+  dplyr::rename(from = from_name, to = to_name) -> upper_columbia_prob_table
+
+# subset the probabilities shared across the DPS
+upper_columbia_prob_table %>% 
+  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                     "mainstem, ICH to LGR", "mainstem, upstream of LGR",  "Deschutes River",               
+                    "Hood River", "Clearwater River")) %>% 
+  distinct(from, to, .keep_all = TRUE) %>% 
+  dplyr::select(-origin) -> upper_columbia_DPS_probs
+
+upper_columbia_prob_table %>% 
+  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", 
+                     "mainstem, ICH to LGR", "mainstem, upstream of LGR",  "Deschutes River",               
+                     "Hood River", "Clearwater River"))) -> upper_columbia_origin_probs
+  
+# export both tables
+write.csv(upper_columbia_DPS_probs, here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_DPS_probs.csv"))
+write.csv(upper_columbia_origin_probs, here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_origin_probs.csv"))
+
 
 
 ##### Extract our parameters of interest #####
@@ -709,6 +814,36 @@ dplyr::select(jdr_mean_probabilities, "2", "4", "8", "15", "16", "29")[3,]
 dplyr::select(uma_mean_probabilities, "2", "4", "8", "15", "16", "29")[3,]
 dplyr::select(yak_mean_probabilities, "2", "4", "8", "15", "16", "29")[3,]
 dplyr::select(wawa_mean_probabilities, "2", "4", "8", "15", "16", "29")[3,]
+
+##### Export tables of parameters for report #####
+
+
+middle_columbia_derived_probabilities %>% 
+  left_join(., from_state_number_names, by = "from") %>% 
+  left_join(., to_state_number_names, by = "to") %>% 
+  dplyr::select(mean, q5, q95, origin, from_name, to_name) %>% 
+  relocate(to_name) %>% 
+  relocate(from_name) %>% 
+  dplyr::rename(from = from_name, to = to_name) -> middle_columbia_prob_table
+
+# subset the probabilities shared across the DPS
+middle_columbia_prob_table %>% 
+  subset(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                     "mainstem, upstream of LGR", "Wenatchee River",  "Entiat River",
+                     "Okanogan River", "Methow River",  "Tucannon River",  "Asotin Creek",
+                     "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River")) %>% 
+  distinct(from, to, .keep_all = TRUE) %>% 
+  dplyr::select(-origin) -> middle_columbia_DPS_probs
+
+middle_columbia_prob_table %>% 
+  subset(!(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                       "mainstem, upstream of LGR", "Wenatchee River",  "Entiat River",
+                       "Okanogan River", "Methow River",  "Tucannon River",  "Asotin Creek",
+                       "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River"))) -> middle_columbia_origin_probs
+
+# export both tables
+write.csv(middle_columbia_DPS_probs, here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_DPS_probs.csv"))
+write.csv(middle_columbia_origin_probs, here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_origin_probs.csv"))
 
 
 ##### Model parameters #####
