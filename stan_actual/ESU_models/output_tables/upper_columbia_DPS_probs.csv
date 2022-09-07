@@ -1,0 +1,29 @@
+"","from","to","mean","q5","q95"
+"1","mainstem, mouth to BON","mainstem, BON to MCN",0.97621665,0.9597181,0.9903892
+"2","mainstem, mouth to BON","loss",0.02378336245,0.009611105,0.040282295
+"3","mainstem, BON to MCN","mainstem, mouth to BON",0.01180624325,0.010187075,0.01338275
+"4","mainstem, BON to MCN","mainstem, MCN to ICH or PRA",0.749419965,0.7443422,0.75399055
+"5","mainstem, BON to MCN","Deschutes River",0.0128987885,0.011566875,0.014319605
+"6","mainstem, BON to MCN","John Day River",8.97494734305618e-06,2.2441155e-12,4.04289899999999e-05
+"7","mainstem, BON to MCN","Hood River",0.000136653837,3.1765625e-05,0.0003117966
+"8","mainstem, BON to MCN","Fifteenmile Creek",1.09058099646484e-05,4.6472985e-12,5.8463605e-05
+"9","mainstem, BON to MCN","Umatilla River",7.53624774858304e-06,6.6859135e-11,3.9265855e-05
+"10","mainstem, BON to MCN","BON to MCN other tributaries",8.57490438582909e-06,6.2660735e-11,5.5564535e-05
+"11","mainstem, BON to MCN","loss",0.225702365,0.22127295,0.230689
+"12","mainstem, ICH to LGR","mainstem, MCN to ICH or PRA",0.096086743095,0.0027534,0.24845875
+"13","mainstem, ICH to LGR","mainstem, upstream of LGR",0.89038297,0.7271722,0.9902374
+"14","mainstem, ICH to LGR","Tucannon River",0.00431028880785371,1.4018525e-12,0.016520485
+"15","mainstem, ICH to LGR","loss",0.00922001335182122,1.01132175e-07,0.0424696999999998
+"16","mainstem, upstream of LGR","mainstem, ICH to LGR",0.330448679,0.12357365,0.55798325
+"17","mainstem, upstream of LGR","Asotin Creek",0.00859146257234199,7.875151e-10,0.034170925
+"18","mainstem, upstream of LGR","Clearwater River",0.108871459,0.0068958085,0.33992495
+"19","mainstem, upstream of LGR","Salmon River",0.00853442749589727,1.8529445e-10,0.0465890899999998
+"20","mainstem, upstream of LGR","Grande Ronde River",0.00929365446215985,3.49152525e-10,0.0615282849999999
+"21","mainstem, upstream of LGR","Imnaha River",0.0097437575930619,1.4490665e-10,0.0605772349999999
+"22","mainstem, upstream of LGR","loss",0.524516535,0.2589309,0.78976565
+"23","Deschutes River","mainstem, BON to MCN",0.87196109,0.8297035,0.90840185
+"24","Deschutes River","loss",0.1280389345,0.091598425,0.1702965
+"25","Hood River","mainstem, BON to MCN",0.956009515,0.7406872,1
+"26","Hood River","loss",0.043990491385431,2.1876195e-09,0.2593128
+"27","Clearwater River","mainstem, upstream of LGR",0.0698190123922664,2.4484031e-08,0.457624449999997
+"28","Clearwater River","loss",0.93018097,0.54237555,1

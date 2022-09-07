@@ -1,0 +1,40 @@
+"","from","to","mean","q5","q95"
+"1","mainstem, RIS to RRE","mainstem, PRA to RIS",0.38370423,0.3278022,0.4434312
+"2","mainstem, RIS to RRE","mainstem, RRE to WEL",0.39021459,0.32952225,0.44613505
+"3","mainstem, RIS to RRE","Wenatchee River",0.0414759794,0.01319368,0.080330505
+"4","mainstem, RIS to RRE","loss",0.18460521,0.13265305,0.25192955
+"5","mainstem, RRE to WEL","mainstem, RIS to RRE",0.303856575,0.1885357,0.426282
+"6","mainstem, RRE to WEL","mainstem, upstream of WEL",0.4284779,0.31947285,0.5510704
+"7","mainstem, RRE to WEL","Entiat River",0.0210879583635,0.0007683897,0.0670352099999999
+"8","mainstem, RRE to WEL","loss",0.2465776235,0.13596245,0.37311035
+"9","mainstem, upstream of WEL","mainstem, RRE to WEL",0.43732338,0.27220005,0.58138535
+"10","mainstem, upstream of WEL","Okanogan River",0.0443883372375,0.0025630705,0.1515804
+"11","mainstem, upstream of WEL","Methow River",0.1303968635,0.03438629,0.25953405
+"12","mainstem, upstream of WEL","loss",0.38789138,0.2324569,0.5454984
+"13","mainstem, upstream of LGR","mainstem, ICH to LGR",0.37982102,0.3585975,0.4029658
+"14","mainstem, upstream of LGR","Asotin Creek",0.01158622175,0.0071165565,0.017801865
+"15","mainstem, upstream of LGR","Clearwater River",0.01803689685,0.01130082,0.026137605
+"16","mainstem, upstream of LGR","Salmon River",0.002129437855,0.0004657099,0.004721423
+"17","mainstem, upstream of LGR","Grande Ronde River",0.016339906,0.010154533,0.02325105
+"18","mainstem, upstream of LGR","Imnaha River",0.00315087297,0.00094598695,0.0069307115
+"19","mainstem, upstream of LGR","loss",0.568935665,0.5431203,0.59010255
+"20","Wenatchee River","mainstem, RIS to RRE",0.5111015575,0.1680591,0.86444365
+"21","Wenatchee River","loss",0.4888984375,0.13555635,0.8319409
+"22","Entiat River","mainstem, RRE to WEL",0.0688148503941308,9.23546850000001e-09,0.521942249999999
+"23","Entiat River","loss",0.9311851365,0.47805775,1
+"24","Okanogan River","mainstem, upstream of WEL",0.0871135163123593,1.2289905e-09,0.6183045
+"25","Okanogan River","loss",0.9128864955,0.3816955,1
+"26","Methow River","mainstem, upstream of WEL",0.661270485,0.2398333,0.96226295
+"27","Methow River","loss",0.33872950535,0.03773684,0.7601667
+"28","Tucannon River","mainstem, ICH to LGR",0.096155876,0.06732018,0.12667415
+"29","Tucannon River","loss",0.903844135,0.87332585,0.9326797
+"30","Asotin Creek","mainstem, upstream of LGR",0.00954971488363042,9.478161e-10,0.0490254649999999
+"31","Asotin Creek","loss",0.990450285,0.9509749,1
+"32","Clearwater River","mainstem, upstream of LGR",0.067652951405,0.002176763,0.223868
+"33","Clearwater River","loss",0.932347025,0.776132,0.99782325
+"34","Salmon River","mainstem, upstream of LGR",0.0390480167419356,1.13766365e-08,0.287135449999999
+"35","Salmon River","loss",0.960951975,0.71286455,1
+"36","Grande Ronde River","mainstem, upstream of LGR",0.00712170482438931,2.2173685e-09,0.0369721699999999
+"37","Grande Ronde River","loss",0.99287831,0.96302775,1
+"38","Imnaha River","mainstem, upstream of LGR",0.0283402848307551,1.24699545e-09,0.1801737
+"39","Imnaha River","loss",0.971659745,0.8198263,1
