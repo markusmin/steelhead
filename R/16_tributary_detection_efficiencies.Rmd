@@ -1,0 +1,214 @@
+---
+title: "16_tributary_detection_efficiencies"
+author: "Markus Min"
+date: '2022-10-02'
+output: html_document
+---
+
+## Description
+This Rmd file will go through the various tributaries in our model and model the detection efficiency at the most downstream interrogation site in each. It will also address the changing distribution of active arrays over time, and determine when a) detections in the tributaries are impossible and b) when it is not possible to calculate detection efficiency in the tributary.
+
+What assumptions can we make about tributary detection efficiencies? Are they shared across years? From Shelby's work, it seems like not for some, like the John Day
+
+Note: Shelby calculated annual detection efficiencies for some years for the following 11 tributaries:
+- Hood River
+- Fifteenmile Creek
+- Deschutes River
+- John Day River
+- Umatilla River
+- Walla Walla River
+- Yakima River
+- Wenatchee River
+- Entiat River
+- Tucannon River
+- Imnaha River
+
+## Summary
+The 17 tributaries in our model can be organized into multiple groups:
+
+### 1) Tributaries where detection efficiencies can be estimated at a site near the mouth for some years
+- Asotin Creek (2011-)
+- Deschutes River (2013-2019)
+- Entiat River (2007-)
+- Fifteenmile Creek (2011-2019) - note river mouth array still active, but no upstream arrays active starting July 2019
+- Hood River (2012-)
+- Tucannon River (2006-)
+- Umatilla River (2007-)
+- Wenatchee River (2010-)
+
+### 2) Tributaries with a array on the mainstem, but a bit up from the mouth
+- Imnaha River (2011-) - at RKM 7 and 10
+- John Day River (2007-) - at RKM 32
+- Methow River - at RKM 3 (2009-2017); at RKM 8 (2017-)
+- Okanogan River (2013-) - at RKM 25
+- Walla Walla River - at RKM 9 and 10, then at RKM 5 starting in 2019
+- Yakima River (2005-) at RKM 76
+
+### 3) Tributaries without anything close to a river mouth site, but plenty of others
+- Clearwater River
+- Salmon River
+
+### 4) Tributaries that we should likely remove from the model given the paucity of arrays
+- Grande Ronde River
+
+The difference between those listed under 3 and those listed under 4 is just how many arrays there are. This shows up in the probabilities of movement from the mainstem to the tributaries for fish of that origin. For example: 
+- Clearwater River from upstream of LGR: 0.303
+- Salmon River from upstream of LGR: 0.279
+- Grande Ronde from upstream of LGR: 0.084
+
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(here)
+
+# read in the site classifications file
+site_classification <- read.csv(here::here("covariate_data", "site_classification.csv"), row.names = 1)
+unique(site_classification$state)
+
+# read in the interrogation sites table
+interrogation_sites <- read.csv(here::here("All Interrogation Sites Table.csv"))
+interrogation_sites %>% 
+  dplyr::rename(event_site_name = Interrogation.Site.Long.Name) -> interrogation_sites
+
+# join the two tables
+site_classification %>% 
+  left_join(., interrogation_sites, by = "event_site_name") -> site_classification
+
+# Make a function to show relevant information from site_classification df
+show_trib_sites <- function(tributary_name){
+  subset(site_classification, state == tributary_name) %>% 
+    dplyr::select(event_site_name, Int.Site.Start.Date,Int.Site.End.Date,Interrogation.Site.Location.RKM) %>% 
+    # sort by RKM to identify most downstream
+    arrange(Interrogation.Site.Location.RKM) -> trib_site_info
+  
+  return(trib_site_info)
+}
+```
+## Asotin Creek
+![](../tributary_maps/asotin_creek.png){width=100%}
+
+- ACM - Asotin Creek near mouth is at RKM 1 of Asotin Creek; others are at RKM 5, 22, and 25
+- ACM start date 8/1/2011. Run year 11/12 and onwards can be seen in Asotin Creek
+- Other sites have start dates within a week in early August 2009. However, these all exist upstream of the Georges Creek confluence, which could be an issue.
+```{r asotin_creek, echo = FALSE}
+show_trib_sites("Asotin Creek")
+```
+
+
+
+## Clearwater River
+There is no site near the mouth of the Clearwater River; in fact, there is not a single interrogation site on the mainstem Clearwater River.
+```{r clearwater_river, echo = FALSE}
+show_trib_sites("Clearwater River")
+```
+
+
+
+## Deschutes River
+The Deschutes River Mouth array was active for run years 13/14 through 18/19 (3/13/2013 - 8/9/2019). In all other years, antennas were only found at RKM 69 or greater.
+```{r deschutes_river, echo = FALSE}
+show_trib_sites("Deschutes River")
+```
+
+
+## Entiat River
+- Lower Entiat River site is at RKM 2; active since 2007
+```{r entiat_river, echo = FALSE}
+show_trib_sites("Entiat River")
+```
+
+## Fifteenmile Creek
+- 158 is ar RKM 4, active since Nov 2011. Only two upstream sites, one of which was only active through 6/30/2019.
+```{r fifteenmile_creek, echo = FALSE}
+show_trib_sites("Fifteenmile Creek")
+```
+
+
+## Grande Ronde River
+The Grande Ronde is basically hopeless - we might consider removing it from our model. The first mainstem site on the Grande Ronde is at RKM 155.
+```{r grande_ronde_river, echo = FALSE}
+show_trib_sites("Grande Ronde River")
+```
+
+
+## Hood River
+HRM site is at RKM 1, starting in January 2012.
+```{r grande_ronde_river, echo = FALSE}
+show_trib_sites("Hood River")
+```
+
+
+## Imnaha River
+There are two Imnaha River sites close to the river mouth, at RKM 7 and RKM 10, both starting in November/December 2010. Would we pool these?
+```{r imnaha_river, echo = FALSE}
+show_trib_sites("Imnaha River")
+```
+
+
+## John Day River
+- JD1 is the most downstream array, but it's all the way at RKM 32.
+- JD1 has a known change over time in detection efficiency. From Richins 2017: "A suspicious trend was observed for the John Day wild population (Figure A.3). The detection efficiencies at “JD1” from 2008/2009 to 2010/2011 were over 98%. According to the PTAGIS event log, the array was washed out by high flows in 2011. A new array was installed at the same location in 2012. In the following run years, the efficiencies dropped by more than half to 38.8%—48.8%. This shift in detection efficiencies was mirrored by a similar and opposite shift in estimates of return rate to home. Total success rates jumped from 34.7%—43.3% to 58.9%— 63.4%. This trend suggests that detection efficiencies may be overestimated in earlier years or underestimated in later years. However, spawning abundance of John Day River steelhead did increase in the same time period (Northwest Fisheries Science Center 2015)."
+```{r john_day_river, echo = FALSE}
+show_trib_sites("John Day River")
+```
+
+
+## Methow River
+- I don't know what's going on with MRB site - it seems like potentially an aggregation of all sites prior 2004-2008
+- LMR site - moved in 2017. From PTAGIS: "LMR is a permanent instream PIT tag interrogation site on the Methow River. When first installed with a single row of six antennas, it was located near the WDFW Miller Hole access site at about river kilometer 3. In December 2010, a second row of six antennas was added to the site. In August 2017, the site was relocated 5 kilometers upstream and the two FS1001M transceivers were replaced with a single Biomark/QST QuBe controller."
+  - Seems like we would definitely need to calculate different detection efficiencies for different time periods
+```{r methow_river, echo = FALSE}
+show_trib_sites("Methow River")
+```
+
+
+## Okanogan River
+- No river mouth site, but one on Lower Okanogan at RKM 25
+```{r okanogan_river, echo = FALSE}
+show_trib_sites("Okanogan River")
+```
+
+
+## Salmon River
+Tons of sites, but all on tribtuaries/different forks of the Salmon
+```{r salmon_river, echo = FALSE}
+show_trib_sites("Salmon River")
+```
+
+
+## Tucannon River
+- LTR at RKM 3, active October 2005
+```{r tucannon_river, echo = FALSE}
+show_trib_sites("Tucannon River")
+```
+
+
+## Umatilla River
+- TMF combined at RKM 5, active Nov 2006
+- TMA adult fishway was separate until Nov 2006
+```{r umatilla_river, echo = FALSE}
+show_trib_sites("Umatilla River")
+```
+
+
+## Walla Walla River
+- ORB at RKM 10, active April 2005 - May 2015
+- PRV at RKM 9, active September 2012 - April 2019
+- WWB at RKM 5, active April 2019 - present
+```{r walla_walla_river, echo = FALSE}
+show_trib_sites("Walla Walla River")
+```
+
+
+## Wenatchee River
+- LWE at RKM 2-3
+```{r wenatchee_river, echo = FALSE}
+show_trib_sites("Wenatchee River")
+```
+
+
+## Yakima River
+- PRO at RKM 76, active October 2004
+```{r yakima_river, echo = FALSE}
+show_trib_sites("Yakima River")
+```
