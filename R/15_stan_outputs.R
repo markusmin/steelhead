@@ -57,8 +57,8 @@ to_state_number_names <- data.frame(to = seq(1,29,1), to_name = model_states)
 # Plot the traceplots
 # They look okay honestly, not horribly autocorrelated
 # fit <- readRDS(here::here("stan_actual", "ESU_models", "snake", "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds"))
-snake_fit <- readRDS(here::here("stan_actual", "ESU_models", "snake", "200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds"))
-# mcmc_trace(snake_fit$draws(), pars = c("borigin1_matrix_21_8"))
+snake_fit <- readRDS(here::here("stan_actual", "ESU_models", "snake", "seed101_200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds"))
+mcmc_trace(snake_fit$draws(), pars = c("borigin1_matrix_21_8"))
 
 # Inspect parameter estimates
 snake_fit_summary <- snake_fit$summary()
@@ -398,7 +398,7 @@ snake_prob_table %>%
                      "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
                      "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
                      "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                      "BON to MCN other tributaries")) %>% 
+                      "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> snake_DPS_probs
 
@@ -407,7 +407,7 @@ snake_prob_table %>%
                        "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
                        "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
                        "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                       "BON to MCN other tributaries"))) -> snake_origin_probs
+                       "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> snake_origin_probs
 
 # export both tables
 write.csv(snake_DPS_probs, here::here("stan_actual", "ESU_models", "output_tables", "snake_DPS_probs.csv"))
