@@ -85,6 +85,9 @@ show_trib_sites <- function(tributary_name){
 }
 ```
 ## Asotin Creek
+[ACM PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ACM)
+
+
 ![](../tributary_maps/asotin_creek.png){width=100%}
 
 - ACM - Asotin Creek near mouth is at RKM 1 of Asotin Creek; others are at RKM 5, 22, and 25
@@ -94,6 +97,20 @@ show_trib_sites <- function(tributary_name){
 show_trib_sites("Asotin Creek")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+
+Yes - upgrade on 10/12/2018. At least two eras: 
+1. 8/1/2011-10/11/2018 (potentially different starting 9/21/12, since two antennas were added to site on this date)
+2. 10/12/2018-present
+
+##### ACM description from PTAGIS:
+> ACM is a permanent instream PIT tag interrogation site located near the mouth of Asotin Creek, a tributary of the Snake River. As of 10/12/2018 all previous components present at ACM have been replaced and upgraded. The site consists of 3 rows of antennas with each row containing two 20- foot HDPE antennae, installed in flat-plate configuration. Each antenna is powered by a Biomark IS1001 (ACN) and the ACNs are connected to a Biomark IS1001-MTS master controller. The antennas were built and installed by WDFW. The site is connected to grid power to charge the battery bank powering the detection system. A cellular modem is installed on site to provide remote communication and allow for automated data collection, however, only manual data collection from the IS1001-MTS will occur at ACM until further notice. Prior to the upgrade, the site consisted of six antennas powered by an FS1001M.
+
+
+##### ACM operational history notes from PTAGIS
+1. Site down from March 19 - August 26, 2017
+2. Site down March 25-September 1, 2014
+3. Site down from March 26 - August 30, 2012. Two antennas were added to the site on September 21, 2012.
 
 
 ## Clearwater River
@@ -103,26 +120,70 @@ show_trib_sites("Clearwater River")
 ```
 
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+NA - no river mouth site chosen
+
 
 ## Deschutes River
-The Deschutes River Mouth array was active for run years 13/14 through 18/19 (3/13/2013 - 8/9/2019). In all other years, antennas were only found at RKM 69 or greater.
+[DRM PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=DRM)
+
+The Deschutes River Mouth (DRM) array was active for run years 13/14 through 18/19 (3/13/2013 - 8/9/2019). In all other years, antennas were only found at RKM 69 or greater.
 ```{r deschutes_river, echo = FALSE}
 show_trib_sites("Deschutes River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+
+No - single era. Note that the detection efficiencies for DRM calculated by Shelby in 13/14 and 14/15 are 475 (SE 4.7%) and 41.4% (SE 6.5%), respectively. No notes in operational history.
+
+##### DRM description from PTAGIS:
+> In February-March 2013, two antenna arrays, arranged upstream- downstream from one another, were installed just upstream from the mouth of the Deschutes River in the west channel at Moody Island (rkm 0.46). This system is based on Biomark?s new IS1001-MTS Multiplexing Transceiver System. The arrays consist of 12-Biomark 20ft STOUT antennas, each controlled by a submersible IS1001 antenna control nodes. There are seven antennas in the upstream array and 60 feet downstream are five antennas in the downstream array. The IS1001 nodes are connected in series and they in turn are connected to an IS1001-Master Controller located adjacent to the array on the west bank of the Deschutes River. Diagnostic and tag detection data will be retrieved remotely using a Campbell Scientific CR1000 data logger and cell phone connection. The IS1001-MTS is capable of detecting FDX-B and HDX PIT tags. Site is no longer active.
+
+##### DRM operational history notes from PTAGIS
+Nothing of note.
 
 ## Entiat River
-- Lower Entiat River site is at RKM 2; active since 2007
+[ENL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ENL)
+
+
+- Lower Entiat River (ENL) site is at RKM 2; active since 2007
 ```{r entiat_river, echo = FALSE}
 show_trib_sites("Entiat River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+
+Appears to be a single era, despite 15 years of operation. However, from 2008-2011, there were large periods of time in which the site was not operational, and antennas were frequently replaced as they went down. Shelby calculated detection efficiencies for ENL starting in 09/10 - values are all basically within SE of each other above 90% (no significant year-to-year variation).
+
+##### ENL description from PTAGIS:
+> This site is located immediately upstream of Entiat, WA. The site is grid powered with a battery switcher and includes eight HDPE pipe-style antennas and IS1001 readers. The readers are connected to an IS1001-MC and satellite remote communications.
+
+##### ENL operational history notes from PTAGIS
+1. 2008: April 16 - 18: data lost due to buffer overrun. May 25 - July 24: all antennae washed out. Sept. 8 - 24: no data due to MUX board failure.
+2. 2009: Jan. 7 - Mar. 7: all antennae washed out. May 26 - July 9: site not operational due to elevated flows.
+3. 2010: The site operated continually from January 1st until May 2, when elevated river discharge resulted in the operational loss of antenna #23. This was followed by the loss of antenna #22 on May 16, #21 on May 31, #25 on June 5, #24 on June 8, and #26 on June 13. There was no detection capability and ENL from June 13 until July 28, when antennas 21, 22, 23, 24, and 25 were reinstalled.
+4. 2011: Antennas 3, 5, 6 lost power Jan. 19, antennas 2 and 4 have high noise, antenna 1 has intermittent high noise. Antennas 1,2, and 4 not reading tags due to high noise on Jan. 27. Antennas 3, 5, and 6 were replaced on Feb. 10, and the noise was reduced on antennas 1, 2, and 4. Periods of high noise occurred during May. Antennas 3 and 6 not operational as of May 23; antenna 5 not operational on June 13. Antennas 3, 5, and 6 replaced on September 1. Site down from October 5-11. Antenna 1 lost power from October 27-December 6.
+
+
 ## Fifteenmile Creek
+[158 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=158)
+
+
 - 158 is ar RKM 4, active since Nov 2011. Only two upstream sites, one of which was only active through 6/30/2019.
 ```{r fifteenmile_creek, echo = FALSE}
 show_trib_sites("Fifteenmile Creek")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+Short periods of time in which antennas were active. Shelby calculated efficiencies starting in 12/13: 49.8% (SE 10.1%), 100% (no SE), 100% (no SE). Doesn't appear that antennas being down affected it.
+
+##### 158 description from PTAGIS:
+> INSTREAM DETECTION ARRAY AT THE CONFLUENCE OF EIGHTMILE CREEK AND FIFTEENMILE CREEKS, CONSISTING OF A FS1001M MULTIPLEXING TRANCEIVER, CELL MODEM, AND THREE ANTENNAS IN EACH CREEK. ANTENNA ARRAYS FOR EACH CREEK CONSIST OF ONE ANTENNA EACH THAT SPANS THE NORMAL HIGH WATER MARK AND IS SECURED TO THE SUBSTRATE FOR PASS-OVER DETECTION. SITE IS GRID-POWERED AND OPERATES YEAR-ROUND. SITE IS ON PRIVATE LAND.
+
+##### 158 operational history notes from PTAGIS
+1. 2012: Antenna 4 down from March 31 - April 5. Antenna 6 down from March 31 - April 18.
+2. 2013: Antenna 6 down from October 23 - December 27
+3. 2014: Site down intermittently through the year, check event log for details. Converted to IS1001-MTS system in October. MARKUS NOTE: there is no event log for 2014, would have to email contact to get it.
 
 ## Grande Ronde River
 The Grande Ronde is basically hopeless - we might consider removing it from our model. The first mainstem site on the Grande Ronde is at RKM 155.
@@ -132,42 +193,120 @@ show_trib_sites("Grande Ronde River")
 
 
 ## Hood River
+[HRM PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=HRM)
+
+
 HRM site is at RKM 1, starting in January 2012.
-```{r grande_ronde_river, echo = FALSE}
+```{r hood_river, echo = FALSE}
 show_trib_sites("Hood River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+The description indicates that this site is highly influenced by river stage. Shelby calculated detection efficiencies in 12/13 and 13/14 of 65% (SE 6.5%) and 41.6% (SE 9.8%), respectively. So yes, I think we should look into annual detection efficiencies, but I also don't think that there is a directional trend/regime shift/multiple eras.
+
+##### HRM description from PTAGIS:
+> An instream interrogation system consisting of 2 antenna arrays located at the mouth of the Hood River. The antennas are against the west side jetty just inside the bar where the Hood River meets the Columbia River. The upstream array is comprised of five 20 foot antennas covering a total of 100 feet from shore. The downstream array is comprised of two 20 foot antennas that extend 40 feet from shore. The antenna arrays cover approximately 3/4 the stream width at low water conditions and a half of the stream at bank full. The transceiver is a IS1001-MTS and power is provided by solar panels charging a battery bank. Interrogation data is submitted several times a week via cellular modem.
+
+##### HRM operational history notes from PTAGIS
+1. 2015: Antenna 1 down April 15 - May 11. Antennas 2 and 3 down April 15 - Jume 5. All 3 upstream antennas replaced June 5 and new antenna added to downstream array.
+2. 2014: Site down September 30-October 27 for installation of new antennas and MTS transceiver.
+3. 2012: First year of operations. Site down a few times in November and December.
 
 ## Imnaha River
-There are two Imnaha River sites close to the river mouth, at RKM 7 and RKM 10, both starting in November/December 2010. Would we pool these?
+[IR1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=IR1)
+[IR2 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=IR2)
+
+
+There are two Imnaha River sites close to the river mouth, at RKM 7 (IR1) and RKM 10 (IR2), both starting in November/December 2010. Would we pool these? There is also a tributary downstream of these on Cow Creek, which flows into the Imnaha at RKM 6.
 ```{r imnaha_river, echo = FALSE}
 show_trib_sites("Imnaha River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+Nothing significant in site operational history. Shelby calculated detection efficiencies at IR1 for 11/12 through 14/15 - some fluctuation, between 84% and 100%, also variation between wild and hatchery populations.
+
+##### IR1 description from PTAGIS:
+> In-stream detection system consisting of a single array located in the lower Imnaha River. The array (IR1) located at river km 7 (N 45.761162, W -116.750658) consists of four 20 foot Biomark flat panel antennas that span the entire river at base flow. IR1 is operated by the Integrated Status and Effectiveness Project (ISEMP) cooperators Nez Perce Tribe and Quantitative Consultants, Inc. and was installed for continuous monitoring on December 3, 2010. The array includes ISEMP standard site monitoring equipment including: air and water temperature probes, and a water pressure transducer to monitor stream level. Electrical power is provided by a solar/propane hybrid thermal electric generator and remote communication provided by a satellite modem.
+
+##### IR1 operational history notes from PTAGIS
+1. 2011: High noise levels from January 11 - March 10.
+
+##### IR2 description from PTAGIS:
+> In-stream detection system consisting of a single array located in the lower Imnaha River. The array (IR2) located at river km 10 (N 45.742839 W -116.764563) consists of one 10 foot and four 20 foot Biomark flat panel antennas that span the entire river at base flow. IR2 is operated by the Integrated Status and Effectiveness Project (ISEMP) cooperators Nez Perce Tribe and Quantitative Consultants, Inc. and was installed for continuous monitoring in November 2010. The array includes ISEMP standard site monitoring equipment including: air and water temperature probes, and a water pressure transducer to monitor stream level. Electrical power is provided by a solar/propane hybrid thermal electric generator and remote communication provided by a satellite modem.
+
+
+##### IR2 operational history notes from PTAGIS
+1. 2011: High noise levels from January 31 - March 10 resulted in sporadic downtime.
+
 
 ## John Day River
+[JD1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=JD1)
+
+
 - JD1 is the most downstream array, but it's all the way at RKM 32.
 - JD1 has a known change over time in detection efficiency. From Richins 2017: "A suspicious trend was observed for the John Day wild population (Figure A.3). The detection efficiencies at “JD1” from 2008/2009 to 2010/2011 were over 98%. According to the PTAGIS event log, the array was washed out by high flows in 2011. A new array was installed at the same location in 2012. In the following run years, the efficiencies dropped by more than half to 38.8%—48.8%. This shift in detection efficiencies was mirrored by a similar and opposite shift in estimates of return rate to home. Total success rates jumped from 34.7%—43.3% to 58.9%— 63.4%. This trend suggests that detection efficiencies may be overestimated in earlier years or underestimated in later years. However, spawning abundance of John Day River steelhead did increase in the same time period (Northwest Fisheries Science Center 2015)."
 ```{r john_day_river, echo = FALSE}
 show_trib_sites("John Day River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+Yes, given Shelby's observations and notes from the event log. Shift in 2012.
+
+Two eras: 
+1.2007-2011
+2. 2012-present
+
+##### JD1 description from PTAGIS:
+John Day River in-stream detection, near McDonald Ferry at RM 20.
+
+##### JD1 operational history notes from PTAGIS
+Nothing of significance
 
 ## Methow River
+[LMR PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LMR)
+
+
 - I don't know what's going on with MRB site - it seems like potentially an aggregation of all sites prior 2004-2008
-- LMR site - moved in 2017. From PTAGIS: "LMR is a permanent instream PIT tag interrogation site on the Methow River. When first installed with a single row of six antennas, it was located near the WDFW Miller Hole access site at about river kilometer 3. In December 2010, a second row of six antennas was added to the site. In August 2017, the site was relocated 5 kilometers upstream and the two FS1001M transceivers were replaced with a single Biomark/QST QuBe controller."
+- LMR site - moved in 2017
   - Seems like we would definitely need to calculate different detection efficiencies for different time periods
 ```{r methow_river, echo = FALSE}
 show_trib_sites("Methow River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+Yes, when the site moved in 2017. However, there are also lots of outages/issues in 2010-2014.
+
+Two eras:
+1. 2009-7/31/2017
+2. 8/1/2017-present
+
+##### LMR description from PTAGIS:
+> LMR is a permanent instream PIT tag interrogation site on the Methow River. When first installed with a single row of six antennas, it was located near the WDFW Miller Hole access site at about river kilometer 3. In December 2010, a second row of six antennas was added to the site. In August 2017, the site was relocated 5 kilometers upstream and the two FS1001M transceivers were replaced with a single Biomark/QST QuBe controller. The site currently consists of two rows of antennas, with each row nearly spanning the wetted width of the channel during base flows. Each row consists of six 20-foot HDPE antennas, installed in flat-plate configuration. Each antenna is powered by a Biomark IS1001 (ACN) and the ACNs are connected to a Biomark/QST QuBe controller. The antennas were built and installed by WDFW. The site is powered by a thermoelectric generator. LMR has remote communication abilities provided by a cellular modem. A submersible pressure transducer and temperature probe sensor are also installed to provide environmental condition data collection.
+
+##### LMR operational history notes from PTAGIS
+1. 2017: Site moved 5 km upstream and both Mux transceivers were replaced with a QuBE/IS1001 setup Start and end dates based on timer tags.
+2. 2014: Data lost from B antennas April 23-28. Data lost from A antennas May 6-8. Data lost from B antennas May 17-27. Site down from July 17-September 3 due to wildfire.
+3. 2012: Multiple periods when one or more antennas were not functioning or data was lost. Check event log for details.
+4. 2011: Array A1-A6, which had been disabled since Dec. 15, 2010, was restored on January 4, 2011. Array C1-C6 was brought back online on March 4. Site down Apr. 8 - Apr. 9. Antenna B3 stopped working on May 15. Antennas B4-B6 stopped working on May 22. Antennas A4-A6 stopped working on May 24. Antenna A3 stopped working on June 4. Antennas A1 and B2 stopped working on June 7. Only antennas A2 and B1 functioning as of June 7. Antennas A1, A3, A4, A5, B2, B3, B4, B5 reinstalled September 27. All antennas, except A6 and B6, installed and operational as of 1400 September 27.
+5. 2010: Refer to the LMR event log for details about individual antenna outages between January 1 and June 21. The entire site was out of service between June 21 and August 23. A second array was installed on Dec. 2, immediately below the original array. The original (A0) array failed on Dec. 14 and the new array (B0) failed on Dec. 15.
 
 ## Okanogan River
-- No river mouth site, but one on Lower Okanogan at RKM 25
+[OKL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=OKL)
+
+
+- No river mouth site, but one on Lower Okanogan (OKL) at RKM 25. File says it started 3/1/2013, PTAGIS says it started 10/8/2013.
 ```{r okanogan_river, echo = FALSE}
 show_trib_sites("Okanogan River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+There are some odd things in the event log about noise, but no directional/era changes. Should calculate annual detection efficiencies and see if there are significant changes.
+
+##### OKL description from PTAGIS:
+> OKL is a permanent instream PIT tag interrogation site at RKM 24.9 on the mainstem Okanogan River, upstream of Chiliwist area in Okanogan County. The site consists of two rows of antennas, with each row spanning the wetted width of the channel during base flows. Each row consists of six 20-foot PVC antennas, installed in flat-plate configuration. The antennas were built and installed by WDFW and CCT. The site is powered by a thermoelectric generator. OKL has remote communication abilities provided by a cellular modem and Campbell Scientific CR1000 datalogger system. A submersible pressure transducer and temperature probe sensors are also installed to provide environmental condition data collection.
+
+##### OKL operational history notes from PTAGIS
+1. 2014: Several unexplained gaps in data collection during January and March.
 
 ## Salmon River
 Tons of sites, but all on tribtuaries/different forks of the Salmon
@@ -175,23 +314,56 @@ Tons of sites, but all on tribtuaries/different forks of the Salmon
 show_trib_sites("Salmon River")
 ```
 
-
 ## Tucannon River
+
+[LTR PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LTR)
+
+
 - LTR at RKM 3, active October 2005
 ```{r tucannon_river, echo = FALSE}
 show_trib_sites("Tucannon River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+There has been a lot of change with this site, and long periods of inactivity as well as multiple shorter periods. Should calculate annual percentages and investigate. Shelby calculated detection efficiencies for 07/07 through 14/15, with gap for 08/09 due to data loss. 06/07 and 07/08 detection efficiencies were above 96%; 09/10 onward there seems to be a drop all the way down to around 60% in 14/15.
+
+eras:
+1. August 2020-present
+2. 2005-1/8/2009
+3. Inactive: 1/8/2009-9/10/2009
+
+##### LTR description from PTAGIS:
+> LTR is a permanent instream PIT tag interrogation site at RKM 2.5 on the Tucannon River. The current configuration installed August 2020 consists of three rows of antennas. The upstream row consists of 2 20-foot HDPE antennas, the middle row consists of 2 20 foot HDPE antennas and 1 10 foot PVC antenna, the bottom row consists of 2 HDPE antennas, installed in flat-plate configuration. Each antenna is powered by a Biomark Multiplexing Reader IS1001-MC master controller. The antennas were built and installed by WDFW. The electrical power at the site is provided by 6 200 watt solar panels. Data currently will be downloaded by Biomark through a satellite modem. No environmental monitors are installed at this time. This site has variously consisted of one or two groups of arrays, about a kilometer apart, located near the mouth of the Tucannon River. From Oct. 2005 until April 2008 the downstream array group consisted of two tandem "log" antenna arrays that spanned the low-water channel above the boat ramp. The upstream array group was located at an abandoned railroad bridge abutment upstream of Hwy 261 on the Tucannon River downstream from Starbuck. The upstream array (A0) operated from Oct. 2005 until January 2009. Its various configurations included both pass-through and pass-over antennas. A single array (C0) with six PVC pipe antennas powered by a QST Qube was re-deployed above the boat ramp in Sept. 2009. Responsibility for site operations transferred from USFWS to WDFW on Jan. 7, 2010. The C0 in-stream array was relocated below the Hwy 261 bridge on Sept. 29, 2010. The Qube was replaced with a Biomark IS1001-MC November 2018.
+
+##### LTR operational history notes from PTAGIS
+1. 2011: Site down from February 24-28 and April 3-12. High flows caused various antennas to lose power or have high noise throughout the season - see event logs for details. Three antennas were replaced August 16, but not fully functional until August 29.
+2. 2010: Data collected prior to Jan. 7 were lost due to an equipment failure. No data are available between Jan. 19 and Feb. 4 due to a complete loss of power and failure of the lithium battery. No data are available between Feb. 16-18, Apr. 16-21, or May 10-24 due to loss of buffered records. No data available between Sept. 1-20; propane ran out. Detectors were moved upstream near the Hwy 261 bridge on Sept. 29, 2010. No data between Dec. 1-13 due to a TEG malfunction.
+3. 2009: The original A0 MUX array was washed out on Jan. 8, 2009. The downstream antennas in the Tucannon River (identified by transceiver C0) were reinstalled on September 10. These antennae replace the upstream array (transceiver A0) that was blown out. The configuration of the new antenna array is as follows, looking downstream: Beginning on the left hand streambank is C1, C2, and C3 (C3 is approximately mid stream). Slightly downstream (approx. 2 feet) beginning mid stream and going towards the right hand streambank are C4, C5 and C6. There is overlap of C2 and C3 with C4 and C5. Data collected between Nov. 22, 2009 and Jan. 7, 2010 were lost due to an equipment failure.
 
 ## Umatilla River
+[TMF PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=TMF)
+
 - TMF combined at RKM 5, active Nov 2006
 - TMA adult fishway was separate until Nov 2006
 ```{r umatilla_river, echo = FALSE}
 show_trib_sites("Umatilla River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+There's nothing really concerning at the TMF site. Shelby calculated detection efficiencies in some years, and they varied a lot, from 54% to 100%. But also seems like there wasn't a ton of data.
+
+##### TMF description from PTAGIS:
+> Adult Fishway and Juvenile Bypass/subsampling facility at Three Mile Falls Dam
+
+##### TMF operational history notes from PTAGIS
+1. 2006: First year for TMF site, which combines and replaces the previous TMJ and TMA sites.
+
 
 ## Walla Walla River
+[ORB PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ORB)
+[PRV PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=PRV)
+[WWB PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=WWB)
+
 - ORB at RKM 10, active April 2005 - May 2015
 - PRV at RKM 9, active September 2012 - April 2019
 - WWB at RKM 5, active April 2019 - present
@@ -199,16 +371,73 @@ show_trib_sites("Umatilla River")
 show_trib_sites("Walla Walla River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+
+There are three different river mouth arrays that are used, depending on the timeframe:
+1. ORB: 4/15/2005-5/4/2015
+2. PRV: 9/25/2012-4/8/2019
+3. WWB: 4/11/2019-present
+
+Shelby calculated detection efficiencies at ORB 07/08-11/12, PRV 12/13-14/15. ORB does seem to have lower, with high SE, detection efficiencies. PRV has generally higher detection efficiencies.
+
+For each of these sites, there are no major shifts in equipment besides a few periods where antennas were down to be aware of.
+
+##### WWB description from PTAGIS:
+![](../tributary_maps/WWB Overview.jpg){width=100%}
+> The site consists of two 50 ft wide floating barges with twelve 6 ft verticle fins. Each pair of fins act as a single antenna, detection for each antenna is the full length of the fin (6 ft) and 3 ft fore and aft of each fin. Barge will be held in place by single 250lb Danforth anchor. Electronics are powered by battery and solar, cellular modems are used for remote access. Site was initially configured with transceiver and antenna IDs opposite to PTAGIS convention, but was corrected on May 16, 2019.
+
+
+##### WWB operational history notes from PTAGIS
+Site was down 2/10/2020-2/28/2020 due to flooding.
+
+
+##### ORB description from PTAGIS:
+> In-stream arrays at Oasis Road Bridge, lower Walla Walla River
+
+##### ORB operational history notes from PTAGIS
+1. 2011: Antennas 1-5 lost power and or anchoring between Jan. 15 and Jan 18, only antenna 6 still working. As of Feb. 3, antennas 4, 5 and 6 are working. Site down from June 2 - 6 due to power loss from vandalization. Only antennas 5 and 6 working as of May 27. All antennas repaired and fully functioning as of September 1.
+2. 2009: 5/18/09 to 5/27/09 - MUX transceiver locked up; no data for this time period. 9/25/09 to 10/05/09 - Site down for maintenance; no data were collected.
+3. 2006: All antennas were out of service between January 1 and January 25, due to a high water event. Various antennas were in and out of service after January 25. See the ORB event log for additional details. A new Upstream Flat-Plate Array was installed on October 3, augmenting the existing Downstream Pass-Through Array.
+
+##### PRV description from PTAGIS:
+> This interrogation site in the lower Walla Walla River at Pierce Green Valley RV Park is a flat panel, single row of 4 antennas, 3 twenty foot panels and 1 ten foot panel. This passive in-stream interrogation system is located at rkm 15 Site was removed in April 2019.
+
+
+##### PRV operational history notes from PTAGIS
+Nothing of note.
 
 ## Wenatchee River
-- LWE at RKM 2-3
+[LWE PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LWE)
+
+
+- LWE at RKM 2-3. PTAGIS says start date of 12/7/2010, file says 10/1/2009
 ```{r wenatchee_river, echo = FALSE}
 show_trib_sites("Wenatchee River")
 ```
 
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+
+Shelby calculated detection efficiencies for 11/12-14/15. Varied from 53.8% in 11/12 to 85% in 14/15, with single digit SEs in each year. Doesn't seem to be directional changes.
+
+##### LWE description from PTAGIS:
+> LWE is a permanent instream PIT tag interrogation site at RKM 2.77 on the Wenatchee River. The site consists of two rows of antennas, with each row nearly spanning the wetted width of the channel during base flows. Each row consists of six 20-foot PVC antennas, installed in flat-plate configuration. Each antenna is powered by a Biomark IS1001 (ACN) and the ACNs are connected to a Biomark IS1001-MC (MTS). The antennas were built and installed by WDFW. The site is powered by a thermoelectric generator. LWE has remote communication abilities provided by a cellular modem and Campbell Scientific CR1000 datalogger. A submersible pressure transducer and temperature probe sensors are also installed to provide environmental condition data collection.
+
+##### LWE operational history notes from PTAGIS
+There are a number of short outages, but nothing too long term.
 
 ## Yakima River
+[PRO PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=PRO)
+
+
 - PRO at RKM 76, active October 2004
 ```{r yakima_river, echo = FALSE}
 show_trib_sites("Yakima River")
 ```
+### Is there reason to believe that the detection efficiency of the antennas at the river mouth site may have changed over time?
+Shelby calculated detection efficiencies for 07/08-14/15. Efficiencies generally very high. The arrays are in the three ladders at Prosser, so we would expect them to have higher detection efficiencies than the in stream arrays.
+
+##### PRO description from PTAGIS:
+> This site monitors the (three) fish ladders and juvenile sampling facility at Prosser Dam. Each ladder has two antennas installed at the counting window. The juvenile sampling facility has antennas installed downstream of the separator and at the exit from the sample room.
+
+##### PRO operational history notes from PTAGIS
+Short periods where individual antennas were down, but no major changes. 
