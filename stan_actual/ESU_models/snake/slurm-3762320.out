@@ -442,9 +442,9 @@ borigin5_matrix_9_24 ~ normal(0,10);
 borigin5_matrix_9_25 ~ normal(0,10);
 borigin5_matrix_9_26 ~ normal(0,10);
 
-[1] "2022-08-18 16:36:52 PDT"
-[1] "2022-08-18 16:37:28 PDT"
-[1] "2022-08-18 16:37:34 PDT"
+[1] "2022-09-06 17:50:25 PDT"
+[1] "2022-09-06 17:51:00 PDT"
+[1] "2022-09-06 17:51:09 PDT"
 Running MCMC with 1 chain, with 28 thread(s) per chain...
 
 Chain 1 Iteration:   1 / 400 [  0%]  (Warmup) 
@@ -489,7 +489,7 @@ Chain 1 Iteration: 370 / 400 [ 92%]  (Sampling)
 Chain 1 Iteration: 380 / 400 [ 95%]  (Sampling) 
 Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling) 
 Chain 1 Iteration: 400 / 400 [100%]  (Sampling) 
-Chain 1 finished in 13308.2 seconds.
+Chain 1 finished in 17724.1 seconds.
 Warning: 200 of 200 (100.0%) transitions hit the maximum treedepth limit of 10.
 See https://mc-stan.org/misc/warnings for details.
 
