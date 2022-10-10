@@ -226,6 +226,53 @@ as.data.frame(ACM_det_eff) %>%
 kable(ACM_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = ACM_det_eff, site_name = "ACM - Asotin Creek near mouth")
+
+##### Plot timing at river mouth and upstream sites #####
+  show_trib_sites(tributary_name) -> trib_sites
+  # identify which sites are upstream of the river mouth
+  upstream_sites <- subset(trib_sites, event_site_name != river_mouth_site)$event_site_name
+  # subset total df to only detections from that tributary
+  trib_det <- subset(det_hist, event_site_name %in% trib_sites$event_site_name)
+  
+  # Get the detections + times of fish at upstream sites
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(upstream_sites)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(upstream_time = start_time) -> trib_up
+  
+  # Get the detections + times of fish at the river mouth site
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(river_mouth_site)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(river_mouth_time = start_time) -> trib_rm
+  
+  # Join the upstream and river mouth detections
+  trib_rm %>% 
+    full_join(trib_up, by = "tag_code") %>% 
+    mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
+    mutate(upstream_time = ymd_hms(upstream_time)) %>%
+    mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
+                         year(river_mouth_time))) %>% 
+    subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
+    mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
+    subset(upstream_time >= ymd(river_mouth_site_start_date) &
+             upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
+  
+trib_det_times %>% 
+  mutate(river_mouth_month = month(river_mouth_time)) %>% 
+  mutate(upstream_month = month(upstream_time)) %>% 
+  dplyr::select(tag_code, river_mouth_month, upstream_month) %>% 
+  pivot_longer(., cols = c("river_mouth_month", "upstream_month")) %>% 
+  dplyr::rename(site = name, month = value) %>% 
+  mutate(site = gsub("_month", "", site)) -> trib_det_month
+
+ggplot(trib_det_month, aes(x = month, fill = site)) +
+  geom_bar(position = "dodge") +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
 ```
 
 
