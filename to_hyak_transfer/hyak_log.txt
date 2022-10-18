@@ -1620,6 +1620,8 @@ scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
 scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
 
 # run all 9 scripts:
+# FIRST - REMOVE THE BINARY FILE
+
 # snake
 sbatch job_seed101_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
 sbatch job_seed102_ckpt_parallel_snake_02_stan_actual_int_origin_mox.slurm
@@ -1636,7 +1638,19 @@ sbatch job_seed102_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.sl
 sbatch job_seed103_ckpt_parallel_upper_columbia_02_stan_actual_int_origin_mox.slurm
 
 
+### 8-19-2022 ###
+# Pull these runs
+# damn, none of the snake runs finished in time - only got to 320 out of 400.
+
+### 9-6-2022 ###
+Run the snake runs on stf instead
+scp ./job_seed101_stf_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+scp ./job_seed102_stf_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
+scp ./job_seed103_stf_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/
 
 
+### 9-7-2022 ###
+# pull the new stf runs
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/ ./
 
 
