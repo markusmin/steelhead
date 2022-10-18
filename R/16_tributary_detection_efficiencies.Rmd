@@ -56,6 +56,15 @@ The 17 tributaries in our model can broadly be organized into multiple groups:
 - Salmon River from upstream of LGR: 0.279
 - Grande Ronde from upstream of LGR: 0.084
 
+## Tributary flow data
+
+Tributary flow data was found using DART: https://www.cbr.washington.edu/dart/query/streamflow_daily.
+Tributary data was then queried directly from USGS by finding the site on the interactive USGS dashboard (https://dashboard.waterdata.usgs.gov/app/nwd/lang-en/?aoi=default) and navigating to the data page for the specific site. I then selected daily data for discharge and gage height.
+
+On the USGS data page for each, I then queried 2005-01-01 through 2022-10-17 and saved the page source of the table of tab-separated values.
+
+For each tributary, I selected data from the station closest to the river mouth array.
+
 
 ```{r load_libraries_data, echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyverse)
@@ -175,6 +184,173 @@ annual_det_eff_gg <- ggplot(trib_det_eff_annual, aes(x = year, y = det_eff,
 
 return(annual_det_eff_gg)
 }
+
+# 4) Plot timing at river mouth and upstream sites
+plot_arrival_timing <- function(tributary_name, river_mouth_site, 
+                           river_mouth_site_start_date, river_mouth_site_end_date){
+  show_trib_sites(tributary_name) -> trib_sites
+  # identify which sites are upstream of the river mouth
+  upstream_sites <- subset(trib_sites, event_site_name != river_mouth_site)$event_site_name
+  # subset total df to only detections from that tributary
+  trib_det <- subset(det_hist, event_site_name %in% trib_sites$event_site_name)
+  
+  # Get the detections + times of fish at upstream sites
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(upstream_sites)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(upstream_time = start_time) -> trib_up
+  
+  # Get the detections + times of fish at the river mouth site
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(river_mouth_site)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(river_mouth_time = start_time) -> trib_rm
+  
+  # Join the upstream and river mouth detections
+  trib_rm %>% 
+    full_join(trib_up, by = "tag_code") %>% 
+    mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
+    mutate(upstream_time = ymd_hms(upstream_time)) %>%
+    mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
+                         year(river_mouth_time))) %>% 
+    subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
+    mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
+    subset(upstream_time >= ymd(river_mouth_site_start_date) &
+             upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
+  
+trib_det_times %>% 
+  mutate(river_mouth_month = month(river_mouth_time)) %>% 
+  mutate(upstream_month = month(upstream_time)) %>% 
+  dplyr::select(tag_code, river_mouth_month, upstream_month) %>% 
+  pivot_longer(., cols = c("river_mouth_month", "upstream_month")) %>% 
+  dplyr::rename(site = name, month = value) %>% 
+  mutate(site = gsub("_month", "", site)) -> trib_det_month
+
+timing_gg <- ggplot(trib_det_month, aes(x = month, fill = site)) +
+  geom_bar(position = position_dodge(preserve = "single")) +
+  scale_fill_manual(values = c("#1f78b4", "#ff7f00")) +
+  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) +
+  ggtitle(river_mouth_site)
+  
+return(timing_gg)
+}
+
+### Tributary function
+
+asotin_creek_usgs_headers = read.table(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+asotin_creek_usgs <- read.csv(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 32, header = F, sep = "\t")
+colnames(asotin_creek_usgs) <- asotin_creek_usgs_headers
+
+# change some column names
+colnames(asotin_creek_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+# drop most columns
+asotin_creek_usgs %>% 
+  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+  mutate(date_time = ymd(date_time)) %>% 
+  mutate(month = month(date_time)) %>% 
+  mutate(year = year(date_time))-> asotin_creek_usgs
+
+asotin_creek_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> asotin_creek_monthly_discharge
+
+asotin_creek_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> asotin_creek_monthly_gage_height
+
+asotin_creek_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) -> asotin_creek_annual_discharge
+
+asotin_creek_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) -> asotin_creek_annual_gage_height
+
+# plot all of them
+ggplot(asotin_creek_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
+  geom_line()
+
+ggplot(asotin_creek_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
+  geom_line()
+
+ggplot(asotin_creek_annual_discharge, aes(x = year, y = mean_discharge_cfs)) +
+  geom_line()
+
+ggplot(asotin_creek_annual_gage_height, aes(x = year, y = mean_gage_height_ft)) +
+  geom_line()
+
+# what's the strength of the relationship between gage height and discharge?
+ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet)) +
+  geom_point() +
+  geom_smooth(formula = gage_height_feet ~ log(discharge_cfs)) +
+  ggtitle("Asotin Creek")
+
+ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
+  geom_point() +
+  ggtitle("Asotin Creek")
+  
+
+entiat_river_usgs_headers = read.table(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+entiat_river_usgs <- read.csv(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 32, header = F, sep = "\t")
+colnames(entiat_river_usgs) <- entiat_river_usgs_headers
+
+# change some column names
+colnames(entiat_river_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+# drop most columns
+entiat_river_usgs %>% 
+  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+  mutate(date_time = ymd(date_time)) %>% 
+  mutate(month = month(date_time)) %>% 
+  mutate(year = year(date_time))-> entiat_river_usgs
+
+entiat_river_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_discharge
+
+entiat_river_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_gage_height
+
+entiat_river_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) -> entiat_river_annual_discharge
+
+entiat_river_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) -> entiat_river_annual_gage_height
+
+# plot all of them
+ggplot(entiat_river_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
+  geom_line()
+
+ggplot(entiat_river_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
+  geom_line()
+
+ggplot(entiat_river_annual_discharge, aes(x = year, y = mean_discharge_cfs)) +
+  geom_line()
+
+ggplot(entiat_river_annual_gage_height, aes(x = year, y = mean_gage_height_ft)) +
+  geom_line()
+
+# what's the strength of the relationship between gage height and discharge?
+ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet)) +
+  geom_point() +
+  geom_smooth(formula = gage_height_feet ~ log(discharge_cfs)) +
+  ggtitle("Entiat River")
+
+ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
+  geom_point() +
+  ggtitle("Entiat River")
+  
+
 ```
 
 
@@ -228,53 +404,16 @@ kable(ACM_det_eff_table, booktabs = T)%>%
 plot_annual_det_eff(trib_det_eff_df = ACM_det_eff, site_name = "ACM - Asotin Creek near mouth")
 
 ##### Plot timing at river mouth and upstream sites #####
-  show_trib_sites(tributary_name) -> trib_sites
-  # identify which sites are upstream of the river mouth
-  upstream_sites <- subset(trib_sites, event_site_name != river_mouth_site)$event_site_name
-  # subset total df to only detections from that tributary
-  trib_det <- subset(det_hist, event_site_name %in% trib_sites$event_site_name)
-  
-  # Get the detections + times of fish at upstream sites
-  trib_det %>% 
-    group_by(tag_code) %>% 
-    filter(event_site_name %in% c(upstream_sites)) %>% 
-    dplyr::select(tag_code, start_time) %>% 
-    filter(!(duplicated(tag_code))) %>% 
-    dplyr::rename(upstream_time = start_time) -> trib_up
-  
-  # Get the detections + times of fish at the river mouth site
-  trib_det %>% 
-    group_by(tag_code) %>% 
-    filter(event_site_name %in% c(river_mouth_site)) %>% 
-    dplyr::select(tag_code, start_time) %>% 
-    filter(!(duplicated(tag_code))) %>% 
-    dplyr::rename(river_mouth_time = start_time) -> trib_rm
-  
-  # Join the upstream and river mouth detections
-  trib_rm %>% 
-    full_join(trib_up, by = "tag_code") %>% 
-    mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
-    mutate(upstream_time = ymd_hms(upstream_time)) %>%
-    mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
-                         year(river_mouth_time))) %>% 
-    subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
-    mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
-    subset(upstream_time >= ymd(river_mouth_site_start_date) &
-             upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
-  
-trib_det_times %>% 
-  mutate(river_mouth_month = month(river_mouth_time)) %>% 
-  mutate(upstream_month = month(upstream_time)) %>% 
-  dplyr::select(tag_code, river_mouth_month, upstream_month) %>% 
-  pivot_longer(., cols = c("river_mouth_month", "upstream_month")) %>% 
-  dplyr::rename(site = name, month = value) %>% 
-  mutate(site = gsub("_month", "", site)) -> trib_det_month
+plot_arrival_timing(tributary_name = "Asotin Creek", river_mouth_site = "ACM - Asotin Creek near mouth", 
+                           river_mouth_site_start_date = "2011-08-01", river_mouth_site_end_date = "2023-01-01")
 
-ggplot(trib_det_month, aes(x = month, fill = site)) +
-  geom_bar(position = "dodge") +
-  scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8,9,10,11,12))
 ```
 
+### USGS data
+- I don't see any data on CBR dart, but there is data on USGS.
+
+Station: Asotin Creek at Asotin, WA. USGS 13335050
+- discharge and gauge height
 
 ## Clearwater River
 There is no site near the mouth of the Clearwater River; in fact, there is not a single interrogation site on the mainstem Clearwater River.
@@ -323,7 +462,15 @@ as.data.frame(DRM_det_eff) %>%
 kable(DRM_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = DRM_det_eff, site_name = "DRM - Deschutes River mouth")
+
+plot_arrival_timing(tributary_name = "Deschutes River", river_mouth_site = "DRM - Deschutes River mouth", 
+                           river_mouth_site_start_date = "2013-03-13", river_mouth_site_end_date = "2019-08-09")
 ```
+
+### USGS data
+Station: Deschutes River at Moody, Near Biggs, OR
+USGS 14103000
+- discharge only
 
 ## Entiat River
 [ENL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ENL)
@@ -364,7 +511,16 @@ as.data.frame(ENL_det_eff) %>%
 kable(ENL_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = ENL_det_eff, site_name = "ENL - Lower Entiat River")
+
+plot_arrival_timing(tributary_name = "Entiat River", river_mouth_site = "ENL - Lower Entiat River", 
+                           river_mouth_site_start_date = "2007-10-01", river_mouth_site_end_date = "2023-01-01")
+
 ```
+
+### USGS data
+Station: Entiat River Near Entiat, WA
+USGS 12452990
+- discharge and gage height
 
 ## Fifteenmile Creek
 [158 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=158)
@@ -403,7 +559,15 @@ as.data.frame(fif8_det_eff) %>%
 kable(fif8_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = fif8_det_eff, site_name = "158 - Fifteenmile Ck at Eightmile Ck")
+
+plot_arrival_timing(tributary_name = "Fifteenmile Creek", river_mouth_site = "158 - Fifteenmile Ck at Eightmile Ck", 
+                           river_mouth_site_start_date = "2011-11-29", river_mouth_site_end_date = "2023-01-01")
 ```
+
+
+### USGS data
+NO USGS DATA
+
 
 ## Grande Ronde River
 The Grande Ronde is basically hopeless - we might consider removing it from our model. The first mainstem site on the Grande Ronde is at RKM 155.
@@ -449,7 +613,16 @@ as.data.frame(HRM_det_eff) %>%
 kable(HRM_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = HRM_det_eff, site_name = "HRM - Hood River Mouth")
+
+plot_arrival_timing(tributary_name = "Hood River", river_mouth_site = "HRM - Hood River Mouth", 
+                           river_mouth_site_start_date = "2012-01-09", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Station: Hood River at Tucker Bridge, near Hood River, OR
+USGS 1412000
+- this is a bit upstream of HRM site and before confluence with Whiskey Creek, but it should be good enough
+- discharge only
 
 ## Imnaha River
 [IR1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=IR1)
@@ -495,9 +668,19 @@ as.data.frame(IR1_det_eff) %>%
 kable(IR1_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = IR1_det_eff, site_name = "IR1 - Lower Imnaha River ISA @ km 7")
+
+plot_arrival_timing(tributary_name = "Imnaha River", river_mouth_site = "IR1 - Lower Imnaha River ISA @ km 7", 
+                           river_mouth_site_start_date = "2012-12-01", river_mouth_site_end_date = "2023-01-01")
 ```
 
 What happened in 2016??? There's nothing in the logs, but perhaps it's a river stage issue?
+
+### USGS data
+Station: Imnaha River at Imnaha, OR
+USGS 13292000
+- Site went offline 2013-10-22
+- discharge only
+
 
 ## John Day River
 [JD1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=JD1)
@@ -541,7 +724,16 @@ as.data.frame(JD1_det_eff) %>%
 kable(JD1_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = JD1_det_eff, site_name = "JD1 - John Day River, McDonald Ferry")
+
+plot_arrival_timing(tributary_name = "John Day River", river_mouth_site = "JD1 - John Day River, McDonald Ferry", 
+                           river_mouth_site_start_date = "2007-09-01", river_mouth_site_end_date = "2023-01-01")
+
 ```
+
+### USGS data
+Station: John Day River at Mcdonald Ferry, OR
+USGS 14048000
+- discharge only
 
 ## Methow River
 [LMR PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LMR)
@@ -589,7 +781,15 @@ as.data.frame(LMR_det_eff) %>%
 kable(LMR_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = LMR_det_eff, site_name = "LMR - Lower Methow River at Pateros")
+
+plot_arrival_timing(tributary_name = "Methow River", river_mouth_site = "LMR - Lower Methow River at Pateros", 
+                           river_mouth_site_start_date = "2009-03-01", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Station: Methow River near Pateros, WA
+USGS 12449950
+- discharge and gage height
 
 ## Okanogan River
 [OKL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=OKL)
@@ -626,7 +826,15 @@ as.data.frame(OKL_det_eff) %>%
 kable(OKL_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = OKL_det_eff, site_name = "OKL - Lower Okanogan Instream Array")
+
+plot_arrival_timing(tributary_name = "Okanogan River", river_mouth_site = "OKL - Lower Okanogan Instream Array", 
+                           river_mouth_site_start_date = "2013-03-15", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Station: Okanogan River at Malott, WA
+USGS 12447200
+- discharge and gage height
 
 ## Salmon River
 Tons of sites, but all on tribtuaries/different forks of the Salmon
@@ -678,7 +886,15 @@ as.data.frame(LTR_det_eff) %>%
 kable(LTR_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = LTR_det_eff, site_name = "LTR - Lower Tucannon River")
+
+plot_arrival_timing(tributary_name = "Tucannon River", river_mouth_site = "LTR - Lower Tucannon River", 
+                           river_mouth_site_start_date = "2005-10-13", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Station: Tucannon River near Starbuck, WA
+USGS 13344500
+- discharge and gage height
 
 ## Umatilla River
 [TMF PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=TMF)
@@ -715,8 +931,17 @@ as.data.frame(TMF_det_eff) %>%
 kable(TMF_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = TMF_det_eff, site_name = "TMF - Three Mile Falls Dam Combined")
+
+plot_arrival_timing(tributary_name = "Umatilla River", river_mouth_site = "TMF - Three Mile Falls Dam Combined", 
+                           river_mouth_site_start_date = "2006-11-08", river_mouth_site_end_date = "2023-01-01")
 ```
 
+### USGS data
+Note - since the tributary site in this case is at a dam, I don't expet river stage/flow to make a big difference in detection probability.
+
+Station: Umatilla River near Umatilla, OR
+USGS 14033500
+- discharge only
 
 ## Walla Walla River
 [ORB PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ORB)
@@ -818,7 +1043,19 @@ as.data.frame(PRV_det_eff) %>%
 kable(PRV_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = PRV_det_eff, site_name = "PRV - Walla Walla R at Pierce RV Prk")
+
+plot_arrival_timing(tributary_name = "Walla Walla River", river_mouth_site = "WWB - Walla Walla River Barge Array", 
+                           river_mouth_site_start_date = "2019-04-11", river_mouth_site_end_date = "2023-01-01")
+plot_arrival_timing(tributary_name = "Walla Walla River", river_mouth_site = "ORB - Oasis Road Bridge", 
+                           river_mouth_site_start_date = "2005-04-15", river_mouth_site_end_date = "2015-05-04")
+plot_arrival_timing(tributary_name = "Walla Walla River", river_mouth_site = "PRV - Walla Walla R at Pierce RV Prk", 
+                           river_mouth_site_start_date = "2012-09-25", river_mouth_site_end_date = "2019-04-08")
 ```
+
+### USGS data
+Station: Walla Walla River near Touchet, WA
+USGS 14018500
+- discharge and gage height
 
 ## Wenatchee River
 [LWE PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LWE)
@@ -857,7 +1094,15 @@ kable(LWE_det_eff_table, booktabs = T)%>%
   kable_styling(latex_options = c("striped", "hold_position"))
 
 plot_annual_det_eff(trib_det_eff_df = LWE_det_eff, site_name = "LWE - Lower Wenatchee River")
+
+plot_arrival_timing(tributary_name = "Wenatchee River", river_mouth_site = "LWE - Lower Wenatchee River", 
+                           river_mouth_site_start_date = "2009-10-01", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Station: Wenatchee River at Monitor, WA
+USGS 12462500
+- discharge and gage height
 
 ## Yakima River
 [PRO PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=PRO)
@@ -893,4 +1138,15 @@ as.data.frame(PRO_det_eff) %>%
 kable(PRO_det_eff_table, booktabs = T)%>% 
   kable_styling(latex_options = c("striped", "hold_position"))
 plot_annual_det_eff(trib_det_eff_df = PRO_det_eff, site_name = "PRO - Prosser Diversion Dam Combined")
+
+plot_arrival_timing(tributary_name = "Yakima River", river_mouth_site = "PRO - Prosser Diversion Dam Combined", 
+                           river_mouth_site_start_date = "2004-10-19", river_mouth_site_end_date = "2023-01-01")
 ```
+
+### USGS data
+Note: Tributary site is in fish ladders at Prosser Dam, so we wouldn't expect a big effect of river stage/flow.
+
+Station: Yakima River at Kiona, WA
+USGS 12510500
+- discharge and gage height
+- this station is downstream of PRO
