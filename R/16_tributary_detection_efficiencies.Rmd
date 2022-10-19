@@ -67,11 +67,13 @@ For each tributary, I selected data from the station closest to the river mouth 
 
 
 ```{r load_libraries_data, echo = FALSE, warning = FALSE, message = FALSE}
+library(plyr)
 library(tidyverse)
 library(here)
 library(lubridate)
 library(janitor)
 library(kableExtra)
+
 
 # read in the site classifications file
 site_classification <- read.csv(here::here("covariate_data", "site_classification.csv"), row.names = 1)
@@ -241,6 +243,211 @@ return(timing_gg)
 
 ### Tributary function
 
+# variables can either be "discharge only" or "discharge and gage height"
+usgs_data_plot <- function(variables, tributary_name, usgs_file_name){
+  if(variables == "discharge only") {
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 28, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
+  usgs %>% 
+    dplyr::select("date_time", "discharge_cfs") %>% 
+    mutate(date_time = ymd(date_time)) %>% 
+    mutate(month = month(date_time)) %>% 
+    mutate(year = year(date_time))-> usgs
+  
+  # summarise into monthly averages
+  usgs %>% 
+    group_by(year,month) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
+  
+  # calculate annual averages
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+  
+    # Generate one plot
+  
+  # 1) Monthly discharge + annual mean
+discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
+  geom_line() +
+  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4") +
+  geom_point(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
+  ggtitle(paste0(tributary_name, " Discharge")) +
+  xlab("Month/Year") +
+  ylab("Mean discharge (cfs)") +
+  scale_y_continuous(lim = c(0, round_any(max(monthly_discharge$mean_discharge_cfs), 1000, f = ceiling)), expand = c(0,0))
+
+return(discharge_plot)
+    
+    
+  }
+  else{
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 32, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+  usgs %>% 
+    dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+    mutate(date_time = ymd(date_time)) %>% 
+    mutate(month = month(date_time)) %>% 
+    mutate(year = year(date_time)) -> usgs
+  
+  # summarise into monthly averages
+  usgs %>% 
+    group_by(year,month) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
+
+  usgs %>% 
+    group_by(year,month) %>% 
+    dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_gage_height
+  
+  # calculate annual averages
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
+  
+  # Generate three plots:
+  
+  # 1) Monthly discharge + annual mean
+discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
+  geom_line() +
+  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4") +
+  geom_point(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
+  ggtitle(paste0(tributary_name, " Discharge")) +
+  xlab("Month/Year") +
+  ylab("Mean discharge (cfs)") +
+  scale_y_continuous(lim = c(0, round_any(max(monthly_discharge$mean_discharge_cfs), 1000, f = ceiling)), expand = c(0,0))
+
+  # 2) Monthly gage height + annual mean
+gage_height_plot <- ggplot(monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
+  geom_line() +
+  geom_line(data = annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
+             color = "#1f78b4") +
+  geom_point(data = annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
+             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
+  ggtitle(paste0(tributary_name, " Stream Gage Height")) +
+  xlab("Month/Year") +
+  ylab("Mean gage height (feet)") +
+  scale_y_continuous(lim = c(0, round_any(max(monthly_gage_height$mean_gage_height_ft), 1, f = ceiling)), expand = c(0,0))
+
+  # 3) Relationship between gage height and discharge, with year as color
+gage_height_v_discharge_plot <- ggplot(usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
+  geom_point() +
+  ggtitle(paste0(tributary_name)) +
+  guides(color = guide_legend(title = "Year", ncol = 2)) +
+  xlab("Discharge (cfs)") +
+  ylab("Gage height (feet)")
+
+return(list(discharge_plot, gage_height_plot, gage_height_v_discharge_plot))
+  }
+
+}
+
+# test function
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Entiat River", usgs_file_name = "entiat_river_12452990.txt")
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")
+```
+
+
+
+```{r}
+
+
+
+
+
+entiat_river_usgs_headers = read.table(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+entiat_river_usgs <- read.csv(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 32, header = F, sep = "\t")
+colnames(entiat_river_usgs) <- entiat_river_usgs_headers
+
+# change some column names
+colnames(entiat_river_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+# drop most columns
+entiat_river_usgs %>% 
+  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+  mutate(date_time = ymd(date_time)) %>% 
+  mutate(month = month(date_time)) %>% 
+  mutate(year = year(date_time))-> entiat_river_usgs
+
+entiat_river_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_discharge
+
+entiat_river_usgs %>% 
+  group_by(year,month) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_gage_height
+
+entiat_river_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> entiat_river_annual_discharge
+
+entiat_river_usgs %>% 
+  group_by(year) %>% 
+  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+  mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> entiat_river_annual_gage_height
+
+# What months have the highest discharge/gage height?
+# Based on our plots of arrival timing, most fish are arriving in March/April, but there are lots year round. Especially at
+# the river mouth, it seems like a peak in late summer (9/10/11) and then in late winter (3/4/5). So honestly year round is probably fine
+ggplot(entiat_river_monthly_discharge, aes(x = month, y = mean_discharge_cfs)) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1,12,1))
+# Peak discharge is in May/June. We don't see many fish at tributary arrays during these months.
+
+# plot all of them
+ggplot(entiat_river_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
+  geom_line() +
+  geom_line(data = entiat_river_annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4") +
+  geom_point(data = entiat_river_annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
+  ggtitle("Entiat River Discharge") +
+  xlab("Month/Year") +
+  ylab("Mean Discharge (cfs)") +
+  scale_y_continuous(lim = c(0, round_any(max(entiat_river_monthly_discharge$mean_discharge_cfs), 1000, f = ceiling)), expand = c(0,0))
+
+ggplot(entiat_river_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
+  geom_line() +
+  geom_line(data = entiat_river_annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
+             color = "#1f78b4") +
+  geom_point(data = entiat_river_annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
+             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
+  ggtitle("Entiat River Stream Gage Height") +
+  xlab("Month/Year") +
+  ylab("Mean Gage Height (feet)") +
+  scale_y_continuous(lim = c(0, round_any(max(entiat_river_monthly_gage_height$mean_gage_height_ft), 1, f = ceiling)), expand = c(0,0))
+
+
+ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
+  geom_point() +
+  ggtitle("Entiat River") +
+  guides(color = guide_legend(title = "Year", ncol = 2))
+  
+###### Asotin Creek ######
+
+
 asotin_creek_usgs_headers = read.table(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
 asotin_creek_usgs <- read.csv(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 32, header = F, sep = "\t")
 colnames(asotin_creek_usgs) <- asotin_creek_usgs_headers
@@ -294,61 +501,6 @@ ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet)) +
 ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
   geom_point() +
   ggtitle("Asotin Creek")
-  
-
-entiat_river_usgs_headers = read.table(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
-entiat_river_usgs <- read.csv(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 32, header = F, sep = "\t")
-colnames(entiat_river_usgs) <- entiat_river_usgs_headers
-
-# change some column names
-colnames(entiat_river_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
-# drop most columns
-entiat_river_usgs %>% 
-  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
-  mutate(date_time = ymd(date_time)) %>% 
-  mutate(month = month(date_time)) %>% 
-  mutate(year = year(date_time))-> entiat_river_usgs
-
-entiat_river_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_discharge
-
-entiat_river_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_gage_height
-
-entiat_river_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) -> entiat_river_annual_discharge
-
-entiat_river_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) -> entiat_river_annual_gage_height
-
-# plot all of them
-ggplot(entiat_river_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
-  geom_line()
-
-ggplot(entiat_river_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
-  geom_line()
-
-ggplot(entiat_river_annual_discharge, aes(x = year, y = mean_discharge_cfs)) +
-  geom_line()
-
-ggplot(entiat_river_annual_gage_height, aes(x = year, y = mean_gage_height_ft)) +
-  geom_line()
-
-# what's the strength of the relationship between gage height and discharge?
-ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet)) +
-  geom_point() +
-  geom_smooth(formula = gage_height_feet ~ log(discharge_cfs)) +
-  ggtitle("Entiat River")
-
-ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
-  geom_point() +
-  ggtitle("Entiat River")
   
 
 ```
@@ -414,6 +566,31 @@ plot_arrival_timing(tributary_name = "Asotin Creek", river_mouth_site = "ACM - A
 
 Station: Asotin Creek at Asotin, WA. USGS 13335050
 - discharge and gauge height
+
+
+```{r asotin_creek_usgs_plot}
+# is there a relationship between discharge and detection efficiency?
+ACM_det_eff %>% 
+  subset(year != "Total") %>% 
+  mutate(year = as.numeric(year)) %>% 
+  left_join(., asotin_creek_annual_discharge, by = "year") %>% 
+  mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
+
+ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
+  geom_point()
+
+# what about gage height and detection efficiency?
+ACM_det_eff %>% 
+  subset(year != "Total") %>% 
+  mutate(year = as.numeric(year)) %>% 
+  left_join(., asotin_creek_annual_gage_height, by = "year") %>% 
+  mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_gageheight
+
+ggplot(ACM_deteff_gageheight, aes(x = mean_gage_height_ft, y = det_eff, color = time_period)) +
+  geom_point() +
+  scale_color_manual(values = c("#33a02c", "#6a3d9a"))
+```
+
 
 ## Clearwater River
 There is no site near the mouth of the Clearwater River; in fact, there is not a single interrogation site on the mainstem Clearwater River.
