@@ -103,6 +103,20 @@ show_trib_sites <- function(tributary_name){
   return(trib_site_info)
 }
 
+# 1.5) Make a function to calculate confidence intervals for proportions based on the binomial
+alpha = 0.05
+     nd = 4
+     n = 20
+
+## Define functions for upper and lower limits
+## for a 90 % confidence interval.
+fl = function(p){pbinom(nd-1,n,p) - (1-alpha/2)}
+fu = function(p){pbinom(nd,n,p) - alpha/2}
+# all in one line:
+lower = uniroot(function(p){pbinom(nd-1,n,p) - (1-alpha/2)}, c(0.01, 0.99))$root
+upper = uniroot(function(p){pbinom(nd,n,p) - alpha/2}, c(0.01, 0.99))$root
+
+
 # 2) Make a function to calculate annual (calendar year) + total detection efficiency for a river mouth site
 # you'll need to know the active period for the river mouth array. If the array is still active, put
 # "2023-01-01" or some other date in the future
@@ -134,33 +148,44 @@ annual_det_eff <- function(tributary_name, river_mouth_site,
   # Join the upstream and river mouth detections
   trib_rm %>% 
     full_join(trib_up, by = "tag_code") %>% 
-    mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
-    mutate(upstream_time = ymd_hms(upstream_time)) %>%
-    mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
+    dplyr::mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
+    dplyr::mutate(upstream_time = ymd_hms(upstream_time)) %>%
+    dplyr::mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
                          year(river_mouth_time))) %>% 
     subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
-    mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
+    dplyr::mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
     subset(upstream_time >= ymd(river_mouth_site_start_date) &
              upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
   
   # Calculate the annual detection efficiencies + errors
   trib_det_times %>% 
     group_by(year) %>% 
-    count(missed_det) %>% 
+    dplyr::count(missed_det) %>% 
     ungroup() %>% 
     complete(year, missed_det, fill = list(n = 0)) %>% 
     group_by(year) %>% 
-    mutate(total = sum(n)) %>% 
+    dplyr::mutate(total = sum(n)) %>% 
     subset(missed_det == "yes") %>%
     adorn_totals("row", ... = c(n, total)) %>% 
-    mutate(det_eff = (total - n)/total) %>% 
-    mutate(det_eff_SD = sqrt(det_eff * (1 - det_eff)/total)) %>% 
-    # here we are using a normal approximation - will get us into trouble with small sample sizes by year, 
-    # and especially as we get close to 0 or 1 (which we often do)
-    mutate(det_eff_lower95 = det_eff -  1.96*det_eff_SD) %>%
-    mutate(det_eff_upper95 = det_eff + 1.96*det_eff_SD) %>% 
+    dplyr::mutate(det_eff = (total - n)/total) %>% 
+    dplyr::mutate(det_eff_SD = sqrt(det_eff * (1 - det_eff)/total)) %>% 
+
     dplyr::select(-missed_det, det_eff_SD) %>% 
     dplyr::rename(missed_det = n) -> trib_det_eff
+  
+  # calculate confidence intervals using mapply because uniroot doesn't play well with mutate
+  # figure out which ones we can calculate a lower value for, because they're not 0% efficient:
+  nonzero_indices <- which(trib_det_eff$missed_det != trib_det_eff$total)
+  # give them all a 0 to start with; those that we can't calculate values for will keep them
+  trib_det_eff$det_eff_lower95 <- 0
+  # then replace others with the actual value
+  trib_det_eff$det_eff_lower95[nonzero_indices] = mapply(function(total, n){uniroot(function(p){pbinom(total-n-1, total,p) - (1-0.05/2)}, c(0.0001, 0.9999))$root}, subset(trib_det_eff, missed_det != total)$total, subset(trib_det_eff, missed_det != total)$missed_det)
+  # figure out which ones we can calculate an upper value for, because they're not 100% efficient:
+  non1_indices <- which(trib_det_eff$missed_det != 0)
+  # assign everything a 1 to begin with; those that we can't calculate values for will keep the 1
+  trib_det_eff$det_eff_upper95 <- 1
+  # then replace the others with an actual value
+  trib_det_eff$det_eff_upper95[non1_indices] = mapply(function(total, n){uniroot(function(p){pbinom(total-n,total,p) - 0.05/2}, c(0.0001, 0.9999))$root}, subset(trib_det_eff, missed_det != 0)$total, subset(trib_det_eff, missed_det != 0)$missed_det)
   
   # return the data frame of detection efficiencies
   
@@ -170,7 +195,7 @@ annual_det_eff <- function(tributary_name, river_mouth_site,
 # 3) Make a function to plot detection efficiency over time
 plot_annual_det_eff <- function(trib_det_eff_df, site_name){
   subset(trib_det_eff_df, year != "Total") %>% 
-  mutate(year = as.numeric(year)) -> trib_det_eff_annual
+  dplyr::mutate(year = as.numeric(year)) -> trib_det_eff_annual
 
 annual_det_eff_gg <- ggplot(trib_det_eff_annual, aes(x = year, y = det_eff,
                                                ymin = det_eff_lower95, ymax = det_eff_upper95)) +
@@ -215,28 +240,28 @@ plot_arrival_timing <- function(tributary_name, river_mouth_site,
   # Join the upstream and river mouth detections
   trib_rm %>% 
     full_join(trib_up, by = "tag_code") %>% 
-    mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
-    mutate(upstream_time = ymd_hms(upstream_time)) %>%
-    mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
+    dplyr::mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
+    dplyr::mutate(upstream_time = ymd_hms(upstream_time)) %>%
+    dplyr::mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
                          year(river_mouth_time))) %>% 
     subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
-    mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
+    dplyr::mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
     subset(upstream_time >= ymd(river_mouth_site_start_date) &
              upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
   
 trib_det_times %>% 
-  mutate(river_mouth_month = month(river_mouth_time)) %>% 
-  mutate(upstream_month = month(upstream_time)) %>% 
+  dplyr::mutate(river_mouth_month = month(river_mouth_time)) %>% 
+  dplyr::mutate(upstream_month = month(upstream_time)) %>% 
   dplyr::select(tag_code, river_mouth_month, upstream_month) %>% 
   pivot_longer(., cols = c("river_mouth_month", "upstream_month")) %>% 
   dplyr::rename(site = name, month = value) %>% 
-  mutate(site = gsub("_month", "", site)) -> trib_det_month
+  dplyr::mutate(site = gsub("_month", "", site)) -> trib_det_month
 
 timing_gg <- ggplot(trib_det_month, aes(x = month, fill = site)) +
   geom_bar(position = position_dodge(preserve = "single")) +
   scale_fill_manual(values = c("#1f78b4", "#ff7f00")) +
   scale_x_continuous(breaks = c(1,2,3,4,5,6,7,8,9,10,11,12)) +
-  ggtitle(river_mouth_site)
+  ggtitle(paste0("Detection timing at ", river_mouth_site))
   
 return(timing_gg)
 }
@@ -254,21 +279,21 @@ usgs_data_plot <- function(variables, tributary_name, usgs_file_name){
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs") %>% 
-    mutate(date_time = ymd(date_time)) %>% 
-    mutate(month = month(date_time)) %>% 
-    mutate(year = year(date_time))-> usgs
+    dplyr::mutate(date_time = ymd(date_time)) %>% 
+    dplyr::mutate(month = month(date_time)) %>% 
+    dplyr::mutate(year = year(date_time))-> usgs
   
   # summarise into monthly averages
   usgs %>% 
     group_by(year,month) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
+    dplyr::mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
   
   # calculate annual averages
   usgs %>% 
     group_by(year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
   
     # Generate one plot
   
@@ -297,31 +322,31 @@ return(discharge_plot)
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
-    mutate(date_time = ymd(date_time)) %>% 
-    mutate(month = month(date_time)) %>% 
-    mutate(year = year(date_time)) -> usgs
+    dplyr::mutate(date_time = ymd(date_time)) %>% 
+    dplyr::mutate(month = month(date_time)) %>% 
+    dplyr::mutate(year = year(date_time)) -> usgs
   
   # summarise into monthly averages
   usgs %>% 
     group_by(year,month) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
+    dplyr::mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
 
   usgs %>% 
     group_by(year,month) %>% 
     dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_gage_height
+    dplyr::mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_gage_height
   
   # calculate annual averages
   usgs %>% 
     group_by(year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
 
   usgs %>% 
     group_by(year) %>% 
     dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-    mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
   
   # Generate three plots:
   
@@ -362,147 +387,58 @@ return(list(discharge_plot, gage_height_plot, gage_height_v_discharge_plot))
 
 }
 
-# test function
-usgs_data_plot(variables = "discharge and gage height", tributary_name = "Entiat River", usgs_file_name = "entiat_river_12452990.txt")
-usgs_data_plot(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")
-```
-
-
-
-```{r}
-
-
-
-
-
-entiat_river_usgs_headers = read.table(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
-entiat_river_usgs <- read.csv(here::here("tributary_data", "entiat_river_12452990.txt"), skip = 32, header = F, sep = "\t")
-colnames(entiat_river_usgs) <- entiat_river_usgs_headers
-
-# change some column names
-colnames(entiat_river_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
-# drop most columns
-entiat_river_usgs %>% 
-  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
-  mutate(date_time = ymd(date_time)) %>% 
-  mutate(month = month(date_time)) %>% 
-  mutate(year = year(date_time))-> entiat_river_usgs
-
-entiat_river_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_discharge
-
-entiat_river_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> entiat_river_monthly_gage_height
-
-entiat_river_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> entiat_river_annual_discharge
-
-entiat_river_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> entiat_river_annual_gage_height
-
-# What months have the highest discharge/gage height?
-# Based on our plots of arrival timing, most fish are arriving in March/April, but there are lots year round. Especially at
-# the river mouth, it seems like a peak in late summer (9/10/11) and then in late winter (3/4/5). So honestly year round is probably fine
-ggplot(entiat_river_monthly_discharge, aes(x = month, y = mean_discharge_cfs)) +
-  geom_point() +
-  scale_x_continuous(breaks = seq(1,12,1))
-# Peak discharge is in May/June. We don't see many fish at tributary arrays during these months.
-
-# plot all of them
-ggplot(entiat_river_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
-  geom_line() +
-  geom_line(data = entiat_river_annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
-             color = "#1f78b4") +
-  geom_point(data = entiat_river_annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
-             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
-  ggtitle("Entiat River Discharge") +
-  xlab("Month/Year") +
-  ylab("Mean Discharge (cfs)") +
-  scale_y_continuous(lim = c(0, round_any(max(entiat_river_monthly_discharge$mean_discharge_cfs), 1000, f = ceiling)), expand = c(0,0))
-
-ggplot(entiat_river_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
-  geom_line() +
-  geom_line(data = entiat_river_annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
-             color = "#1f78b4") +
-  geom_point(data = entiat_river_annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
-             color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
-  ggtitle("Entiat River Stream Gage Height") +
-  xlab("Month/Year") +
-  ylab("Mean Gage Height (feet)") +
-  scale_y_continuous(lim = c(0, round_any(max(entiat_river_monthly_gage_height$mean_gage_height_ft), 1, f = ceiling)), expand = c(0,0))
-
-
-ggplot(entiat_river_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
-  geom_point() +
-  ggtitle("Entiat River") +
-  guides(color = guide_legend(title = "Year", ncol = 2))
+usgs_annual_means <- function(variables, tributary_name, usgs_file_name){
+  if(variables == "discharge only") {
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 28, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
+  usgs %>% 
+    dplyr::select("date_time", "discharge_cfs") %>% 
+    dplyr::mutate(date_time = ymd(date_time)) %>% 
+    dplyr::mutate(month = month(date_time)) %>% 
+    dplyr::mutate(year = year(date_time))-> usgs
   
-###### Asotin Creek ######
+  # calculate annual averages
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
 
-
-asotin_creek_usgs_headers = read.table(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
-asotin_creek_usgs <- read.csv(here::here("tributary_data", "asotin_creek_13335050.txt"), skip = 32, header = F, sep = "\t")
-colnames(asotin_creek_usgs) <- asotin_creek_usgs_headers
-
-# change some column names
-colnames(asotin_creek_usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
-# drop most columns
-asotin_creek_usgs %>% 
-  dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
-  mutate(date_time = ymd(date_time)) %>% 
-  mutate(month = month(date_time)) %>% 
-  mutate(year = year(date_time))-> asotin_creek_usgs
-
-asotin_creek_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> asotin_creek_monthly_discharge
-
-asotin_creek_usgs %>% 
-  group_by(year,month) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-  mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> asotin_creek_monthly_gage_height
-
-asotin_creek_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) -> asotin_creek_annual_discharge
-
-asotin_creek_usgs %>% 
-  group_by(year) %>% 
-  summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) -> asotin_creek_annual_gage_height
-
-# plot all of them
-ggplot(asotin_creek_monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
-  geom_line()
-
-ggplot(asotin_creek_monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
-  geom_line()
-
-ggplot(asotin_creek_annual_discharge, aes(x = year, y = mean_discharge_cfs)) +
-  geom_line()
-
-ggplot(asotin_creek_annual_gage_height, aes(x = year, y = mean_gage_height_ft)) +
-  geom_line()
-
-# what's the strength of the relationship between gage height and discharge?
-ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet)) +
-  geom_point() +
-  geom_smooth(formula = gage_height_feet ~ log(discharge_cfs)) +
-  ggtitle("Asotin Creek")
-
-ggplot(asotin_creek_usgs, aes(x = discharge_cfs, y = gage_height_feet, color = as.factor(year))) +
-  geom_point() +
-  ggtitle("Asotin Creek")
+return(annual_discharge)
+    
+    
+  }
+  else{
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 32, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+  usgs %>% 
+    dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+    dplyr::mutate(date_time = ymd(date_time)) %>% 
+    dplyr::mutate(month = month(date_time)) %>% 
+    dplyr::mutate(year = year(date_time)) -> usgs
   
+  # calculate annual averages
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
 
+  usgs %>% 
+    group_by(year) %>% 
+    dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
+    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
+  
+return(list(annual_discharge, annual_gage_height))
+  }
+
+}
 ```
 
 
@@ -545,9 +481,9 @@ ACM_det_eff <- annual_det_eff(tributary_name = "Asotin Creek", river_mouth_site 
 
 
 as.data.frame(ACM_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> ACM_det_eff_table
   
 
@@ -568,13 +504,20 @@ Station: Asotin Creek at Asotin, WA. USGS 13335050
 - discharge and gauge height
 
 
-```{r asotin_creek_usgs_plot}
+```{r asotin_creek_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")
+
+# Get annual discharge and gage height means
+asotin_creek_annual_discharge <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[1]]
+asotin_creek_annual_gage_height <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[2]]
+
 # is there a relationship between discharge and detection efficiency?
 ACM_det_eff %>% 
   subset(year != "Total") %>% 
-  mutate(year = as.numeric(year)) %>% 
+  dplyr::mutate(year = as.numeric(year)) %>% 
   left_join(., asotin_creek_annual_discharge, by = "year") %>% 
-  mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
+  dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
 
 ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
   geom_point()
@@ -582,9 +525,9 @@ ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = ti
 # what about gage height and detection efficiency?
 ACM_det_eff %>% 
   subset(year != "Total") %>% 
-  mutate(year = as.numeric(year)) %>% 
+  dplyr::mutate(year = as.numeric(year)) %>% 
   left_join(., asotin_creek_annual_gage_height, by = "year") %>% 
-  mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_gageheight
+  dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_gageheight
 
 ggplot(ACM_deteff_gageheight, aes(x = mean_gage_height_ft, y = det_eff, color = time_period)) +
   geom_point() +
@@ -630,9 +573,9 @@ DRM_det_eff <- annual_det_eff(tributary_name = "Deschutes River", river_mouth_si
 
 
 as.data.frame(DRM_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> DRM_det_eff_table
   
 
@@ -679,9 +622,9 @@ ENL_det_eff <- annual_det_eff(tributary_name = "Entiat River", river_mouth_site 
 
 
 as.data.frame(ENL_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> ENL_det_eff_table
   
 
@@ -727,9 +670,9 @@ fif8_det_eff <- annual_det_eff(tributary_name = "Fifteenmile Creek", river_mouth
 
 
 as.data.frame(fif8_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> fif8_det_eff_table
   
 
@@ -781,9 +724,9 @@ HRM_det_eff <- annual_det_eff(tributary_name = "Hood River", river_mouth_site = 
 
 
 as.data.frame(HRM_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> HRM_det_eff_table
   
 
@@ -836,9 +779,9 @@ IR1_det_eff <- annual_det_eff(tributary_name = "Imnaha River", river_mouth_site 
 
 
 as.data.frame(IR1_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> IR1_det_eff_table
   
 
@@ -892,9 +835,9 @@ JD1_det_eff <- annual_det_eff(tributary_name = "John Day River", river_mouth_sit
 
 
 as.data.frame(JD1_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> JD1_det_eff_table
   
 
@@ -949,9 +892,9 @@ LMR_det_eff <- annual_det_eff(tributary_name = "Methow River", river_mouth_site 
 
 
 as.data.frame(LMR_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> LMR_det_eff_table
   
 
@@ -994,9 +937,9 @@ OKL_det_eff <- annual_det_eff(tributary_name = "Okanogan River", river_mouth_sit
 
 
 as.data.frame(OKL_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> OKL_det_eff_table
   
 
@@ -1054,9 +997,9 @@ LTR_det_eff <- annual_det_eff(tributary_name = "Tucannon River", river_mouth_sit
 
 
 as.data.frame(LTR_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> LTR_det_eff_table
   
 
@@ -1099,9 +1042,9 @@ TMF_det_eff <- annual_det_eff(tributary_name = "Umatilla River", river_mouth_sit
 
 
 as.data.frame(TMF_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> TMF_det_eff_table
   
 
@@ -1179,9 +1122,9 @@ WWB_det_eff <- annual_det_eff(tributary_name = "Walla Walla River", river_mouth_
 
 
 as.data.frame(WWB_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> WWB_det_eff_table
   
 
@@ -1195,9 +1138,9 @@ ORB_det_eff <- annual_det_eff(tributary_name = "Walla Walla River", river_mouth_
 
 
 as.data.frame(ORB_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> ORB_det_eff_table
   
 
@@ -1211,9 +1154,9 @@ PRV_det_eff <- annual_det_eff(tributary_name = "Walla Walla River", river_mouth_
 
 
 as.data.frame(PRV_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> PRV_det_eff_table
   
 
@@ -1261,9 +1204,9 @@ LWE_det_eff <- annual_det_eff(tributary_name = "Wenatchee River", river_mouth_si
 
 
 as.data.frame(LWE_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> LWE_det_eff_table
   
 
@@ -1306,9 +1249,9 @@ PRO_det_eff <- annual_det_eff(tributary_name = "Yakima River", river_mouth_site 
 
 
 as.data.frame(PRO_det_eff) %>% 
-  mutate(det_eff = round(det_eff, 3)) %>% 
-  mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
-  mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
+  dplyr::mutate(det_eff = round(det_eff, 3)) %>% 
+  dplyr::mutate(det_eff_lower95 = round(det_eff_lower95, 3)) %>% 
+  dplyr::mutate(det_eff_upper95 = round(det_eff_upper95, 3)) %>% 
   dplyr::select(-det_eff_SD) -> PRO_det_eff_table
   
 
