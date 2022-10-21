@@ -520,7 +520,8 @@ ACM_det_eff %>%
   dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
 
 ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
-  geom_point()
+  geom_point() +
+  scale_color_manual(values = c("#33a02c", "#6a3d9a"))
 
 # what about gage height and detection efficiency?
 ACM_det_eff %>% 
@@ -532,6 +533,24 @@ ACM_det_eff %>%
 ggplot(ACM_deteff_gageheight, aes(x = mean_gage_height_ft, y = det_eff, color = time_period)) +
   geom_point() +
   scale_color_manual(values = c("#33a02c", "#6a3d9a"))
+
+# fit det_eff ~ time_period + discharge
+# glm(ACM_deteff_discharge$det_eff ~ ACM_deteff_discharge$mean_discharge_cfs, family = "binomial")
+
+det_eff_discharge_glm <- glm(det_eff ~ mean_discharge_cfs, data = ACM_deteff_discharge,
+    weights = total, family = "binomial")
+
+# plot predicted values
+predict_discharge <- seq(50, 150, 1)
+predict_det_eff <- predict(det_eff_discharge_glm, list(mean_discharge_cfs = predict_discharge), type = "response")
+predict_df <- data.frame(mean_discharge_cfs = predict_discharge, det_eff = predict_det_eff)
+
+ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
+  geom_point() +
+  scale_color_manual(values = c("#33a02c", "#6a3d9a")) +
+  geom_line(data = predict_df, aes(x = mean_discharge_cfs, y = det_eff, color = NULL), lty = 2)
+
+
 ```
 
 
