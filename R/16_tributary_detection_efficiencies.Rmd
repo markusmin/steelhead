@@ -266,7 +266,16 @@ timing_gg <- ggplot(trib_det_month, aes(x = month, fill = site)) +
 return(timing_gg)
 }
 
-### Tributary function
+##### Tributary functions #####
+
+# first create run year df
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_start <- seq(ymd("2004-06-01"), ymd("2022-06-01"), by = "years")
+run_year_end <- seq(ymd("2005-05-31"), ymd("2023-05-31"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+# run year mutate: mutate(run_year = subset(run_year_df, run_year_start < start_time & run_year_end > start_time)$run_year)
 
 # variables can either be "discharge only" or "discharge and gage height"
 usgs_data_plot <- function(variables, tributary_name, usgs_file_name){
@@ -289,19 +298,23 @@ usgs_data_plot <- function(variables, tributary_name, usgs_file_name){
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
     dplyr::mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_discharge
   
-  # calculate annual averages
+  # calculate annual (run year) averages
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_discharge
   
     # Generate one plot
   
   # 1) Monthly discharge + annual mean
 discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
-  geom_line() +
-  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
-             color = "#1f78b4") +
+  geom_line(aes(color = "Monthly average")) +
+  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs, color = "Run year average")) +
+  scale_color_manual(name = "Value", values = c("Monthly average" = "black", "Run year average" = "#1f78b4")) +
+  theme(legend.position = c(0.8, 0.8)) +
   geom_point(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
              color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
   ggtitle(paste0(tributary_name, " Discharge")) +
@@ -337,25 +350,32 @@ return(discharge_plot)
     dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
     dplyr::mutate(year_month = ymd(paste(year, month,"01",sep="-")))-> monthly_gage_height
   
-  # calculate annual averages
+  # calculate annual (run year) averages
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_discharge
 
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_gage_height
   
   # Generate three plots:
   
-  # 1) Monthly discharge + annual mean
+  # 1) Monthly discharge + annual (by run year) mean
 discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_discharge_cfs)) +
-  geom_line() +
-  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
-             color = "#1f78b4") +
-  geom_point(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs), 
+  geom_line(aes(color = "Monthly average")) +
+  geom_line(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs, color = "Run year average")) +
+  scale_color_manual(name = "Value", values = c("Monthly average" = "black", "Run year average" = "#1f78b4")) +
+  theme(legend.position = c(0.8, 0.8)) +
+  geom_point(data = annual_discharge, aes(x = year_month, y = mean_discharge_cfs),
              color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
   ggtitle(paste0(tributary_name, " Discharge")) +
   xlab("Month/Year") +
@@ -364,9 +384,10 @@ discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_dischar
 
   # 2) Monthly gage height + annual mean
 gage_height_plot <- ggplot(monthly_gage_height, aes(x = year_month, y = mean_gage_height_ft)) +
-  geom_line() +
-  geom_line(data = annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
-             color = "#1f78b4") +
+  geom_line(aes(color = "Monthly average")) +
+  geom_line(data = annual_gage_height, aes(x = year_month, y = mean_gage_height_ft, color = "Run year average")) +
+  scale_color_manual(name = "Value", values = c("Monthly average" = "black", "Run year average" = "#1f78b4")) +
+  theme(legend.position = c(0.8, 0.2)) +
   geom_point(data = annual_gage_height, aes(x = year_month, y = mean_gage_height_ft),
              color = "#1f78b4", shape = 23, size = 2, fill = "#a6cee3") +
   ggtitle(paste0(tributary_name, " Stream Gage Height")) +
@@ -387,6 +408,7 @@ return(list(discharge_plot, gage_height_plot, gage_height_v_discharge_plot))
 
 }
 
+# calculate annual (by run year) means for discharge/gage height
 usgs_annual_means <- function(variables, tributary_name, usgs_file_name){
   if(variables == "discharge only") {
     usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 28, header = F, nrows = 1, as.is = T, sep = "\t")
@@ -403,9 +425,12 @@ usgs_annual_means <- function(variables, tributary_name, usgs_file_name){
   
   # calculate annual averages
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_discharge
 
 return(annual_discharge)
     
@@ -426,19 +451,32 @@ return(annual_discharge)
   
   # calculate annual averages
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_discharge
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_discharge
 
   usgs %>% 
-    group_by(year) %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
     dplyr::summarise(mean_gage_height_ft = mean(gage_height_feet, na.rm = TRUE)) %>% 
-    dplyr::mutate(year_month = ymd(paste(year,"01-01",sep="-")))-> annual_gage_height
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_gage_height
   
 return(list(annual_discharge, annual_gage_height))
   }
 
 }
+
+
+# add this plot for all tributaries!
+
+ggplot(monthly_discharge, aes(x = month, y = mean_discharge_cfs, color = as.factor(year))) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1, 12, 1))
 ```
 
 
