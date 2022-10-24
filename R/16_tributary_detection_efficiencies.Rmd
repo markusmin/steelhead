@@ -65,6 +65,21 @@ On the USGS data page for each, I then queried 2005-01-01 through 2022-10-17 and
 
 For each tributary, I selected data from the station closest to the river mouth array.
 
+## Detection efficiency GLM
+
+In this Rmd, we estimate annual detection efficiency as a function of equipment configuration and discharge.
+
+The equation for estimating detection efficiency is as follows:
+$$
+z_i \sim \text{Binomial}(p_{i}) \\
+\text{logit}(p_i) = \alpha_{j, k} + \beta_{j, k} discharge_{j,t}
+$$
+The indices represent the following:
+
+- $i$ is the individual fish
+- $j$ is the tributary
+- $k$ is the site configuration (a categorical variable)
+- $t$ is the run year
 
 ```{r load_libraries_data, echo = FALSE, warning = FALSE, message = FALSE}
 library(plyr)
@@ -73,7 +88,7 @@ library(here)
 library(lubridate)
 library(janitor)
 library(kableExtra)
-
+library(ggrepel)
 
 # read in the site classifications file
 site_classification <- read.csv(here::here("covariate_data", "site_classification.csv"), row.names = 1)
@@ -270,8 +285,8 @@ return(timing_gg)
 
 # first create run year df
 run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
-run_year_start <- seq(ymd("2004-06-01"), ymd("2022-06-01"), by = "years")
-run_year_end <- seq(ymd("2005-05-31"), ymd("2023-05-31"), by = "years")
+run_year_start <- seq(ymd_hms("2004-06-01 00:00:00"), ymd_hms("2022-06-01 00:00:00"), by = "years")
+run_year_end <- seq(ymd_hms("2005-05-31 23:59:59"), ymd_hms("2023-05-31 23:59:59"), by = "years")
 
 run_year_df <- data.frame(run_year, run_year_start, run_year_end)
 
@@ -284,10 +299,25 @@ usgs_data_plot <- function(variables, tributary_name, usgs_file_name){
     usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, sep = "\t")
     colnames(usgs) <- usgs_headers
     
+    if (tributary_name == "Imnaha River"){
+    # drop the time zone column
+    usgs %>% 
+      dplyr::select(-tz_cd) -> usgs
+  }
+
+    
   # edit column names and drop irrelevant ones
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
+  
+  # If it's the imnaha, it's reported every 15 minutes. We want just the daily; remove the time
+  if (tributary_name == "Imnaha River"){
+    usgs %>% 
+      mutate(date_time =substr(date_time, start = 1, stop = 10)) -> usgs
+  }
+  
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs") %>% 
+    mutate(discharge_cfs = as.numeric(discharge_cfs)) %>% 
     dplyr::mutate(date_time = ymd(date_time)) %>% 
     dplyr::mutate(month = month(date_time)) %>% 
     dplyr::mutate(year = year(date_time))-> usgs
@@ -322,19 +352,28 @@ discharge_plot <- ggplot(monthly_discharge, aes(x = year_month, y = mean_dischar
   ylab("Mean discharge (cfs)") +
   scale_y_continuous(lim = c(0, round_any(max(monthly_discharge$mean_discharge_cfs), 1000, f = ceiling)), expand = c(0,0))
 
-return(discharge_plot)
+# 2) Discharge by month of year
+monthly_discharge_plot <- ggplot(monthly_discharge, aes(x = month, y = mean_discharge_cfs, color = as.factor(year))) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  ggtitle(paste0(tributary_name))
+
+return(list(discharge_plot, monthly_discharge_plot))
     
     
-  }
-  else{
+  } else{
     usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
     usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 32, header = F, sep = "\t")
     colnames(usgs) <- usgs_headers
     
+    
   # edit column names and drop irrelevant ones
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+  
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+    mutate(discharge_cfs = as.numeric(discharge_cfs)) %>% 
+    mutate(gage_height_feet = as.numeric(gage_height_feet)) %>% 
     dplyr::mutate(date_time = ymd(date_time)) %>% 
     dplyr::mutate(month = month(date_time)) %>% 
     dplyr::mutate(year = year(date_time)) -> usgs
@@ -403,22 +442,44 @@ gage_height_v_discharge_plot <- ggplot(usgs, aes(x = discharge_cfs, y = gage_hei
   xlab("Discharge (cfs)") +
   ylab("Gage height (feet)")
 
-return(list(discharge_plot, gage_height_plot, gage_height_v_discharge_plot))
+# 4) Discharge by month of year
+monthly_discharge_plot <- ggplot(monthly_discharge, aes(x = month, y = mean_discharge_cfs, color = as.factor(year))) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  ggtitle(paste0(tributary_name))
+
+return(list(discharge_plot, monthly_discharge_plot, gage_height_plot, gage_height_v_discharge_plot))
   }
 
 }
 
-# calculate annual (by run year) means for discharge/gage height
+# 5) calculate annual (by run year) means for discharge/gage height
 usgs_annual_means <- function(variables, tributary_name, usgs_file_name){
   if(variables == "discharge only") {
     usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 28, header = F, nrows = 1, as.is = T, sep = "\t")
     usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, sep = "\t")
     colnames(usgs) <- usgs_headers
     
+  if (tributary_name == "Imnaha River"){
+    # drop the time zone column
+    usgs %>% 
+      dplyr::select(-tz_cd) -> usgs
+  }
+  
+    
+    
   # edit column names and drop irrelevant ones
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
+  
+    # If it's the imnaha, it's reported every 15 minutes. We want just the daily; remove the time
+  if (tributary_name == "Imnaha River"){
+    usgs %>% 
+      mutate(date_time =substr(date_time, start = 1, stop = 10)) -> usgs
+  }
+  
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs") %>% 
+    mutate(discharge_cfs = as.numeric(discharge_cfs)) %>% 
     dplyr::mutate(date_time = ymd(date_time)) %>% 
     dplyr::mutate(month = month(date_time)) %>% 
     dplyr::mutate(year = year(date_time))-> usgs
@@ -443,8 +504,11 @@ return(annual_discharge)
     
   # edit column names and drop irrelevant ones
   colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+  
   usgs %>% 
     dplyr::select("date_time", "discharge_cfs", "gage_height_feet") %>% 
+    mutate(discharge_cfs = as.numeric(discharge_cfs)) %>% 
+    mutate(gage_height_feet = as.numeric(gage_height_feet)) %>% 
     dplyr::mutate(date_time = ymd(date_time)) %>% 
     dplyr::mutate(month = month(date_time)) %>% 
     dplyr::mutate(year = year(date_time)) -> usgs
@@ -471,12 +535,333 @@ return(list(annual_discharge, annual_gage_height))
 
 }
 
+# 6) fit glm to detection efficiency as a function of discharge and categorical
+det_eff_glm <- function(variables, # we're only calculating as a function of discharge, but we need this to know how to read in the files
+                        tributary_name, usgs_file_name, 
+                        equipment_categories_start_run_years, # this and next line are vectors of years (round to year because we're doing an annual calculation currently) that we use to input changes in site configuration
+                        equipment_categories_end_run_years, 
+                        river_mouth_site, 
+                        river_mouth_site_start_date, river_mouth_site_end_date){
+  
+  ##### Part one: Get the discharge data #####
+  
+  if(variables == "discharge only") {
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 28, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+  if (tributary_name == "Imnaha River"){
+    # drop the time zone column
+    usgs %>% 
+      dplyr::select(-tz_cd) -> usgs
+  }
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved")
+  
+  if (tributary_name == "Imnaha River"){
+    usgs %>% 
+      mutate(date_time =substr(date_time, start = 1, stop = 10)) -> usgs
+  }
+    
 
-# add this plot for all tributaries!
+  } else {
+    usgs_headers <- read.table(here::here("tributary_data", usgs_file_name), skip = 30, header = F, nrows = 1, as.is = T, sep = "\t")
+    usgs <- read.table(here::here("tributary_data", usgs_file_name), skip = 32, header = F, sep = "\t")
+    colnames(usgs) <- usgs_headers
+    
+    
+  # edit column names and drop irrelevant ones
+  colnames(usgs) <- c("agency", "site_no", "date_time", "discharge_cfs", "discharge_cfs_approved", "gage_height_feet", "gage_height_feet_approved")
+  
 
-ggplot(monthly_discharge, aes(x = month, y = mean_discharge_cfs, color = as.factor(year))) +
-  geom_point() +
-  scale_x_continuous(breaks = seq(1, 12, 1))
+  }
+  
+  # select only the discharge data and dates
+  usgs %>% 
+    dplyr::select("date_time", "discharge_cfs") %>% 
+    mutate(discharge_cfs = as.numeric(discharge_cfs)) %>% 
+    dplyr::mutate(date_time = ymd(date_time)) %>% 
+    dplyr::mutate(month = month(date_time)) %>% 
+    dplyr::mutate(year = year(date_time)) -> usgs
+  
+  # calculate annual averages by run year
+  usgs %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    group_by(run_year) %>% 
+    dplyr::summarise(mean_discharge_cfs = mean(discharge_cfs, na.rm = TRUE)) %>% 
+    dplyr::mutate(year_month = ymd(paste(substr(run_year, start = 4, stop = 5),"01-01",sep="-")))-> annual_discharge
+  
+  ##### Part 2: Get the detection data #####
+  show_trib_sites(tributary_name) -> trib_sites
+  # identify which sites are upstream of the river mouth
+  upstream_sites <- subset(trib_sites, event_site_name != river_mouth_site)$event_site_name
+  # subset total df to only detections from that tributary
+  trib_det <- subset(det_hist, event_site_name %in% trib_sites$event_site_name)
+  
+  # Get the detections + times of fish at upstream sites
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(upstream_sites)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(upstream_time = start_time) -> trib_up
+  
+  # Get the detections + times of fish at the river mouth site
+  trib_det %>% 
+    group_by(tag_code) %>% 
+    filter(event_site_name %in% c(river_mouth_site)) %>% 
+    dplyr::select(tag_code, start_time) %>% 
+    filter(!(duplicated(tag_code))) %>% 
+    dplyr::rename(river_mouth_time = start_time) -> trib_rm
+  
+  # Join the upstream and river mouth detections
+  trib_rm %>% 
+    full_join(trib_up, by = "tag_code") %>% 
+    dplyr::mutate(river_mouth_time = ymd_hms(river_mouth_time)) %>% 
+    dplyr::mutate(upstream_time = ymd_hms(upstream_time)) %>%
+    dplyr::mutate(year = ifelse(is.na(river_mouth_time), year(upstream_time),
+                         year(river_mouth_time))) %>% 
+    subset(!(is.na(upstream_time))) %>% # we're only looking at fish that we saw at the upstream arrays
+    dplyr::mutate(missed_det = ifelse(is.na(river_mouth_time), "yes", "no"))  %>% 
+    subset(upstream_time >= ymd(river_mouth_site_start_date) &
+             upstream_time <= ymd(river_mouth_site_end_date)) -> trib_det_times
+  
+  ##### From this point on, we need to allow for 1, 2, or 3 eras of detection #####
+  ##### two eras: #####
+  if (length(equipment_categories_start_run_years) == 2){
+    
+      # reformat; add the run year column
+  # get indices for start and end run years for eras
+  start_indices <- vector(length = length(equipment_categories_start_run_years))
+  end_indices <- vector(length = length(equipment_categories_start_run_years))
+  for (i in 1:length(equipment_categories_start_run_years)){
+     start_indices[i] <- which(run_year_df$run_year == equipment_categories_start_run_years[i])
+     end_indices[i] <- which(run_year_df$run_year == equipment_categories_end_run_years[i])
+  }
+  
+  
+  trib_det_times %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= upstream_time & run_year_end >= upstream_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    # now add categorical variable for era
+    # mutate(ifelse(run_year %in% c("05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14",
+    #                               "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21", "21/22")))
+    # mutate(era = ifelse(run_year %in% c("18/19", "19/20", "20/21", "21/22") ,"2018-present", "2011-2018")) %>% 
+    # function:
+    mutate(era = ifelse(run_year %in% run_year_df$run_year[start_indices[1]:end_indices[1]] ,paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]), 
+                        paste0(equipment_categories_start_run_years[2], "-", equipment_categories_end_run_years[2]))) %>% 
+    # join with the discharge data based on run year
+    left_join(., annual_discharge, by = "run_year") %>% 
+    mutate(detected = ifelse(missed_det == "yes", 0, 1))-> trib_det_discharge
+  
+  ### Fit the GLM
+  # The GLM will have this form: logit(p_{t,j}) = alpha_{i,j} + beta_j * discharge_{t,j}
+  # where j is the tributary, t is the run year, and i is the era (categorical variable for equipment at a river mouth site)
+  det_discharge_glm <- glm(detected ~ era + mean_discharge_cfs, data = trib_det_discharge,
+      family = binomial(link = "logit"))
+  
+  summary(det_discharge_glm)
+  
+  # Plot the GLM fit
+  era1_int <- det_discharge_glm$coefficients[1]
+  era2_int <- det_discharge_glm$coefficients[2]
+  discharge_slope <- det_discharge_glm$coefficients[3]
+  
+  # Get a seq of discharge values
+  discharge_seq <- seq(min(trib_det_discharge$mean_discharge_cfs), max(trib_det_discharge$mean_discharge_cfs), 1)
+  
+  newdata <- data.frame(mean_discharge_cfs = rep(discharge_seq, 2), era = c(rep("era1", length(discharge_seq)), rep("era2", length(discharge_seq))))
+  
+  newdata_era1 <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]))
+  era1_predict <- predict(det_discharge_glm, newdata_era1, se.fit = TRUE, type = "response")
+  newdata_era2 <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[2], "-", equipment_categories_end_run_years[2]))
+  era2_predict <- predict(det_discharge_glm, newdata_era2, se.fit = TRUE, type = "response")
+  
+  era1_df <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]),
+                         fit = era1_predict$fit, UL = era1_predict$fit + era1_predict$se.fit * 1.96,
+                         LL = era1_predict$fit - era1_predict$se.fit * 1.96)
+  
+  era2_df <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[2], "-", equipment_categories_end_run_years[2]),
+                         fit = era2_predict$fit, UL = era2_predict$fit + era2_predict$se.fit * 1.96,
+                         LL = era2_predict$fit - era2_predict$se.fit * 1.96)
+  
+  # join the two
+  era1_df %>% 
+    bind_rows(era2_df) -> all_eras_df
+    # mutate(fit = exp(fit), UL = exp(UL), LL = exp(LL)) -> all_eras_df
+  
+  # plot it
+  # first create a summary of detections
+  trib_det_discharge %>% 
+    group_by(mean_discharge_cfs) %>% 
+    summarise(det_eff = mean(detected), N = n()) %>% 
+    left_join(., distinct(dplyr::select(ungroup(trib_det_discharge), mean_discharge_cfs, era, run_year)), by = "mean_discharge_cfs")-> trib_det_summ
+  
+  predict_fit_plot <- ggplot(all_eras_df, aes(x = mean_discharge_cfs, y = fit, color = era)) +
+    geom_ribbon(aes(ymin = LL, ymax = UL), alpha = .25) +
+    geom_line(size = 1) +
+    scale_y_continuous(lim = c(0,1)) +
+    geom_point(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, color = era, size = N),
+               shape = 19) +
+    geom_text_repel(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, label = run_year)) +
+    ylab("Detection Efficiency") + 
+    ggtitle(river_mouth_site)
+  } else if (length(equipment_categories_start_run_years) == 3){
+    
+    ##### three eras: #####
+    
+      # reformat; add the run year column
+  # get indices for start and end run years for eras
+  start_indices <- vector(length = length(equipment_categories_start_run_years))
+  end_indices <- vector(length = length(equipment_categories_start_run_years))
+  for (i in 1:length(equipment_categories_start_run_years)){
+     start_indices[i] <- which(run_year_df$run_year == equipment_categories_start_run_years[i])
+     end_indices[i] <- which(run_year_df$run_year == equipment_categories_end_run_years[i])
+  }
+  
+  
+  trib_det_times %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= upstream_time & run_year_end >= upstream_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    mutate(era = ifelse(run_year %in% run_year_df$run_year[start_indices[1]:end_indices[1]] ,paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]),
+                        ifelse(run_year %in% run_year_df$run_year[start_indices[2]:end_indices[2]] ,paste0(equipment_categories_start_run_years[2], "-",
+                                                                                                    equipment_categories_end_run_years[2]),
+                        paste0(equipment_categories_start_run_years[3], "-", equipment_categories_end_run_years[3])))) %>% 
+    # join with the discharge data based on run year
+    left_join(., annual_discharge, by = "run_year") %>% 
+    mutate(detected = ifelse(missed_det == "yes", 0, 1))-> trib_det_discharge
+  
+  ### Fit the GLM
+  # The GLM will have this form: logit(p_{t,j}) = alpha_{i,j} + beta_j * discharge_{t,j}
+  # where j is the tributary, t is the run year, and i is the era (categorical variable for equipment at a river mouth site)
+  det_discharge_glm <- glm(detected ~ era + mean_discharge_cfs, data = trib_det_discharge,
+      family = binomial(link = "logit"))
+  
+  summary(det_discharge_glm)
+  
+  # Plot the GLM fit
+  era1_int <- det_discharge_glm$coefficients[1]
+  era2_int <- det_discharge_glm$coefficients[2]
+  era3_int <- det_discharge_glm$coefficients[3]
+  discharge_slope <- det_discharge_glm$coefficients[4]
+  
+  # Get a seq of discharge values
+  discharge_seq <- seq(min(trib_det_discharge$mean_discharge_cfs), max(trib_det_discharge$mean_discharge_cfs), 1)
+  
+  newdata_era1 <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]))
+  era1_predict <- predict(det_discharge_glm, newdata_era1, se.fit = TRUE, type = "response")
+  newdata_era2 <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[2], "-", equipment_categories_end_run_years[2]))
+  era2_predict <- predict(det_discharge_glm, newdata_era2, se.fit = TRUE, type = "response")
+  newdata_era3 <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[3], "-", equipment_categories_end_run_years[3]))
+  era3_predict <- predict(det_discharge_glm, newdata_era3, se.fit = TRUE, type = "response")
+  
+  era1_df <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[1], "-",
+                                                                                                    equipment_categories_end_run_years[1]),
+                         fit = era1_predict$fit, UL = era1_predict$fit + era1_predict$se.fit * 1.96,
+                         LL = era1_predict$fit - era1_predict$se.fit * 1.96)
+  
+  era2_df <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[2], "-", equipment_categories_end_run_years[2]),
+                         fit = era2_predict$fit, UL = era2_predict$fit + era2_predict$se.fit * 1.96,
+                         LL = era2_predict$fit - era2_predict$se.fit * 1.96)
+  
+  era3_df <- data.frame(mean_discharge_cfs = discharge_seq, era = paste0(equipment_categories_start_run_years[3], "-", equipment_categories_end_run_years[3]),
+                         fit = era3_predict$fit, UL = era3_predict$fit + era3_predict$se.fit * 1.96,
+                         LL = era3_predict$fit - era3_predict$se.fit * 1.96)
+  
+  # join the two
+  era1_df %>% 
+    bind_rows(era2_df) %>% 
+    bind_rows(era3_df)-> all_eras_df
+    # mutate(fit = exp(fit), UL = exp(UL), LL = exp(LL)) -> all_eras_df
+  
+  # plot it
+  # first create a summary of detections
+  trib_det_discharge %>% 
+    group_by(mean_discharge_cfs) %>% 
+    summarise(det_eff = mean(detected), N = n()) %>% 
+    left_join(., distinct(dplyr::select(ungroup(trib_det_discharge), mean_discharge_cfs, era, run_year)), by = "mean_discharge_cfs")-> trib_det_summ
+  
+  predict_fit_plot <- ggplot(all_eras_df, aes(x = mean_discharge_cfs, y = fit, color = era)) +
+    geom_ribbon(aes(ymin = LL, ymax = UL), alpha = .25) +
+    geom_line(size = 1) +
+    scale_y_continuous(lim = c(0,1)) +
+    geom_point(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, color = era, size = N),
+               shape = 19) +
+    geom_text_repel(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, label = run_year)) +
+    ylab("Detection Efficiency") +
+    ggtitle(river_mouth_site)
+  } else {
+        ##### single era: #####
+  trib_det_times %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <=  upstream_time & run_year_end >= upstream_time)$run_year) %>% 
+    subset(!(run_year %in% c("04/05", "22/23"))) %>% 
+    # join with the discharge data based on run year
+    left_join(., annual_discharge, by = "run_year") %>% 
+    mutate(detected = ifelse(missed_det == "yes", 0, 1))-> trib_det_discharge
+  
+  ### Fit the GLM
+  # The GLM will have this form: logit(p_{t,j}) = alpha_{i,j} + beta_j * discharge_{t,j}
+  # where j is the tributary, t is the run year, and i is the era (categorical variable for equipment at a river mouth site)
+  det_discharge_glm <- glm(detected ~ mean_discharge_cfs, data = trib_det_discharge,
+      family = binomial(link = "logit"))
+  
+  summary(det_discharge_glm)
+  
+  # Plot the GLM fit
+  int <- det_discharge_glm$coefficients[1]
+  discharge_slope <- det_discharge_glm$coefficients[2]
+  
+  # Get a seq of discharge values
+  discharge_seq <- seq(min(trib_det_discharge$mean_discharge_cfs, na.rm = TRUE), max(trib_det_discharge$mean_discharge_cfs, na.rm = TRUE), 1)
+  
+  newdata <- data.frame(mean_discharge_cfs = discharge_seq)
+  predict <- predict(det_discharge_glm, newdata, se.fit = TRUE, type = "response")
+  
+  predict_df <- data.frame(mean_discharge_cfs = discharge_seq, 
+                         fit = predict$fit, UL = predict$fit + predict$se.fit * 1.96,
+                         LL = predict$fit - predict$se.fit * 1.96)
+  
+  # plot it
+  # first create a summary of detections
+  trib_det_discharge %>% 
+    group_by(mean_discharge_cfs) %>% 
+    summarise(det_eff = mean(detected), N = n()) %>% 
+    left_join(., distinct(dplyr::select(ungroup(trib_det_discharge), mean_discharge_cfs, run_year)), by = "mean_discharge_cfs")-> trib_det_summ
+  
+  predict_fit_plot <- ggplot(predict_df, aes(x = mean_discharge_cfs, y = fit)) +
+    geom_ribbon(aes(ymin = LL, ymax = UL), alpha = .25) +
+    geom_line(size = 1) +
+    scale_y_continuous(lim = c(0,1)) +
+    geom_point(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, size = N),
+               shape = 19) +
+    geom_text_repel(data = trib_det_summ, aes(x = mean_discharge_cfs, y = det_eff, label = run_year)) +
+    ylab("Detection Efficiency") +
+    ggtitle(river_mouth_site)
+    
+    
+  }
+  
+  
+  
+
+  
+  ##### For any number of eras: return glm fit and plot #####
+  return(list(summary(det_discharge_glm), predict_fit_plot))
+    
+}
+
+
 ```
 
 
@@ -547,47 +932,44 @@ Station: Asotin Creek at Asotin, WA. USGS 13335050
 usgs_data_plot(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")
 
 # Get annual discharge and gage height means
-asotin_creek_annual_discharge <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[1]]
-asotin_creek_annual_gage_height <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[2]]
+# asotin_creek_annual_discharge <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[1]]
+# asotin_creek_annual_gage_height <- usgs_annual_means(variables = "discharge and gage height", tributary_name = "Asotin Creek", usgs_file_name = "asotin_creek_13335050.txt")[[2]]
+# 
+# # is there a relationship between discharge and detection efficiency?
+# ACM_det_eff %>% 
+#   subset(year != "Total") %>% 
+#   dplyr::mutate(year = as.numeric(year)) %>% 
+#   left_join(., asotin_creek_annual_discharge, by = "year") %>% 
+#   dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
+# 
+# ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
+#   geom_point() +
+#   scale_color_manual(values = c("#33a02c", "#6a3d9a"))
+# 
+# # what about gage height and detection efficiency?
+# ACM_det_eff %>% 
+#   subset(year != "Total") %>% 
+#   dplyr::mutate(year = as.numeric(year)) %>% 
+#   left_join(., asotin_creek_annual_gage_height, by = "year") %>% 
+#   dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_gageheight
+# 
+# ggplot(ACM_deteff_gageheight, aes(x = mean_gage_height_ft, y = det_eff, color = time_period)) +
+#   geom_point() +
+#   scale_color_manual(values = c("#33a02c", "#6a3d9a"))
+# 
 
-# is there a relationship between discharge and detection efficiency?
-ACM_det_eff %>% 
-  subset(year != "Total") %>% 
-  dplyr::mutate(year = as.numeric(year)) %>% 
-  left_join(., asotin_creek_annual_discharge, by = "year") %>% 
-  dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_discharge
+```
 
-ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
-  geom_point() +
-  scale_color_manual(values = c("#33a02c", "#6a3d9a"))
-
-# what about gage height and detection efficiency?
-ACM_det_eff %>% 
-  subset(year != "Total") %>% 
-  dplyr::mutate(year = as.numeric(year)) %>% 
-  left_join(., asotin_creek_annual_gage_height, by = "year") %>% 
-  dplyr::mutate(time_period = ifelse(year <= 2018, "2011-2018", "2019-present"))-> ACM_deteff_gageheight
-
-ggplot(ACM_deteff_gageheight, aes(x = mean_gage_height_ft, y = det_eff, color = time_period)) +
-  geom_point() +
-  scale_color_manual(values = c("#33a02c", "#6a3d9a"))
-
-# fit det_eff ~ time_period + discharge
-# glm(ACM_deteff_discharge$det_eff ~ ACM_deteff_discharge$mean_discharge_cfs, family = "binomial")
-
-det_eff_discharge_glm <- glm(det_eff ~ mean_discharge_cfs, data = ACM_deteff_discharge,
-    weights = total, family = "binomial")
-
-# plot predicted values
-predict_discharge <- seq(50, 150, 1)
-predict_det_eff <- predict(det_eff_discharge_glm, list(mean_discharge_cfs = predict_discharge), type = "response")
-predict_df <- data.frame(mean_discharge_cfs = predict_discharge, det_eff = predict_det_eff)
-
-ggplot(ACM_deteff_discharge, aes(x = mean_discharge_cfs, y = det_eff, color = time_period)) +
-  geom_point() +
-  scale_color_manual(values = c("#33a02c", "#6a3d9a")) +
-  geom_line(data = predict_df, aes(x = mean_discharge_cfs, y = det_eff, color = NULL), lty = 2)
-
+### Detection efficiency vs. discharge
+```{r asotin_creek_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Asotin Creek", 
+             usgs_file_name = "asotin_creek_13335050.txt", 
+              equipment_categories_start_run_years = c("11/12", "18/19"),
+              equipment_categories_end_run_years = c("17/18", "21/22"), 
+              river_mouth_site = "ACM - Asotin Creek near mouth", 
+              river_mouth_site_start_date = "2011-08-01", 
+             river_mouth_site_end_date = "2023-01-01")
 
 ```
 
@@ -649,6 +1031,25 @@ Station: Deschutes River at Moody, Near Biggs, OR
 USGS 14103000
 - discharge only
 
+```{r deschutes_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge only", tributary_name = "Deschutes River", usgs_file_name = "deschutes_river_14103000.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r deschutes_river_deteff_discharge}
+det_eff_glm(variables = "discharge only",
+             tributary_name = "Deschutes River", 
+            usgs_file_name = "deschutes_river_14103000.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "DRM - Deschutes River mouth", 
+              river_mouth_site_start_date = "2013-03-13", 
+            river_mouth_site_end_date = "2019-08-09")
+
+```
+
 ## Entiat River
 [ENL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ENL)
 
@@ -698,6 +1099,26 @@ plot_arrival_timing(tributary_name = "Entiat River", river_mouth_site = "ENL - L
 Station: Entiat River Near Entiat, WA
 USGS 12452990
 - discharge and gage height
+
+
+```{r entiat_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Entiat River", usgs_file_name = "entiat_river_12452990.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r entiat_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Entiat River", 
+            usgs_file_name = "entiat_river_12452990.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "ENL - Lower Entiat River", 
+              river_mouth_site_start_date = "2007-10-01", 
+            river_mouth_site_end_date = "2023-01-01")
+
+```
 
 ## Fifteenmile Creek
 [158 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=158)
@@ -801,6 +1222,26 @@ USGS 1412000
 - this is a bit upstream of HRM site and before confluence with Whiskey Creek, but it should be good enough
 - discharge only
 
+
+```{r hood_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge only", tributary_name = "Hood River", usgs_file_name = "hood_river_14120000.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r hood_river_deteff_discharge}
+det_eff_glm(variables = "discharge only",
+             tributary_name = "Hood River", 
+            usgs_file_name = "hood_river_14120000.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "HRM - Hood River Mouth", 
+              river_mouth_site_start_date = "2012-01-09", 
+            river_mouth_site_end_date = "2023-01-01")
+
+```
+
 ## Imnaha River
 [IR1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=IR1)
 
@@ -858,6 +1299,24 @@ USGS 13292000
 - Site went offline 2013-10-22
 - discharge only
 
+```{r imnaha_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge only", tributary_name = "Imnaha River", usgs_file_name = "imnaha_river_13292000.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r imnaha_river_deteff_discharge}
+det_eff_glm(variables = "discharge only",
+             tributary_name = "Imnaha River", 
+            usgs_file_name = "imnaha_river_13292000.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "IR1 - Lower Imnaha River ISA @ km 7", 
+                           river_mouth_site_start_date = "2012-12-01", river_mouth_site_end_date = "2023-01-01")
+
+```
+
 
 ## John Day River
 [JD1 PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=JD1)
@@ -911,6 +1370,24 @@ plot_arrival_timing(tributary_name = "John Day River", river_mouth_site = "JD1 -
 Station: John Day River at Mcdonald Ferry, OR
 USGS 14048000
 - discharge only
+
+```{r john_day_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge only", tributary_name = "John Day River", usgs_file_name = "john_day_river_14048000.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r john_day_river_deteff_discharge}
+det_eff_glm(variables = "discharge only",
+             tributary_name = "John Day River", 
+            usgs_file_name = "john_day_river_14048000.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "JD1 - John Day River, McDonald Ferry", 
+                river_mouth_site_start_date = "2007-09-01", river_mouth_site_end_date = "2023-01-01")
+
+```
 
 ## Methow River
 [LMR PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LMR)
@@ -968,6 +1445,25 @@ Station: Methow River near Pateros, WA
 USGS 12449950
 - discharge and gage height
 
+
+```{r methow_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Methow River", usgs_file_name = "methow_river_12449950.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r methow_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Methow River", 
+            usgs_file_name = "methow_river_12449950.txt",
+              equipment_categories_start_run_years = c("09/10", "17/18"),
+              equipment_categories_end_run_years = c("16/17", "21/22"), 
+              river_mouth_site = "LMR - Lower Methow River at Pateros", 
+                           river_mouth_site_start_date = "2009-03-01", river_mouth_site_end_date = "2023-01-01")
+
+```
+
 ## Okanogan River
 [OKL PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=OKL)
 
@@ -1013,6 +1509,24 @@ Station: Okanogan River at Malott, WA
 USGS 12447200
 - discharge and gage height
 
+```{r okanogan_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Okanogan River", usgs_file_name = "okanogan_12447200.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r okanogan_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Okanogan River", 
+            usgs_file_name = "okanogan_12447200.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "OKL - Lower Okanogan Instream Array", 
+                river_mouth_site_start_date = "2013-03-15", river_mouth_site_end_date = "2023-01-01")
+
+```
+
 ## Salmon River
 Tons of sites, but all on tribtuaries/different forks of the Salmon
 ```{r salmon_river, echo = FALSE}
@@ -1037,6 +1551,11 @@ Three potential eras:
 1. August 2020-present
 2. 2005-1/8/2009
 3. Inactive: 1/8/2009-9/10/2009
+
+However - we only have data from 2011 onwards. So our eras will be:
+
+1. 10/11 through 19/20
+2. 20/21 - present
 
 ##### LTR description from PTAGIS:
 > LTR is a permanent instream PIT tag interrogation site at RKM 2.5 on the Tucannon River. The current configuration installed August 2020 consists of three rows of antennas. The upstream row consists of 2 20-foot HDPE antennas, the middle row consists of 2 20 foot HDPE antennas and 1 10 foot PVC antenna, the bottom row consists of 2 HDPE antennas, installed in flat-plate configuration. Each antenna is powered by a Biomark Multiplexing Reader IS1001-MC master controller. The antennas were built and installed by WDFW. The electrical power at the site is provided by 6 200 watt solar panels. Data currently will be downloaded by Biomark through a satellite modem. No environmental monitors are installed at this time. This site has variously consisted of one or two groups of arrays, about a kilometer apart, located near the mouth of the Tucannon River. From Oct. 2005 until April 2008 the downstream array group consisted of two tandem "log" antenna arrays that spanned the low-water channel above the boat ramp. The upstream array group was located at an abandoned railroad bridge abutment upstream of Hwy 261 on the Tucannon River downstream from Starbuck. The upstream array (A0) operated from Oct. 2005 until January 2009. Its various configurations included both pass-through and pass-over antennas. A single array (C0) with six PVC pipe antennas powered by a QST Qube was re-deployed above the boat ramp in Sept. 2009. Responsibility for site operations transferred from USFWS to WDFW on Jan. 7, 2010. The C0 in-stream array was relocated below the Hwy 261 bridge on Sept. 29, 2010. The Qube was replaced with a Biomark IS1001-MC November 2018.
@@ -1072,6 +1591,24 @@ plot_arrival_timing(tributary_name = "Tucannon River", river_mouth_site = "LTR -
 Station: Tucannon River near Starbuck, WA
 USGS 13344500
 - discharge and gage height
+
+```{r tucannon_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Tucannon River", usgs_file_name = "tucannon_river_13344500.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r tucannon_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Tucannon River", 
+            usgs_file_name = "tucannon_river_13344500.txt",
+              equipment_categories_start_run_years = c("10/11", "20/21"),
+              equipment_categories_end_run_years = c("19/20", "21/22"), 
+              river_mouth_site = "LTR - Lower Tucannon River", 
+                           river_mouth_site_start_date = "2005-10-13", river_mouth_site_end_date = "2023-01-01")
+
+```
 
 ## Umatilla River
 [TMF PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=TMF)
@@ -1119,6 +1656,24 @@ Note - since the tributary site in this case is at a dam, I don't expet river st
 Station: Umatilla River near Umatilla, OR
 USGS 14033500
 - discharge only
+
+```{r umatilla_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge only", tributary_name = "Umatilla River", usgs_file_name = "umatilla_river_14033500.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r umatilla_river_deteff_discharge}
+det_eff_glm(variables = "discharge only",
+             tributary_name = "Umatilla River", 
+            usgs_file_name = "umatilla_river_14033500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "TMF - Three Mile Falls Dam Combined", 
+              river_mouth_site_start_date = "2006-11-08", river_mouth_site_end_date = "2023-01-01")
+
+```
 
 ## Walla Walla River
 [ORB PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=ORB)
@@ -1234,6 +1789,43 @@ Station: Walla Walla River near Touchet, WA
 USGS 14018500
 - discharge and gage height
 
+```{r walla_walla_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Walla Walla River", usgs_file_name = "walla_walla_14018500.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r walla_walla_river_deteff_discharge}
+# WWB
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Walla Walla River", 
+            usgs_file_name = "walla_walla_14018500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "WWB - Walla Walla River Barge Array", 
+                           river_mouth_site_start_date = "2019-04-11", river_mouth_site_end_date = "2023-01-01")
+
+# ORB
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Walla Walla River", 
+            usgs_file_name = "walla_walla_14018500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "ORB - Oasis Road Bridge", 
+                           river_mouth_site_start_date = "2005-04-15", river_mouth_site_end_date = "2015-05-04")
+
+
+# PRV
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Walla Walla River", 
+            usgs_file_name = "walla_walla_14018500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "PRV - Walla Walla R at Pierce RV Prk", 
+                           river_mouth_site_start_date = "2012-09-25", river_mouth_site_end_date = "2019-04-08")
+```
+
 ## Wenatchee River
 [LWE PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=LWE)
 
@@ -1247,6 +1839,8 @@ show_trib_sites("Wenatchee River")
 
 Shelby calculated detection efficiencies for 11/12-14/15. Varied from 53.8% in 11/12 to 85% in 14/15, with single digit SEs in each year. Doesn't seem to be directional changes.
 
+We should start though on 01/05/2011; since that's when site operations were restored and then kept up.
+
 ##### LWE description from PTAGIS:
 > LWE is a permanent instream PIT tag interrogation site at RKM 2.77 on the Wenatchee River. The site consists of two rows of antennas, with each row nearly spanning the wetted width of the channel during base flows. Each row consists of six 20-foot PVC antennas, installed in flat-plate configuration. Each antenna is powered by a Biomark IS1001 (ACN) and the ACNs are connected to a Biomark IS1001-MC (MTS). The antennas were built and installed by WDFW. The site is powered by a thermoelectric generator. LWE has remote communication abilities provided by a cellular modem and Campbell Scientific CR1000 datalogger. A submersible pressure transducer and temperature probe sensors are also installed to provide environmental condition data collection.
 
@@ -1257,7 +1851,7 @@ There are a number of short outages, but nothing too long term.
 ```{r wenatchee_river_detection_efficiency, echo = FALSE, message = FALSE, warning = FALSE}
 
 LWE_det_eff <- annual_det_eff(tributary_name = "Wenatchee River", river_mouth_site = "LWE - Lower Wenatchee River", 
-                           river_mouth_site_start_date = "2009-10-01", river_mouth_site_end_date = "2023-01-01")
+                           river_mouth_site_start_date = "2011-01-05", river_mouth_site_end_date = "2023-01-01")
 
 
 as.data.frame(LWE_det_eff) %>% 
@@ -1273,13 +1867,31 @@ kable(LWE_det_eff_table, booktabs = T)%>%
 plot_annual_det_eff(trib_det_eff_df = LWE_det_eff, site_name = "LWE - Lower Wenatchee River")
 
 plot_arrival_timing(tributary_name = "Wenatchee River", river_mouth_site = "LWE - Lower Wenatchee River", 
-                           river_mouth_site_start_date = "2009-10-01", river_mouth_site_end_date = "2023-01-01")
+                           river_mouth_site_start_date = "2011-01-05", river_mouth_site_end_date = "2023-01-01")
 ```
 
 ### USGS data
 Station: Wenatchee River at Monitor, WA
 USGS 12462500
 - discharge and gage height
+
+```{r wenatchee_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Wenatchee River", usgs_file_name = "wenatchee_river_12462500.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r wenatchee_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Wenatchee River", 
+            usgs_file_name = "wenatchee_river_12462500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "LWE - Lower Wenatchee River", 
+                           river_mouth_site_start_date = "2011-01-05", river_mouth_site_end_date = "2023-01-01")
+
+```
 
 ## Yakima River
 [PRO PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=PRO)
@@ -1327,3 +1939,21 @@ Station: Yakima River at Kiona, WA
 USGS 12510500
 - discharge and gage height
 - this station is downstream of PRO
+
+```{r yakima_river_usgs_plot, message = FALSE, echo = FALSE}
+# Plot discharge and gage height data
+usgs_data_plot(variables = "discharge and gage height", tributary_name = "Yakima River", usgs_file_name = "yakima_river_12510500.txt")
+
+```
+
+### Detection efficiency vs. discharge
+```{r yakima_river_deteff_discharge}
+det_eff_glm(variables = "discharge and gage height",
+             tributary_name = "Yakima River", 
+            usgs_file_name = "yakima_river_12510500.txt",
+              equipment_categories_start_run_years = NA,
+              equipment_categories_end_run_years = NA, 
+              river_mouth_site = "PRO - Prosser Diversion Dam Combined", 
+                           river_mouth_site_start_date = "2004-10-19", river_mouth_site_end_date = "2023-01-01")
+
+```
