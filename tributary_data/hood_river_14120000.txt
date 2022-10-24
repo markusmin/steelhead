@@ -22,7 +22,6 @@
 #        113482       00060     00003     Discharge, cubic feet per second (Mean)
 #
 # Data-value qualification codes included in this output:
-#        
 #     A  Approved for publication -- Processing and review completed.
 #     P  Provisional data subject to revision.
 #     e  Value has been estimated.
