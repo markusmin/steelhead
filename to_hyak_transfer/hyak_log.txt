@@ -1656,3 +1656,12 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/ ./
 ### 10-28-22 ###
 What I'm doing now is re-running the complete states code, where the river mouth and upstream sites are now called different states.
 This is necessary to estimate detection efficiency in the stan model.
+
+# Transfer the v4 script to hyak:
+scp -r ./2022-10-27-complete_det_hist_ckpt/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/
+
+# Run em all
+sbatch complete_det_hist_ckpt_part1.slurm
+sbatch complete_det_hist_ckpt_part2.slurm
+sbatch complete_det_hist_ckpt_part3.slurm
+sbatch complete_det_hist_ckpt_part4.slurm
