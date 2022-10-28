@@ -1653,4 +1653,6 @@ scp ./job_seed103_stf_parallel_snake_02_stan_actual_int_origin_mox.slurm mmin@mo
 # pull the new stf runs
 scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/snake/ ./
 
-
+### 10-28-22 ###
+What I'm doing now is re-running the complete states code, where the river mouth and upstream sites are now called different states.
+This is necessary to estimate detection efficiency in the stan model.
