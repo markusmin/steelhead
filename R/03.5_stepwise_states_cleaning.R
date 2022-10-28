@@ -79,10 +79,15 @@ tag_codes_1 %>%
 # read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv")) %>%
 #   dplyr::select(-X) -> states_complete
 
-states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
-states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
-states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
-states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
+# states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
+# states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
+# states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
+# states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
+
+states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
+states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
+states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
+states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
 
 states_complete_part1 %>% 
   bind_rows(., states_complete_part2) %>% 
@@ -202,11 +207,11 @@ for (i in 1:nrow(states_complete)){
 
 
 # Put this checkpoint in so we don't have to re-run the for loop
-write.csv(states_complete, here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_times_interpolated.csv"))
+write.csv(states_complete, here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_times_interpolated.csv"))
 
 # read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
 # read.csv(here::here("from_hyak_transfer", "2022-07-18-complete_det_hist", "states_complete_times_interpolated.csv")) %>%
-read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_times_interpolated.csv")) %>%
+read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_times_interpolated.csv")) %>%
   dplyr::select(-X) -> states_complete
 
 # Okay, I'm not exactly sure why these fish are missing date/times, but manually fix them
