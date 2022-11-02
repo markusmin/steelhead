@@ -84,10 +84,15 @@ tag_codes_1 %>%
 # states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
 # states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-08-08-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
 
-states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
-states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
-states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
-states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
+# states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
+# states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
+# states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
+# states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-10-27-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
+
+states_complete_part1 <- read.csv(here::here("from_hyak_transfer", "2022-11-02-complete_det_hist_ckpt", "states_complete_part1.csv"), row.names = 1)
+states_complete_part2 <- read.csv(here::here("from_hyak_transfer", "2022-11-02-complete_det_hist_ckpt", "states_complete_part2.csv"), row.names = 1)
+states_complete_part3 <- read.csv(here::here("from_hyak_transfer", "2022-11-02-complete_det_hist_ckpt", "states_complete_part3.csv"), row.names = 1)
+states_complete_part4 <- read.csv(here::here("from_hyak_transfer", "2022-11-02-complete_det_hist_ckpt", "states_complete_part4.csv"), row.names = 1)
 
 states_complete_part1 %>% 
   bind_rows(., states_complete_part2) %>% 
