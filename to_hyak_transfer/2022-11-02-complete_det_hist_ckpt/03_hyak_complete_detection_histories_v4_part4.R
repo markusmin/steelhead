@@ -5,7 +5,7 @@
 # The changes from the last script to this script are to split all of the tributaries into upstream and river mouth sites
 
 # For testing:
-# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-10-27-complete_det_hist_ckpt/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/to_hyak_transfer/2022-11-02-complete_det_hist_ckpt/")
 
 # compare new and old sites
 # site_classification_old <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "site_classification.csv"))
@@ -1005,12 +1005,6 @@ det_hist <- subset(det_hist, !(tag_code %in% c(first_quarter_tag_codes, second_q
 fish_counter <- 1
 
 nfish <- length(unique(det_hist$tag_code))
-
-
-# Remove fields that we aren't interested in
-det_hist %>% 
-  dplyr::select(-c(start_antenna_id, end_antenna_id,
-                   ant_config)) -> det_hist
 
 # Append a dummy fish
 

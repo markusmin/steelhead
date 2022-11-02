@@ -1004,12 +1004,6 @@ fish_counter <- 1
 
 nfish <- length(unique(det_hist$tag_code))
 
-
-# Remove fields that we aren't interested in
-det_hist %>% 
-  dplyr::select(-c(start_antenna_id, end_antenna_id,
-                   ant_config)) -> det_hist
-
 # Append a dummy fish
 
 det_hist %>% 
