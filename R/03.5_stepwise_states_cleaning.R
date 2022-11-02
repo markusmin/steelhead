@@ -336,6 +336,8 @@ table(first_adult_states$pathway)
 # First, we need to identify the end of spawning movements.
 
 # Identify which sites are tributaries and which are mainstem sites
+# so we never even use this in this script!
+# We jsut say that everything that isn't mainstem is a tributary. Which makes sense. So this isn't affected by division into upstream and river mouth interrogation sites.
 tributary_mainstem <- data.frame(tributary = c("Asotin Creek", 
                                                "Clearwater River",
                                                "Deschutes River", 
@@ -773,9 +775,53 @@ subset(states_complete, tag_code %in% BFA_tags) -> BFA_firststates_complete
 subset(adults_only_states, tag_code %in% problem_tags) -> adult_only_issues
 setdiff(adults_first_states$tag_code_2, adults_only_states$tag_code_2)
 
+##### Remove ghost tags - use criteria from DART (provided by Susannah Iltis) #####
+
+# DART applies these criteria for identifying ghost/shed tags for our tributary queries:
+# (1) detected 3 or more years after last detection for all species tagged as adults
+# (2) detected 5 years after last detection for all stages and species
+# (3) steelhead tagged as juvenile with first detection 4 or more years after tagging
+# (4) salmon tagged as juvenile with first detection 2 or more years after tagging
+# (5) all tagged as adults with first detection 2 or more years after tagging.
+
+# for our script, we've already removed the entire juvenile history at this point. So we can apply criteria (1)
+# and remove everything that's occurred >= 3 years after the last detection
+
+# load previously identified bad tags
+bad_tags <- read.csv(here::here("bad_tags.csv"))
+
+adults_only_states %>% 
+  # subset(tag_code %in% bad_tags$tag_code) %>%  # for testing
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  mutate(time_between_detections = ifelse(tag_code == lag(tag_code), time_after_release - lag(time_after_release), NA)) %>%
+  # mutate(time_between_detections = ifelse(tag_code == lag(tag_code), interval(date_time, lag(date_time)), NA)) %>% 
+  mutate(ghost_tag = ifelse(time_between_detections >= 365*3, "ghost", 
+                            ifelse(is.na(time_between_detections) | time_between_detections < 365*3, "not_ghost", NA))) -> adults_only_states
+
+# now note that everything that occurs after when we first note it's a ghost is also ghost activity
+eventual_ghost_tags <- unique(subset(adults_only_states, ghost_tag == "ghost")$tag_code)
+adults_only_states %>% 
+  mutate(ghost_start = ifelse(ghost_tag == "ghost", order, NA)) %>% 
+  subset(ghost_tag == "ghost") %>% 
+  dplyr::select(tag_code, ghost_start) -> ghost_tag_start
+
+adults_only_states %>% 
+  ungroup() %>% 
+  left_join(., ghost_tag_start, by = "tag_code") %>% 
+  # group_by(tag_code) %>% 
+  mutate(ghost_tag = ifelse(tag_code %in% eventual_ghost_tags & order >= ghost_start, "ghost", "not_ghost")) -> adults_only_states
+
+# check on our ghost tags
+adults_only_states %>% 
+  group_by(tag_code) %>% 
+  filter(any(ghost_tag == "ghost")) -> ghost_tags
+
+# remove all of the ghost tag activity
+adults_only_states %>% 
+  subset(ghost_tag != "ghost") -> adults_only_states
 
 
-# Now, export this file, removing irrelevant columns
+##### Now, export this file, removing irrelevant columns #####
 adults_only_states %>% 
   dplyr::select(tag_code, state, date_time, pathway, life_stage, tag_code_2) -> adults_only_states_for_export
 write.csv(adults_only_states_for_export, here::here("stan_actual", "adults_states_complete.csv"))
@@ -835,6 +881,13 @@ write.csv(middle_columbia_adults_only_states, here::here("stan_actual", "ESU_mod
 write.csv(lower_columbia_adults_only_states, here::here("stan_actual", "ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"))
 
 
+# write them to new folders
+write.csv(snake_adults_only_states, here::here("stan_actual", "deteff_ESU_models", "snake", "snake_adults_states_complete.csv"))
+write.csv(upper_columbia_adults_only_states, here::here("stan_actual", "deteff_ESU_models", "upper_columbia", "upper_columbia_adults_states_complete.csv"))
+write.csv(middle_columbia_adults_only_states, here::here("stan_actual", "deteff_ESU_models", "middle_columbia", "middle_columbia_adults_states_complete.csv"))
+write.csv(lower_columbia_adults_only_states, here::here("stan_actual", "deteff_ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"))
+
+
 
 # Some summary statistics:
 
@@ -853,6 +906,49 @@ length(unique(kelts_final$tag_code))
 
 repeat_kelts %>% 
   dplyr::select(-c("release_year", "release_month",  "release_day", "event_year",    "event_month",  "event_day")) -> repeat_kelts_abbrev
+
+# how often do we see RM AFTER upstream?
+adults_only_states %>% 
+  mutate(trib_det_type = ifelse(grepl("Upstream", state), "upstream",
+                                ifelse(grepl("Mouth", state), "river_mouth",
+                                       "neither"))) -> adults_only_states_2
+
+adults_only_states_2 %>% 
+  mutate(upstream_seq = ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "river_mouth", "upstream to river mouth",
+                               ifelse(tag_code != lead(tag_code) & trib_det_type == "upstream", "upstream to loss",
+                           NA))) -> adults_only_states_2
+adults_only_states_2 %>% 
+  group_by(tag_code) %>% 
+  filter(any(!(is.na(upstream_seq)))) -> trib_upstream_det
+
+table(trib_upstream_det$upstream_seq)
+
+trib_upstream_det %>% 
+  group_by(tag_code) %>% 
+  filter(any(upstream_seq == "upstream to river mouth")) -> upstoRM
+
+# So we never see river mouth detection after upstream... makes sense? This should be removed by our script to ID kelts
+
+# let's check the script where we don't filter out by life stage (includes kelts)
+states_complete %>% 
+  mutate(trib_det_type = ifelse(grepl("Upstream", state), "upstream",
+                                ifelse(grepl("Mouth", state), "river_mouth",
+                                       "neither"))) -> states_complete_2
+
+states_complete_2 %>% 
+  mutate(upstream_seq = ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "river_mouth", "upstream to river mouth",
+                               ifelse(tag_code != lead(tag_code) & trib_det_type == "upstream", "upstream to loss",
+                                      NA))) -> states_complete_2
+states_complete_2 %>% 
+  group_by(tag_code) %>% 
+  filter(any(!(is.na(upstream_seq)))) -> trib_upstream_det
+
+table(trib_upstream_det$upstream_seq)
+
+trib_upstream_det %>% 
+  group_by(tag_code) %>% 
+  filter(any(upstream_seq == "upstream to river mouth")) -> upstoRM
+
 
 
 
