@@ -911,12 +911,17 @@ repeat_kelts %>%
 adults_only_states %>% 
   mutate(trib_det_type = ifelse(grepl("Upstream", state), "upstream",
                                 ifelse(grepl("Mouth", state), "river_mouth",
-                                       "neither"))) -> adults_only_states_2
+                                       ifelse(grepl("mainstem", state), "mainstem",
+                                       "neither")))) -> adults_only_states_2
 
 adults_only_states_2 %>% 
   mutate(upstream_seq = ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "river_mouth", "upstream to river mouth",
                                ifelse(tag_code != lead(tag_code) & trib_det_type == "upstream", "upstream to loss",
-                           NA))) -> adults_only_states_2
+                                      ifelse(tag_code != lead(tag_code) & trib_det_type == "river_mouth", "RM to loss",
+                                      ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "mainstem", "upstream to mainstem",
+                                             ifelse(tag_code == lead(tag_code) & trib_det_type == "river_mouth" & lead(trib_det_type) == "upstream", "RM to upstream",
+                                                    ifelse(tag_code == lead(tag_code) & trib_det_type == "river_mouth" & lead(trib_det_type) == "mainstem", "RM to mainstem",
+                           NA))))))) -> adults_only_states_2
 adults_only_states_2 %>% 
   group_by(tag_code) %>% 
   filter(any(!(is.na(upstream_seq)))) -> trib_upstream_det
@@ -936,6 +941,7 @@ states_complete %>%
                                        "neither"))) -> states_complete_2
 
 states_complete_2 %>% 
+  ungroup() %>% 
   mutate(upstream_seq = ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "river_mouth", "upstream to river mouth",
                                ifelse(tag_code != lead(tag_code) & trib_det_type == "upstream", "upstream to loss",
                                       NA))) -> states_complete_2
@@ -944,6 +950,7 @@ states_complete_2 %>%
   filter(any(!(is.na(upstream_seq)))) -> trib_upstream_det
 
 table(trib_upstream_det$upstream_seq)
+# also none here
 
 trib_upstream_det %>% 
   group_by(tag_code) %>% 
