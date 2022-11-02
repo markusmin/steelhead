@@ -1,4 +1,4 @@
-# stepwise_states_cleaning
+# 03.5 stepwise_states_cleaning
 
 library(here)
 library(tidyverse)
@@ -907,7 +907,7 @@ states_complete %>%
 
 # 1,379
 length(unique(kelts_final$tag_code))
-# About 2% of adults (returns to BON) exhibit kelt movement
+# About 2% of adults (returns to BON) exhibit kelt movement 
 
 repeat_kelts %>% 
   dplyr::select(-c("release_year", "release_month",  "release_day", "event_year",    "event_month",  "event_day")) -> repeat_kelts_abbrev
@@ -933,34 +933,4 @@ adults_only_states_2 %>%
 
 table(trib_upstream_det$upstream_seq)
 
-trib_upstream_det %>% 
-  group_by(tag_code) %>% 
-  filter(any(upstream_seq == "upstream to river mouth")) -> upstoRM
-
-# So we never see river mouth detection after upstream... makes sense? This should be removed by our script to ID kelts
-
-# let's check the script where we don't filter out by life stage (includes kelts)
-states_complete %>% 
-  mutate(trib_det_type = ifelse(grepl("Upstream", state), "upstream",
-                                ifelse(grepl("Mouth", state), "river_mouth",
-                                       "neither"))) -> states_complete_2
-
-states_complete_2 %>% 
-  ungroup() %>% 
-  mutate(upstream_seq = ifelse(tag_code == lead(tag_code) & trib_det_type == "upstream" & lead(trib_det_type) == "river_mouth", "upstream to river mouth",
-                               ifelse(tag_code != lead(tag_code) & trib_det_type == "upstream", "upstream to loss",
-                                      NA))) -> states_complete_2
-states_complete_2 %>% 
-  group_by(tag_code) %>% 
-  filter(any(!(is.na(upstream_seq)))) -> trib_upstream_det
-
-table(trib_upstream_det$upstream_seq)
-# also none here
-
-trib_upstream_det %>% 
-  group_by(tag_code) %>% 
-  filter(any(upstream_seq == "upstream to river mouth")) -> upstoRM
-
-
-
-
+# So we see all possible tributary transitions: RM to mainstem, RM to upstream, RM to loss; upstream to loss, upstream to mainstem, upstream to RM
