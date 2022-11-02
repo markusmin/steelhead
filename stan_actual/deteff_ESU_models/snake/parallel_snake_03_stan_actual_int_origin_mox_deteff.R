@@ -159,104 +159,199 @@ transition_matrix["mainstem, upstream of LGR", "Grande Ronde River"] <- 1
 transition_matrix["mainstem, upstream of LGR", "Imnaha River"] <- 1
 
 
-# 10: Deschutes River
-transition_matrix["Deschutes River", "loss"] <- 1
-transition_matrix["Deschutes River", "mainstem, BON to MCN"] <- 1
+# Deschutes River
+# 10: Deschutes River Mouth
+# 11: Deschutes River Upstream
+transition_matrix["Deschutes River Mouth", "loss"] <- 1
+transition_matrix["Deschutes River Mouth", "mainstem, BON to MCN"] <- 1
+transition_matrix["Deschutes River Mouth", "Deschutes River Upstream"] <- 1
+transition_matrix["Deschutes River Upstream", "loss"] <- 1
+transition_matrix["Deschutes River Upstream", "mainstem, BON to MCN"] <- 1
+transition_matrix["Deschutes River Upstream", "Deschutes River Mouth"] <- 1
 
 
-# 11: John Day River
-transition_matrix["John Day River", "loss"] <- 1
-transition_matrix["John Day River", "mainstem, BON to MCN"] <- 1
+# John Day River
+# 12: John Day River Mouth
+# 13: John Day River Upstream
+transition_matrix["John Day River Mouth", "loss"] <- 1
+transition_matrix["John Day River Mouth", "mainstem, BON to MCN"] <- 1
+transition_matrix["John Day River Mouth", "John Day River Upstream"] <- 1
+transition_matrix["John Day River Upstream", "loss"] <- 1
+transition_matrix["John Day River Upstream", "mainstem, BON to MCN"] <- 1
+transition_matrix["John Day River Upstream", "John Day River Mouth"] <- 1
 
 
-# 12: Hood River
-transition_matrix["Hood River", "loss"] <- 1
-transition_matrix["Hood River", "mainstem, BON to MCN"] <- 1
+# Hood River
+# 14: Hood River Mouth
+# 15: Hood River Upstream
+transition_matrix["Hood River River Mouth", "loss"] <- 1
+transition_matrix["Hood River River Mouth", "mainstem, BON to MCN"] <- 1
+transition_matrix["Hood River River Mouth", "Hood River River Upstream"] <- 1
+transition_matrix["Hood River River Upstream", "loss"] <- 1
+transition_matrix["Hood River River Upstream", "mainstem, BON to MCN"] <- 1
+transition_matrix["Hood River River Upstream", "Hood River River Mouth"] <- 1
 
 
-# 13: Fifteenmile Creek
-transition_matrix["Fifteenmile Creek", "loss"] <- 1
-transition_matrix["Fifteenmile Creek", "mainstem, BON to MCN"] <- 1
+# Fifteenmile Creek
+# 16: Fifteenmile Creek Mouth
+# 17: Fifteenmile Creek Upstream
+transition_matrix["Fifteenmile Creek Mouth", "loss"] <- 1
+transition_matrix["Fifteenmile Creek Mouth", "mainstem, BON to MCN"] <- 1
+transition_matrix["Fifteenmile Creek Mouth", "Fifteenmile Creek Upstream"] <- 1
+transition_matrix["Fifteenmile Creek Upstream", "loss"] <- 1
+transition_matrix["Fifteenmile Creek Upstream", "mainstem, BON to MCN"] <- 1
+transition_matrix["Fifteenmile Creek Upstream", "Fifteenmile Creek Mouth"] <- 1
 
 
-# 14: Umatilla River
-transition_matrix["Umatilla River", "loss"] <- 1
-transition_matrix["Umatilla River", "mainstem, BON to MCN"] <- 1
+# Umatilla River
+# 18: Umatilla River Mouth
+# 19: Umatilla River Upstream
+transition_matrix["Umatilla River Mouth", "loss"] <- 1
+transition_matrix["Umatilla River Mouth", "mainstem, BON to MCN"] <- 1
+transition_matrix["Umatilla River Mouth", "Umatilla River Upstream"] <- 1
+transition_matrix["Umatilla River Upstream", "loss"] <- 1
+transition_matrix["Umatilla River Upstream", "mainstem, BON to MCN"] <- 1
+transition_matrix["Umatilla River Upstream", "Umatilla River Mouth"] <- 1
 
 
-# 15: Yakima River
-transition_matrix["Yakima River", "loss"] <- 1
-transition_matrix["Yakima River", "mainstem, MCN to ICH or PRA"] <- 1
+# Yakima River
+# 20: Yakima River Mouth
+# 21: Yakima River Upstream
+transition_matrix["Yakima River Mouth", "loss"] <- 1
+transition_matrix["Yakima River Mouth", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["Yakima River Mouth", "Yakima River Upstream"] <- 1
+transition_matrix["Yakima River Upstream", "loss"] <- 1
+transition_matrix["Yakima River Upstream", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["Yakima River Upstream", "Yakima River Mouth"] <- 1
 
 
-# 16: Walla Walla River
-transition_matrix["Walla Walla River", "loss"] <- 1
-transition_matrix["Walla Walla River", "mainstem, MCN to ICH or PRA"] <- 1
+# Walla Walla River
+# 22: Walla Walla River Mouth
+# 23: Walla Walla River Upstream
+transition_matrix["Walla Walla River Mouth", "loss"] <- 1
+transition_matrix["Walla Walla River Mouth", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["Walla Walla River Mouth", "Walla Walla River Upstream"] <- 1
+transition_matrix["Walla Walla River Upstream", "loss"] <- 1
+transition_matrix["Walla Walla River Upstream", "mainstem, MCN to ICH or PRA"] <- 1
+transition_matrix["Walla Walla River Upstream", "Walla Walla River Mouth"] <- 1
 
 
-# 17: Wenatchee River
-transition_matrix["Wenatchee River", "loss"] <- 1
-transition_matrix["Wenatchee River", "mainstem, RIS to RRE"] <- 1
+# Wenatchee River
+# 24: Wenatchee River Mouth
+# 25: Wenatchee River Upstream
+transition_matrix["Wenatchee River Mouth", "loss"] <- 1
+transition_matrix["Wenatchee River Mouth", "mainstem, RIS to RRE"] <- 1
+transition_matrix["Wenatchee River Mouth", "Wenatchee River Upstream"] <- 1
+transition_matrix["Wenatchee River Upstream", "loss"] <- 1
+transition_matrix["Wenatchee River Upstream", "mainstem, RIS to RRE"] <- 1
+transition_matrix["Wenatchee River Upstream", "Wenatchee River Mouth"] <- 1
 
 
-# 18: Entiat River
-transition_matrix["Entiat River", "loss"] <- 1
-transition_matrix["Entiat River", "mainstem, RRE to WEL"] <- 1
+# Entiat River
+# 26: Entiat River Mouth
+# 27: Entiat River Upstream
+transition_matrix["Entiat River Mouth", "loss"] <- 1
+transition_matrix["Entiat River Mouth", "mainstem, RRE to WEL"] <- 1
+transition_matrix["Entiat River Mouth", "Entiat River Upstream"] <- 1
+transition_matrix["Entiat River Upstream", "loss"] <- 1
+transition_matrix["Entiat River Upstream", "mainstem, RRE to WEL"] <- 1
+transition_matrix["Entiat River Upstream", "Entiat River Mouth"] <- 1
 
 
-# 19: Okanogan River
-transition_matrix["Okanogan River", "loss"] <- 1
-transition_matrix["Okanogan River", "mainstem, upstream of WEL"] <- 1
+# Okanogan River
+# 28: Okanogan River Mouth
+# 29: Okanogan River Upstream
+transition_matrix["Okanogan River Mouth", "loss"] <- 1
+transition_matrix["Okanogan River Mouth", "mainstem, upstream of WEL"] <- 1
+transition_matrix["Okanogan River Mouth", "Okanogan River Upstream"] <- 1
+transition_matrix["Okanogan River Upstream", "loss"] <- 1
+transition_matrix["Okanogan River Upstream", "mainstem, upstream of WEL"] <- 1
+transition_matrix["Okanogan River Upstream", "Okanogan River Mouth"] <- 1
 
 
-# 20: Methow River
-transition_matrix["Methow River", "loss"] <- 1
-transition_matrix["Methow River", "mainstem, upstream of WEL"] <- 1
+# Methow River
+# 30: Methow River Mouth
+# 31: Methow River Upstream
+transition_matrix["Methow River Mouth", "loss"] <- 1
+transition_matrix["Methow River Mouth", "mainstem, upstream of WEL"] <- 1
+transition_matrix["Methow River Mouth", "Methow River Upstream"] <- 1
+transition_matrix["Methow River Upstream", "loss"] <- 1
+transition_matrix["Methow River Upstream", "mainstem, upstream of WEL"] <- 1
+transition_matrix["Methow River Upstream", "Methow River Mouth"] <- 1
 
 
-# 21: Tucannon River
-transition_matrix["Tucannon River", "loss"] <- 1
-transition_matrix["Tucannon River", "mainstem, ICH to LGR"] <- 1
+# Tucannon River
+# 32: Tucannon River Mouth
+# 33: Tucannon River Upstream
+transition_matrix["Tucannon River Mouth", "loss"] <- 1
+transition_matrix["Tucannon River Mouth", "mainstem, ICH to LGR"] <- 1
+transition_matrix["Tucannon River Mouth", "Tucannon River Upstream"] <- 1
+transition_matrix["Tucannon River Upstream", "loss"] <- 1
+transition_matrix["Tucannon River Upstream", "mainstem, ICH to LGR"] <- 1
+transition_matrix["Tucannon River Upstream", "Tucannon River Mouth"] <- 1
 
 
-# 22: Asotin Creek
-transition_matrix["Asotin Creek", "loss"] <- 1
-transition_matrix["Asotin Creek", "mainstem, upstream of LGR"] <- 1
+# Asotin Creek
+# 34: Asotin Creek Mouth
+# 35: Asotin Creek Upstream
+transition_matrix["Asotin Creek Mouth", "loss"] <- 1
+transition_matrix["Asotin Creek Mouth", "mainstem, upstream of LGR"] <- 1
+transition_matrix["Asotin Creek Mouth", "Asotin Creek Upstream"] <- 1
+transition_matrix["Asotin Creek Upstream", "loss"] <- 1
+transition_matrix["Asotin Creek Upstream", "mainstem, upstream of LGR"] <- 1
+transition_matrix["Asotin Creek Upstream", "Asotin Creek Mouth"] <- 1
 
 
-# 23: Clearwater River
+# 36: Clearwater River
 transition_matrix["Clearwater River", "loss"] <- 1
 transition_matrix["Clearwater River", "mainstem, upstream of LGR"] <- 1
 
 
-# 24: Salmon River
+# 37: Salmon River
 transition_matrix["Salmon River", "loss"] <- 1
 transition_matrix["Salmon River", "mainstem, upstream of LGR"] <- 1
 
 
-# 25: Grande Ronde River
+# 38: Grande Ronde River
 transition_matrix["Grande Ronde River", "loss"] <- 1
 transition_matrix["Grande Ronde River", "mainstem, upstream of LGR"] <- 1
 
 
-# 26: Imnaha River
-transition_matrix["Imnaha River", "loss"] <- 1
-transition_matrix["Imnaha River", "mainstem, upstream of LGR"] <- 1
+# Imnaha River
+# 39: Imnaha River Mouth
+# 40: Imnaha River Upstream
+transition_matrix["Imnaha River Mouth", "loss"] <- 1
+transition_matrix["Imnaha River Mouth", "mainstem, upstream of LGR"] <- 1
+transition_matrix["Imnaha River Mouth", "Imnaha River Upstream"] <- 1
+transition_matrix["Imnaha River Upstream", "loss"] <- 1
+transition_matrix["Imnaha River Upstream", "mainstem, upstream of LGR"] <- 1
+transition_matrix["Imnaha River Upstream", "Imnaha River Mouth"] <- 1
 
-# 27: BON to MCN other tributaries
+# 41: BON to MCN other tributaries
 transition_matrix["BON to MCN other tributaries", "loss"] <- 1
 transition_matrix["BON to MCN other tributaries", "mainstem, BON to MCN"] <- 1
 
-# 28: Upstream WEL other tributaries
+# 42: Upstream WEL other tributaries
 transition_matrix["Upstream WEL other tributaries", "loss"] <- 1
 transition_matrix["Upstream WEL other tributaries", "mainstem, upstream of WEL"] <- 1
 
 
 ##### for this ESU - cut out state transitions for which we have no data #####
 # Remove the states that no fish ever enter
+# SEE END OF SCRIPT WHERE WE CHECK
+# Check to see if every transition in our model is represented
 
 # Snake River fish have been everywhere! So we use the full set of states
-
+# Now that we have separate river mouth and upstream states, no fish have ever been in:
+# 1) Hood River Upstream
+# 2) Wenatchee River Upstream
+# set these all to zero
+transition_matrix["Hood River River Upstream", "loss"] <- 0
+transition_matrix["Hood River River Upstream", "mainstem, BON to MCN"] <- 0
+transition_matrix["Hood River River Upstream", "Hood River River Mouth"] <- 0
+transition_matrix["Wenatchee River Upstream", "loss"] <- 0
+transition_matrix["Wenatchee River Upstream", "mainstem, RIS to RRE"] <- 0
+transition_matrix["Wenatchee River Upstream", "Wenatchee River Mouth"] <- 0
 
 
 ##### Data continued #####
@@ -278,12 +373,15 @@ movements %>%
 movements %>% 
   as.data.frame() -> movements_df
 
-snake_movements <- subset(movements_df, row %in% c(8,9,21,22,23,24,25,26) |
-                                     col %in% c(8,9,21,22,23,24,25,26))
+# snake_movements <- subset(movements_df, row %in% c(8,9,21,22,23,24,25,26) |
+#                                      col %in% c(8,9,21,22,23,24,25,26))
+snake_movements <- subset(movements_df, row %in% c(8,9,seq(32,39,1)) |
+                            col %in% c(8,9,seq(32,39,1)))
 
-non_snake_movements  <- subset(movements_df, !(row %in% c(8,9,21,22,23,24,25,26)) &
-                                          !(col %in% c(8,9,21,22,23,24,25,26)))
+non_snake_movements  <- subset(movements_df, !(row %in% c(8,9,seq(32,39,1))) &
+                                          !(col %in% c(8,9,seq(32,39,1))))
 
+# print declaration of b0_matrix parameters
 for (i in 1:(nrow(b0_matrix_names))){
   # Paste the numerator
   cat("real ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
@@ -291,6 +389,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 
 # There are six origins in this model, so we will have five origin parameters.
 # We will only allow an origin effect within the ESU (so after PRA). Before, they will only have an intercept term
+# print declaration of borigin parameters
 for (i in 1:5){
   for (j in 1:nrow(snake_movements)){
     cat("real ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], ";", "\n", sep = "")
@@ -314,6 +413,7 @@ for (i in 1:5){
 }
 
 # write out the priors
+# print b0 matrix priors
 for (i in 1:(nrow(b0_matrix_names))){
   # Paste the numerator
   cat(b0_matrix_names$b0_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
@@ -369,6 +469,7 @@ states_complete %>%
 
 
 # Loop through to convert df to array
+# This takes about 30 seconds
 print(Sys.time())
 for (i in 1:nrow(states_complete)){
 # for (i in 1:100){
@@ -390,15 +491,15 @@ trapped_fish_tags <- trapped_fish$tag_code_2
 which(unique_tag_codes %in% trapped_fish_tags) -> trapped_fish_indices
 
 for (i in 1:nfish){
-  # 29 is the loss state
+  # 43 is the loss state
   n_not_loss_states[i] <- sum(state_data[,,i])
-  state_data[29, n_not_loss_states[i]+1,i] <- 1
+  state_data[43, n_not_loss_states[i]+1,i] <- 1
 }
 
 # remove the extra loss state for the trapped fish
 for (i in 1:length(trapped_fish_indices)){
   j <- trapped_fish_indices[i]
-  state_data[29, n_not_loss_states[j]+1,j] <-0
+  state_data[43, n_not_loss_states[j]+1,j] <-0
 }
 
 saveRDS(state_data, "snake_state_data.csv")
@@ -682,8 +783,8 @@ model_states %>%
 
 states_complete %>% 
   left_join(., model_states_df, by = "state") %>% 
-  mutate(transition = ifelse(tag_code_2 == lag(tag_code_2), paste0(lag(state), " - ", state))) %>% 
-  mutate(transition_numeric = ifelse(tag_code_2 == lag(tag_code_2), paste0(lag(index), " - ", index))) -> state_transitions
+  mutate(transition = ifelse(tag_code_2 == lag(tag_code_2), paste0(lag(state), " - ", state), NA)) %>% 
+  mutate(transition_numeric = ifelse(tag_code_2 == lag(tag_code_2), paste0(lag(index), " - ", index), NA)) -> state_transitions
 
 table(state_transitions$transition)
 table(state_transitions$transition_numeric)
