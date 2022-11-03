@@ -1,4 +1,5 @@
-// 02_stan_actual_upper_columbia_int_origin
+// 03_parallel_snake_stan_actual_int_origin_deteff
+// This model includes a detection efficiency calculation for the tributaries.
 
 functions{
     real partial_sum_lpmf( // int[] slice_n_fish, # I don't think that we need this, given that we are using start and end to index the detection histories
@@ -33,6 +34,10 @@ functions{
                         array[,] real borigin3_matrix,
                         array[,] real borigin4_matrix,
                         array[,] real borigin5_matrix
+                        // below is new data for detection efficiency
+                        
+                        
+                        
                         ) { # I don't think we need this either? Since we're just indexing it again with start and end
                           
   // First, declare the total lp (log probability) variable that we will be returning
@@ -50,18 +55,18 @@ functions{
     
     // Here, create a vector to store the lp at each observation for a fish
     // vector[n_obs[i]] lp_fish;
-    # Let's initialize this instead as a real value starting at zero
+    // Let's initialize this instead as a real value starting at zero
     real lp_fish = 0;
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
 
         // vector for logits
-        vector[29] logits;
+        vector[43] logits;
         
         // derived proportions
         // simplex[29] p_vec;
         // So it looks like you're not allowed to use a simplex as a local variable. That's annoying.
-        vector[29] p_vec;
+        vector[43] p_vec;
         
 
         
@@ -71,8 +76,8 @@ functions{
         // current = states_mat[i - start + 1,j];
         
 
-        // Populate each of the first 28 (non-loss)
-        for (k in 1:28){
+        // Populate each of the first 42 (non-loss)
+        for (k in 1:42){
           logits[k] = b0_matrix[current, k]+ 
           // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
           cat_X_mat[i,3] * borigin1_matrix[current,k] +
@@ -88,7 +93,7 @@ functions{
         }
         
         // loss param
-        logits[29] = 0;
+        logits[43] = 0;
         // proper proportion vector
         p_vec = softmax(logits);
             
@@ -123,7 +128,7 @@ data {
   int n_ind; // number of individuals (this is nfish)
   array[n_ind,max_visits] int y; // array with dimensions nfish (number of fish), 41 (maximum number of site visits)
   array[n_ind] int n_obs; // n_obs is a vector that contains the number of site visits for each individual - but needs to be declared as array to take integer values
-  vector[29] possible_movements; // a vector containing the number of possible transitions out of each state
+  vector[43] possible_movements; // a vector containing the number of possible transitions out of each state
   array[n_ind, max_visits-1] int states_mat; // a matrix (array to take integer values) with rows = each fish and columns = the site visits
   // array[54, 2] int movements; // a matrix that contains the possible transitions out of each state
   int nmovements; // an integer value containing the number of possible transitions (same as rows in movements data)
@@ -132,10 +137,10 @@ data {
   int n_notmovements; // an integer value containing the number of non- possible transitions (same as rows in not_movements data)
   array[n_notmovements,2] int not_movements; // a matrix containing all non-allowed state transitions
   // array[n_ind, 48] int dates; // a matrix containing dates (as integers) where rows = number of fish and columns = site visits
-  matrix[29, 29] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
-  array[n_ind, 7] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin)
+  matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
+  array[n_ind, 8] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin and run year)
   
-  # new data for tributary detection efficiency
+  // new data for tributary detection efficiency
   
   
   // Declare data for parallelization (reduce sum function)
@@ -832,6 +837,10 @@ borigin5_matrix_9_37 ~ normal(0,10);
 borigin5_matrix_9_38 ~ normal(0,10);
 borigin5_matrix_40_39 ~ normal(0,10);
 borigin5_matrix_39_40 ~ normal(0,10);
+
+// Detection efficiency GLM
+// This is calculated 
+
 
 
 // PARALLELIZATION EDITS 

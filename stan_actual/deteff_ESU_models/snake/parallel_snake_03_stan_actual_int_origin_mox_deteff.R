@@ -427,7 +427,7 @@ for (i in 1:5){
   cat ("\n")
 }
 
-##### LOAD and REFORMAT DATA #####
+##### LOAD and REFORMAT STATES DATA #####
 
 # Load states complete
 # states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
@@ -503,6 +503,16 @@ for (i in 1:length(trapped_fish_indices)){
 }
 
 saveRDS(state_data, "snake_state_data.csv")
+
+##### Load and reformat tributary data for detection efficiency #####
+
+# Load tributary discharge data
+tributary_discharge_data <- read.csv("tributary_discharge_data.csv")
+
+# Get tributary categorical data (equipment eras)
+# this by run year
+# we will have multiple eras, then NAs for run years without an ability to calculate detection efficiency
+
 
 ##### Convert the dates into a numeric index #####
 # for now, comment this whole block out
@@ -667,12 +677,14 @@ n.ind <- dim(state_data)[3]
   
   
   # Create the design matrix for categorical variables
-  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 7)
+  # new for detection efficiency: add a run year field to allow for glm calculation
+  # of detection efficiency, as well as to note when certain movements are not possible
+  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 8)
   # Start it so that they're all 0s
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_actual[,1] <- 1
   
-  # This is for origin + rear
+  # This is for origin + rear + run year
   for (i in 1:n.ind){
     # Rear type
     if (fish_sim_cat_data_actual$rear_type[i] == 1){
@@ -736,7 +748,9 @@ n.ind <- dim(state_data)[3]
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual,
-               grainsize = 1, N = dim(state_data_2)[1])
+               grainsize = 1, N = dim(state_data_2)[1],
+               # New data for detection efficiency
+               trib_discharge = )
   
   
   print(Sys.time())
