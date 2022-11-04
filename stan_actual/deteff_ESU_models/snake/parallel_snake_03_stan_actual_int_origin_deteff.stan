@@ -35,9 +35,14 @@ functions{
                         array[,] real borigin4_matrix,
                         array[,] real borigin5_matrix,
                         // below is new data for detection efficiency
-                        // declare an array that you can store parameters calculated in 
-                        // detection efficiency stan script in
-                        array[,] real det_eff_param_matrix
+                        // declare an array that you can detection probabilities in, 
+                        // indexed by rows = run years, columns = tributaries.
+                        // We will calculate estimated detection probability
+                        // This matrix will contain the parameters (both alpha/intercept from era
+                        // and beta, for slope of discharge relationship)
+                        array[,] real det_eff_param_matrix;
+                        array[,] real discharge_matrix;
+                        
                         
                         
                         ) { # I don't think we need this either? Since we're just indexing it again with start and end
@@ -96,8 +101,19 @@ functions{
         
         // loss param
         logits[43] = 0;
-        // proper proportion vector
-        p_vec = softmax(logits);
+        // proper proportion vector, uncorrected for detection efficiency
+        p_vec_uncorrected = softmax(logits);
+        
+        // calculate detection efficiency (pseudocode)
+        eta = alpha + beta * discharge;
+        detection_prob = exp(eta)/(1 + exp(eta));
+        
+        
+        
+        
+        // now incorporate detection efficiency (pseudocode)
+        p_vec = p_vec_uncorrected[indexing] * detection_prob;
+        
             
         // print("p_vec: ", p_vec);
         // print("i = ",i);
