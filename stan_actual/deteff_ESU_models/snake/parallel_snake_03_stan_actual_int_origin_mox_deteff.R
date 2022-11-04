@@ -513,6 +513,63 @@ tributary_discharge_data <- read.csv("tributary_discharge_data.csv")
 # this by run year
 # we will have multiple eras, then NAs for run years without an ability to calculate detection efficiency
 
+# Create a design matrix for all tributary data
+# first columns = intercepts for eras
+# last columns = discharge values
+# rows = run years
+
+# first create the run year df
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_start <- seq(ymd_hms("2004-06-01 00:00:00"), ymd_hms("2022-06-01 00:00:00"), by = "years")
+run_year_end <- seq(ymd_hms("2005-05-31 23:59:59"), ymd_hms("2023-05-31 23:59:59"), by = "years")
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end)
+
+
+
+# initialize the matrix, with dimensions rows = run years, columns = N eras (for alphas) + N tributaries (for betas)
+# NOTE: for the Imnaha and for Fifteenmile Creek, we will not have a relationship with discharge. So we will only have an intercept, and put
+# in fake data (-999) for the discharge data in order to allow it to run.
+
+# Tributaries that we have no capability to estimate detection capability: Clearwater River, Grande Ronde River, Salmon River
+
+# Note that we are choosing the start run year depending on when in the year the site came online (e.g. 12/2011 would be
+# 11/12 start year). If it's active in the spring of that run year then we accept it
+
+# Here's how many eras we have (do it alphabetically)
+# Asotin Creek 1: 11/12 - 17/18
+# Asotin Creek 2: 18/19 - 21/22
+# Deschutes River 1: 13/14 - 18/19
+# Entiat River 1: 07/08 - 21/22
+# Fifteenmile Creek: 11/12 - 18/19; river mouth site still active after this point but no upstream sites
+# Hood River 1: 12/13 - 21/22
+# Imnaha River 1: 10/11 - 21/22
+# John Day River 1: 12/13 - 21/22
+# Methow River 1: 09/10 - 16/17
+# Methow River 2: 17/18 - 21/22
+# Okanogan River 1: 13/14 - 21/22
+# Tucannon River 1: 10/11 - 19/20
+# Tucannon River 2: 20/21 - 21/22
+# Umatilla River 1: 06/07 - 21/22; note though that there does seem to be a temporal trend in detection efficiency. Big jump up starting in 14/15 run year
+# Walla Walla River 1 (ORB): 05/06 - 14/15
+# Walla Walla River 2 (PRV): 12/13 - 18/19
+# Walla Walla River 3 (WWB): 19/20 - 21/22
+# We're going to have to deal with this overlap; since PRV is 1 RKM downstream (closer to mouth) of 
+# ORB, we can call ORB in years of overlap as an upstream site
+# Wenatchee River 1: 10/11 (starts January 2011) - 21/22
+# Yakima River 1: 04/05 - 21/22
+
+
+
+tributary_design_matrix <- matrix(nrow = )
+
+
+
+
+rownames(tributary_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
+
+
+
 
 ##### Convert the dates into a numeric index #####
 # for now, comment this whole block out
