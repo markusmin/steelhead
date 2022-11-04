@@ -223,6 +223,41 @@ fit <- mod$sample(
   init = 1
 )
 
+
+# Extract parameter estimates
+fit$save_object(file = "snake_detection_efficiency_stan_fit.rds")
+
+# Calculate detection probability from parameter estimates
+snake_deteff_stan_fit_summary <- fit$summary()
+
+# Get the parameters in a vector, then multiply by the matrix of discharges and calculate p for each run year/trib combination
+snake_deteff_param_est <- snake_deteff_stan_fit_summary$median[2:9]
+
+# Create the matrix of run year/era/tributry
+snake_run_year_trib_deteff <- matrix(nrow = length(seq(5,21,1)), ncol = 3)
+rownames(snake_run_year_trib_deteff) <- tuc_discharge$run_year
+colnames(snake_run_year_trib_deteff) <- c("Tucannon River", "Asotin Creek", "Imnaha River")
+
+# mini design matrix for tucannon
+# Ignore 22/23 run year, since we don't have full data for this year
+# nrow = 12, because this is the number of years we can calculate a detection efficiency for (i.e., we have a river mouth site)
+# ncol = 3; two for different alphas, one for beta
+tuc_design_matrix <- matrix(nrow = 12, ncol = 3)
+tuc_design_matrix[,1] <- c(rep(1, 10), rep(0, 2))
+tuc_design_matrix[,2] <- c(rep(0, 10), rep(1, 2))
+tuc_design_matrix[,3] <- tuc_discharge$mean_discharge_cfs[6:nrow(tuc_discharge)]
+# for ease of interpretation (and for sanity check), add run years:
+rownames(tuc_design_matrix) <- tuc_discharge$run_year[6:nrow(tuc_discharge)]
+
+# Get the linear predictor eta
+# design_matrix2 %*% as.matrix(snake_deteff_param_est, nrow = 8, ncol = 1) -> snake_eta_vec
+tuc_design_matrix %*% as.matrix(snake_deteff_param_est[c(1,2,6)], nrow = 8, ncol = 1) -> tuc_eta_vec
+
+# Get the estimated detection efficiency using inv logit
+snake_run_year_trib_deteff[6:nrow(snake_run_year_trib_deteff), 1] <- exp(tuc_eta_vec)/(1 + exp(tuc_eta_vec))
+
+
+
 # Now, get the Imnaha detection efficiency without any covariates
 subset(snake_deteff_data, is.na(mean_discharge_cfs) & tributary == "Imnaha") -> imn_nodischarge
 
