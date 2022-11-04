@@ -33,9 +33,11 @@ functions{
                         array[,] real borigin2_matrix,
                         array[,] real borigin3_matrix,
                         array[,] real borigin4_matrix,
-                        array[,] real borigin5_matrix
+                        array[,] real borigin5_matrix,
                         // below is new data for detection efficiency
-                        
+                        // declare an array that you can store parameters calculated in 
+                        // detection efficiency stan script in
+                        array[,] real det_eff_param_matrix
                         
                         
                         ) { # I don't think we need this either? Since we're just indexing it again with start and end
@@ -350,58 +352,58 @@ real borigin5_matrix_39_40;
 
 transformed parameters {
   // Declare a matrix to store b0 params
-  // matrix[29,29] b0_matrix;
-  array[29,29] real b0_matrix;
+  // matrix[43,43] b0_matrix;
+  array[43,43] real b0_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
-  // b0_matrix = rep_matrix(-100000, 29, 29);
-  b0_matrix = rep_array(-100000, 29, 29);
+  // b0_matrix = rep_matrix(-100000, 43, 43);
+  b0_matrix = rep_array(-100000, 43, 43);
   
   // Declare a matrix to store borigin1 params
-  // matrix[29,29] borigin1_matrix;
-  array[29,29] real borigin1_matrix;
+  // matrix[43,43] borigin1_matrix;
+  array[43,43] real borigin1_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
   // Non-zero elements will be overwritten
-  // borigin1_matrix = rep_matrix(-100000, 29, 29);
-  // borigin1_matrix = rep_matrix(0, 29, 29);
-  borigin1_matrix = rep_array(0, 29, 29);
+  // borigin1_matrix = rep_matrix(-100000, 43, 43);
+  // borigin1_matrix = rep_matrix(0, 43, 43);
+  borigin1_matrix = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin2 params
-  // matrix[29,29] borigin2_matrix;
-  array[29,29] real borigin2_matrix;
+  // matrix[43,43] borigin2_matrix;
+  array[43,43] real borigin2_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
-  // borigin2_matrix = rep_matrix(-100000, 29, 29);
-  // borigin2_matrix = rep_matrix(0, 29, 29);
-  borigin2_matrix = rep_array(0, 29, 29);
+  // borigin2_matrix = rep_matrix(-100000, 43, 43);
+  // borigin2_matrix = rep_matrix(0, 43, 43);
+  borigin2_matrix = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin3 params
-  // matrix[29,29] borigin3_matrix;
-  array[29,29] real borigin3_matrix;
+  // matrix[43,43] borigin3_matrix;
+  array[43,43] real borigin3_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
-  // borigin3_matrix = rep_matrix(-100000, 29, 29);
-  // borigin3_matrix = rep_matrix(0, 29, 29);
-  borigin3_matrix = rep_array(0, 29, 29);
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin3_matrix = rep_matrix(0, 43, 43);
+  borigin3_matrix = rep_array(0, 43, 43);
   
     // Declare a matrix to store borigin4 params
-  // matrix[29,29] borigin4_matrix;
-  array[29,29] real borigin4_matrix;
+  // matrix[43,43] borigin4_matrix;
+  array[43,43] real borigin4_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
-  // borigin3_matrix = rep_matrix(-100000, 29, 29);
-  // borigin4_matrix = rep_matrix(0, 29, 29);
-  borigin4_matrix = rep_array(0, 29, 29);
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin4_matrix = rep_matrix(0, 43, 43);
+  borigin4_matrix = rep_array(0, 43, 43);
   
     // Declare a matrix to store borigin5 params
-  // matrix[29,29] borigin5_matrix;
-  array[29,29] real borigin5_matrix;
+  // matrix[43,43] borigin5_matrix;
+  array[43,43] real borigin5_matrix;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
-  // borigin3_matrix = rep_matrix(-100000, 29, 29);
-  // borigin5_matrix = rep_matrix(0, 29, 29);
-  borigin5_matrix = rep_array(0, 29, 29);
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin5_matrix = rep_matrix(0, 43, 43);
+  borigin5_matrix = rep_array(0, 43, 43);
   
   
   // Populate this matrix with betas
@@ -599,22 +601,22 @@ borigin5_matrix[40,39] = borigin5_matrix_40_39;
 borigin5_matrix[39,40] = borigin5_matrix_39_40;
 
 #### Calculate movement probabilities as derived parameters
-matrix[29,29] origin1_probs;
-origin1_probs = rep_matrix(0, 29, 29);
-matrix[29,29] origin2_probs;
-origin2_probs = rep_matrix(0, 29, 29);
-matrix[29,29] origin3_probs;
-origin3_probs = rep_matrix(0, 29, 29);
-matrix[29,29] origin4_probs;
-origin4_probs = rep_matrix(0, 29, 29);
-matrix[29,29] origin5_probs;
-origin5_probs = rep_matrix(0, 29, 29);
-matrix[29,29] origin6_probs;
-origin6_probs = rep_matrix(0, 29, 29);
+matrix[43,43] origin1_probs;
+origin1_probs = rep_matrix(0, 43, 43);
+matrix[43,43] origin2_probs;
+origin2_probs = rep_matrix(0, 43, 43);
+matrix[43,43] origin3_probs;
+origin3_probs = rep_matrix(0, 43, 43);
+matrix[43,43] origin4_probs;
+origin4_probs = rep_matrix(0, 43, 43);
+matrix[43,43] origin5_probs;
+origin5_probs = rep_matrix(0, 43, 43);
+matrix[43,43] origin6_probs;
+origin6_probs = rep_matrix(0, 43, 43);
 
   # for each of the non-loss states:
-for (i in 1:28){
-  for (j in 1:28){
+for (i in 1:42){
+  for (j in 1:42){
     origin1_probs[i,j] = exp(b0_matrix[i,j]+ borigin1_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin1_matrix[i,]))));
     origin2_probs[i,j] = exp(b0_matrix[i,j]+ borigin2_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin2_matrix[i,]))));
     origin3_probs[i,j] = exp(b0_matrix[i,j]+ borigin3_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin3_matrix[i,]))));
@@ -627,13 +629,13 @@ for (i in 1:28){
 }
 
 # calculate loss states
-for (i in 1:28){
-  origin1_probs[i,29] = 1 - sum(origin1_probs[i,1:28]);
-  origin2_probs[i,29] = 1 - sum(origin2_probs[i,1:28]);
-  origin3_probs[i,29] = 1 - sum(origin3_probs[i,1:28]);
-  origin4_probs[i,29] = 1 - sum(origin4_probs[i,1:28]);
-  origin5_probs[i,29] = 1 - sum(origin5_probs[i,1:28]);
-  origin6_probs[i,29] = 1 - sum(origin6_probs[i,1:28]);
+for (i in 1:42){
+  origin1_probs[i,43] = 1 - sum(origin1_probs[i,1:42]);
+  origin2_probs[i,43] = 1 - sum(origin2_probs[i,1:42]);
+  origin3_probs[i,43] = 1 - sum(origin3_probs[i,1:42]);
+  origin4_probs[i,43] = 1 - sum(origin4_probs[i,1:42]);
+  origin5_probs[i,43] = 1 - sum(origin5_probs[i,1:42]);
+  origin6_probs[i,43] = 1 - sum(origin6_probs[i,1:42]);
   
 }
 
