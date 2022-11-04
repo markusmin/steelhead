@@ -183,13 +183,23 @@ for (i in 1:nrow(snake_deteff_data)){
   }
 }
 
+# Remove all rows from design that have missing data (is there a way around this 
+# in the future to still estimate an intercept but no slope?)
+na.omit(design_matrix) -> design_matrix2
 
 
 ##### Fit stan model #####
 
+# step 0: data in a list #
+data <- list(N = nrow(design_matrix2),
+             y = subset(snake_deteff_data, !(is.na(mean_discharge_cfs)))$detected,
+             J = 5,
+             K = 3,
+             X = design_matrix2)
+
 # Step 1: load the model
 # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
-mod <- cmdstan_model("parallel_snake_02_stan_actual_int_origin.stan", compile = FALSE)
+mod <- cmdstan_model("snake_detection_efficiency.stan", compile = FALSE)
 
 # Step 2: Compile the model, set up to run in parallel
 mod$compile(cpp_options = list(stan_threads = TRUE))
@@ -200,15 +210,38 @@ fit <- mod$sample(
   # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
   # seed = 456,
   # chains = 3, 
-  chains = 1,
-  parallel_chains = 1,
+  chains = 3,
+  # parallel_chains = 1,
   # parallel_chains = 3,
   refresh = 10, # print update every iter
   # iter_sampling = 1000,
   # iter_warmup = 1000,
-  iter_warmup = 200,
-  iter_sampling = 200,
-  threads_per_chain = 28,
+  iter_warmup = 1000,
+  iter_sampling = 1000,
+  # threads_per_chain = 28,
+  threads_per_chain = 1,
   init = 1
 )
+
+# Now, get the Imnaha detection efficiency without any covariates
+subset(snake_deteff_data, is.na(mean_discharge_cfs) & tributary == "Imnaha") -> imn_nodischarge
+
+# Get p, plus 90% CI
+imn_nodisp <- sum(imn_nodischarge$detected)/nrow(imn_nodischarge)
+
+alpha = 0.10 # 90% confidence interval
+nd = sum(imn_nodischarge$detected)
+n = nrow(imn_nodischarge)
+
+## Define functions for upper and lower limits
+## for a 90 % confidence interval.
+fl = function(p){pbinom(nd-1,n,p) - (1-alpha/2)}
+fu = function(p){pbinom(nd,n,p) - alpha/2}
+# all in one line:
+lower = uniroot(function(p){pbinom(nd-1,n,p) - (1-alpha/2)}, c(0.01, 0.99))$root
+upper = uniroot(function(p){pbinom(nd,n,p) - alpha/2}, c(0.01, 0.99))$root
+print(paste0("mean: ", round(imn_nodisp, 3), "; q5: ", round(lower, 3), "; q95: ", round(upper, 3)))
+
+
+
 
