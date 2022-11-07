@@ -1294,6 +1294,8 @@ plot_arrival_timing(tributary_name = "Imnaha River", river_mouth_site = "IR1 - L
 What happened in 2016??? There's nothing in the logs, but perhaps it's a river stage issue?
 
 ### USGS data
+**PLEASE NOTE: The run year 13/14 needs to be removed from this analysis, since it's not a complete year of discharge data**
+
 Station: Imnaha River at Imnaha, OR
 USGS 13292000
 - Site went offline 2013-10-22
