@@ -40,8 +40,22 @@ functions{
                         // We will calculate estimated detection probability
                         // This matrix will contain the parameters (both alpha/intercept from era
                         // and beta, for slope of discharge relationship)
-                        array[,] real det_eff_param_matrix;
-                        array[,] real discharge_matrix;
+                        // array[,] real det_eff_param_matrix;
+                        // array[,] real discharge_matrix;
+                        
+                        // different approach - include it directly in the model
+                        // need to declare an array with dimensions (number of tributaries for which we can estimate detection efficiency) x 
+                        // (number of run years) x (number of detection efficiency parameters)
+                        // this is in effect an array of design matrices
+                        array[,,] real tributary_design_matrices_array,
+                        
+                        // declare a vector for the parameters for the detection efficiency glm
+                        vector detection_efficiency_parameters,
+                        
+                        // declare a vector to store the run years of fish
+                        vector fish_run_years,
+                        
+                        
                         
                         
                         
@@ -70,13 +84,6 @@ functions{
         // vector for logits
         vector[43] logits;
         
-        // derived proportions
-        // simplex[29] p_vec;
-        // So it looks like you're not allowed to use a simplex as a local variable. That's annoying.
-        vector[43] p_vec;
-        
-
-        
         // Get the index of the current state
         int current;
         current = states_mat[i,j];
@@ -101,18 +108,83 @@ functions{
         
         // loss param
         logits[43] = 0;
+        
+        // Now, we need an if/else statement: If it's in a tributary, correct for detection efficiency, otherwise leave it alone
+        
+        // if it is in a state that connects to at tributary for which we can estimate detection efficiency:
+        if (current %in% mainstem_trib_states){
+          // declare vector to store movement probabilities
+          vector[43] p_vec;
+          
+          // declare vector to store uncorrected for detection efficiency movement probabilities
+          vector[43] p_vec_uncorrected;
+          
+          
         // proper proportion vector, uncorrected for detection efficiency
         p_vec_uncorrected = softmax(logits);
         
         // calculate detection efficiency (pseudocode)
-        eta = alpha + beta * discharge;
-        detection_prob = exp(eta)/(1 + exp(eta));
+        
+        // first: we need to determine how many different detection probabilities we need to estimate, and the loop through them
+        // declare an integer for the length of the for loop
+        int n_deteffs;
+        n_deteffs = n_detection_efficiencies[current];
+        
+        // now declare a vector with that length to store the detection probability values
+        vector[n_deteffs] detection_efficiencies;
+        
+        // loop through all of the detection efficiencies that you need to calculate
+        for (l in 1:n_deteffs){
+          // step 1: select the appropriate tributary design matrix
+          // declare an integer to store the index of the state
+          int trib_index;
+          // figure out the state of the index
+          trib_index = mainstem_trib_connections[[which(current == mainstem_trib_states)]][l];
+        
+          // pull the appropriate design matrix out
+          // tributary_design_matrices_array[trib_index,,];
+        
+          // step 2: select the correct run year from the tributary design matrix
+          int fish_run_year_index;
+          fish_run_year_index = fish_run_years[i];
+        
+          // step 3: Multiply this row of the tributary design matrix by the parameter vector to get eta, the linear predictor
+          real eta;
+          eta = tributary_design_matrices_array[trib_index,fish_run_year_index,] * det_eff_params;
+          
+        
+          // step 4: get the estimated detection probability using the inverse logit
+          detection_efficiencies[l] = exp(eta)/(1 + exp(eta));
+        }
+        
+        // now, store all of the detection efficiencies in the appropriate places in all of the transition probabilities
+        
+        vector[42] correction_factors;
+        
         
         
         
         
         // now incorporate detection efficiency (pseudocode)
-        p_vec = p_vec_uncorrected[indexing] * detection_prob;
+        for (m in 1:(n_states-1)){
+          p_vec[m] = p_vec_uncorrected[m] * detection_efficiencies[m];
+          
+        }
+        
+          // if it's not, just calculate as normal
+        } else{
+          
+          // declare vector to store movement probabilities
+          vector[43] p_vec;
+          
+          // populate that vector from logits
+          p_vec = softmax(logits);
+          
+          
+        }
+        
+        
+
         
             
         // print("p_vec: ", p_vec);
@@ -159,7 +231,7 @@ data {
   array[n_ind, 8] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin and run year)
   
   // new data for tributary detection efficiency
-  
+  array[7] vector[5] mainstem_trib_connections;
   
   // Declare data for parallelization (reduce sum function)
   int<lower=0> N;
@@ -420,6 +492,10 @@ transformed parameters {
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin5_matrix = rep_matrix(0, 43, 43);
   borigin5_matrix = rep_array(0, 43, 43);
+  
+  // Finally, declare the parameter vector for the detection probability calculation
+  det_eff_params = vector[34];
+  
   
   
   // Populate this matrix with betas

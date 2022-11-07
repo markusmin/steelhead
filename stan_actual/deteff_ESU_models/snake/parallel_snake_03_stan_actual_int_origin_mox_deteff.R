@@ -518,6 +518,13 @@ tributary_discharge_data <- read.csv("tributary_discharge_data.csv")
 # last columns = discharge values
 # rows = run years
 
+# This creates the master file; we then subset it to make a design matrix for each tributary, where we replace every value except
+# the relevant columns with zeros. We will then store this in one big array; each slice of the array will be one tributary,
+# then rows will be run years, and columns will be the design matrix for the parameters.
+# Then, in the actual model code, we will use the tributary a fish was detected in to select a slice of the array;
+# then that slice (which is the design matrix for that tributary) will then be indexed by the run year to get a row vector.
+# The row vector will be multiplied by the full parameter vector (all alphas and betas) to get the eta (linear predictor) for the detection efficiency GLM
+
 # first create the run year df
 run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
 run_year_start <- seq(ymd_hms("2004-06-01 00:00:00"), ymd_hms("2022-06-01 00:00:00"), by = "years")
@@ -529,7 +536,7 @@ run_year_df <- data.frame(run_year, run_year_start, run_year_end)
 
 # initialize the matrix, with dimensions rows = run years, columns = N eras (for alphas) + N tributaries (for betas)
 # NOTE: for the Imnaha and for Fifteenmile Creek, we will not have a relationship with discharge. So we will only have an intercept, and put
-# in fake data (-999) for the discharge data in order to allow it to run.
+# in fake data (all zeros, so that the slope term doesn't matter) for the discharge data in order to allow it to run.
 
 # Tributaries that we have no capability to estimate detection capability: Clearwater River, Grande Ronde River, Salmon River
 
@@ -550,25 +557,245 @@ run_year_df <- data.frame(run_year, run_year_start, run_year_end)
 # Okanogan River 1: 13/14 - 21/22
 # Tucannon River 1: 10/11 - 19/20
 # Tucannon River 2: 20/21 - 21/22
-# Umatilla River 1: 06/07 - 21/22; note though that there does seem to be a temporal trend in detection efficiency. Big jump up starting in 14/15 run year
+# Umatilla River 1: 06/07 - 13/14
+# Umatilla River 2: 14/15 - 21/22 (see email from Stacy Remple for info on this - not in tributary detection efficiency RMD)
 # Walla Walla River 1 (ORB): 05/06 - 14/15
 # Walla Walla River 2 (PRV): 12/13 - 18/19
 # Walla Walla River 3 (WWB): 19/20 - 21/22
-# We're going to have to deal with this overlap; since PRV is 1 RKM downstream (closer to mouth) of 
+# We're going to have to deal with this overlap in the Walla Walla; since PRV is 1 RKM downstream (closer to mouth) of 
 # ORB, we can call ORB in years of overlap as an upstream site
 # Wenatchee River 1: 10/11 (starts January 2011) - 21/22
 # Yakima River 1: 04/05 - 21/22
 
+# Total eras: 20
+# Total tribs: 14 (17 total - Clearwater, Grande Ronde, and Salmon)
+
+# So the first 20 columns are the era/intercept terms, then the next 14 are the slope terms for discharge
+
+# We then have 18 run years (04/05 through 21/22)
+
+# Our parameter vector will also be a column vector of length 34
+
+tributary_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+
+# This is to make it easier to tell indexing
+rownames(tributary_design_matrix) <- paste0(run_year_df$run_year[1:(nrow(run_year_df)-1)], "-", seq(1,18,1))
+
+# Now let's populate it with 1s/discharge values
+
+# (1) Asotin Creek 1: 11/12 - 17/18
+tributary_design_matrix[8:14,1] <- 1
+
+# (2) Asotin Creek 2: 18/19 - 21/22
+tributary_design_matrix[15:18,2] <- 1
+
+# (3) Deschutes River 1: 13/14 - 18/19
+tributary_design_matrix[10:15,3] <- 1
+
+# (4) Entiat River 1: 07/08 - 21/22
+tributary_design_matrix[4:18,4] <- 1
+
+# (5) Fifteenmile Creek: 11/12 - 18/19; river mouth site still active after this point but no upstream sites
+tributary_design_matrix[8:15,5] <- 1
+
+# (6) Hood River 1: 12/13 - 21/22
+tributary_design_matrix[9:18,6] <- 1
+
+# (7) Imnaha River 1: 10/11 - 21/22
+tributary_design_matrix[7:18,7] <- 1
+
+# (8) John Day River 1: 12/13 - 21/22
+tributary_design_matrix[9:18,8] <- 1
+
+# (9) Methow River 1: 09/10 - 16/17
+tributary_design_matrix[6:13,9] <- 1
+
+# (10) Methow River 2: 17/18 - 21/22
+tributary_design_matrix[14:18,10] <- 1
+
+# (11) Okanogan River 1: 13/14 - 21/22
+tributary_design_matrix[10:18,11] <- 1
+
+# (12) Tucannon River 1: 10/11 - 19/20
+tributary_design_matrix[7:16,12] <- 1
+
+# (13) Tucannon River 2: 20/21 - 21/22
+tributary_design_matrix[17:18,13] <- 1
+
+# (14) Umatilla River 1: 06/07 - 13/14
+tributary_design_matrix[3:10,14] <- 1
+
+# (15) Umatilla River 2: 14/15 - 21/22 (see email from Stacy Remple for info on this - not in tributary detection efficiency RMD)
+tributary_design_matrix[11:18,15] <- 1
+
+# (16) Walla Walla River 1 (ORB): 05/06 - 11/12 (this site continues to 14/15, but in 12/13 the PRV site comes online which is closer to the river mouth and also seems to have better detection efficiency)
+tributary_design_matrix[2:8,16] <- 1
+
+# (17) Walla Walla River 2 (PRV): 12/13 - 18/19
+tributary_design_matrix[9:15,17] <- 1
+
+# (18) Walla Walla River 3 (WWB): 19/20 - 21/22
+tributary_design_matrix[16:18,18] <- 1
+
+# (19) Wenatchee River 1: 10/11 (starts January 2011) - 21/22
+tributary_design_matrix[7:18,19] <- 1
+
+# (20) Yakima River 1: 04/05 - 21/22
+tributary_design_matrix[1:18,20] <- 1
 
 
-tributary_design_matrix <- matrix(nrow = )
+# Now, add discharge values in the remaining columns
+tributary_design_matrix[2:18,21] <-subset(tributary_discharge_data, tributary == "Asotin Creek")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,22] <-subset(tributary_discharge_data, tributary == "Deschutes River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,23] <-subset(tributary_discharge_data, tributary == "Entiat River")$mean_discharge_cfs
+
+# tributary_design_matrix[2:18,24] <-subset(tributary_discharge_data, tributary == "Fifteenmile Creek")$mean_discharge_cfs
+# No discharge data for Fifteenmile Creek - keep as zeros
+
+tributary_design_matrix[2:18,25] <-subset(tributary_discharge_data, tributary == "Hood River")$mean_discharge_cfs
+
+# tributary_design_matrix[2:10,26] <-subset(tributary_discharge_data, tributary == "Imnaha River")$mean_discharge_cfs
+# Indexing is different for the Imnaha because we only have discharge data through 12/13 (13/14 data is not from the complete run year)
+# Keep Imnaha as all zeros - we only have one year (12/13) with overlap between discharge data and detection capability
+
+tributary_design_matrix[2:18,27] <-subset(tributary_discharge_data, tributary == "John Day River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,28] <-subset(tributary_discharge_data, tributary == "Methow River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,29] <-subset(tributary_discharge_data, tributary == "Okanogan River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,30] <-subset(tributary_discharge_data, tributary == "Tucannon River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,31] <-subset(tributary_discharge_data, tributary == "Umatilla River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,32] <-subset(tributary_discharge_data, tributary == "Walla Walla River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,33] <-subset(tributary_discharge_data, tributary == "Wenatchee River")$mean_discharge_cfs
+
+tributary_design_matrix[2:18,34] <-subset(tributary_discharge_data, tributary == "Yakima River")$mean_discharge_cfs
 
 
 
 
+# change row names just to run years
 rownames(tributary_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 
+# Remove the 04/05 run year
+tributary_design_matrix <- tributary_design_matrix[2:18,]
 
+# Take the master tributary design matrix, and create design matrices for each of the tributaries individually
+asotin_creek_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(asotin_creek_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+asotin_creek_design_matrix[,1] <- tributary_design_matrix[,1]
+asotin_creek_design_matrix[,2] <- tributary_design_matrix[,2]
+asotin_creek_design_matrix[,21] <- tributary_design_matrix[,21]
+
+deschutes_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(deschutes_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+deschutes_river_design_matrix[,3] <- tributary_design_matrix[,3]
+deschutes_river_design_matrix[,22] <- tributary_design_matrix[,22]
+
+entiat_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(entiat_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+entiat_river_design_matrix[,4] <- tributary_design_matrix[,4]
+entiat_river_design_matrix[,23] <- tributary_design_matrix[,23]
+
+fifteenmile_creek_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(fifteenmile_creek_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+fifteenmile_creek_design_matrix[,5] <- tributary_design_matrix[,5]
+fifteenmile_creek_design_matrix[,24] <- tributary_design_matrix[,24]
+
+hood_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(hood_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+hood_river_design_matrix[,6] <- tributary_design_matrix[,6]
+hood_river_design_matrix[,25] <- tributary_design_matrix[,25]
+
+imnaha_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(imnaha_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+imnaha_river_design_matrix[,7] <- tributary_design_matrix[,7]
+imnaha_river_design_matrix[,26] <- tributary_design_matrix[,26]
+
+john_day_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(john_day_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+john_day_river_design_matrix[,8] <- tributary_design_matrix[,8]
+john_day_river_design_matrix[,27] <- tributary_design_matrix[,27]
+
+methow_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(methow_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+methow_river_design_matrix[,9] <- tributary_design_matrix[,9]
+methow_river_design_matrix[,10] <- tributary_design_matrix[,10]
+methow_river_design_matrix[,28] <- tributary_design_matrix[,28]
+
+okanogan_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(okanogan_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+okanogan_river_design_matrix[,11] <- tributary_design_matrix[,11]
+okanogan_river_design_matrix[,29] <- tributary_design_matrix[,29]
+
+tucannon_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(tucannon_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+tucannon_river_design_matrix[,12] <- tributary_design_matrix[,12]
+tucannon_river_design_matrix[,13] <- tributary_design_matrix[,13]
+tucannon_river_design_matrix[,30] <- tributary_design_matrix[,30]
+
+umatilla_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(umatilla_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+umatilla_river_design_matrix[,14] <- tributary_design_matrix[,14]
+umatilla_river_design_matrix[,15] <- tributary_design_matrix[,15]
+umatilla_river_design_matrix[,31] <- tributary_design_matrix[,31]
+
+walla_walla_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(walla_walla_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+walla_walla_river_design_matrix[,16] <- tributary_design_matrix[,16]
+walla_walla_river_design_matrix[,17] <- tributary_design_matrix[,17]
+walla_walla_river_design_matrix[,18] <- tributary_design_matrix[,18]
+walla_walla_river_design_matrix[,32] <- tributary_design_matrix[,32]
+
+wenatchee_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(wenatchee_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+wenatchee_river_design_matrix[,19] <- tributary_design_matrix[,19]
+wenatchee_river_design_matrix[,33] <- tributary_design_matrix[,33]
+
+yakima_river_design_matrix <- matrix(0, nrow = 17, ncol = 34)
+rownames(yakima_river_design_matrix) <- run_year_df$run_year[2:(nrow(run_year_df)-1)]
+yakima_river_design_matrix[,20] <- tributary_design_matrix[,20]
+yakima_river_design_matrix[,34] <- tributary_design_matrix[,34]
+
+# Now take these matrices and store them in one big array
+tributary_design_matrices_array <- array(0, dim = c(14,17,34))
+
+# Asotin Creek
+tributary_design_matrices_array[1,,] <- asotin_creek_design_matrix
+tributary_design_matrices_array[2,,] <- deschutes_river_design_matrix
+tributary_design_matrices_array[3,,] <- entiat_river_design_matrix
+tributary_design_matrices_array[4,,] <- fifteenmile_creek_design_matrix
+tributary_design_matrices_array[5,,] <- hood_river_design_matrix
+tributary_design_matrices_array[6,,] <- imnaha_river_design_matrix
+tributary_design_matrices_array[7,,] <- john_day_river_design_matrix
+tributary_design_matrices_array[8,,] <- methow_river_design_matrix
+tributary_design_matrices_array[9,,] <- okanogan_river_design_matrix
+tributary_design_matrices_array[10,,] <- tucannon_river_design_matrix
+tributary_design_matrices_array[11,,] <- umatilla_river_design_matrix
+tributary_design_matrices_array[12,,] <- walla_walla_river_design_matrix
+tributary_design_matrices_array[13,,] <- wenatchee_river_design_matrix
+tributary_design_matrices_array[14,,] <- yakima_river_design_matrix
+
+# Create a vector for the order of these tributaries
+trib_det_eff_order <- c("Asotin_Creek", 
+"Deschutes_River", 
+"Entiat_River", 
+"Fifteenmile_Creek", 
+"Hood_River",
+"Imnaha_River",
+"John_Day_River", 
+"Methow_River", 
+"Okanogan_River", 
+"Tucannon_River", 
+"Umatilla_River",
+"Walla_Walla_River",
+"Wenatchee_River", 
+"Yakima_River")
 
 
 ##### Convert the dates into a numeric index #####
@@ -795,7 +1022,43 @@ n.ind <- dim(state_data)[3]
     
   }
     
-    
+  
+  # Get vector of run years of fish
+  # need the -1 correction for indices because we're ignoring the 04/05 run year
+  fish_run_years <- vector(length = n.ind)
+  
+  states_complete %>% 
+    distinct(tag_code_2, .keep_all = TRUE) %>% 
+    mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) %>% 
+    dplyr::select(tag_code_2, run_year) -> tag_code_2_run_years
+  
+  for (i in 1:n.ind){
+    fish_run_years[i] <- which(run_year_df$run_year == tag_code_2_run_years$run_year[i])-1
+  }
+  
+  # Get the state numbers that are mainstem states that connect to tributaries for which we can estimate detection efficiency
+  mainstem_trib_states <- c(2,3,5,6,7,8,9)
+  
+  # Now create a list of vectors of which tributaries connect to each of these
+  # To make 
+  mainstem_trib_connections <- list(c(2,4,5,7,11),
+                                    c(12,14,0,0,0),
+                                    c(13,0,0,0,0),
+                                    c(3,0,0,0,0),
+                                    c(9,8,0,0,0),
+                                    c(10,0,0,0,0),
+                                    c(1,6,0,0,0))
+  
+  # Now, figure out how many detection efficiencies you need to calculate for each mainstem stem
+  # make this the length of number of states for ease of indexing
+  n_detection_efficiencies <- rep(0, 43)
+  n_detection_efficiencies[2] <- 5
+  n_detection_efficiencies[3] <- 2
+  n_detection_efficiencies[5] <- 1
+  n_detection_efficiencies[6] <- 1
+  n_detection_efficiencies[7] <- 2
+  n_detection_efficiencies[8] <- 1
+  n_detection_efficiencies[9] <- 2
   
   ##### Run stan model #####
   
@@ -807,7 +1070,10 @@ n.ind <- dim(state_data)[3]
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual,
                grainsize = 1, N = dim(state_data_2)[1],
                # New data for detection efficiency
-               trib_discharge = )
+               tributary_design_matrices_array = tributary_design_matrices_array,
+               fish_run_years = fish_run_years,
+               mainstem_trib_states = mainstem_trib_states,
+               n_detection_efficiencies = n_detection_efficiencies)
   
   
   print(Sys.time())
