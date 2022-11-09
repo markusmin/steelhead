@@ -427,6 +427,12 @@ b0_matrix_names %>%
   mutate(within_trib_movement = ifelse(row %in% upstream_indices & col %in% river_mouth_indices |
                                        col %in% upstream_indices & row %in% river_mouth_indices, 1, 0)) -> b0_matrix_names
 
+b0_matrix_names %>% 
+  mutate(upstream_mainstem_movement = ifelse(row %in% upstream_indices & col %in% mainstem_indices, 1, 0)) -> b0_matrix_names
+
+b0_matrix_names %>% 
+  mutate(river_mouth_mainstem_movement = ifelse(row %in% river_mouth_indices & col %in% mainstem_indices, 1, 0)) -> b0_matrix_names
+
 
 movements_df %>% 
   mutate(mainstem_upstream_movement = ifelse(row %in% mainstem_indices & col %in% upstream_indices, 1, 0)) -> movements_df
@@ -437,6 +443,12 @@ movements_df %>%
 movements_df %>% 
   mutate(within_trib_movement = ifelse(row %in% upstream_indices & col %in% river_mouth_indices |
                                          col %in% upstream_indices & row %in% river_mouth_indices, 1, 0)) -> movements_df
+
+movements_df %>% 
+  mutate(upstream_mainstem_movement = ifelse(row %in% upstream_indices & col %in% mainstem_indices, 1, 0)) -> movements_df
+
+movements_df %>% 
+  mutate(river_mouth_mainstem_movement = ifelse(row %in% river_mouth_indices & col %in% mainstem_indices, 1, 0)) -> movements_df
 
 # snake_movements <- subset(movements_df, row %in% c(8,9,21,22,23,24,25,26) |
 #                                      col %in% c(8,9,21,22,23,24,25,26))
@@ -471,6 +483,13 @@ for (i in 1:(nrow(b0_matrix_names))){
   # If it's a movement from mainstem to upstream - we also don't want it
   else if (b0_matrix_names$mainstem_upstream_movement[i] == 1){
     # do nothing!
+  }
+  
+  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
+  # these transitions will get the same parameters as the river mouth to mainstem
+  else if (b0_matrix_names$upstream_mainstem_movement[i] == 1){
+    # do nothing!
   } else {
   # Finally - if it's any other movement, just treat it like normal!
   # If it's not, print just the one version
@@ -498,6 +517,12 @@ for (i in 1:5){
     # If it's a movement from mainstem to upstream - we also don't want it
     else if (snake_movements$mainstem_upstream_movement[j] == 1){
       # do nothing!
+    } 
+    # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+    # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
+    # these transitions will get the same parameters as the river mouth to mainstem
+    else if (snake_movements$upstream_mainstem_movement[j] == 1){
+      # do nothing!
     } else {
       # Finally - if it's any other movement, just treat it like normal!
       # If it's not, print just the one version
@@ -513,69 +538,144 @@ for (i in 1:5){
 
 # Write out two separate matrices - an NDE (no detection efficiency correction) and a DE (detection efficiency) matrix
 for (i in 1:(nrow(b0_matrix_names))){
-  # Paste the numerator
-  # cat("b0_matrix[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
-  # If it is a tributary movement, store different versions of it (DE and NDE) in the two matrices
-  if (b0_matrix_names$mainstem_trib_movement[i] == 1){
-    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], "_DE",";", "\n", sep = "")
-    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], "_NDE",";", "\n", sep = "")
+  # Movements from mainstem to river mouth: store the two different versions
+  if (b0_matrix_names$mainstem_river_mouth_movement[i] == 1){
+      cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], "_DE",";", "\n", sep = "")
+      cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], "_NDE",";", "\n", sep = "")
     
-    # If it's not, store the same parameter in both matrices
+  }
+  
+  # If it's a within tributary movement - we don't want it
+  else if (b0_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream:
+  # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
+  # For DE - we don't care about this, because we're removing the upstream states
+  else if (b0_matrix_names$mainstem_upstream_movement[i] == 1){
+    # cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_DE",";", "\n", sep = "")
+    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+  }
+  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream (for both DE and NDE)
+  else if (b0_matrix_names$upstream_mainstem_movement[i] == 1){
+    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_DE",";", "\n", sep = "")
+    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+  # If it's not, store the same parameter in both matrices
   } else {
     cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], ";", "\n", sep = "")
     cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], ";", "\n", sep = "")
   }
-  
-}
+    
+} 
 
 # There are six origins, so five parameters for origin
 for (i in 1:5){
   for (j in 1:nrow(snake_movements)){
-    
-    # Store two versions in different matrices
-    # If it is a tributary movement, store different versions of it (DE and NDE) in the two matrices
-    if (snake_movements$mainstem_trib_movement[j] == 1){
+    # Movements from mainstem to river mouth: store the two different versions
+    if (snake_movements$mainstem_river_mouth_movement[j] == 1){
       cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_DE", ";", "\n", sep = "")
       cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_NDE", ";", "\n", sep = "")
-      # If it's not, store the same parameter in both matrices
-    } else {
-      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], ";", "\n", sep = "")
-      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], ";", "\n", sep = "")
+      
     }
     
+    # If it's a within tributary movement - we don't want it
+    else if (snake_movements$within_trib_movement[j] == 1){
+      # do nothing!
+    }
+    # If it's a movement from mainstem to upstream:
+    # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
+    # For DE - we don't care about this, because we're removing the upstream states
+    else if (snake_movements$mainstem_upstream_movement[j] == 1){
+      # cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_DE", ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_NDE", ";", "\n", sep = "")
+      
+    }
+    # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream (for both DE and NDE)
+    else if (snake_movements$upstream_mainstem_movement[j] == 1){
+      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_DE", ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_NDE", ";", "\n", sep = "")
+      # If it's not, store the same parameter in both matrices
+    } else {
+      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_DE", ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_NDE", ";", "\n", sep = "")
+    }
     
   }
+  
   cat ("\n")
 }
+  
+
 
 # write out the priors
 # print b0 matrix priors
 for (i in 1:(nrow(b0_matrix_names))){
   
-  # If it is a tributary movement, print two versions of it (DE and NDE)
-  if (b0_matrix_names$mainstem_trib_movement[i] == 1){
+  # Paste the numerator
+  
+  # If it is a movement from the mainstem into the river mouth state, then it gets two versions of the parameter.
+  # If it's not, then it just gets one.
+  # If its a movement from the upstream to the river mouth state or vice versa, it doesn't get a parameter at all - 
+  # we don't care about these movements.
+  
+  # Movements from mainstem to river mouth: print two versions
+  if (b0_matrix_names$mainstem_river_mouth_movement[i] == 1){
     cat(b0_matrix_names$b0_matrix_name[i], "_DE", " ~ normal(0,10);", "\n", sep = "")
     cat(b0_matrix_names$b0_matrix_name[i], "_NDE", " ~ normal(0,10);", "\n", sep = "")
-    
-    # If it's not, print just the one version
+  }
+  
+  # If it's a within tributary movement - we don't want it (no prior)
+  else if (b0_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream - we also don't want it (no prior)
+  else if (b0_matrix_names$mainstem_upstream_movement[i] == 1){
+    # do nothing!
+  }
+  
+  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter (so no prior).
+  # these transitions will get the same parameters as the river mouth to mainstem
+  else if (b0_matrix_names$upstream_mainstem_movement[i] == 1){
+    # do nothing!
   } else {
+    # Finally - if it's any other movement, just treat it like normal!
+    # If it's not, print just the one version
     cat(b0_matrix_names$b0_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
   }
+  
 
 }
 
 # There are six origins in this model, so we will have five origin parameters.
 for (i in 1:5){
   for (j in 1:nrow(snake_movements)){
-    # If it is a tributary movement, store different versions of it (DE and NDE) in the two matrices
-    if (snake_movements$mainstem_trib_movement[j] == 1){
+    
+    # Movements from mainstem to river mouth: print two versions
+    if (snake_movements$mainstem_river_mouth_movement[j] == 1){
       cat("borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
       cat("borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
-      # If it's not, just one parameter with a prior
+    }
+    
+    # If it's a within tributary movement - we don't want it
+    else if (snake_movements$within_trib_movement[j] == 1){
+      # do nothing!
+    }
+    # If it's a movement from mainstem to upstream - we also don't want it
+    else if (snake_movements$mainstem_upstream_movement[j] == 1){
+      # do nothing!
+    } 
+    # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+    # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
+    # these transitions will get the same parameters as the river mouth to mainstem
+    else if (snake_movements$upstream_mainstem_movement[j] == 1){
+      # do nothing!
     } else {
+      # Finally - if it's any other movement, just treat it like normal!
+      # If it's not, print just the one version
       cat("borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], " ~ normal(0,10);", "\n", sep = "")
     }
-  
+    
   }
   cat ("\n")
 }
@@ -1212,6 +1312,75 @@ n.ind <- dim(state_data)[3]
   n_detection_efficiencies[7] <- 2
   n_detection_efficiencies[8] <- 1
   n_detection_efficiencies[9] <- 2
+  
+  ##### Create the run year/detection efficiency array #####
+  # we need an array that we can index - current (from, rows) x k (to, columns) x run years (slices) - and the values
+  # indicate which of the two matrices to use
+  # 0 means no detection efficiency correction; 1 means use detection efficiency matrix to pull parameter value from
+  # 18 run years: 04/05 through 21/22 (this is the same ad the detection efficiency GLM indexing)
+  
+  # Also note - we only need to see transitions from mainstem to river mouth
+  run_year_DE_array <- array(0, dim = c(nstates, nstates, 18))
+  
+  # figure out what the indices are of the various tributaries with detection efficiency estimation capability
+  print(paste0(seq(1,43,1), " - ", model_states))
+  
+  # Asotin Creek
+  # From Upstream LGR (9) to mouth (34) or upstream (35)
+  run_year_DE_array[9,34,8:18] <- 1
+  
+  # Deschutes River
+  # From mainstem BON to MCN (2) to mouth (10) or upstream (11)
+  run_year_DE_array[2,10,10:15] <- 1
+  
+  # Entiat River
+  # From RRE to WEL (6) to mouth (26) or upstream (27)
+  run_year_DE_array[6,26,4:18] <- 1
+  
+  # Fifteenmile Creek
+  # From BON to MCN (2) to mouth (16) or upstream (17)
+  # Note here that in years 16:18, we no longer have upstream sites, but still have a river mouth site
+  run_year_DE_array[2,16,8:18] <- 1
+  
+  # Hood River
+  # From BON to MCN (2) to mouth (14) or upstream (15)
+  run_year_DE_array[2,14,9:18] <- 1
+  
+  # Imnaha River
+  # From Upstream LGR (9) to mouth (39) or upstream (40)
+  run_year_DE_array[9,39,7:18] <- 1
+  
+  # John Day River
+  # From BON to MCN (2) to mouth (12) or upstream (13)
+  run_year_DE_array[2,12,9:18] <- 1
+  
+  # Methow River
+  # From Upstream WEL (7) to mouth (30) or upstream (31)
+  run_year_DE_array[7,30,6:18] <- 1
+  
+  # Okanogan River
+  # From Upstream WEL (7) to mouth (28) or upstream (29)
+  run_year_DE_array[7,28,10:18] <- 1
+  
+  # Tucannon River
+  # From ICH to LGR (8) to mouth (32) or upstream (33)
+  run_year_DE_array[8,32,7:18] <- 1
+  
+  # Umatilla River
+  # From BON to MCN (2) to mouth (18) or upstream (19)
+  run_year_DE_array[2,18,3:18] <- 1
+  
+  # Walla Walla River
+  # From MCN to ICH or PRA (3) to mouth (22) or upstream (23)
+  run_year_DE_array[3,22,2:18] <- 1
+  
+  # Wenatchee River
+  # From RIS to RRE (5) to mouth (24) or upstream (25)
+  run_year_DE_array[5,24,7:18] <- 1
+  
+  # Yakima River
+  # From MCN to ICH or PRA (3) to mouth (20) or upstream (21)
+  run_year_DE_array[3,20,1:18] <- 1
   
   ##### Run stan model #####
   
