@@ -64,8 +64,8 @@ functions{
                         // declare a vector for the parameters for the detection efficiency glm
                         vector detection_efficiency_parameters,
                         
-                        // declare a vector to store the run years of fish
-                        vector fish_run_years,
+                        // declare a vector to store the run year that each transition occurs in
+                        vector transition_run_years,
                         
                         
                         
@@ -80,6 +80,7 @@ functions{
     
     // start - end apparently doesn't work because reduce_sum() resets the indices for each slice (confusing) - according to this post: https://discourse.mc-stan.org/t/parallelization-in-cmdstanr-using-reduce-sum-on-a-multinomial-likelihood/24607/7
   // or maybe not, this post seems to contradict this: https://discourse.mc-stan.org/t/help-with-multi-threading-a-simple-ordinal-probit-model-using-reduce-sum/15353
+  // i is the number of fish
   for (i in start:end){
     // for (i in 1:end-start+1){
     // Loop through each of the observations, stopping at the loss column
@@ -90,6 +91,7 @@ functions{
     // vector[n_obs[i]] lp_fish;
     // Let's initialize this instead as a real value starting at zero
     real lp_fish = 0;
+    // j is the index of the observation (i.e., each individual state transition)
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
 
@@ -101,6 +103,8 @@ functions{
         current = states_mat[i,j];
         // current = states_mat[i - start + 1,j];
         
+        // here: create a vector with the length of the states, where we will store whether or not they are affected by DE
+        vector[42] DE_correction;
 
         // Populate each of the first 42 (non-loss)
         for (k in 1:42){
@@ -110,42 +114,110 @@ functions{
           // we need an array that we can index - current (from, rows) x k (to, columns) x run years (slices) - and the values
           // indicate which of the two matrices to use
           
-          // START HERE: array is created, now just index to it!
+          // what we'll do:
+          // create a vector (or array?). Every time we need to select from the DE matrix, note
+          // which transition this is. Then, once we're done, we can then index to those and do
+          // the correction, where we multiply by a p, and then subtract that from the loss category
+          
+          // If we are in a run year in a state transition where we are estimating DE, use that matrix;
+          // for indexing by run year - some up all n_obs prior to this fish, plus whatever index we're on for the current fish
+          // need to make an exception for the first fish, which uses only the index j
+          if (i == 1){
+                      if (run_year_DE_array[current,k,transition_run_years[j]] == 1){
+                      logits[k] = b0_matrix_DE[current, k]+ 
+                      // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
+                      cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
+                      cat_X_mat[i,4] * borigin2_matrix_DE[current,k] +
+                      cat_X_mat[i,5] * borigin3_matrix_DE[current,k] +
+                      cat_X_mat[i,6] * borigin4_matrix_DE[current,k] +
+                      cat_X_mat[i,7] * borigin5_matrix_DE[current,k];
+                      
+                      // store in the vector that it's DE
+                      DE_correction[k] = 1
+                      
+                      // Else, use the NDE matrix
+                      } else {
+                      logits[k] = b0_matrix_NDE[current, k]+ 
+                      // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
+                      cat_X_mat[i,3] * borigin1_matrix_NDE[current,k] +
+                      cat_X_mat[i,4] * borigin2_matrix_NDE[current,k] +
+                      cat_X_mat[i,5] * borigin3_matrix_NDE[current,k] +
+                      cat_X_mat[i,6] * borigin4_matrix_NDE[current,k] +
+                      cat_X_mat[i,7] * borigin5_matrix_NDE[current,k];
+                      
+                      // otherwise, store in the vector that it's not DE
+                      DE_correction[k] = 0
+                      }
+                      
+          
+          } else {
+            # If we're in a state/run year combo that needs DE correction, correct for it
+                    if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
+                    logits[k] = b0_matrix_DE[current, k]+ 
+                    // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
+                    cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
+                    cat_X_mat[i,4] * borigin2_matrix_DE[current,k] +
+                    cat_X_mat[i,5] * borigin3_matrix_DE[current,k] +
+                    cat_X_mat[i,6] * borigin4_matrix_DE[current,k] +
+                    cat_X_mat[i,7] * borigin5_matrix_DE[current,k];
+                    
+                    // store in the vector that it's DE
+                    DE_correction[k] = 1
+                    
+                    // Else, use the NDE matrix, and don't correct for detection efficiency
+                    } else {
+                    logits[k] = b0_matrix_NDE[current, k]+ 
+                    // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
+                    cat_X_mat[i,3] * borigin1_matrix_NDE[current,k] +
+                    cat_X_mat[i,4] * borigin2_matrix_NDE[current,k] +
+                    cat_X_mat[i,5] * borigin3_matrix_NDE[current,k] +
+                    cat_X_mat[i,6] * borigin4_matrix_NDE[current,k] +
+                    cat_X_mat[i,7] * borigin5_matrix_NDE[current,k];
+                    
+                    // otherwise, store in the vector that it's not DE
+                    DE_correction[k] = 0
+                    }
+                    
+          }
           
           
+        }
+          // loss param
+          logits[43] = 0;
+                    
+          // declare vector to store true movement probabilities
+          vector[43] p_vec_actual;
           
-          logits[k] = b0_matrix[current, k]+ 
-          // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
-          cat_X_mat[i,3] * borigin1_matrix[current,k] +
-          cat_X_mat[i,4] * borigin2_matrix[current,k] +
-          cat_X_mat[i,5] * borigin3_matrix[current,k] +
-          cat_X_mat[i,6] * borigin4_matrix[current,k] +
-          cat_X_mat[i,7] * borigin5_matrix[current,k];
-          // cat_X_mat[i - start + 1,3] * borigin1_matrix[current,k] + 
-          // cat_X_mat[i - start + 1,4] * borigin2_matrix[current,k] + 
-          // cat_X_mat[i - start + 1,5] * borigin3_matrix[current,k] + 
-          // cat_X_mat[i - start + 1,6] * borigin4_matrix[current,k] + 
-          // cat_X_mat[i - start + 1,7] * borigin5_matrix[current,k];
+          // declare vector to store observed movement probabilities, which are a product of the true probabilities, mulitplied by detection efficiency
+          vector[43] p_vec_observed;
+          
+          // proportion vector, uncorrected for detection efficiency
+          p_vec_actual = softmax(logits);
+          
+          // now, loop through transitions again, and calculate detection efficiency for each where DE_correction == 1
+          
+          
+          // now loop through transitions and modify p_vec to account for this
+        for (k in 1:42){
+          if (DE_correction[k] == 1) {
+            p_vec_observed[k] = p_vec_actual * det_eff[k];
+            
+            // each time you modify a term, modify the loss term by the same amount
+            
+          } else {
+            p_vec_observed[k] = p_vec[k];
+            
+          }
+          
+          
         }
         
-        // loss param
-        logits[43] = 0;
-        
-        // Now, we need an if/else statement: If it's in a tributary, correct for detection efficiency, otherwise leave it alone
-        
-        // if it is in a state that connects to at tributary for which we can estimate detection efficiency:
-        if (current %in% mainstem_trib_states){
-          // declare vector to store movement probabilities
-          vector[43] p_vec;
-          
-          // declare vector to store uncorrected for detection efficiency movement probabilities
-          vector[43] p_vec_uncorrected;
           
           
-        // proper proportion vector, uncorrected for detection efficiency
-        p_vec_uncorrected = softmax(logits);
-        
-        // calculate detection efficiency (pseudocode)
+          
+          
+        // START OLD CODE
+         // calculate detection efficiency (pseudocode)
         
         // first: we need to determine how many different detection probabilities we need to estimate, and the loop through them
         // declare an integer for the length of the for loop
@@ -189,24 +261,29 @@ functions{
         
         // now incorporate detection efficiency (pseudocode)
         for (m in 1:(n_states-1)){
-          p_vec[m] = p_vec_uncorrected[m] * detection_efficiencies[m];
+          p_vec[m] = p_vec_observed[m] * detection_efficiencies[m];
           
         }
-        
-          // if it's not, just calculate as normal
-        } else{
           
+          
+          
+          
+          
+          
+          
+                    
+
+                    
+          // loss param
+          logits[43] = 0;
+                    
           // declare vector to store movement probabilities
           vector[43] p_vec;
           
           // populate that vector from logits
           p_vec = softmax(logits);
-          
-          
-        }
-        
-        
-
+ 
+      // END OLD CODE
         
             
         // print("p_vec: ", p_vec);
@@ -226,10 +303,7 @@ functions{
     total_lp += lp_fish;
     
     
-  }
     return total_lp;
-}
-
 }
 
 
