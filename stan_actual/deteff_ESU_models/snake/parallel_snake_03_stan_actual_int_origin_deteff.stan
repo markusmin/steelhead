@@ -195,14 +195,38 @@ functions{
           p_vec_actual = softmax(logits);
           
           // now, loop through transitions again, and calculate detection efficiency for each where DE_correction == 1
+          // declare one vector for linear predictors and one for actual detection efficiency
+          vector[42] det_eff_eta;
+          vector[42] det_eff;
+        for (k in 1:42){
+          if (DE_correction[k] == 1) {
+            // to calculate detection efficiency by indexing:
+            // The tributary design matrices array will have the same number of slices as states (42, for 43 - loss).
+            // Only 14 of these slices (the 14 tributaries that have DE calculations) will have non-zero values, but this will make the indexing simpler.
+            // we will index slices using k.
+            // Rows will be run years, indexed using transition_run_years[sum(n_obs[1:i-1], j)], same as above
+            // the columns will then be the appropriate row of the design matrix, for that state and tributary.
+            // That will then be multiplied by the full, 34 length parameter vector. This will be written out in
+            // the transformed parameters section, and will have 20 alpha terms and 14 beta terms.
+            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[sum(n_obs[1:i-1], j)],,k] * det_eff_param_vector; // THIS IS PSEUDOCODE - NEED TO INDEX
+            det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
+            
+          } else {
+            // If we don't have to calculate a detection efficiency, don't do anything
+            
+          }
+          
+          
+        }
           
           
           // now loop through transitions and modify p_vec to account for this
         for (k in 1:42){
           if (DE_correction[k] == 1) {
-            p_vec_observed[k] = p_vec_actual * det_eff[k];
+            p_vec_observed[k] = p_vec_actual[k] * det_eff[k];
             
             // each time you modify a term, modify the loss term by the same amount
+            p_vec_actual[43] = p_vec_actual[43] + p_vec_actual[k] * (1 - det_eff[k]);
             
           } else {
             p_vec_observed[k] = p_vec[k];
@@ -211,79 +235,6 @@ functions{
           
           
         }
-        
-          
-          
-          
-          
-        // START OLD CODE
-         // calculate detection efficiency (pseudocode)
-        
-        // first: we need to determine how many different detection probabilities we need to estimate, and the loop through them
-        // declare an integer for the length of the for loop
-        int n_deteffs;
-        n_deteffs = n_detection_efficiencies[current];
-        
-        // now declare a vector with that length to store the detection probability values
-        vector[n_deteffs] detection_efficiencies;
-        
-        // loop through all of the detection efficiencies that you need to calculate
-        for (l in 1:n_deteffs){
-          // step 1: select the appropriate tributary design matrix
-          // declare an integer to store the index of the state
-          int trib_index;
-          // figure out the state of the index
-          trib_index = mainstem_trib_connections[[which(current == mainstem_trib_states)]][l];
-        
-          // pull the appropriate design matrix out
-          // tributary_design_matrices_array[trib_index,,];
-        
-          // step 2: select the correct run year from the tributary design matrix
-          int fish_run_year_index;
-          fish_run_year_index = fish_run_years[i];
-        
-          // step 3: Multiply this row of the tributary design matrix by the parameter vector to get eta, the linear predictor
-          real eta;
-          eta = tributary_design_matrices_array[trib_index,fish_run_year_index,] * det_eff_params;
-          
-        
-          // step 4: get the estimated detection probability using the inverse logit
-          detection_efficiencies[l] = exp(eta)/(1 + exp(eta));
-        }
-        
-        // now, store all of the detection efficiencies in the appropriate places in all of the transition probabilities
-        
-        vector[42] correction_factors;
-        
-        
-        
-        
-        
-        // now incorporate detection efficiency (pseudocode)
-        for (m in 1:(n_states-1)){
-          p_vec[m] = p_vec_observed[m] * detection_efficiencies[m];
-          
-        }
-          
-          
-          
-          
-          
-          
-          
-                    
-
-                    
-          // loss param
-          logits[43] = 0;
-                    
-          // declare vector to store movement probabilities
-          vector[43] p_vec;
-          
-          // populate that vector from logits
-          p_vec = softmax(logits);
- 
-      // END OLD CODE
         
             
         // print("p_vec: ", p_vec);
@@ -494,6 +445,46 @@ real borigin5_matrix_9_34_NDE;
 real borigin5_matrix_9_36;
 real borigin5_matrix_9_37;
 real borigin5_matrix_9_38;
+
+// here, write out all of the parameters for detection efficiency
+// twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
+real asotin_alpha1;
+real asotin_alpha2;
+real deschutes_alpha1;
+real entiat_alpha1;
+real fifteenmile_alpha1;
+real hood_alpha1;
+real imnaha_alpha1;
+real john_day_alpha1;
+real methow_alpha1;
+real methow_alpha2;
+real okanogan_alpha1;
+real tucannon_alpha1;
+real tucannon_alpha2;
+real umatilla_alpha1;
+real umatilla_alpha2;
+real walla_walla_alpha1;
+real walla_walla_alpha2;
+real walla_walla_alpha3;
+real wenatchee_alpha1;
+real yakima_alpha1;
+
+// 14 terms for discharge relationship, one for each tributary
+real asotin_beta;
+real deschutes_beta;
+real entiat_beta;
+real fifteenmile_beta;
+real hood_beta;
+real imnaha_beta;
+real john_day_beta;
+real methow_beta;
+real okanogan_beta;
+real tucannon_beta;
+real umatilla_beta;
+real walla_walla_beta;
+real wenatchee_beta;
+real yakima_beta;
+
   
 }
 
@@ -894,6 +885,49 @@ borigin5_matrix_NDE[9,37] = borigin5_matrix_9_37_NDE;
 borigin5_matrix_DE[9,38] = borigin5_matrix_9_38_DE;
 borigin5_matrix_NDE[9,38] = borigin5_matrix_9_38_NDE;
 
+// detection efficiency - create a vector that stores all parameters
+vector[43] real det_eff_param_vector;
+
+// populate the vector
+det_eff_param_vector[1] = asotin_alpha1;
+det_eff_param_vector[2] = asotin_alpha2;
+det_eff_param_vector[3] = deschutes_alpha1;
+det_eff_param_vector[4] = entiat_alpha1;
+det_eff_param_vector[5] = fifteenmile_alpha1;
+det_eff_param_vector[6] = hood_alpha1;
+det_eff_param_vector[7] = imnaha_alpha1;
+det_eff_param_vector[8] = john_day_alpha1;
+det_eff_param_vector[9] = methow_alpha1;
+det_eff_param_vector[10] = methow_alpha2;
+det_eff_param_vector[11] = okanogan_alpha1;
+det_eff_param_vector[12] = tucannon_alpha1;
+det_eff_param_vector[13] = tucannon_alpha2;
+det_eff_param_vector[14] = umatilla_alpha1;
+det_eff_param_vector[15] = umatilla_alpha2;
+det_eff_param_vector[16] = walla_walla_alpha1;
+det_eff_param_vector[17] = walla_walla_alpha2;
+det_eff_param_vector[18] = walla_walla_alpha3;
+det_eff_param_vector[19] = wenatchee_alpha1;
+det_eff_param_vector[20] = yakima_alpha1;
+
+// 14 terms for discharge relationship, one for each tributary
+det_eff_param_vector[21] = asotin_beta;
+det_eff_param_vector[22] = deschutes_beta;
+det_eff_param_vector[23] = entiat_beta;
+det_eff_param_vector[24] = fifteenmile_beta;
+det_eff_param_vector[25] = hood_beta;
+det_eff_param_vector[26] = imnaha_beta;
+det_eff_param_vector[27] = john_day_beta;
+det_eff_param_vector[28] = methow_beta;
+det_eff_param_vector[29] = okanogan_beta;
+det_eff_param_vector[30] = tucannon_beta;
+det_eff_param_vector[31] = umatilla_beta;
+det_eff_param_vector[32] = walla_walla_beta;
+det_eff_param_vector[33] = wenatchee_beta;
+det_eff_param_vector[34] = yakima_beta;
+
+
+
 #### Calculate movement probabilities as derived parameters
 matrix[43,43] origin1_probs;
 origin1_probs = rep_matrix(0, 43, 43);
@@ -1097,8 +1131,47 @@ borigin5_matrix_9_36 ~ normal(0,10);
 borigin5_matrix_9_37 ~ normal(0,10);
 borigin5_matrix_9_38 ~ normal(0,10);
 
-// Detection efficiency GLM
-// This is calculated 
+// Prior on detection efficiency parameters - from the other stan script for detection efficiency
+// here, write out all of the parameters for detection efficiency
+// twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
+// the outputs from that model will be the first column [,1] containing central tendency (mean)
+// and the second column [,2] containing the standard deviation
+asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+asotin_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+deschutes_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+entiat_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+hood_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+imnaha_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+john_day_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+methow_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+methow_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+okanogan_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+tucannon_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+tucannon_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+umatilla_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+umatilla_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+walla_walla_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+walla_walla_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+walla_walla_alpha3 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+wenatchee_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+yakima_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+
+// 14 terms for discharge relationship, one for each tributary
+asotin_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+deschutes_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+entiat_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+fifteenmile_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+hood_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+imnaha_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+john_day_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+methow_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+okanogan_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+tucannon_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+umatilla_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+walla_walla_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+wenatchee_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+yakima_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
 
 
 
