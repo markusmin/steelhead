@@ -465,13 +465,13 @@ na.omit(design_matrix) -> design_matrix2
 # step 0: data in a list #
 data <- list(N = nrow(design_matrix2),
              y = subset(deteff_data, !(is.na(mean_discharge_cfs)))$detected,
-             J = 5,
-             K = 3,
+             J = 20,
+             K = 14,
              X = design_matrix2)
 
 # Step 1: load the model
 # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
-mod <- cmdstan_model("snake_detection_efficiency.stan", compile = FALSE)
+mod <- cmdstan_model(here::here("stan_actual", "deteff_ESU_models", "detection_efficiency.stan"), compile = FALSE)
 
 # Step 2: Compile the model, set up to run in parallel
 mod$compile(cpp_options = list(stan_threads = TRUE))
@@ -479,28 +479,39 @@ mod$compile(cpp_options = list(stan_threads = TRUE))
 # Step 3: Run MCMC (HMC)
 fit <- mod$sample(
   data = data, 
-  # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
-  # seed = 456,
-  # chains = 3, 
+  # seed = 123, 
   chains = 3,
   # parallel_chains = 1,
   # parallel_chains = 3,
   refresh = 10, # print update every iter
   # iter_sampling = 1000,
   # iter_warmup = 1000,
-  iter_warmup = 1000,
-  iter_sampling = 1000,
+  iter_warmup = 5000,
+  iter_sampling = 5000,
   # threads_per_chain = 28,
-  threads_per_chain = 1,
-  init = 1
+  threads_per_chain = 7,
+  init = 1,
+  thin = 10
 )
 
 
 # Extract parameter estimates
-fit$save_object(file = "snake_detection_efficiency_stan_fit.rds")
+fit$save_object(file = here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
 
 # Calculate detection probability from parameter estimates
 snake_deteff_stan_fit_summary <- fit$summary()
+
+snake_deteff_stan_fit_summary[1:100,]
+
+##### EXPORT PARAMETER ESTIMATES TO USE AS PRIORS IN PRIMARY MODEL #####
+# create matrix to store values
+det_eff_param_posteriors <- matrix(nrow = 34, ncol = 2)
+det_eff_param_posteriors[,1] <- snake_deteff_stan_fit_summary$mean[2:35]
+det_eff_param_posteriors[,2] <- snake_deteff_stan_fit_summary$sd[2:35]
+
+
+
+
 
 # Get the parameters in a vector, then multiply by the matrix of discharges and calculate p for each run year/trib combination
 snake_deteff_param_est <- snake_deteff_stan_fit_summary$median[2:9]
