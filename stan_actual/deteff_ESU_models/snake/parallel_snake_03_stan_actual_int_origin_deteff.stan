@@ -65,13 +65,13 @@ functions{
                         vector detection_efficiency_parameters,
                         
                         // declare a vector to store the run year that each transition occurs in
-                        vector transition_run_years,
+                        array[] int transition_run_years,
                         
+                        // declare the array that says in which run years in which states we calculate DE
+                        array[,,] int run_year_DE_array,
                         
-                        
-                        
-                        
-                        ) { # I don't think we need this either? Since we're just indexing it again with start and end
+                        // declare the matrix that contains the posteriors from the det eff script:
+                        matrix det_eff_param_posteriors) { // I don't think we need this either? Since we're just indexing it again with start and end
                           
   // First, declare the total lp (log probability) variable that we will be returning
   real total_lp = 0;
@@ -133,7 +133,7 @@ functions{
                       cat_X_mat[i,7] * borigin5_matrix_DE[current,k];
                       
                       // store in the vector that it's DE
-                      DE_correction[k] = 1
+                      DE_correction[k] = 1;
                       
                       // Else, use the NDE matrix
                       } else {
@@ -146,12 +146,12 @@ functions{
                       cat_X_mat[i,7] * borigin5_matrix_NDE[current,k];
                       
                       // otherwise, store in the vector that it's not DE
-                      DE_correction[k] = 0
+                      DE_correction[k] = 0;
                       }
                       
           
           } else {
-            # If we're in a state/run year combo that needs DE correction, correct for it
+            // If we're in a state/run year combo that needs DE correction, correct for it
                     if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
                     // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
@@ -162,7 +162,7 @@ functions{
                     cat_X_mat[i,7] * borigin5_matrix_DE[current,k];
                     
                     // store in the vector that it's DE
-                    DE_correction[k] = 1
+                    DE_correction[k] = 1;
                     
                     // Else, use the NDE matrix, and don't correct for detection efficiency
                     } else {
@@ -175,7 +175,7 @@ functions{
                     cat_X_mat[i,7] * borigin5_matrix_NDE[current,k];
                     
                     // otherwise, store in the vector that it's not DE
-                    DE_correction[k] = 0
+                    DE_correction[k] = 0;
                     }
                     
           }
@@ -200,6 +200,14 @@ functions{
           vector[42] det_eff;
         for (k in 1:42){
           if (DE_correction[k] == 1) {
+            // the exception for if i = 1 for the indexing:
+            if (i == 1){
+            
+            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[j],,k] * det_eff_param_vector; 
+            det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
+              
+            } else {
+              
             // to calculate detection efficiency by indexing:
             // The tributary design matrices array will have the same number of slices as states (42, for 43 - loss).
             // Only 14 of these slices (the 14 tributaries that have DE calculations) will have non-zero values, but this will make the indexing simpler.
@@ -208,8 +216,13 @@ functions{
             // the columns will then be the appropriate row of the design matrix, for that state and tributary.
             // That will then be multiplied by the full, 34 length parameter vector. This will be written out in
             // the transformed parameters section, and will have 20 alpha terms and 14 beta terms.
-            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[sum(n_obs[1:i-1], j)],,k] * det_eff_param_vector; // THIS IS PSEUDOCODE - NEED TO INDEX
+            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[sum(n_obs[1:i-1], j)],,k] * det_eff_param_vector; 
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
+              
+            }
+            
+
+
             
           } else {
             // If we don't have to calculate a detection efficiency, don't do anything
@@ -257,7 +270,9 @@ functions{
     return total_lp;
 }
 
+}
 
+}
 
 data {
   // array[10, 41, 1200] int y; // array with dimensions 10 states (rows), 48 columns (maximum number of site visits), 1200 matrix slices (number of fish); has to be int for multinomial logit
@@ -544,7 +559,7 @@ transformed parameters {
   borigin5_matrix = rep_array(0, 43, 43);
   
   // Finally, declare the parameter vector for the detection probability calculation
-  det_eff_params = vector[34];
+  vector[34] det_eff_params;
   
   
   
@@ -886,7 +901,7 @@ borigin5_matrix_DE[9,38] = borigin5_matrix_9_38_DE;
 borigin5_matrix_NDE[9,38] = borigin5_matrix_9_38_NDE;
 
 // detection efficiency - create a vector that stores all parameters
-vector[43] real det_eff_param_vector;
+vector[43] det_eff_param_vector;
 
 // populate the vector
 det_eff_param_vector[1] = asotin_alpha1;
