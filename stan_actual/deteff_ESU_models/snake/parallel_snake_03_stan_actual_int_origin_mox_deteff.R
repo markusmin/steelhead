@@ -1513,7 +1513,8 @@ n.ind <- dim(state_data)[3]
                tributary_design_matrices_array = tributary_design_matrices_array,
                transition_run_years = transition_run_years,
                mainstem_trib_states = mainstem_trib_states,
-               n_detection_efficiencies = n_detection_efficiencies)
+               n_detection_efficiencies = n_detection_efficiencies,
+               run_year_DE_array)
   
   
   print(Sys.time())
@@ -1525,7 +1526,7 @@ n.ind <- dim(state_data)[3]
   # Fit stan model using cmdstan
   # Step 1: load the model
   # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
-  mod <- cmdstan_model("parallel_snake_02_stan_actual_int_origin.stan", compile = FALSE)
+  mod <- cmdstan_model("parallel_snake_03_stan_actual_int_origin_deteff.stan", compile = FALSE)
   
   # Step 2: Compile the model, set up to run in parallel
   mod$compile(cpp_options = list(stan_threads = TRUE))
