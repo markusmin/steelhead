@@ -458,6 +458,13 @@ snake_movements <- subset(movements_df, row %in% c(8,9,seq(32,39,1)) |
 non_snake_movements  <- subset(movements_df, !(row %in% c(8,9,seq(32,39,1))) &
                                  !(col %in% c(8,9,seq(32,39,1))))
 
+# I think these both need to be order by from (rows), to (columns)
+snake_movements %>% 
+  arrange(row, col) -> snake_movements
+
+b0_matrix_names %>% 
+  arrange(row,col) -> b0_matrix_names
+
 
 
 
@@ -556,10 +563,12 @@ for (i in 1:(nrow(b0_matrix_names))){
     # cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_DE",";", "\n", sep = "")
     cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_NDE",";", "\n", sep = "")
   }
-  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream (for both DE and NDE)
+  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
+  # And note - that these are not DE or NDE parameters
+  # Because of order, we need -2 here instead of -1, to pick the right from state
   else if (b0_matrix_names$upstream_mainstem_movement[i] == 1){
-    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_DE",";", "\n", sep = "")
-    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-2],";", "\n", sep = "")
+    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-2],";", "\n", sep = "")
   # If it's not, store the same parameter in both matrices
   } else {
     cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], ";", "\n", sep = "")
@@ -590,14 +599,15 @@ for (i in 1:5){
       cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_NDE", ";", "\n", sep = "")
       
     }
-    # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream (for both DE and NDE)
+    # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
+    # And note - that these are not DE or NDE parameters
     else if (snake_movements$upstream_mainstem_movement[j] == 1){
-      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_DE", ";", "\n", sep = "")
-      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j-1], "_NDE", ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j],  ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j-1], "_", snake_movements$col[j], ";", "\n", sep = "")
       # If it's not, store the same parameter in both matrices
     } else {
-      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_DE", ";", "\n", sep = "")
-      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], "_NDE", ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_DE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j], ";", "\n", sep = "")
+      cat("borigin", i, "_matrix_NDE[", snake_movements$row[j], ",", snake_movements$col[j], "]", " = ", "borigin", i, "_matrix_", snake_movements$row[j], "_", snake_movements$col[j],  ";", "\n", sep = "")
     }
     
   }
@@ -693,7 +703,7 @@ states_complete %>%
   # group_by(tag_code) %>% 
   # We need to use tag_code_2 because this splits apart repeat spawners
   group_by(tag_code_2) %>% 
-  count() %>% 
+  dplyr::count() %>% 
   as.data.frame() -> site_visits_by_tag_code
 
 # + 1 here because we don't yet have a loss state
@@ -711,13 +721,13 @@ state_data <- array(data = 0, dim = c(nstates, max_visits, nfish))
 states_complete %>% 
   # group_by(tag_code) %>% 
   group_by(tag_code_2) %>% 
-  mutate(order = row_number()) -> states_complete
+  dplyr::mutate(order = row_number()) -> states_complete
 
 # add a column to index by fish
 states_complete %>% 
   # group_by(tag_code) %>% 
   group_by(tag_code_2) %>% 
-  mutate(tag_code_number = cur_group_id()) -> states_complete
+  dplyr::mutate(tag_code_number = cur_group_id()) -> states_complete
 
 
 ##### EDIT STATES DATA - REMOVE UPSTREAM DETECTIONS IN DE YEARS #####
@@ -736,8 +746,8 @@ run_year_df <- data.frame(run_year, run_year_start, run_year_end, run_year_numer
 print(Sys.time())
 states_complete %>% 
   rowwise() %>% # this is apparently crucial to getting this to work
-  mutate(date_time = ymd_hms(date_time)) %>% 
-  mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) -> states_complete
+  dplyr::mutate(date_time = ymd_hms(date_time)) %>% 
+  dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) -> states_complete
 print(Sys.time())
 
 
@@ -842,6 +852,7 @@ states_complete %>%
 print(Sys.time())
 for (i in 1:nrow(states_complete)){
 # for (i in 1:100){
+  # We need to skip all upstream detections in DE years
   # index by 1) which state, 2) which visit, 3) which fish
   state_data[which(model_states == states_complete[i, "state", drop = TRUE]),states_complete[i, "order", drop = TRUE], states_complete[i, "tag_code_number", drop = TRUE]] <- 1 
   
@@ -1496,8 +1507,10 @@ n.ind <- dim(state_data)[3]
   
   
   
+  # Load the data from the detection efficiency model to use as priors in this model
+  det_eff_param_posteriors <- as.matrix(read.csv("det_eff_param_posteriors.csv", row.names = 1))
   
-  
+  ntransitions = length(transition_run_years)
   
   
   ##### Run stan model #####
@@ -1511,10 +1524,12 @@ n.ind <- dim(state_data)[3]
                grainsize = 1, N = dim(state_data_2)[1],
                # New data for detection efficiency
                tributary_design_matrices_array = tributary_design_matrices_array,
+               ntransitions = ntransitions,
                transition_run_years = transition_run_years,
                mainstem_trib_states = mainstem_trib_states,
                n_detection_efficiencies = n_detection_efficiencies,
-               run_year_DE_array)
+               run_year_DE_array = run_year_DE_array,
+               det_eff_param_posteriors = det_eff_param_posteriors)
   
   
   print(Sys.time())
