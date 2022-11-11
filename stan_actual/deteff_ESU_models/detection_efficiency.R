@@ -494,20 +494,30 @@ fit <- mod$sample(
   thin = 10
 )
 
+mcmc_trace(fit$draws(), pars = c("alpha[1]"))
+
 
 # Extract parameter estimates
 fit$save_object(file = here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
 
-# Calculate detection probability from parameter estimates
-snake_deteff_stan_fit_summary <- fit$summary()
+fit <- readRDS(here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
 
-snake_deteff_stan_fit_summary[1:100,]
+# Calculate detection probability from parameter estimates
+deteff_stan_fit_summary <- fit$summary()
+
+# simple diagnostics
+acf(fit$draws()[,2,3])
+mcmc_trace(fit$draws(), pars = c("alpha[1]"))
+
+deteff_stan_fit_summary[1:10,]
 
 ##### EXPORT PARAMETER ESTIMATES TO USE AS PRIORS IN PRIMARY MODEL #####
 # create matrix to store values
 det_eff_param_posteriors <- matrix(nrow = 34, ncol = 2)
 det_eff_param_posteriors[,1] <- snake_deteff_stan_fit_summary$mean[2:35]
 det_eff_param_posteriors[,2] <- snake_deteff_stan_fit_summary$sd[2:35]
+
+write.csv(det_eff_param_posteriors, here::here("stan_actual", "deteff_ESU_models", "det_eff_param_posteriors.csv"))
 
 
 
