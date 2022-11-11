@@ -61,17 +61,15 @@ functions{
                         // this is in effect an array of design matrices
                         array[,,] real tributary_design_matrices_array,
                         
-                        // declare a vector for the parameters for the detection efficiency glm
-                        vector detection_efficiency_parameters,
-                        
                         // declare a vector to store the run year that each transition occurs in
-                        array[] int transition_run_years,
+                        array[] int transition_run_years, // or does this need to be array[] int?
                         
                         // declare the array that says in which run years in which states we calculate DE
                         array[,,] int run_year_DE_array,
                         
-                        // declare the matrix that contains the posteriors from the det eff script:
-                        matrix det_eff_param_posteriors) { // I don't think we need this either? Since we're just indexing it again with start and end
+                        // declare the vector that contains the parameters for detection efficiency
+                        vector det_eff_param_vector
+                        ) { // I don't think we need this either? Since we're just indexing it again with start and end
                           
   // First, declare the total lp (log probability) variable that we will be returning
   real total_lp = 0;
@@ -123,7 +121,22 @@ functions{
           // for indexing by run year - some up all n_obs prior to this fish, plus whatever index we're on for the current fish
           // need to make an exception for the first fish, which uses only the index j
           if (i == 1){
-                      if (run_year_DE_array[current,k,transition_run_years[j]] == 1){
+            int run_year_index;
+            // now, sum the vector to get a single integer value for indexing the run year vector
+            run_year_index = j;
+            // get the actual run year
+            int run_year_actual;
+            run_year_actual = transition_run_years[run_year_index];
+                    // if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
+                      // need to declare another intermediate value: an integer that takes either 0 or 1, for whether it's DE or NDE
+                      int DE_index;
+                      // now, determine if it's 0 or 1
+                      DE_index = run_year_DE_array[current,k,run_year_actual];
+                      // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
+                        if (DE_index == 1){
+                        
+                        
+                        
                       logits[k] = b0_matrix_DE[current, k]+ 
                       // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
                       cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
@@ -152,7 +165,25 @@ functions{
           
           } else {
             // If we're in a state/run year combo that needs DE correction, correct for it
-                    if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
+            // first: declare a vector that stores all of the indices that we need to sum to get the right run year
+            array[i] int run_year_indices_vector;
+            // then populate: first elements are all the number of transitions from all previous fish
+            run_year_indices_vector[1:(i-1)] = n_obs[1:i-1];
+            // last element is the transition number of the current fish  
+            run_year_indices_vector[i] = j;
+            int run_year_index;
+            // now, sum the vector to get a single integer value for indexing the run year vector
+            run_year_index = sum(run_year_indices_vector);
+            // get the actual run year
+            int run_year_actual;
+            run_year_actual = transition_run_years[run_year_index];
+                    // if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
+                      // need to declare another intermediate value: an integer that takes either 0 or 1, for whether it's DE or NDE
+                      int DE_index;
+                      // now, determine if it's 0 or 1
+                      DE_index = run_year_DE_array[current,k,run_year_actual];
+                      // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
+                        if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
                     // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
                     cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
@@ -202,8 +233,8 @@ functions{
           if (DE_correction[k] == 1) {
             // the exception for if i = 1 for the indexing:
             if (i == 1){
-            
-            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[j],,k] * det_eff_param_vector; 
+            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * det_eff_param_vector; 
+            // det_eff_eta[k] = tributary_design_vector * det_eff_param_vector; 
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
               
             } else {
@@ -216,7 +247,21 @@ functions{
             // the columns will then be the appropriate row of the design matrix, for that state and tributary.
             // That will then be multiplied by the full, 34 length parameter vector. This will be written out in
             // the transformed parameters section, and will have 20 alpha terms and 14 beta terms.
-            det_eff_eta[k] = tributary_design_matrices_array[transition_run_years[sum(n_obs[1:i-1], j)],,k] * det_eff_param_vector; 
+            
+            // indexing tweaks
+            // first: declare a vector that stores all of the indices that we need to sum to get the right run year
+            array[i] int run_year_indices_vector;
+            // then populate: first elements are all the number of transitions from all previous fish
+            run_year_indices_vector[1:(i-1)] = n_obs[1:i-1];
+            // last element is the transition number of the current fish  
+            run_year_indices_vector[i] = j;
+            int run_year_index;
+            // now, sum the vector to get a single integer value for indexing the run year vector
+            run_year_index = sum(run_year_indices_vector);
+            // get the actual run year
+            int run_year_actual;
+            run_year_actual = transition_run_years[run_year_index];
+            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector; 
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
               
             }
@@ -242,7 +287,7 @@ functions{
             p_vec_actual[43] = p_vec_actual[43] + p_vec_actual[k] * (1 - det_eff[k]);
             
           } else {
-            p_vec_observed[k] = p_vec[k];
+            p_vec_observed[k] = p_vec_actual[k];
             
           }
           
@@ -257,7 +302,7 @@ functions{
         // Store the log probability of that individual transition in the vector that we declared
         // lp_fish[j] = categorical_lpmf(slice_y[i,j+1] | p_vec);
         // Changed the indexing here, based on:https://discourse.mc-stan.org/t/help-with-multi-threading-a-simple-ordinal-probit-model-using-reduce-sum/15353
-        lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec);
+        lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
         // lp_fish += categorical_lpmf(slice_y[i,j+1] | p_vec);
       
     }
@@ -268,11 +313,11 @@ functions{
     
     
     return total_lp;
-}
+} // end looping through fish in this slice
 
-}
+} // end partial_sum_lpmf function
 
-}
+} // end functions block
 
 data {
   // array[10, 41, 1200] int y; // array with dimensions 10 states (rows), 48 columns (maximum number of site visits), 1200 matrix slices (number of fish); has to be int for multinomial logit
@@ -292,8 +337,17 @@ data {
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
   array[n_ind, 8] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin and run year)
   
-  // new data for tributary detection efficiency
-  array[7] vector[5] mainstem_trib_connections;
+  matrix[34,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
+  
+  // array that contains design matrices for each tributary
+  array[14,17,34] int tributary_design_matrices_array;
+  
+  // vector that contains the run years in which each individual transition occurred
+  int ntransitions;
+  array[ntransitions] int transition_run_years;
+  
+  // array that contains which run years in which transitions need DE correction
+  array[43,43,18] int run_year_DE_array;
   
   // Declare data for parallelization (reduce sum function)
   int<lower=0> N;
@@ -316,11 +370,13 @@ real b0_matrix_16_2;
 real b0_matrix_18_2;
 real b0_matrix_41_2;
 real b0_matrix_2_3;
+real b0_matrix_4_3;
 real b0_matrix_8_3;
 real b0_matrix_20_3;
 real b0_matrix_22_3;
 real b0_matrix_3_4;
 real b0_matrix_5_4;
+real b0_matrix_4_5;
 real b0_matrix_6_5;
 real b0_matrix_24_5;
 real b0_matrix_5_6;
@@ -504,59 +560,104 @@ real yakima_beta;
 }
 
 transformed parameters {
+  // We now need two matrices always - one for DE params, and one for NDE params
+  
+  
   // Declare a matrix to store b0 params
   // matrix[43,43] b0_matrix;
-  array[43,43] real b0_matrix;
+  array[43,43] real b0_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
   // b0_matrix = rep_matrix(-100000, 43, 43);
-  b0_matrix = rep_array(-100000, 43, 43);
+  b0_matrix_DE = rep_array(-100000, 43, 43);
+  
+  array[43,43] real b0_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Non-zero elements will be overwritten
+  // b0_matrix = rep_matrix(-100000, 43, 43);
+  b0_matrix_NDE = rep_array(-100000, 43, 43);
   
   // Declare a matrix to store borigin1 params
   // matrix[43,43] borigin1_matrix;
-  array[43,43] real borigin1_matrix;
+  array[43,43] real borigin1_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
   // Non-zero elements will be overwritten
   // borigin1_matrix = rep_matrix(-100000, 43, 43);
   // borigin1_matrix = rep_matrix(0, 43, 43);
-  borigin1_matrix = rep_array(0, 43, 43);
+  borigin1_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real borigin1_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
+  // Non-zero elements will be overwritten
+  // borigin1_matrix = rep_matrix(-100000, 43, 43);
+  // borigin1_matrix = rep_matrix(0, 43, 43);
+  borigin1_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin2 params
   // matrix[43,43] borigin2_matrix;
-  array[43,43] real borigin2_matrix;
+  array[43,43] real borigin2_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
   // borigin2_matrix = rep_matrix(-100000, 43, 43);
   // borigin2_matrix = rep_matrix(0, 43, 43);
-  borigin2_matrix = rep_array(0, 43, 43);
+  borigin2_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real borigin2_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Non-zero elements will be overwritten
+  // borigin2_matrix = rep_matrix(-100000, 43, 43);
+  // borigin2_matrix = rep_matrix(0, 43, 43);
+  borigin2_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin3 params
   // matrix[43,43] borigin3_matrix;
-  array[43,43] real borigin3_matrix;
+  array[43,43] real borigin3_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin3_matrix = rep_matrix(0, 43, 43);
-  borigin3_matrix = rep_array(0, 43, 43);
+  borigin3_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real borigin3_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Non-zero elements will be overwritten
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin3_matrix = rep_matrix(0, 43, 43);
+  borigin3_matrix_NDE = rep_array(0, 43, 43);
   
     // Declare a matrix to store borigin4 params
   // matrix[43,43] borigin4_matrix;
-  array[43,43] real borigin4_matrix;
+  array[43,43] real borigin4_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin4_matrix = rep_matrix(0, 43, 43);
-  borigin4_matrix = rep_array(0, 43, 43);
+  borigin4_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real borigin4_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Non-zero elements will be overwritten
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin4_matrix = rep_matrix(0, 43, 43);
+  borigin4_matrix_NDE = rep_array(0, 43, 43);
   
     // Declare a matrix to store borigin5 params
   // matrix[43,43] borigin5_matrix;
-  array[43,43] real borigin5_matrix;
+  array[43,43] real borigin5_matrix_DE;
   // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
   // Non-zero elements will be overwritten
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin5_matrix = rep_matrix(0, 43, 43);
-  borigin5_matrix = rep_array(0, 43, 43);
+  borigin5_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real borigin5_matrix_NDE;
+  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
+  // Non-zero elements will be overwritten
+  // borigin3_matrix = rep_matrix(-100000, 43, 43);
+  // borigin5_matrix = rep_matrix(0, 43, 43);
+  borigin5_matrix_NDE = rep_array(0, 43, 43);
   
   // Finally, declare the parameter vector for the detection probability calculation
   vector[34] det_eff_params;
@@ -565,86 +666,135 @@ transformed parameters {
   
   // Populate this matrix with betas
   // Fill in all of the non-zero elements into the b0_matrix
-b0_matrix_DE[2,1] = b0_matrix_2_1;
-b0_matrix_NDE[2,1] = b0_matrix_2_1;
 b0_matrix_DE[1,2] = b0_matrix_1_2;
 b0_matrix_NDE[1,2] = b0_matrix_1_2;
+b0_matrix_DE[2,1] = b0_matrix_2_1;
+b0_matrix_NDE[2,1] = b0_matrix_2_1;
+b0_matrix_DE[2,3] = b0_matrix_2_3;
+b0_matrix_NDE[2,3] = b0_matrix_2_3;
+b0_matrix_DE[2,10] = b0_matrix_2_10_DE;
+b0_matrix_NDE[2,10] = b0_matrix_2_10_NDE;
+b0_matrix_NDE[2,11] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,12] = b0_matrix_2_12_DE;
+b0_matrix_NDE[2,12] = b0_matrix_2_12_NDE;
+b0_matrix_NDE[2,13] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,14] = b0_matrix_2_14_DE;
+b0_matrix_NDE[2,14] = b0_matrix_2_14_NDE;
+b0_matrix_NDE[2,15] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,16] = b0_matrix_2_16_DE;
+b0_matrix_NDE[2,16] = b0_matrix_2_16_NDE;
+b0_matrix_NDE[2,17] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,18] = b0_matrix_2_18_DE;
+b0_matrix_NDE[2,18] = b0_matrix_2_18_NDE;
+b0_matrix_NDE[2,19] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,41] = b0_matrix_2_41;
+b0_matrix_NDE[2,41] = b0_matrix_2_41;
 b0_matrix_DE[3,2] = b0_matrix_3_2;
 b0_matrix_NDE[3,2] = b0_matrix_3_2;
+b0_matrix_DE[3,4] = b0_matrix_3_4;
+b0_matrix_NDE[3,4] = b0_matrix_3_4;
+b0_matrix_DE[3,8] = b0_matrix_3_8;
+b0_matrix_NDE[3,8] = b0_matrix_3_8;
+b0_matrix_DE[3,20] = b0_matrix_3_20_DE;
+b0_matrix_NDE[3,20] = b0_matrix_3_20_NDE;
+b0_matrix_NDE[3,21] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,22] = b0_matrix_3_22_DE;
+b0_matrix_NDE[3,22] = b0_matrix_3_22_NDE;
+b0_matrix_NDE[3,23] = b0_matrix_3_22_NDE;
+b0_matrix_DE[4,3] = b0_matrix_4_3;
+b0_matrix_NDE[4,3] = b0_matrix_4_3;
+b0_matrix_DE[4,5] = b0_matrix_4_5;
+b0_matrix_NDE[4,5] = b0_matrix_4_5;
+b0_matrix_DE[5,4] = b0_matrix_5_4;
+b0_matrix_NDE[5,4] = b0_matrix_5_4;
+b0_matrix_DE[5,6] = b0_matrix_5_6;
+b0_matrix_NDE[5,6] = b0_matrix_5_6;
+b0_matrix_DE[5,24] = b0_matrix_5_24_DE;
+b0_matrix_NDE[5,24] = b0_matrix_5_24_NDE;
+b0_matrix_NDE[5,25] = b0_matrix_5_24_NDE;
+b0_matrix_DE[6,5] = b0_matrix_6_5;
+b0_matrix_NDE[6,5] = b0_matrix_6_5;
+b0_matrix_DE[6,7] = b0_matrix_6_7;
+b0_matrix_NDE[6,7] = b0_matrix_6_7;
+b0_matrix_DE[6,26] = b0_matrix_6_26_DE;
+b0_matrix_NDE[6,26] = b0_matrix_6_26_NDE;
+b0_matrix_NDE[6,27] = b0_matrix_6_26_NDE;
+b0_matrix_DE[7,6] = b0_matrix_7_6;
+b0_matrix_NDE[7,6] = b0_matrix_7_6;
+b0_matrix_DE[7,28] = b0_matrix_7_28_DE;
+b0_matrix_NDE[7,28] = b0_matrix_7_28_NDE;
+b0_matrix_NDE[7,29] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,30] = b0_matrix_7_30_DE;
+b0_matrix_NDE[7,30] = b0_matrix_7_30_NDE;
+b0_matrix_NDE[7,31] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,42] = b0_matrix_7_42;
+b0_matrix_NDE[7,42] = b0_matrix_7_42;
+b0_matrix_DE[8,3] = b0_matrix_8_3;
+b0_matrix_NDE[8,3] = b0_matrix_8_3;
+b0_matrix_DE[8,9] = b0_matrix_8_9;
+b0_matrix_NDE[8,9] = b0_matrix_8_9;
+b0_matrix_DE[8,32] = b0_matrix_8_32_DE;
+b0_matrix_NDE[8,32] = b0_matrix_8_32_NDE;
+b0_matrix_NDE[8,33] = b0_matrix_8_32_NDE;
+b0_matrix_DE[9,8] = b0_matrix_9_8;
+b0_matrix_NDE[9,8] = b0_matrix_9_8;
+b0_matrix_DE[9,34] = b0_matrix_9_34_DE;
+b0_matrix_NDE[9,34] = b0_matrix_9_34_NDE;
+b0_matrix_NDE[9,35] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,36] = b0_matrix_9_36;
+b0_matrix_NDE[9,36] = b0_matrix_9_36;
+b0_matrix_DE[9,37] = b0_matrix_9_37;
+b0_matrix_NDE[9,37] = b0_matrix_9_37;
+b0_matrix_DE[9,38] = b0_matrix_9_38;
+b0_matrix_NDE[9,38] = b0_matrix_9_38;
 b0_matrix_DE[10,2] = b0_matrix_10_2;
 b0_matrix_NDE[10,2] = b0_matrix_10_2;
-b0_matrix_DE[11,2] = b0_matrix_10_2_DE;
-b0_matrix_NDE[11,2] = b0_matrix_10_2_NDE;
+b0_matrix_DE[11,2] = b0_matrix_10_2;
+b0_matrix_NDE[11,2] = b0_matrix_10_2;
 b0_matrix_DE[12,2] = b0_matrix_12_2;
 b0_matrix_NDE[12,2] = b0_matrix_12_2;
-b0_matrix_DE[13,2] = b0_matrix_12_2_DE;
-b0_matrix_NDE[13,2] = b0_matrix_12_2_NDE;
+b0_matrix_DE[13,2] = b0_matrix_12_2;
+b0_matrix_NDE[13,2] = b0_matrix_12_2;
 b0_matrix_DE[14,2] = b0_matrix_14_2;
 b0_matrix_NDE[14,2] = b0_matrix_14_2;
 b0_matrix_DE[16,2] = b0_matrix_16_2;
 b0_matrix_NDE[16,2] = b0_matrix_16_2;
-b0_matrix_DE[17,2] = b0_matrix_16_2_DE;
-b0_matrix_NDE[17,2] = b0_matrix_16_2_NDE;
+b0_matrix_DE[17,2] = b0_matrix_16_2;
+b0_matrix_NDE[17,2] = b0_matrix_16_2;
 b0_matrix_DE[18,2] = b0_matrix_18_2;
 b0_matrix_NDE[18,2] = b0_matrix_18_2;
-b0_matrix_DE[19,2] = b0_matrix_18_2_DE;
-b0_matrix_NDE[19,2] = b0_matrix_18_2_NDE;
-b0_matrix_DE[41,2] = b0_matrix_41_2;
-b0_matrix_NDE[41,2] = b0_matrix_41_2;
-b0_matrix_DE[2,3] = b0_matrix_2_3;
-b0_matrix_NDE[2,3] = b0_matrix_2_3;
-b0_matrix_DE[8,3] = b0_matrix_8_3;
-b0_matrix_NDE[8,3] = b0_matrix_8_3;
+b0_matrix_DE[19,2] = b0_matrix_18_2;
+b0_matrix_NDE[19,2] = b0_matrix_18_2;
 b0_matrix_DE[20,3] = b0_matrix_20_3;
 b0_matrix_NDE[20,3] = b0_matrix_20_3;
-b0_matrix_DE[21,3] = b0_matrix_20_3_DE;
-b0_matrix_NDE[21,3] = b0_matrix_20_3_NDE;
+b0_matrix_DE[21,3] = b0_matrix_20_3;
+b0_matrix_NDE[21,3] = b0_matrix_20_3;
 b0_matrix_DE[22,3] = b0_matrix_22_3;
 b0_matrix_NDE[22,3] = b0_matrix_22_3;
-b0_matrix_DE[23,3] = b0_matrix_22_3_DE;
-b0_matrix_NDE[23,3] = b0_matrix_22_3_NDE;
-b0_matrix_DE[3,4] = b0_matrix_3_4;
-b0_matrix_NDE[3,4] = b0_matrix_3_4;
-b0_matrix_DE[5,4] = b0_matrix_5_4;
-b0_matrix_NDE[5,4] = b0_matrix_5_4;
-b0_matrix_DE[6,5] = b0_matrix_6_5;
-b0_matrix_NDE[6,5] = b0_matrix_6_5;
+b0_matrix_DE[23,3] = b0_matrix_22_3;
+b0_matrix_NDE[23,3] = b0_matrix_22_3;
 b0_matrix_DE[24,5] = b0_matrix_24_5;
 b0_matrix_NDE[24,5] = b0_matrix_24_5;
-b0_matrix_DE[5,6] = b0_matrix_5_6;
-b0_matrix_NDE[5,6] = b0_matrix_5_6;
-b0_matrix_DE[7,6] = b0_matrix_7_6;
-b0_matrix_NDE[7,6] = b0_matrix_7_6;
 b0_matrix_DE[26,6] = b0_matrix_26_6;
 b0_matrix_NDE[26,6] = b0_matrix_26_6;
-b0_matrix_DE[27,6] = b0_matrix_26_6_DE;
-b0_matrix_NDE[27,6] = b0_matrix_26_6_NDE;
-b0_matrix_DE[6,7] = b0_matrix_6_7;
-b0_matrix_NDE[6,7] = b0_matrix_6_7;
+b0_matrix_DE[27,6] = b0_matrix_26_6;
+b0_matrix_NDE[27,6] = b0_matrix_26_6;
 b0_matrix_DE[28,7] = b0_matrix_28_7;
 b0_matrix_NDE[28,7] = b0_matrix_28_7;
-b0_matrix_DE[29,7] = b0_matrix_28_7_DE;
-b0_matrix_NDE[29,7] = b0_matrix_28_7_NDE;
+b0_matrix_DE[29,7] = b0_matrix_28_7;
+b0_matrix_NDE[29,7] = b0_matrix_28_7;
 b0_matrix_DE[30,7] = b0_matrix_30_7;
 b0_matrix_NDE[30,7] = b0_matrix_30_7;
-b0_matrix_DE[31,7] = b0_matrix_30_7_DE;
-b0_matrix_NDE[31,7] = b0_matrix_30_7_NDE;
-b0_matrix_DE[42,7] = b0_matrix_42_7;
-b0_matrix_NDE[42,7] = b0_matrix_42_7;
-b0_matrix_DE[3,8] = b0_matrix_3_8;
-b0_matrix_NDE[3,8] = b0_matrix_3_8;
-b0_matrix_DE[9,8] = b0_matrix_9_8;
-b0_matrix_NDE[9,8] = b0_matrix_9_8;
+b0_matrix_DE[31,7] = b0_matrix_30_7;
+b0_matrix_NDE[31,7] = b0_matrix_30_7;
 b0_matrix_DE[32,8] = b0_matrix_32_8;
 b0_matrix_NDE[32,8] = b0_matrix_32_8;
-b0_matrix_DE[33,8] = b0_matrix_32_8_DE;
-b0_matrix_NDE[33,8] = b0_matrix_32_8_NDE;
-b0_matrix_DE[8,9] = b0_matrix_8_9;
-b0_matrix_NDE[8,9] = b0_matrix_8_9;
+b0_matrix_DE[33,8] = b0_matrix_32_8;
+b0_matrix_NDE[33,8] = b0_matrix_32_8;
 b0_matrix_DE[34,9] = b0_matrix_34_9;
 b0_matrix_NDE[34,9] = b0_matrix_34_9;
-b0_matrix_DE[35,9] = b0_matrix_34_9_DE;
-b0_matrix_NDE[35,9] = b0_matrix_34_9_NDE;
+b0_matrix_DE[35,9] = b0_matrix_34_9;
+b0_matrix_NDE[35,9] = b0_matrix_34_9;
 b0_matrix_DE[36,9] = b0_matrix_36_9;
 b0_matrix_NDE[36,9] = b0_matrix_36_9;
 b0_matrix_DE[37,9] = b0_matrix_37_9;
@@ -653,252 +803,207 @@ b0_matrix_DE[38,9] = b0_matrix_38_9;
 b0_matrix_NDE[38,9] = b0_matrix_38_9;
 b0_matrix_DE[39,9] = b0_matrix_39_9;
 b0_matrix_NDE[39,9] = b0_matrix_39_9;
-b0_matrix_DE[40,9] = b0_matrix_39_9_DE;
-b0_matrix_NDE[40,9] = b0_matrix_39_9_NDE;
-b0_matrix_DE[2,10] = b0_matrix_2_10_DE;
-b0_matrix_NDE[2,10] = b0_matrix_2_10_NDE;
-b0_matrix_NDE[2,11] = b0_matrix_11_10_NDE;
-b0_matrix_DE[2,12] = b0_matrix_2_12_DE;
-b0_matrix_NDE[2,12] = b0_matrix_2_12_NDE;
-b0_matrix_NDE[2,13] = b0_matrix_13_12_NDE;
-b0_matrix_DE[2,14] = b0_matrix_2_14_DE;
-b0_matrix_NDE[2,14] = b0_matrix_2_14_NDE;
-b0_matrix_NDE[2,15] = b0_matrix_2_14_NDE;
-b0_matrix_DE[2,16] = b0_matrix_2_16_DE;
-b0_matrix_NDE[2,16] = b0_matrix_2_16_NDE;
-b0_matrix_NDE[2,17] = b0_matrix_17_16_NDE;
-b0_matrix_DE[2,18] = b0_matrix_2_18_DE;
-b0_matrix_NDE[2,18] = b0_matrix_2_18_NDE;
-b0_matrix_NDE[2,19] = b0_matrix_19_18_NDE;
-b0_matrix_DE[3,20] = b0_matrix_3_20_DE;
-b0_matrix_NDE[3,20] = b0_matrix_3_20_NDE;
-b0_matrix_NDE[3,21] = b0_matrix_21_20_NDE;
-b0_matrix_DE[3,22] = b0_matrix_3_22_DE;
-b0_matrix_NDE[3,22] = b0_matrix_3_22_NDE;
-b0_matrix_NDE[3,23] = b0_matrix_23_22_NDE;
-b0_matrix_DE[5,24] = b0_matrix_5_24_DE;
-b0_matrix_NDE[5,24] = b0_matrix_5_24_NDE;
-b0_matrix_NDE[5,25] = b0_matrix_5_24_NDE;
-b0_matrix_DE[6,26] = b0_matrix_6_26_DE;
-b0_matrix_NDE[6,26] = b0_matrix_6_26_NDE;
-b0_matrix_NDE[6,27] = b0_matrix_27_26_NDE;
-b0_matrix_DE[7,28] = b0_matrix_7_28_DE;
-b0_matrix_NDE[7,28] = b0_matrix_7_28_NDE;
-b0_matrix_NDE[7,29] = b0_matrix_29_28_NDE;
-b0_matrix_DE[7,30] = b0_matrix_7_30_DE;
-b0_matrix_NDE[7,30] = b0_matrix_7_30_NDE;
-b0_matrix_NDE[7,31] = b0_matrix_31_30_NDE;
-b0_matrix_DE[8,32] = b0_matrix_8_32_DE;
-b0_matrix_NDE[8,32] = b0_matrix_8_32_NDE;
-b0_matrix_NDE[8,33] = b0_matrix_33_32_NDE;
-b0_matrix_DE[9,34] = b0_matrix_9_34_DE;
-b0_matrix_NDE[9,34] = b0_matrix_9_34_NDE;
-b0_matrix_NDE[9,35] = b0_matrix_35_34_NDE;
-b0_matrix_DE[9,36] = b0_matrix_9_36;
-b0_matrix_NDE[9,36] = b0_matrix_9_36;
-b0_matrix_DE[9,37] = b0_matrix_9_37;
-b0_matrix_NDE[9,37] = b0_matrix_9_37;
-b0_matrix_DE[9,38] = b0_matrix_9_38;
-b0_matrix_NDE[9,38] = b0_matrix_9_38;
-b0_matrix_DE[2,41] = b0_matrix_2_41;
-b0_matrix_NDE[2,41] = b0_matrix_2_41;
-b0_matrix_DE[7,42] = b0_matrix_7_42;
-b0_matrix_NDE[7,42] = b0_matrix_7_42;
+b0_matrix_DE[40,9] = b0_matrix_39_9;
+b0_matrix_NDE[40,9] = b0_matrix_39_9;
+b0_matrix_DE[41,2] = b0_matrix_41_2;
+b0_matrix_NDE[41,2] = b0_matrix_41_2;
+b0_matrix_DE[42,7] = b0_matrix_42_7;
+b0_matrix_NDE[42,7] = b0_matrix_42_7;
 
-borigin1_matrix_DE[8,3] = borigin1_matrix_8_3_DE;
-borigin1_matrix_NDE[8,3] = borigin1_matrix_8_3_NDE;
-borigin1_matrix_DE[3,8] = borigin1_matrix_3_8_DE;
-borigin1_matrix_NDE[3,8] = borigin1_matrix_3_8_NDE;
-borigin1_matrix_DE[9,8] = borigin1_matrix_9_8_DE;
-borigin1_matrix_NDE[9,8] = borigin1_matrix_9_8_NDE;
-borigin1_matrix_DE[32,8] = borigin1_matrix_32_8_DE;
-borigin1_matrix_NDE[32,8] = borigin1_matrix_32_8_NDE;
-borigin1_matrix_DE[33,8] = borigin1_matrix_32_8_DE;
-borigin1_matrix_NDE[33,8] = borigin1_matrix_32_8_NDE;
-borigin1_matrix_DE[8,9] = borigin1_matrix_8_9_DE;
-borigin1_matrix_NDE[8,9] = borigin1_matrix_8_9_NDE;
-borigin1_matrix_DE[34,9] = borigin1_matrix_34_9_DE;
-borigin1_matrix_NDE[34,9] = borigin1_matrix_34_9_NDE;
-borigin1_matrix_DE[35,9] = borigin1_matrix_34_9_DE;
-borigin1_matrix_NDE[35,9] = borigin1_matrix_34_9_NDE;
-borigin1_matrix_DE[36,9] = borigin1_matrix_36_9_DE;
-borigin1_matrix_NDE[36,9] = borigin1_matrix_36_9_NDE;
-borigin1_matrix_DE[37,9] = borigin1_matrix_37_9_DE;
-borigin1_matrix_NDE[37,9] = borigin1_matrix_37_9_NDE;
-borigin1_matrix_DE[38,9] = borigin1_matrix_38_9_DE;
-borigin1_matrix_NDE[38,9] = borigin1_matrix_38_9_NDE;
-borigin1_matrix_DE[39,9] = borigin1_matrix_39_9_DE;
-borigin1_matrix_NDE[39,9] = borigin1_matrix_39_9_NDE;
-borigin1_matrix_DE[40,9] = borigin1_matrix_39_9_DE;
-borigin1_matrix_NDE[40,9] = borigin1_matrix_39_9_NDE;
+borigin1_matrix_DE[3,8] = borigin1_matrix_3_8;
+borigin1_matrix_NDE[3,8] = borigin1_matrix_3_8;
+borigin1_matrix_DE[8,3] = borigin1_matrix_8_3;
+borigin1_matrix_NDE[8,3] = borigin1_matrix_8_3;
+borigin1_matrix_DE[8,9] = borigin1_matrix_8_9;
+borigin1_matrix_NDE[8,9] = borigin1_matrix_8_9;
 borigin1_matrix_DE[8,32] = borigin1_matrix_8_32_DE;
 borigin1_matrix_NDE[8,32] = borigin1_matrix_8_32_NDE;
-borigin1_matrix_NDE[8,33] = borigin1_matrix_33_32_NDE;
+borigin1_matrix_NDE[8,33] = borigin1_matrix_8_32_NDE;
+borigin1_matrix_DE[9,8] = borigin1_matrix_9_8;
+borigin1_matrix_NDE[9,8] = borigin1_matrix_9_8;
 borigin1_matrix_DE[9,34] = borigin1_matrix_9_34_DE;
 borigin1_matrix_NDE[9,34] = borigin1_matrix_9_34_NDE;
-borigin1_matrix_NDE[9,35] = borigin1_matrix_35_34_NDE;
-borigin1_matrix_DE[9,36] = borigin1_matrix_9_36_DE;
-borigin1_matrix_NDE[9,36] = borigin1_matrix_9_36_NDE;
-borigin1_matrix_DE[9,37] = borigin1_matrix_9_37_DE;
-borigin1_matrix_NDE[9,37] = borigin1_matrix_9_37_NDE;
-borigin1_matrix_DE[9,38] = borigin1_matrix_9_38_DE;
-borigin1_matrix_NDE[9,38] = borigin1_matrix_9_38_NDE;
+borigin1_matrix_NDE[9,35] = borigin1_matrix_9_34_NDE;
+borigin1_matrix_DE[9,36] = borigin1_matrix_9_36;
+borigin1_matrix_NDE[9,36] = borigin1_matrix_9_36;
+borigin1_matrix_DE[9,37] = borigin1_matrix_9_37;
+borigin1_matrix_NDE[9,37] = borigin1_matrix_9_37;
+borigin1_matrix_DE[9,38] = borigin1_matrix_9_38;
+borigin1_matrix_NDE[9,38] = borigin1_matrix_9_38;
+borigin1_matrix_DE[32,8] = borigin1_matrix_32_8;
+borigin1_matrix_NDE[32,8] = borigin1_matrix_32_8;
+borigin1_matrix_DE[33,8] = borigin1_matrix_32_8;
+borigin1_matrix_NDE[33,8] = borigin1_matrix_32_8;
+borigin1_matrix_DE[34,9] = borigin1_matrix_34_9;
+borigin1_matrix_NDE[34,9] = borigin1_matrix_34_9;
+borigin1_matrix_DE[35,9] = borigin1_matrix_34_9;
+borigin1_matrix_NDE[35,9] = borigin1_matrix_34_9;
+borigin1_matrix_DE[36,9] = borigin1_matrix_36_9;
+borigin1_matrix_NDE[36,9] = borigin1_matrix_36_9;
+borigin1_matrix_DE[37,9] = borigin1_matrix_37_9;
+borigin1_matrix_NDE[37,9] = borigin1_matrix_37_9;
+borigin1_matrix_DE[38,9] = borigin1_matrix_38_9;
+borigin1_matrix_NDE[38,9] = borigin1_matrix_38_9;
+borigin1_matrix_DE[39,9] = borigin1_matrix_39_9;
+borigin1_matrix_NDE[39,9] = borigin1_matrix_39_9;
+borigin1_matrix_DE[40,9] = borigin1_matrix_39_9;
+borigin1_matrix_NDE[40,9] = borigin1_matrix_39_9;
 
-borigin2_matrix_DE[8,3] = borigin2_matrix_8_3_DE;
-borigin2_matrix_NDE[8,3] = borigin2_matrix_8_3_NDE;
-borigin2_matrix_DE[3,8] = borigin2_matrix_3_8_DE;
-borigin2_matrix_NDE[3,8] = borigin2_matrix_3_8_NDE;
-borigin2_matrix_DE[9,8] = borigin2_matrix_9_8_DE;
-borigin2_matrix_NDE[9,8] = borigin2_matrix_9_8_NDE;
-borigin2_matrix_DE[32,8] = borigin2_matrix_32_8_DE;
-borigin2_matrix_NDE[32,8] = borigin2_matrix_32_8_NDE;
-borigin2_matrix_DE[33,8] = borigin2_matrix_32_8_DE;
-borigin2_matrix_NDE[33,8] = borigin2_matrix_32_8_NDE;
-borigin2_matrix_DE[8,9] = borigin2_matrix_8_9_DE;
-borigin2_matrix_NDE[8,9] = borigin2_matrix_8_9_NDE;
-borigin2_matrix_DE[34,9] = borigin2_matrix_34_9_DE;
-borigin2_matrix_NDE[34,9] = borigin2_matrix_34_9_NDE;
-borigin2_matrix_DE[35,9] = borigin2_matrix_34_9_DE;
-borigin2_matrix_NDE[35,9] = borigin2_matrix_34_9_NDE;
-borigin2_matrix_DE[36,9] = borigin2_matrix_36_9_DE;
-borigin2_matrix_NDE[36,9] = borigin2_matrix_36_9_NDE;
-borigin2_matrix_DE[37,9] = borigin2_matrix_37_9_DE;
-borigin2_matrix_NDE[37,9] = borigin2_matrix_37_9_NDE;
-borigin2_matrix_DE[38,9] = borigin2_matrix_38_9_DE;
-borigin2_matrix_NDE[38,9] = borigin2_matrix_38_9_NDE;
-borigin2_matrix_DE[39,9] = borigin2_matrix_39_9_DE;
-borigin2_matrix_NDE[39,9] = borigin2_matrix_39_9_NDE;
-borigin2_matrix_DE[40,9] = borigin2_matrix_39_9_DE;
-borigin2_matrix_NDE[40,9] = borigin2_matrix_39_9_NDE;
+borigin2_matrix_DE[3,8] = borigin2_matrix_3_8;
+borigin2_matrix_NDE[3,8] = borigin2_matrix_3_8;
+borigin2_matrix_DE[8,3] = borigin2_matrix_8_3;
+borigin2_matrix_NDE[8,3] = borigin2_matrix_8_3;
+borigin2_matrix_DE[8,9] = borigin2_matrix_8_9;
+borigin2_matrix_NDE[8,9] = borigin2_matrix_8_9;
 borigin2_matrix_DE[8,32] = borigin2_matrix_8_32_DE;
 borigin2_matrix_NDE[8,32] = borigin2_matrix_8_32_NDE;
-borigin2_matrix_NDE[8,33] = borigin2_matrix_33_32_NDE;
+borigin2_matrix_NDE[8,33] = borigin2_matrix_8_32_NDE;
+borigin2_matrix_DE[9,8] = borigin2_matrix_9_8;
+borigin2_matrix_NDE[9,8] = borigin2_matrix_9_8;
 borigin2_matrix_DE[9,34] = borigin2_matrix_9_34_DE;
 borigin2_matrix_NDE[9,34] = borigin2_matrix_9_34_NDE;
-borigin2_matrix_NDE[9,35] = borigin2_matrix_35_34_NDE;
-borigin2_matrix_DE[9,36] = borigin2_matrix_9_36_DE;
-borigin2_matrix_NDE[9,36] = borigin2_matrix_9_36_NDE;
-borigin2_matrix_DE[9,37] = borigin2_matrix_9_37_DE;
-borigin2_matrix_NDE[9,37] = borigin2_matrix_9_37_NDE;
-borigin2_matrix_DE[9,38] = borigin2_matrix_9_38_DE;
-borigin2_matrix_NDE[9,38] = borigin2_matrix_9_38_NDE;
+borigin2_matrix_NDE[9,35] = borigin2_matrix_9_34_NDE;
+borigin2_matrix_DE[9,36] = borigin2_matrix_9_36;
+borigin2_matrix_NDE[9,36] = borigin2_matrix_9_36;
+borigin2_matrix_DE[9,37] = borigin2_matrix_9_37;
+borigin2_matrix_NDE[9,37] = borigin2_matrix_9_37;
+borigin2_matrix_DE[9,38] = borigin2_matrix_9_38;
+borigin2_matrix_NDE[9,38] = borigin2_matrix_9_38;
+borigin2_matrix_DE[32,8] = borigin2_matrix_32_8;
+borigin2_matrix_NDE[32,8] = borigin2_matrix_32_8;
+borigin2_matrix_DE[33,8] = borigin2_matrix_32_8;
+borigin2_matrix_NDE[33,8] = borigin2_matrix_32_8;
+borigin2_matrix_DE[34,9] = borigin2_matrix_34_9;
+borigin2_matrix_NDE[34,9] = borigin2_matrix_34_9;
+borigin2_matrix_DE[35,9] = borigin2_matrix_34_9;
+borigin2_matrix_NDE[35,9] = borigin2_matrix_34_9;
+borigin2_matrix_DE[36,9] = borigin2_matrix_36_9;
+borigin2_matrix_NDE[36,9] = borigin2_matrix_36_9;
+borigin2_matrix_DE[37,9] = borigin2_matrix_37_9;
+borigin2_matrix_NDE[37,9] = borigin2_matrix_37_9;
+borigin2_matrix_DE[38,9] = borigin2_matrix_38_9;
+borigin2_matrix_NDE[38,9] = borigin2_matrix_38_9;
+borigin2_matrix_DE[39,9] = borigin2_matrix_39_9;
+borigin2_matrix_NDE[39,9] = borigin2_matrix_39_9;
+borigin2_matrix_DE[40,9] = borigin2_matrix_39_9;
+borigin2_matrix_NDE[40,9] = borigin2_matrix_39_9;
 
-borigin3_matrix_DE[8,3] = borigin3_matrix_8_3_DE;
-borigin3_matrix_NDE[8,3] = borigin3_matrix_8_3_NDE;
-borigin3_matrix_DE[3,8] = borigin3_matrix_3_8_DE;
-borigin3_matrix_NDE[3,8] = borigin3_matrix_3_8_NDE;
-borigin3_matrix_DE[9,8] = borigin3_matrix_9_8_DE;
-borigin3_matrix_NDE[9,8] = borigin3_matrix_9_8_NDE;
-borigin3_matrix_DE[32,8] = borigin3_matrix_32_8_DE;
-borigin3_matrix_NDE[32,8] = borigin3_matrix_32_8_NDE;
-borigin3_matrix_DE[33,8] = borigin3_matrix_32_8_DE;
-borigin3_matrix_NDE[33,8] = borigin3_matrix_32_8_NDE;
-borigin3_matrix_DE[8,9] = borigin3_matrix_8_9_DE;
-borigin3_matrix_NDE[8,9] = borigin3_matrix_8_9_NDE;
-borigin3_matrix_DE[34,9] = borigin3_matrix_34_9_DE;
-borigin3_matrix_NDE[34,9] = borigin3_matrix_34_9_NDE;
-borigin3_matrix_DE[35,9] = borigin3_matrix_34_9_DE;
-borigin3_matrix_NDE[35,9] = borigin3_matrix_34_9_NDE;
-borigin3_matrix_DE[36,9] = borigin3_matrix_36_9_DE;
-borigin3_matrix_NDE[36,9] = borigin3_matrix_36_9_NDE;
-borigin3_matrix_DE[37,9] = borigin3_matrix_37_9_DE;
-borigin3_matrix_NDE[37,9] = borigin3_matrix_37_9_NDE;
-borigin3_matrix_DE[38,9] = borigin3_matrix_38_9_DE;
-borigin3_matrix_NDE[38,9] = borigin3_matrix_38_9_NDE;
-borigin3_matrix_DE[39,9] = borigin3_matrix_39_9_DE;
-borigin3_matrix_NDE[39,9] = borigin3_matrix_39_9_NDE;
-borigin3_matrix_DE[40,9] = borigin3_matrix_39_9_DE;
-borigin3_matrix_NDE[40,9] = borigin3_matrix_39_9_NDE;
+borigin3_matrix_DE[3,8] = borigin3_matrix_3_8;
+borigin3_matrix_NDE[3,8] = borigin3_matrix_3_8;
+borigin3_matrix_DE[8,3] = borigin3_matrix_8_3;
+borigin3_matrix_NDE[8,3] = borigin3_matrix_8_3;
+borigin3_matrix_DE[8,9] = borigin3_matrix_8_9;
+borigin3_matrix_NDE[8,9] = borigin3_matrix_8_9;
 borigin3_matrix_DE[8,32] = borigin3_matrix_8_32_DE;
 borigin3_matrix_NDE[8,32] = borigin3_matrix_8_32_NDE;
-borigin3_matrix_NDE[8,33] = borigin3_matrix_33_32_NDE;
+borigin3_matrix_NDE[8,33] = borigin3_matrix_8_32_NDE;
+borigin3_matrix_DE[9,8] = borigin3_matrix_9_8;
+borigin3_matrix_NDE[9,8] = borigin3_matrix_9_8;
 borigin3_matrix_DE[9,34] = borigin3_matrix_9_34_DE;
 borigin3_matrix_NDE[9,34] = borigin3_matrix_9_34_NDE;
-borigin3_matrix_NDE[9,35] = borigin3_matrix_35_34_NDE;
-borigin3_matrix_DE[9,36] = borigin3_matrix_9_36_DE;
-borigin3_matrix_NDE[9,36] = borigin3_matrix_9_36_NDE;
-borigin3_matrix_DE[9,37] = borigin3_matrix_9_37_DE;
-borigin3_matrix_NDE[9,37] = borigin3_matrix_9_37_NDE;
-borigin3_matrix_DE[9,38] = borigin3_matrix_9_38_DE;
-borigin3_matrix_NDE[9,38] = borigin3_matrix_9_38_NDE;
+borigin3_matrix_NDE[9,35] = borigin3_matrix_9_34_NDE;
+borigin3_matrix_DE[9,36] = borigin3_matrix_9_36;
+borigin3_matrix_NDE[9,36] = borigin3_matrix_9_36;
+borigin3_matrix_DE[9,37] = borigin3_matrix_9_37;
+borigin3_matrix_NDE[9,37] = borigin3_matrix_9_37;
+borigin3_matrix_DE[9,38] = borigin3_matrix_9_38;
+borigin3_matrix_NDE[9,38] = borigin3_matrix_9_38;
+borigin3_matrix_DE[32,8] = borigin3_matrix_32_8;
+borigin3_matrix_NDE[32,8] = borigin3_matrix_32_8;
+borigin3_matrix_DE[33,8] = borigin3_matrix_32_8;
+borigin3_matrix_NDE[33,8] = borigin3_matrix_32_8;
+borigin3_matrix_DE[34,9] = borigin3_matrix_34_9;
+borigin3_matrix_NDE[34,9] = borigin3_matrix_34_9;
+borigin3_matrix_DE[35,9] = borigin3_matrix_34_9;
+borigin3_matrix_NDE[35,9] = borigin3_matrix_34_9;
+borigin3_matrix_DE[36,9] = borigin3_matrix_36_9;
+borigin3_matrix_NDE[36,9] = borigin3_matrix_36_9;
+borigin3_matrix_DE[37,9] = borigin3_matrix_37_9;
+borigin3_matrix_NDE[37,9] = borigin3_matrix_37_9;
+borigin3_matrix_DE[38,9] = borigin3_matrix_38_9;
+borigin3_matrix_NDE[38,9] = borigin3_matrix_38_9;
+borigin3_matrix_DE[39,9] = borigin3_matrix_39_9;
+borigin3_matrix_NDE[39,9] = borigin3_matrix_39_9;
+borigin3_matrix_DE[40,9] = borigin3_matrix_39_9;
+borigin3_matrix_NDE[40,9] = borigin3_matrix_39_9;
 
-borigin4_matrix_DE[8,3] = borigin4_matrix_8_3_DE;
-borigin4_matrix_NDE[8,3] = borigin4_matrix_8_3_NDE;
-borigin4_matrix_DE[3,8] = borigin4_matrix_3_8_DE;
-borigin4_matrix_NDE[3,8] = borigin4_matrix_3_8_NDE;
-borigin4_matrix_DE[9,8] = borigin4_matrix_9_8_DE;
-borigin4_matrix_NDE[9,8] = borigin4_matrix_9_8_NDE;
-borigin4_matrix_DE[32,8] = borigin4_matrix_32_8_DE;
-borigin4_matrix_NDE[32,8] = borigin4_matrix_32_8_NDE;
-borigin4_matrix_DE[33,8] = borigin4_matrix_32_8_DE;
-borigin4_matrix_NDE[33,8] = borigin4_matrix_32_8_NDE;
-borigin4_matrix_DE[8,9] = borigin4_matrix_8_9_DE;
-borigin4_matrix_NDE[8,9] = borigin4_matrix_8_9_NDE;
-borigin4_matrix_DE[34,9] = borigin4_matrix_34_9_DE;
-borigin4_matrix_NDE[34,9] = borigin4_matrix_34_9_NDE;
-borigin4_matrix_DE[35,9] = borigin4_matrix_34_9_DE;
-borigin4_matrix_NDE[35,9] = borigin4_matrix_34_9_NDE;
-borigin4_matrix_DE[36,9] = borigin4_matrix_36_9_DE;
-borigin4_matrix_NDE[36,9] = borigin4_matrix_36_9_NDE;
-borigin4_matrix_DE[37,9] = borigin4_matrix_37_9_DE;
-borigin4_matrix_NDE[37,9] = borigin4_matrix_37_9_NDE;
-borigin4_matrix_DE[38,9] = borigin4_matrix_38_9_DE;
-borigin4_matrix_NDE[38,9] = borigin4_matrix_38_9_NDE;
-borigin4_matrix_DE[39,9] = borigin4_matrix_39_9_DE;
-borigin4_matrix_NDE[39,9] = borigin4_matrix_39_9_NDE;
-borigin4_matrix_DE[40,9] = borigin4_matrix_39_9_DE;
-borigin4_matrix_NDE[40,9] = borigin4_matrix_39_9_NDE;
+borigin4_matrix_DE[3,8] = borigin4_matrix_3_8;
+borigin4_matrix_NDE[3,8] = borigin4_matrix_3_8;
+borigin4_matrix_DE[8,3] = borigin4_matrix_8_3;
+borigin4_matrix_NDE[8,3] = borigin4_matrix_8_3;
+borigin4_matrix_DE[8,9] = borigin4_matrix_8_9;
+borigin4_matrix_NDE[8,9] = borigin4_matrix_8_9;
 borigin4_matrix_DE[8,32] = borigin4_matrix_8_32_DE;
 borigin4_matrix_NDE[8,32] = borigin4_matrix_8_32_NDE;
-borigin4_matrix_NDE[8,33] = borigin4_matrix_33_32_NDE;
+borigin4_matrix_NDE[8,33] = borigin4_matrix_8_32_NDE;
+borigin4_matrix_DE[9,8] = borigin4_matrix_9_8;
+borigin4_matrix_NDE[9,8] = borigin4_matrix_9_8;
 borigin4_matrix_DE[9,34] = borigin4_matrix_9_34_DE;
 borigin4_matrix_NDE[9,34] = borigin4_matrix_9_34_NDE;
-borigin4_matrix_NDE[9,35] = borigin4_matrix_35_34_NDE;
-borigin4_matrix_DE[9,36] = borigin4_matrix_9_36_DE;
-borigin4_matrix_NDE[9,36] = borigin4_matrix_9_36_NDE;
-borigin4_matrix_DE[9,37] = borigin4_matrix_9_37_DE;
-borigin4_matrix_NDE[9,37] = borigin4_matrix_9_37_NDE;
-borigin4_matrix_DE[9,38] = borigin4_matrix_9_38_DE;
-borigin4_matrix_NDE[9,38] = borigin4_matrix_9_38_NDE;
+borigin4_matrix_NDE[9,35] = borigin4_matrix_9_34_NDE;
+borigin4_matrix_DE[9,36] = borigin4_matrix_9_36;
+borigin4_matrix_NDE[9,36] = borigin4_matrix_9_36;
+borigin4_matrix_DE[9,37] = borigin4_matrix_9_37;
+borigin4_matrix_NDE[9,37] = borigin4_matrix_9_37;
+borigin4_matrix_DE[9,38] = borigin4_matrix_9_38;
+borigin4_matrix_NDE[9,38] = borigin4_matrix_9_38;
+borigin4_matrix_DE[32,8] = borigin4_matrix_32_8;
+borigin4_matrix_NDE[32,8] = borigin4_matrix_32_8;
+borigin4_matrix_DE[33,8] = borigin4_matrix_32_8;
+borigin4_matrix_NDE[33,8] = borigin4_matrix_32_8;
+borigin4_matrix_DE[34,9] = borigin4_matrix_34_9;
+borigin4_matrix_NDE[34,9] = borigin4_matrix_34_9;
+borigin4_matrix_DE[35,9] = borigin4_matrix_34_9;
+borigin4_matrix_NDE[35,9] = borigin4_matrix_34_9;
+borigin4_matrix_DE[36,9] = borigin4_matrix_36_9;
+borigin4_matrix_NDE[36,9] = borigin4_matrix_36_9;
+borigin4_matrix_DE[37,9] = borigin4_matrix_37_9;
+borigin4_matrix_NDE[37,9] = borigin4_matrix_37_9;
+borigin4_matrix_DE[38,9] = borigin4_matrix_38_9;
+borigin4_matrix_NDE[38,9] = borigin4_matrix_38_9;
+borigin4_matrix_DE[39,9] = borigin4_matrix_39_9;
+borigin4_matrix_NDE[39,9] = borigin4_matrix_39_9;
+borigin4_matrix_DE[40,9] = borigin4_matrix_39_9;
+borigin4_matrix_NDE[40,9] = borigin4_matrix_39_9;
 
-borigin5_matrix_DE[8,3] = borigin5_matrix_8_3_DE;
-borigin5_matrix_NDE[8,3] = borigin5_matrix_8_3_NDE;
-borigin5_matrix_DE[3,8] = borigin5_matrix_3_8_DE;
-borigin5_matrix_NDE[3,8] = borigin5_matrix_3_8_NDE;
-borigin5_matrix_DE[9,8] = borigin5_matrix_9_8_DE;
-borigin5_matrix_NDE[9,8] = borigin5_matrix_9_8_NDE;
-borigin5_matrix_DE[32,8] = borigin5_matrix_32_8_DE;
-borigin5_matrix_NDE[32,8] = borigin5_matrix_32_8_NDE;
-borigin5_matrix_DE[33,8] = borigin5_matrix_32_8_DE;
-borigin5_matrix_NDE[33,8] = borigin5_matrix_32_8_NDE;
-borigin5_matrix_DE[8,9] = borigin5_matrix_8_9_DE;
-borigin5_matrix_NDE[8,9] = borigin5_matrix_8_9_NDE;
-borigin5_matrix_DE[34,9] = borigin5_matrix_34_9_DE;
-borigin5_matrix_NDE[34,9] = borigin5_matrix_34_9_NDE;
-borigin5_matrix_DE[35,9] = borigin5_matrix_34_9_DE;
-borigin5_matrix_NDE[35,9] = borigin5_matrix_34_9_NDE;
-borigin5_matrix_DE[36,9] = borigin5_matrix_36_9_DE;
-borigin5_matrix_NDE[36,9] = borigin5_matrix_36_9_NDE;
-borigin5_matrix_DE[37,9] = borigin5_matrix_37_9_DE;
-borigin5_matrix_NDE[37,9] = borigin5_matrix_37_9_NDE;
-borigin5_matrix_DE[38,9] = borigin5_matrix_38_9_DE;
-borigin5_matrix_NDE[38,9] = borigin5_matrix_38_9_NDE;
-borigin5_matrix_DE[39,9] = borigin5_matrix_39_9_DE;
-borigin5_matrix_NDE[39,9] = borigin5_matrix_39_9_NDE;
-borigin5_matrix_DE[40,9] = borigin5_matrix_39_9_DE;
-borigin5_matrix_NDE[40,9] = borigin5_matrix_39_9_NDE;
+borigin5_matrix_DE[3,8] = borigin5_matrix_3_8;
+borigin5_matrix_NDE[3,8] = borigin5_matrix_3_8;
+borigin5_matrix_DE[8,3] = borigin5_matrix_8_3;
+borigin5_matrix_NDE[8,3] = borigin5_matrix_8_3;
+borigin5_matrix_DE[8,9] = borigin5_matrix_8_9;
+borigin5_matrix_NDE[8,9] = borigin5_matrix_8_9;
 borigin5_matrix_DE[8,32] = borigin5_matrix_8_32_DE;
 borigin5_matrix_NDE[8,32] = borigin5_matrix_8_32_NDE;
-borigin5_matrix_NDE[8,33] = borigin5_matrix_33_32_NDE;
+borigin5_matrix_NDE[8,33] = borigin5_matrix_8_32_NDE;
+borigin5_matrix_DE[9,8] = borigin5_matrix_9_8;
+borigin5_matrix_NDE[9,8] = borigin5_matrix_9_8;
 borigin5_matrix_DE[9,34] = borigin5_matrix_9_34_DE;
 borigin5_matrix_NDE[9,34] = borigin5_matrix_9_34_NDE;
-borigin5_matrix_NDE[9,35] = borigin5_matrix_35_34_NDE;
-borigin5_matrix_DE[9,36] = borigin5_matrix_9_36_DE;
-borigin5_matrix_NDE[9,36] = borigin5_matrix_9_36_NDE;
-borigin5_matrix_DE[9,37] = borigin5_matrix_9_37_DE;
-borigin5_matrix_NDE[9,37] = borigin5_matrix_9_37_NDE;
-borigin5_matrix_DE[9,38] = borigin5_matrix_9_38_DE;
-borigin5_matrix_NDE[9,38] = borigin5_matrix_9_38_NDE;
+borigin5_matrix_NDE[9,35] = borigin5_matrix_9_34_NDE;
+borigin5_matrix_DE[9,36] = borigin5_matrix_9_36;
+borigin5_matrix_NDE[9,36] = borigin5_matrix_9_36;
+borigin5_matrix_DE[9,37] = borigin5_matrix_9_37;
+borigin5_matrix_NDE[9,37] = borigin5_matrix_9_37;
+borigin5_matrix_DE[9,38] = borigin5_matrix_9_38;
+borigin5_matrix_NDE[9,38] = borigin5_matrix_9_38;
+borigin5_matrix_DE[32,8] = borigin5_matrix_32_8;
+borigin5_matrix_NDE[32,8] = borigin5_matrix_32_8;
+borigin5_matrix_DE[33,8] = borigin5_matrix_32_8;
+borigin5_matrix_NDE[33,8] = borigin5_matrix_32_8;
+borigin5_matrix_DE[34,9] = borigin5_matrix_34_9;
+borigin5_matrix_NDE[34,9] = borigin5_matrix_34_9;
+borigin5_matrix_DE[35,9] = borigin5_matrix_34_9;
+borigin5_matrix_NDE[35,9] = borigin5_matrix_34_9;
+borigin5_matrix_DE[36,9] = borigin5_matrix_36_9;
+borigin5_matrix_NDE[36,9] = borigin5_matrix_36_9;
+borigin5_matrix_DE[37,9] = borigin5_matrix_37_9;
+borigin5_matrix_NDE[37,9] = borigin5_matrix_37_9;
+borigin5_matrix_DE[38,9] = borigin5_matrix_38_9;
+borigin5_matrix_NDE[38,9] = borigin5_matrix_38_9;
+borigin5_matrix_DE[39,9] = borigin5_matrix_39_9;
+borigin5_matrix_NDE[39,9] = borigin5_matrix_39_9;
+borigin5_matrix_DE[40,9] = borigin5_matrix_39_9;
+borigin5_matrix_NDE[40,9] = borigin5_matrix_39_9;
 
 // detection efficiency - create a vector that stores all parameters
 vector[43] det_eff_param_vector;
@@ -943,42 +1048,77 @@ det_eff_param_vector[34] = yakima_beta;
 
 
 
-#### Calculate movement probabilities as derived parameters
-matrix[43,43] origin1_probs;
-origin1_probs = rep_matrix(0, 43, 43);
-matrix[43,43] origin2_probs;
-origin2_probs = rep_matrix(0, 43, 43);
-matrix[43,43] origin3_probs;
-origin3_probs = rep_matrix(0, 43, 43);
-matrix[43,43] origin4_probs;
-origin4_probs = rep_matrix(0, 43, 43);
-matrix[43,43] origin5_probs;
-origin5_probs = rep_matrix(0, 43, 43);
-matrix[43,43] origin6_probs;
-origin6_probs = rep_matrix(0, 43, 43);
+// Calculate movement probabilities as derived parameters
+// make two - one for DE corrected, one for DE uncorrected
+matrix[43,43] origin1_probs_DE;
+origin1_probs_DE = rep_matrix(0, 43, 43);
+matrix[43,43] origin2_probs_DE;
+origin2_probs_DE = rep_matrix(0, 43, 43);
+matrix[43,43] origin3_probs_DE;
+origin3_probs_DE = rep_matrix(0, 43, 43);
+matrix[43,43] origin4_probs_DE;
+origin4_probs_DE = rep_matrix(0, 43, 43);
+matrix[43,43] origin5_probs_DE;
+origin5_probs_DE = rep_matrix(0, 43, 43);
+matrix[43,43] origin6_probs_DE;
+origin6_probs_DE = rep_matrix(0, 43, 43);
 
-  # for each of the non-loss states:
+matrix[43,43] origin1_probs_NDE;
+origin1_probs_NDE = rep_matrix(0, 43, 43);
+matrix[43,43] origin2_probs_NDE;
+origin2_probs_NDE = rep_matrix(0, 43, 43);
+matrix[43,43] origin3_probs_NDE;
+origin3_probs_NDE = rep_matrix(0, 43, 43);
+matrix[43,43] origin4_probs_NDE;
+origin4_probs_NDE = rep_matrix(0, 43, 43);
+matrix[43,43] origin5_probs_NDE;
+origin5_probs_NDE = rep_matrix(0, 43, 43);
+matrix[43,43] origin6_probs_NDE;
+origin6_probs_NDE = rep_matrix(0, 43, 43);
+
+// for each of the non-loss states:
 for (i in 1:42){
   for (j in 1:42){
-    origin1_probs[i,j] = exp(b0_matrix[i,j]+ borigin1_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin1_matrix[i,]))));
-    origin2_probs[i,j] = exp(b0_matrix[i,j]+ borigin2_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin2_matrix[i,]))));
-    origin3_probs[i,j] = exp(b0_matrix[i,j]+ borigin3_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin3_matrix[i,]))));
-    origin4_probs[i,j] = exp(b0_matrix[i,j]+ borigin4_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin4_matrix[i,]))));
-    origin5_probs[i,j] = exp(b0_matrix[i,j]+ borigin5_matrix[i,j])/(1 + sum(exp(to_row_vector(b0_matrix[i,]) + to_row_vector(borigin5_matrix[i,]))));
-    origin6_probs[i,j] = exp(b0_matrix[i,j]- borigin1_matrix[i,j] - borigin2_matrix[i,j] - borigin3_matrix[i,j] - borigin4_matrix[i,j] - borigin5_matrix[i,j])/
-    (1 + sum(exp(to_row_vector(b0_matrix[i,]) - to_row_vector(borigin1_matrix[i,]) - to_row_vector(borigin2_matrix[i,]) - to_row_vector(borigin3_matrix[i,]) - 
-    to_row_vector(borigin4_matrix[i,]) - to_row_vector(borigin5_matrix[i,]))));
+    // first for DE
+    
+    origin1_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin1_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin1_matrix_DE[i,]))));
+    origin2_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin2_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin2_matrix_DE[i,]))));
+    origin3_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin3_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin3_matrix_DE[i,]))));
+    origin4_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin4_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin4_matrix_DE[i,]))));
+    origin5_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin5_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin5_matrix_DE[i,]))));
+    origin6_probs_DE[i,j] = exp(b0_matrix_DE[i,j]- borigin1_matrix_DE[i,j] - borigin2_matrix_DE[i,j] - borigin3_matrix_DE[i,j] - borigin4_matrix_DE[i,j] - borigin5_matrix_DE[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) - to_row_vector(borigin1_matrix_DE[i,]) - to_row_vector(borigin2_matrix_DE[i,]) - to_row_vector(borigin3_matrix_DE[i,]) - 
+    to_row_vector(borigin4_matrix_DE[i,]) - to_row_vector(borigin5_matrix_DE[i,]))));
+    
+    // then for NDE
+    
+    origin1_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin1_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin1_matrix_NDE[i,]))));
+    origin2_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin2_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin2_matrix_NDE[i,]))));
+    origin3_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin3_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin3_matrix_NDE[i,]))));
+    origin4_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin4_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin4_matrix_NDE[i,]))));
+    origin5_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin5_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin5_matrix_NDE[i,]))));
+    origin6_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]- borigin1_matrix_NDE[i,j] - borigin2_matrix_NDE[i,j] - borigin3_matrix_NDE[i,j] - borigin4_matrix_NDE[i,j] - borigin5_matrix_NDE[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) - to_row_vector(borigin1_matrix_NDE[i,]) - to_row_vector(borigin2_matrix_NDE[i,]) - to_row_vector(borigin3_matrix_NDE[i,]) - 
+    to_row_vector(borigin4_matrix_NDE[i,]) - to_row_vector(borigin5_matrix_NDE[i,]))));
+    
   }
 }
 
-# calculate loss states
+// calculate loss states
 for (i in 1:42){
-  origin1_probs[i,43] = 1 - sum(origin1_probs[i,1:42]);
-  origin2_probs[i,43] = 1 - sum(origin2_probs[i,1:42]);
-  origin3_probs[i,43] = 1 - sum(origin3_probs[i,1:42]);
-  origin4_probs[i,43] = 1 - sum(origin4_probs[i,1:42]);
-  origin5_probs[i,43] = 1 - sum(origin5_probs[i,1:42]);
-  origin6_probs[i,43] = 1 - sum(origin6_probs[i,1:42]);
+  origin1_probs_DE[i,43] = 1 - sum(origin1_probs_DE[i,1:42]);
+  origin2_probs_DE[i,43] = 1 - sum(origin2_probs_DE[i,1:42]);
+  origin3_probs_DE[i,43] = 1 - sum(origin3_probs_DE[i,1:42]);
+  origin4_probs_DE[i,43] = 1 - sum(origin4_probs_DE[i,1:42]);
+  origin5_probs_DE[i,43] = 1 - sum(origin5_probs_DE[i,1:42]);
+  origin6_probs_DE[i,43] = 1 - sum(origin6_probs_DE[i,1:42]);
+  
+  origin1_probs_NDE[i,43] = 1 - sum(origin1_probs_NDE[i,1:42]);
+  origin2_probs_NDE[i,43] = 1 - sum(origin2_probs_NDE[i,1:42]);
+  origin3_probs_NDE[i,43] = 1 - sum(origin3_probs_NDE[i,1:42]);
+  origin4_probs_NDE[i,43] = 1 - sum(origin4_probs_NDE[i,1:42]);
+  origin5_probs_NDE[i,43] = 1 - sum(origin5_probs_NDE[i,1:42]);
+  origin6_probs_NDE[i,43] = 1 - sum(origin6_probs_NDE[i,1:42]);
   
 }
 
@@ -1151,6 +1291,7 @@ borigin5_matrix_9_38 ~ normal(0,10);
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
 // the outputs from that model will be the first column [,1] containing central tendency (mean)
 // and the second column [,2] containing the standard deviation
+// need to fix indexing!
 asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
 asotin_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
 deschutes_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
@@ -1195,8 +1336,10 @@ yakima_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2
 // This should allow us to increment log density across fish, rather than observations within a fish, allowing us to 
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, cat_X_mat, states_mat, n_obs,
-  b0_matrix, borigin1_matrix, borigin2_matrix, borigin3_matrix, borigin4_matrix, borigin5_matrix);
+  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, cat_X_mat, states_mat, n_obs, // arguments 1-8
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE, borigin3_matrix_DE, borigin4_matrix_DE, borigin5_matrix_DE, // arguments 9-14
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE, borigin3_matrix_NDE, borigin4_matrix_NDE, borigin5_matrix_NDE, // arguments 15-20
+  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments arguments 21-24
 
 }
 
