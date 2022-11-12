@@ -178,4 +178,11 @@ asotin_discharge %>%
 # Export this file
 write.csv(all_tribs_discharge, here::here("covariate_data", "tributary_discharge_data.csv"), row.names = FALSE)
 
+# Export a second file - z-score the values (by each of the tributaries), then export
+all_tribs_discharge %>% 
+  group_by(tributary) %>% 
+  mutate(mean_discharge_zscore = (mean_discharge_cfs - mean(mean_discharge_cfs))/sd(mean_discharge_cfs)) -> all_tribs_discharge_zscore
+
+write.csv(all_tribs_discharge_zscore, here::here("covariate_data", "tributary_discharge_data_zscore.csv"), row.names = FALSE)
+
 
