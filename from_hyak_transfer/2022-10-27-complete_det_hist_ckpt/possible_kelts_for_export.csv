@@ -1,0 +1,250 @@
+"","tag_code","state","date_time","pathway","release_date","days_after_release","life_stage","BON_arrival","days_after_arrival","direction","next_direction","max_direction_index","eventual_repeat","repeat_start"
+"1","384.3B239A8BD6","mainstem, BON to MCN",2015-08-24 11:44:51,"BON (adult)","2014-04-14",497.2,"Adult",2015-08-24 11:44:51,0,"upstream","downstream",446,"eventual_repeat",13
+"2","384.3B239A8BD6","mainstem, MCN to ICH or PRA",2015-08-31 07:17:10,"MCN (adult)","2014-04-14",504,"Adult",2015-08-24 11:44:51,6.8,"upstream","downstream",446,"eventual_repeat",13
+"3","384.3B239A8BD6","mainstem, PRA to RIS",2015-09-05 14:19:51,"PRA (adult)","2014-04-14",509.3,"Adult",2015-08-24 11:44:51,12.1,"upstream","downstream",446,"eventual_repeat",13
+"4","384.3B239A8BD6","mainstem, RIS to RRE",2015-09-17 20:02:15,"RIS (adult)","2014-04-14",521.5,"Adult",2015-08-24 11:44:51,24.3,"upstream","downstream",446,"eventual_repeat",13
+"5","384.3B239A8BD6","mainstem, RRE to WEL",2015-09-20 12:27:45,"RRE (adult)","2014-04-14",524.2,"Adult",2015-08-24 11:44:51,27,"upstream","downstream",446,"eventual_repeat",13
+"6","384.3B239A8BD6","mainstem, upstream of WEL",2015-09-22 19:54:38,"WEL (adult)","2014-04-14",526.5,"Adult",2015-08-24 11:44:51,29.3,"upstream","downstream",446,"eventual_repeat",13
+"7","384.3B239A8BD6","mainstem, RRE to WEL",2016-04-11 10:11:00,"implicit","2014-04-14",728.1,"kelt",2015-08-24 11:44:51,230.9,"downstream","upstream",446,"eventual_repeat",13
+"8","384.3B239A8BD6","mainstem, RIS to RRE",2016-04-11 10:11:00,"RRE_fallback_arrays","2014-04-14",728.1,"kelt",2015-08-24 11:44:51,230.9,"downstream","upstream",446,"eventual_repeat",13
+"9","384.3B239A8BD6","mainstem, PRA to RIS",2016-08-08 13:35:34,"implicit","2014-04-14",847.3,"kelt",2015-08-24 11:44:51,350.1,"downstream","upstream",446,"eventual_repeat",13
+"10","384.3B239A8BD6","mainstem, MCN to ICH or PRA",2016-08-08 13:35:34,"implicit","2014-04-14",847.3,"kelt",2015-08-24 11:44:51,350.1,"downstream","upstream",446,"eventual_repeat",13
+"11","384.3B239A8BD6","mainstem, BON to MCN",2016-08-08 13:35:34,"implicit","2014-04-14",847.3,"kelt",2015-08-24 11:44:51,350.1,"downstream","upstream",446,"eventual_repeat",13
+"12","384.3B239A8BD6","mainstem, mouth to BON",2016-08-08 13:35:34,"implicit","2014-04-14",847.3,"kelt",2015-08-24 11:44:51,350.1,"downstream","upstream",446,"eventual_repeat",13
+"13","384.3B239A8BD6","mainstem, BON to MCN",2016-08-08 13:35:34,"BON (adult)","2014-04-14",847.3,"possible_kelt",2015-08-24 11:44:51,350.1,"upstream","downstream",446,"eventual_repeat",13
+"14","3D9.1BF16072EA","mainstem, BON to MCN",2005-07-13 13:50:37,"BON (adult)","2003-05-07",798.3,"Adult",2005-07-13 13:50:37,0,"upstream","downstream",1962,"eventual_repeat",13
+"15","3D9.1BF16072EA","mainstem, MCN to ICH or PRA",2005-07-23 11:28:07,"MCN (adult)","2003-05-07",808.2,"Adult",2005-07-13 13:50:37,9.9,"upstream","downstream",1962,"eventual_repeat",13
+"16","3D9.1BF16072EA","mainstem, PRA to RIS",2005-08-09 05:15:00,"PRA (adult)","2003-05-07",824.9,"Adult",2005-07-13 13:50:37,26.6,"upstream","downstream",1962,"eventual_repeat",13
+"17","3D9.1BF16072EA","mainstem, RIS to RRE",2005-08-13 12:15:49,"RIS (adult)","2003-05-07",829.2,"Adult",2005-07-13 13:50:37,30.9,"upstream","downstream",1962,"eventual_repeat",13
+"18","3D9.1BF16072EA","mainstem, RRE to WEL",2005-09-30 05:43:29,"implicit","2003-05-07",876.9,"Adult",2005-07-13 13:50:37,78.7,"upstream","downstream",1962,"eventual_repeat",13
+"19","3D9.1BF16072EA","mainstem, upstream of WEL",2005-09-30 05:43:29,"WEL (adult)","2003-05-07",876.9,"Adult",2005-07-13 13:50:37,78.7,"upstream","downstream",1962,"eventual_repeat",13
+"20","3D9.1BF16072EA","mainstem, RRE to WEL",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"21","3D9.1BF16072EA","mainstem, RIS to RRE",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"22","3D9.1BF16072EA","mainstem, PRA to RIS",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"23","3D9.1BF16072EA","mainstem, MCN to ICH or PRA",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"24","3D9.1BF16072EA","mainstem, BON to MCN",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"25","3D9.1BF16072EA","mainstem, mouth to BON",2007-07-22 15:20:02,"implicit","2003-05-07",1537.3,"kelt",2005-07-13 13:50:37,739.1,"downstream","upstream",1962,"eventual_repeat",13
+"26","3D9.1BF16072EA","mainstem, BON to MCN",2007-07-22 15:20:02,"BON (adult)","2003-05-07",1537.3,"possible_kelt",2005-07-13 13:50:37,739.1,"upstream","downstream",1962,"eventual_repeat",13
+"27","3D9.1BF163A586","mainstem, BON to MCN",2005-07-30 10:52:33,"BON (adult)","2003-04-30",822.2,"Adult",2005-07-30 10:52:33,0,"upstream","downstream",1992,"eventual_repeat",15
+"28","3D9.1BF163A586","mainstem, MCN to ICH or PRA",2005-08-04 15:57:33,"MCN (adult)","2003-04-30",827.4,"Adult",2005-07-30 10:52:33,5.2,"upstream","downstream",1992,"eventual_repeat",15
+"29","3D9.1BF163A586","mainstem, PRA to RIS",2005-08-12 04:53:34,"PRA (adult)","2003-04-30",834.9,"Adult",2005-07-30 10:52:33,12.8,"upstream","downstream",1992,"eventual_repeat",15
+"30","3D9.1BF163A586","mainstem, MCN to ICH or PRA",2005-08-14 07:59:40,"implicit","2003-04-30",837,"Adult",2005-07-30 10:52:33,14.9,"downstream","upstream",1992,"eventual_repeat",15
+"31","3D9.1BF163A586","mainstem, PRA to RIS",2005-08-14 07:59:40,"PRA (adult)","2003-04-30",837,"Adult",2005-07-30 10:52:33,14.9,"upstream","downstream",1992,"eventual_repeat",15
+"32","3D9.1BF163A586","mainstem, RIS to RRE",2005-08-20 11:31:38,"implicit","2003-04-30",843.2,"Adult",2005-07-30 10:52:33,21,"upstream","downstream",1992,"eventual_repeat",15
+"33","3D9.1BF163A586","mainstem, RRE to WEL",2005-08-20 11:31:38,"implicit","2003-04-30",843.2,"Adult",2005-07-30 10:52:33,21,"upstream","downstream",1992,"eventual_repeat",15
+"34","3D9.1BF163A586","mainstem, upstream of WEL",2005-08-20 11:31:38,"WEL (adult)","2003-04-30",843.2,"Adult",2005-07-30 10:52:33,21,"upstream","downstream",1992,"eventual_repeat",15
+"35","3D9.1BF163A586","mainstem, RRE to WEL",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"36","3D9.1BF163A586","mainstem, RIS to RRE",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"37","3D9.1BF163A586","mainstem, PRA to RIS",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"38","3D9.1BF163A586","mainstem, MCN to ICH or PRA",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"39","3D9.1BF163A586","mainstem, BON to MCN",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"40","3D9.1BF163A586","mainstem, mouth to BON",2007-07-14 11:20:46,"implicit","2003-04-30",1536.2,"kelt",2005-07-30 10:52:33,714,"downstream","upstream",1992,"eventual_repeat",15
+"41","3D9.1BF163A586","mainstem, BON to MCN",2007-07-14 11:20:46,"BON (adult)","2003-04-30",1536.2,"possible_kelt",2005-07-30 10:52:33,714,"upstream","downstream",1992,"eventual_repeat",15
+"42","3D9.1BF18CBA38","mainstem, BON to MCN",2007-07-26 19:00:32,"BON (adult)","2005-04-27",820.5,"Adult",2007-07-26 19:00:32,0,"upstream","downstream",2342,"eventual_repeat",13
+"43","3D9.1BF18CBA38","mainstem, MCN to ICH or PRA",2007-09-16 13:40:51,"MCN (adult)","2005-04-27",872.3,"Adult",2007-07-26 19:00:32,51.8,"upstream","downstream",2342,"eventual_repeat",13
+"44","3D9.1BF18CBA38","mainstem, PRA to RIS",2007-09-20 12:42:52,"PRA (adult)","2005-04-27",876.2,"Adult",2007-07-26 19:00:32,55.7,"upstream","downstream",2342,"eventual_repeat",13
+"45","3D9.1BF18CBA38","mainstem, RIS to RRE",2007-09-23 01:40:00,"RIS (adult)","2005-04-27",878.8,"Adult",2007-07-26 19:00:32,58.3,"upstream","downstream",2342,"eventual_repeat",13
+"46","3D9.1BF18CBA38","mainstem, RRE to WEL",2007-09-24 15:27:13,"RRE (adult)","2005-04-27",880.4,"Adult",2007-07-26 19:00:32,59.9,"upstream","downstream",2342,"eventual_repeat",13
+"47","3D9.1BF18CBA38","mainstem, upstream of WEL",2007-09-27 08:48:08,"WEL (adult)","2005-04-27",883.1,"Adult",2007-07-26 19:00:32,62.6,"upstream","downstream",2342,"eventual_repeat",13
+"48","3D9.1BF18CBA38","mainstem, RRE to WEL",2008-05-28 06:20:20,"implicit","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"49","3D9.1BF18CBA38","mainstem, RIS to RRE",2008-05-28 06:20:20,"implicit","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"50","3D9.1BF18CBA38","mainstem, PRA to RIS",2008-05-28 06:20:20,"implicit","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"51","3D9.1BF18CBA38","mainstem, MCN to ICH or PRA",2008-05-28 06:20:20,"implicit","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"52","3D9.1BF18CBA38","mainstem, BON to MCN",2008-05-28 06:20:20,"implicit","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"53","3D9.1BF18CBA38","mainstem, mouth to BON",2008-05-28 06:20:20,"BON_fallback_arrays","2005-04-27",1127,"kelt",2007-07-26 19:00:32,306.5,"downstream","upstream",2342,"eventual_repeat",13
+"54","3D9.1BF18CBA38","mainstem, BON to MCN",2009-07-31 15:27:37,"BON (adult)","2005-04-27",1556.4,"possible_kelt",2007-07-26 19:00:32,735.9,"upstream","downstream",2342,"eventual_repeat",13
+"55","3D9.1BF1B084BE","mainstem, BON to MCN",2005-08-13 14:48:06,"BON (adult)","2004-04-29",471.3,"possible_kelt",2005-08-13 14:48:06,0,"upstream","downstream",2710,"eventual_repeat",3
+"56","3D9.1BF1B084BE","mainstem, mouth to BON",2007-08-09 08:58:38,"implicit","2004-04-29",1197.1,"kelt",2005-08-13 14:48:06,725.8,"downstream","upstream",2710,"eventual_repeat",3
+"57","3D9.1BF1B084BE","mainstem, BON to MCN",2007-08-09 08:58:38,"BON (adult)","2004-04-29",1197.1,"repeat",2005-08-13 14:48:06,725.8,"upstream","downstream",2710,"eventual_repeat",3
+"58","3D9.1BF1B084BE","John Day River",2007-10-20 23:07:08,"JDR_sites","2004-04-29",1269.7,"repeat",2005-08-13 14:48:06,798.3,"upstream","downstream",2710,"eventual_repeat",3
+"59","3D9.1BF1CEFEFA","mainstem, BON to MCN",2005-08-05 07:31:40,"BON (adult)","2004-05-06",456,"possible_kelt",2005-08-05 07:31:40,0,"upstream","downstream",2844,"eventual_repeat",3
+"60","3D9.1BF1CEFEFA","mainstem, mouth to BON",2006-09-14 17:38:28,"implicit","2004-05-06",861.4,"kelt",2005-08-05 07:31:40,405.4,"downstream","upstream",2844,"eventual_repeat",3
+"61","3D9.1BF1CEFEFA","mainstem, BON to MCN",2006-09-14 17:38:28,"BON (adult)","2004-05-06",861.4,"repeat",2005-08-05 07:31:40,405.4,"upstream","downstream",2844,"eventual_repeat",3
+"62","3D9.1BF1CEFEFA","mainstem, MCN to ICH or PRA",2006-10-26 10:56:37,"MCN (adult)","2004-05-06",903.2,"repeat",2005-08-05 07:31:40,447.1,"upstream","downstream",2844,"eventual_repeat",3
+"63","3D9.1BF1F693B6","mainstem, BON to MCN",2006-07-13 18:08:18,"BON (adult)","2004-05-06",798.5,"Adult",2006-07-13 18:08:18,0,"upstream","downstream",2986,"eventual_repeat",5
+"64","3D9.1BF1F693B6","mainstem, MCN to ICH or PRA",2006-10-02 14:44:04,"MCN (adult)","2004-05-06",879.3,"Adult",2006-07-13 18:08:18,80.9,"upstream","downstream",2986,"eventual_repeat",5
+"65","3D9.1BF1F693B6","mainstem, BON to MCN",2007-09-02 12:37:22,"implicit","2004-05-06",1214.2,"kelt",2006-07-13 18:08:18,415.8,"downstream","upstream",2986,"eventual_repeat",5
+"66","3D9.1BF1F693B6","mainstem, mouth to BON",2007-09-02 12:37:22,"implicit","2004-05-06",1214.2,"kelt",2006-07-13 18:08:18,415.8,"downstream","upstream",2986,"eventual_repeat",5
+"67","3D9.1BF1F693B6","mainstem, BON to MCN",2007-09-02 12:37:22,"BON (adult)","2004-05-06",1214.2,"possible_kelt",2006-07-13 18:08:18,415.8,"upstream","downstream",2986,"eventual_repeat",5
+"68","3D9.1BF2094119","mainstem, BON to MCN",2007-08-23 19:37:10,"BON (adult)","2005-04-19",856.5,"Adult",2007-08-23 19:37:10,0,"upstream","downstream",3436,"eventual_repeat",13
+"69","3D9.1BF2094119","mainstem, MCN to ICH or PRA",2007-09-19 17:23:29,"MCN (adult)","2005-04-19",883.4,"Adult",2007-08-23 19:37:10,26.9,"upstream","downstream",3436,"eventual_repeat",13
+"70","3D9.1BF2094119","mainstem, PRA to RIS",2007-09-23 07:08:54,"PRA (adult)","2005-04-19",887,"Adult",2007-08-23 19:37:10,30.5,"upstream","downstream",3436,"eventual_repeat",13
+"71","3D9.1BF2094119","mainstem, RIS to RRE",2007-09-27 02:28:25,"RIS (adult)","2005-04-19",890.8,"Adult",2007-08-23 19:37:10,34.3,"upstream","downstream",3436,"eventual_repeat",13
+"72","3D9.1BF2094119","mainstem, RRE to WEL",2007-09-30 15:06:38,"RRE (adult)","2005-04-19",894.3,"Adult",2007-08-23 19:37:10,37.8,"upstream","downstream",3436,"eventual_repeat",13
+"73","3D9.1BF2094119","mainstem, upstream of WEL",2007-10-03 00:35:59,"WEL (adult)","2005-04-19",896.7,"Adult",2007-08-23 19:37:10,40.2,"upstream","downstream",3436,"eventual_repeat",13
+"74","3D9.1BF2094119","mainstem, RRE to WEL",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"75","3D9.1BF2094119","mainstem, RIS to RRE",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"76","3D9.1BF2094119","mainstem, PRA to RIS",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"77","3D9.1BF2094119","mainstem, MCN to ICH or PRA",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"78","3D9.1BF2094119","mainstem, BON to MCN",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"79","3D9.1BF2094119","mainstem, mouth to BON",2008-09-12 10:39:45,"implicit","2005-04-19",1242.2,"kelt",2007-08-23 19:37:10,385.6,"downstream","upstream",3436,"eventual_repeat",13
+"80","3D9.1BF2094119","mainstem, BON to MCN",2008-09-12 10:39:45,"BON (adult)","2005-04-19",1242.2,"possible_kelt",2007-08-23 19:37:10,385.6,"upstream","downstream",3436,"eventual_repeat",13
+"81","3D9.1BF20A31ED","mainstem, BON to MCN",2006-07-25 10:03:25,"BON (adult)","2005-04-27",454.1,"Adult",2006-07-25 10:03:25,0,"upstream","downstream",3470,"eventual_repeat",13
+"82","3D9.1BF20A31ED","mainstem, MCN to ICH or PRA",2006-09-13 07:24:10,"MCN (adult)","2005-04-27",504,"Adult",2006-07-25 10:03:25,49.9,"upstream","downstream",3470,"eventual_repeat",13
+"83","3D9.1BF20A31ED","mainstem, PRA to RIS",2006-09-17 04:05:38,"PRA (adult)","2005-04-27",507.9,"Adult",2006-07-25 10:03:25,53.8,"upstream","downstream",3470,"eventual_repeat",13
+"84","3D9.1BF20A31ED","mainstem, RIS to RRE",2006-09-22 15:50:28,"RIS (adult)","2005-04-27",513.4,"Adult",2006-07-25 10:03:25,59.2,"upstream","downstream",3470,"eventual_repeat",13
+"85","3D9.1BF20A31ED","mainstem, RRE to WEL",2006-09-25 08:54:02,"RRE (adult)","2005-04-27",516.1,"Adult",2006-07-25 10:03:25,62,"upstream","downstream",3470,"eventual_repeat",13
+"86","3D9.1BF20A31ED","mainstem, upstream of WEL",2006-09-27 16:10:02,"WEL (adult)","2005-04-27",518.4,"Adult",2006-07-25 10:03:25,64.3,"upstream","downstream",3470,"eventual_repeat",13
+"87","3D9.1BF20A31ED","mainstem, RRE to WEL",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"88","3D9.1BF20A31ED","mainstem, RIS to RRE",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"89","3D9.1BF20A31ED","mainstem, PRA to RIS",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"90","3D9.1BF20A31ED","mainstem, MCN to ICH or PRA",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"91","3D9.1BF20A31ED","mainstem, BON to MCN",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"92","3D9.1BF20A31ED","mainstem, mouth to BON",2007-08-30 11:36:05,"implicit","2005-04-27",855.2,"kelt",2006-07-25 10:03:25,401.1,"downstream","upstream",3470,"eventual_repeat",13
+"93","3D9.1BF20A31ED","mainstem, BON to MCN",2007-08-30 11:36:05,"BON (adult)","2005-04-27",855.2,"possible_kelt",2006-07-25 10:03:25,401.1,"upstream","downstream",3470,"eventual_repeat",13
+"94","3D9.1BF20F2FC8","mainstem, BON to MCN",2006-09-13 12:19:16,"BON (adult)","2005-04-19",512.2,"Adult",2006-09-13 12:19:16,0,"upstream","downstream",3642,"eventual_repeat",5
+"95","3D9.1BF20F2FC8","mainstem, MCN to ICH or PRA",2006-10-23 10:09:39,"MCN (adult)","2005-04-19",552.1,"Adult",2006-09-13 12:19:16,39.9,"upstream","downstream",3642,"eventual_repeat",5
+"96","3D9.1BF20F2FC8","mainstem, BON to MCN",2007-09-07 16:59:37,"implicit","2005-04-19",871.4,"kelt",2006-09-13 12:19:16,359.2,"downstream","upstream",3642,"eventual_repeat",5
+"97","3D9.1BF20F2FC8","mainstem, mouth to BON",2007-09-07 16:59:37,"implicit","2005-04-19",871.4,"kelt",2006-09-13 12:19:16,359.2,"downstream","upstream",3642,"eventual_repeat",5
+"98","3D9.1BF20F2FC8","mainstem, BON to MCN",2007-09-07 16:59:37,"BON (adult)","2005-04-19",871.4,"possible_kelt",2006-09-13 12:19:16,359.2,"upstream","downstream",3642,"eventual_repeat",5
+"99","3D9.1BF22A63DA","mainstem, BON to MCN",2006-07-23 15:07:19,"BON (adult)","2005-04-26",453.3,"possible_kelt",2006-07-23 15:07:19,0,"upstream","downstream",3694,"eventual_repeat",3
+"100","3D9.1BF22A63DA","mainstem, mouth to BON",2007-05-14 14:09:05,"BON_fallback_arrays","2005-04-26",748.3,"kelt",2006-07-23 15:07:19,295,"downstream","upstream",3694,"eventual_repeat",3
+"101","3D9.1BF22A63DA","mainstem, BON to MCN",2007-08-16 15:51:40,"BON (adult)","2005-04-26",842.4,"repeat",2006-07-23 15:07:19,389,"upstream","downstream",3694,"eventual_repeat",3
+"102","3D9.1BF22A63DA","mainstem, MCN to ICH or PRA",2007-09-28 08:28:40,"MCN (adult)","2005-04-26",885.1,"repeat",2006-07-23 15:07:19,431.7,"upstream","downstream",3694,"eventual_repeat",3
+"103","3D9.1BF25FD88D","mainstem, BON to MCN",2007-08-02 13:31:47,"BON (adult)","2006-05-08",451.3,"possible_kelt",2007-08-02 13:31:47,0,"upstream","downstream",4490,"eventual_repeat",3
+"104","3D9.1BF25FD88D","mainstem, mouth to BON",2008-05-11 23:28:41,"BON_fallback_arrays","2006-05-08",734.7,"kelt",2007-08-02 13:31:47,283.4,"downstream","upstream",4490,"eventual_repeat",3
+"105","3D9.1BF25FD88D","mainstem, BON to MCN",2009-08-24 09:06:56,"BON (adult)","2006-05-08",1204.1,"possible_kelt",2007-08-02 13:31:47,752.8,"upstream","downstream",4490,"eventual_repeat",3
+"106","3D9.1BF27DF909","mainstem, BON to MCN",2009-08-25 12:32:11,"BON (adult)","2008-05-03",479.2,"possible_kelt",2009-08-25 12:32:11,0,"upstream","downstream",5096,"eventual_repeat",3
+"107","3D9.1BF27DF909","mainstem, mouth to BON",2010-04-18 09:45:12,"BON_fallback_arrays","2008-05-03",715.1,"kelt",2009-08-25 12:32:11,235.9,"downstream","upstream",5096,"eventual_repeat",3
+"108","3D9.1BF27DF909","mainstem, BON to MCN",2010-06-11 11:54:00,"BON (adult)","2008-05-03",769.2,"repeat",2009-08-25 12:32:11,290,"upstream","downstream",5096,"eventual_repeat",3
+"109","3D9.1BF27DF909","mainstem, MCN to ICH or PRA",2010-06-16 19:44:02,"MCN (adult)","2008-05-03",774.5,"repeat",2009-08-25 12:32:11,295.3,"upstream","downstream",5096,"eventual_repeat",3
+"110","3D9.1BF27DF909","mainstem, ICH to LGR",2010-06-18 12:32:31,"ICH (adult)","2008-05-03",776.2,"repeat",2009-08-25 12:32:11,297,"upstream","downstream",5096,"eventual_repeat",3
+"111","3D9.1BF27EC4DF","mainstem, BON to MCN",2010-07-18 07:39:13,"BON (adult)","2008-04-08",831,"Adult",2010-07-18 07:39:13,0,"upstream","downstream",5212,"eventual_repeat",9
+"112","3D9.1BF27EC4DF","mainstem, MCN to ICH or PRA",2010-08-03 13:03:40,"MCN (adult)","2008-04-08",847.3,"Adult",2010-07-18 07:39:13,16.2,"upstream","downstream",5212,"eventual_repeat",9
+"113","3D9.1BF27EC4DF","mainstem, ICH to LGR",2010-08-07 10:41:42,"ICH (adult)","2008-04-08",851.2,"Adult",2010-07-18 07:39:13,20.1,"upstream","downstream",5212,"eventual_repeat",9
+"114","3D9.1BF27EC4DF","mainstem, upstream of LGR",2010-09-05 16:42:49,"LGR (adult)","2008-04-08",880.4,"Adult",2010-07-18 07:39:13,49.4,"upstream","downstream",5212,"eventual_repeat",9
+"115","3D9.1BF27EC4DF","mainstem, ICH to LGR",2011-05-01 06:39:38,"implicit","2008-04-08",1118,"kelt",2010-07-18 07:39:13,287,"downstream","upstream",5212,"eventual_repeat",9
+"116","3D9.1BF27EC4DF","mainstem, MCN to ICH or PRA",2011-05-01 06:39:38,"implicit","2008-04-08",1118,"kelt",2010-07-18 07:39:13,287,"downstream","upstream",5212,"eventual_repeat",9
+"117","3D9.1BF27EC4DF","mainstem, BON to MCN",2011-05-01 06:39:38,"implicit","2008-04-08",1118,"kelt",2010-07-18 07:39:13,287,"downstream","upstream",5212,"eventual_repeat",9
+"118","3D9.1BF27EC4DF","mainstem, mouth to BON",2011-05-01 06:39:38,"BON_fallback_arrays","2008-04-08",1118,"kelt",2010-07-18 07:39:13,287,"downstream","upstream",5212,"eventual_repeat",9
+"119","3D9.1BF27EC4DF","mainstem, BON to MCN",2011-08-19 11:08:05,"BON (adult)","2008-04-08",1228.2,"possible_kelt",2010-07-18 07:39:13,397.1,"upstream","downstream",5212,"eventual_repeat",9
+"120","3D9.1BF2808FAC","mainstem, BON to MCN",2010-07-30 13:17:15,"BON (adult)","2008-04-22",829.3,"possible_kelt",2010-07-30 13:17:15,0,"upstream","downstream",5266,"eventual_repeat",3
+"121","3D9.1BF2808FAC","mainstem, mouth to BON",2011-08-26 11:54:07,"implicit","2008-04-22",1221.2,"kelt",2010-07-30 13:17:15,391.9,"downstream","upstream",5266,"eventual_repeat",3
+"122","3D9.1BF2808FAC","mainstem, BON to MCN",2011-08-26 11:54:07,"BON (adult)","2008-04-22",1221.2,"possible_kelt",2010-07-30 13:17:15,391.9,"upstream","downstream",5266,"eventual_repeat",3
+"123","3D9.1C2C313936","mainstem, BON to MCN",2009-08-23 14:57:51,"BON (adult)","2007-12-12",620.3,"possible_kelt",2009-08-23 14:57:51,0,"upstream","downstream",5431,"eventual_repeat",3
+"124","3D9.1C2C313936","mainstem, mouth to BON",2010-09-10 13:57:32,"implicit","2007-12-12",1003.2,"kelt",2009-08-23 14:57:51,383,"downstream","upstream",5431,"eventual_repeat",3
+"125","3D9.1C2C313936","mainstem, BON to MCN",2010-09-10 13:57:32,"BON (adult)","2007-12-12",1003.2,"repeat",2009-08-23 14:57:51,383,"upstream","downstream",5431,"eventual_repeat",3
+"126","3D9.1C2C313936","mainstem, mouth to BON",2011-04-29 17:24:01,"BON_fallback_arrays","2007-12-12",1234.4,"repeat_kelt",2009-08-23 14:57:51,614.1,"downstream","upstream",5431,"eventual_repeat",3
+"127","3D9.1C2C4F3481","mainstem, BON to MCN",2009-08-19 13:03:56,"BON (adult)","2008-05-16",460.3,"possible_kelt",2009-08-19 13:03:56,0,"upstream","downstream",7038,"eventual_repeat",3
+"128","3D9.1C2C4F3481","mainstem, mouth to BON",2010-09-03 13:31:14,"implicit","2008-05-16",840.3,"kelt",2009-08-19 13:03:56,380,"downstream","upstream",7038,"eventual_repeat",3
+"129","3D9.1C2C4F3481","mainstem, BON to MCN",2010-09-03 13:31:14,"BON (adult)","2008-05-16",840.3,"possible_kelt",2009-08-19 13:03:56,380,"upstream","downstream",7038,"eventual_repeat",3
+"130","3D9.1C2C4F7057","mainstem, BON to MCN",2009-08-24 05:36:08,"BON (adult)","2008-04-17",493.9,"Adult",2009-08-24 05:36:08,0,"upstream","downstream",7120,"eventual_repeat",9
+"131","3D9.1C2C4F7057","mainstem, MCN to ICH or PRA",2009-09-06 11:08:08,"MCN (adult)","2008-04-17",507.2,"Adult",2009-08-24 05:36:08,13.2,"upstream","downstream",7120,"eventual_repeat",9
+"132","3D9.1C2C4F7057","mainstem, ICH to LGR",2009-09-12 15:57:31,"ICH (adult)","2008-04-17",513.4,"Adult",2009-08-24 05:36:08,19.4,"upstream","downstream",7120,"eventual_repeat",9
+"133","3D9.1C2C4F7057","mainstem, upstream of LGR",2009-09-21 08:58:41,"LGR (adult)","2008-04-17",522.1,"Adult",2009-08-24 05:36:08,28.1,"upstream","downstream",7120,"eventual_repeat",9
+"134","3D9.1C2C4F7057","mainstem, ICH to LGR",2011-08-08 16:53:31,"implicit","2008-04-17",1208.4,"kelt",2009-08-24 05:36:08,714.5,"downstream","upstream",7120,"eventual_repeat",9
+"135","3D9.1C2C4F7057","mainstem, MCN to ICH or PRA",2011-08-08 16:53:31,"implicit","2008-04-17",1208.4,"kelt",2009-08-24 05:36:08,714.5,"downstream","upstream",7120,"eventual_repeat",9
+"136","3D9.1C2C4F7057","mainstem, BON to MCN",2011-08-08 16:53:31,"implicit","2008-04-17",1208.4,"kelt",2009-08-24 05:36:08,714.5,"downstream","upstream",7120,"eventual_repeat",9
+"137","3D9.1C2C4F7057","mainstem, mouth to BON",2011-08-08 16:53:31,"implicit","2008-04-17",1208.4,"kelt",2009-08-24 05:36:08,714.5,"downstream","upstream",7120,"eventual_repeat",9
+"138","3D9.1C2C4F7057","mainstem, BON to MCN",2011-08-08 16:53:31,"BON (adult)","2008-04-17",1208.4,"possible_kelt",2009-08-24 05:36:08,714.5,"upstream","downstream",7120,"eventual_repeat",9
+"139","3D9.1C2C857828","mainstem, BON to MCN",2009-08-11 07:08:24,"BON (adult)","2008-05-24",444,"Adult",2009-08-11 07:08:24,0,"upstream","downstream",8412,"eventual_repeat",5
+"140","3D9.1C2C857828","mainstem, MCN to ICH or PRA",2009-09-14 09:01:41,"MCN (adult)","2008-05-24",478.1,"Adult",2009-08-11 07:08:24,34.1,"upstream","downstream",8412,"eventual_repeat",5
+"141","3D9.1C2C857828","mainstem, BON to MCN",2009-11-26 14:48:25,"MCN_fallback_arrays","2008-05-24",551.3,"kelt",2009-08-11 07:08:24,107.3,"downstream","upstream",8412,"eventual_repeat",5
+"142","3D9.1C2C857828","mainstem, mouth to BON",2011-08-14 18:39:49,"implicit","2008-05-24",1177.5,"kelt",2009-08-11 07:08:24,733.5,"downstream","upstream",8412,"eventual_repeat",5
+"143","3D9.1C2C857828","mainstem, BON to MCN",2011-08-14 18:39:49,"BON (adult)","2008-05-24",1177.5,"possible_kelt",2009-08-11 07:08:24,733.5,"upstream","downstream",8412,"eventual_repeat",5
+"144","3D9.1C2CFCF6B2","mainstem, BON to MCN",2010-06-23 13:57:37,"BON (adult)","2009-05-22",397.3,"possible_kelt",2010-06-23 13:57:37,0,"upstream","downstream",10438,"eventual_repeat",3
+"145","3D9.1C2CFCF6B2","mainstem, mouth to BON",2011-07-21 14:44:21,"implicit","2009-05-22",790.3,"kelt",2010-06-23 13:57:37,393,"downstream","upstream",10438,"eventual_repeat",3
+"146","3D9.1C2CFCF6B2","mainstem, BON to MCN",2011-07-21 14:44:21,"BON (adult)","2009-05-22",790.3,"possible_kelt",2010-06-23 13:57:37,393,"upstream","downstream",10438,"eventual_repeat",3
+"147","3D9.1C2CFD0B54","mainstem, BON to MCN",2010-07-11 07:12:06,"BON (adult)","2009-05-14",423,"possible_kelt",2010-07-11 07:12:06,0,"upstream","downstream",10458,"eventual_repeat",3
+"148","3D9.1C2CFD0B54","mainstem, mouth to BON",2011-07-30 07:21:14,"implicit","2009-05-14",807,"kelt",2010-07-11 07:12:06,384,"downstream","upstream",10458,"eventual_repeat",3
+"149","3D9.1C2CFD0B54","mainstem, BON to MCN",2011-07-30 07:21:14,"BON (adult)","2009-05-14",807,"repeat",2010-07-11 07:12:06,384,"upstream","downstream",10458,"eventual_repeat",3
+"150","3D9.1C2CFD0B54","Fifteenmile Creek",2011-12-29 21:38:06,"FIF_sites","2009-05-14",959.6,"repeat",2010-07-11 07:12:06,536.6,"upstream","downstream",10458,"eventual_repeat",3
+"151","3D9.1C2CFD8A74","mainstem, BON to MCN",2011-08-07 18:56:31,"BON (adult)","2010-04-24",470.5,"Adult",2011-08-07 18:56:31,0,"upstream","downstream",10500,"eventual_repeat",5
+"152","3D9.1C2CFD8A74","Umatilla River",2012-05-17 01:29:47,"UMA_sites","2010-04-24",753.8,"Adult",2011-08-07 18:56:31,283.3,"upstream","downstream",10500,"eventual_repeat",5
+"153","3D9.1C2CFD8A74","mainstem, BON to MCN",2013-08-03 04:42:34,"implicit","2010-04-24",1196.9,"kelt",2011-08-07 18:56:31,726.4,"downstream","upstream",10500,"eventual_repeat",5
+"154","3D9.1C2CFD8A74","mainstem, mouth to BON",2013-08-03 04:42:34,"implicit","2010-04-24",1196.9,"kelt",2011-08-07 18:56:31,726.4,"downstream","upstream",10500,"eventual_repeat",5
+"155","3D9.1C2CFD8A74","mainstem, BON to MCN",2013-08-03 04:42:34,"BON (adult)","2010-04-24",1196.9,"possible_kelt",2011-08-07 18:56:31,726.4,"upstream","downstream",10500,"eventual_repeat",5
+"156","3D9.1C2CFF613C","mainstem, BON to MCN",2010-08-07 13:57:44,"BON (adult)","2009-05-21",443.3,"possible_kelt",2010-08-07 13:57:44,0,"upstream","downstream",10650,"eventual_repeat",3
+"157","3D9.1C2CFF613C","mainstem, mouth to BON",2012-08-18 13:48:09,"implicit","2009-05-21",1185.3,"kelt",2010-08-07 13:57:44,742,"downstream","upstream",10650,"eventual_repeat",3
+"158","3D9.1C2CFF613C","mainstem, BON to MCN",2012-08-18 13:48:09,"BON (adult)","2009-05-21",1185.3,"repeat",2010-08-07 13:57:44,742,"upstream","downstream",10650,"eventual_repeat",3
+"159","3D9.1C2CFF613C","Fifteenmile Creek",2012-11-02 23:11:02,"FIF_sites","2009-05-21",1261.7,"repeat",2010-08-07 13:57:44,818.4,"upstream","downstream",10650,"eventual_repeat",3
+"160","3D9.1C2D4A009A","mainstem, BON to MCN",2011-08-05 13:00:14,"BON (adult)","2010-04-29",463.3,"possible_kelt",2011-08-05 13:00:14,0,"upstream","downstream",12452,"eventual_repeat",3
+"161","3D9.1C2D4A009A","mainstem, mouth to BON",2012-08-30 14:25:01,"implicit","2010-04-29",854.3,"kelt",2011-08-05 13:00:14,391.1,"downstream","upstream",12452,"eventual_repeat",3
+"162","3D9.1C2D4A009A","mainstem, BON to MCN",2012-08-30 14:25:01,"BON (adult)","2010-04-29",854.3,"repeat",2011-08-05 13:00:14,391.1,"upstream","downstream",12452,"eventual_repeat",3
+"163","3D9.1C2D4A009A","John Day River",2012-10-30 06:10:56,"JDR_sites","2010-04-29",915,"repeat",2011-08-05 13:00:14,451.7,"upstream","downstream",12452,"eventual_repeat",3
+"164","3D9.1C2D5D37DB","mainstem, BON to MCN",2012-07-16 16:23:38,"BON (adult)","2010-05-10",798.4,"Adult",2012-07-16 16:23:38,0,"upstream","downstream",12604,"eventual_repeat",11
+"165","3D9.1C2D5D37DB","mainstem, MCN to ICH or PRA",2012-08-05 14:44:08,"MCN (adult)","2010-05-10",818.3,"Adult",2012-07-16 16:23:38,19.9,"upstream","downstream",12604,"eventual_repeat",11
+"166","3D9.1C2D5D37DB","mainstem, ICH to LGR",2012-09-29 16:46:29,"ICH (adult)","2010-05-10",873.4,"Adult",2012-07-16 16:23:38,75,"upstream","downstream",12604,"eventual_repeat",11
+"167","3D9.1C2D5D37DB","mainstem, upstream of LGR",2012-10-06 13:19:26,"LGR (adult)","2010-05-10",880.3,"Adult",2012-07-16 16:23:38,81.9,"upstream","downstream",12604,"eventual_repeat",11
+"168","3D9.1C2D5D37DB","Clearwater River",2013-02-27 20:28:16,"CLE_sites","2010-05-10",1024.6,"Adult",2012-07-16 16:23:38,226.2,"upstream","downstream",12604,"eventual_repeat",11
+"169","3D9.1C2D5D37DB","mainstem, upstream of LGR",2013-03-26 08:21:42,"implicit","2010-05-10",1051.1,"kelt",2012-07-16 16:23:38,252.7,"downstream","upstream",12604,"eventual_repeat",11
+"170","3D9.1C2D5D37DB","mainstem, ICH to LGR",2013-03-26 08:21:42,"ICH_LGR_inriver","2010-05-10",1051.1,"kelt",2012-07-16 16:23:38,252.7,"downstream","upstream",12604,"eventual_repeat",11
+"171","3D9.1C2D5D37DB","mainstem, MCN to ICH or PRA",2013-04-21 14:31:19,"implicit","2010-05-10",1077.3,"kelt",2012-07-16 16:23:38,278.9,"downstream","upstream",12604,"eventual_repeat",11
+"172","3D9.1C2D5D37DB","mainstem, BON to MCN",2013-04-21 14:31:19,"implicit","2010-05-10",1077.3,"kelt",2012-07-16 16:23:38,278.9,"downstream","upstream",12604,"eventual_repeat",11
+"173","3D9.1C2D5D37DB","mainstem, mouth to BON",2013-04-21 14:31:19,"BON_fallback_arrays","2010-05-10",1077.3,"kelt",2012-07-16 16:23:38,278.9,"downstream","upstream",12604,"eventual_repeat",11
+"174","3D9.1C2D5D37DB","mainstem, BON to MCN",2014-08-12 13:14:05,"BON (adult)","2010-05-10",1555.3,"possible_kelt",2012-07-16 16:23:38,756.9,"upstream","downstream",12604,"eventual_repeat",11
+"175","3D9.1C2DB97236","mainstem, BON to MCN",2014-08-28 04:25:57,"BON (adult)","2011-10-22",1040.9,"Adult",2014-08-28 04:25:57,0,"upstream","downstream",15696,"eventual_repeat",11
+"176","3D9.1C2DB97236","mainstem, MCN to ICH or PRA",2014-09-19 10:28:49,"MCN (adult)","2011-10-22",1063.1,"Adult",2014-08-28 04:25:57,22.3,"upstream","downstream",15696,"eventual_repeat",11
+"177","3D9.1C2DB97236","mainstem, ICH to LGR",2014-09-23 17:55:38,"ICH (adult)","2011-10-22",1067.5,"Adult",2014-08-28 04:25:57,26.6,"upstream","downstream",15696,"eventual_repeat",11
+"178","3D9.1C2DB97236","mainstem, upstream of LGR",2014-10-02 19:48:20,"LGR (adult)","2011-10-22",1076.5,"Adult",2014-08-28 04:25:57,35.6,"upstream","downstream",15696,"eventual_repeat",11
+"179","3D9.1C2DB97236","Salmon River",2015-05-10 00:32:10,"SAL_sites","2011-10-22",1295.7,"Adult",2014-08-28 04:25:57,254.8,"upstream","downstream",15696,"eventual_repeat",11
+"180","3D9.1C2DB97236","mainstem, upstream of LGR",2015-06-29 14:20:07,"implicit","2011-10-22",1346.3,"kelt",2014-08-28 04:25:57,305.4,"downstream","upstream",15696,"eventual_repeat",11
+"181","3D9.1C2DB97236","mainstem, ICH to LGR",2015-06-29 14:20:07,"implicit","2011-10-22",1346.3,"kelt",2014-08-28 04:25:57,305.4,"downstream","upstream",15696,"eventual_repeat",11
+"182","3D9.1C2DB97236","mainstem, MCN to ICH or PRA",2015-06-29 14:20:07,"implicit","2011-10-22",1346.3,"kelt",2014-08-28 04:25:57,305.4,"downstream","upstream",15696,"eventual_repeat",11
+"183","3D9.1C2DB97236","mainstem, BON to MCN",2015-06-29 14:20:07,"implicit","2011-10-22",1346.3,"kelt",2014-08-28 04:25:57,305.4,"downstream","upstream",15696,"eventual_repeat",11
+"184","3D9.1C2DB97236","mainstem, mouth to BON",2015-06-29 14:20:07,"implicit","2011-10-22",1346.3,"kelt",2014-08-28 04:25:57,305.4,"downstream","upstream",15696,"eventual_repeat",11
+"185","3D9.1C2DB97236","mainstem, BON to MCN",2015-06-29 14:20:07,"BON (adult)","2011-10-22",1346.3,"possible_kelt",2014-08-28 04:25:57,305.4,"upstream","downstream",15696,"eventual_repeat",11
+"186","3D9.1C2DCD18E7","mainstem, BON to MCN",2013-07-06 16:59:22,"BON (adult)","2011-09-21",654.4,"Adult",2013-07-06 16:59:22,0,"upstream","downstream",16364,"eventual_repeat",9
+"187","3D9.1C2DCD18E7","mainstem, MCN to ICH or PRA",2013-07-16 17:45:22,"MCN (adult)","2011-09-21",664.4,"Adult",2013-07-06 16:59:22,10,"upstream","downstream",16364,"eventual_repeat",9
+"188","3D9.1C2DCD18E7","mainstem, ICH to LGR",2013-07-19 12:41:50,"ICH (adult)","2011-09-21",667.2,"Adult",2013-07-06 16:59:22,12.8,"upstream","downstream",16364,"eventual_repeat",9
+"189","3D9.1C2DCD18E7","mainstem, upstream of LGR",2013-08-04 10:02:08,"LGR (adult)","2011-09-21",683.1,"Adult",2013-07-06 16:59:22,28.7,"upstream","downstream",16364,"eventual_repeat",9
+"190","3D9.1C2DCD18E7","mainstem, ICH to LGR",2014-05-12 13:03:53,"ICH_LGR_inriver","2011-09-21",964.3,"kelt",2013-07-06 16:59:22,309.8,"downstream","upstream",16364,"eventual_repeat",9
+"191","3D9.1C2DCD18E7","mainstem, MCN to ICH or PRA",2015-07-21 06:44:33,"implicit","2011-09-21",1399,"kelt",2013-07-06 16:59:22,744.6,"downstream","upstream",16364,"eventual_repeat",9
+"192","3D9.1C2DCD18E7","mainstem, BON to MCN",2015-07-21 06:44:33,"implicit","2011-09-21",1399,"kelt",2013-07-06 16:59:22,744.6,"downstream","upstream",16364,"eventual_repeat",9
+"193","3D9.1C2DCD18E7","mainstem, mouth to BON",2015-07-21 06:44:33,"implicit","2011-09-21",1399,"kelt",2013-07-06 16:59:22,744.6,"downstream","upstream",16364,"eventual_repeat",9
+"194","3D9.1C2DCD18E7","mainstem, BON to MCN",2015-07-21 06:44:33,"BON (adult)","2011-09-21",1399,"possible_kelt",2013-07-06 16:59:22,744.6,"upstream","downstream",16364,"eventual_repeat",9
+"195","3D9.1C2DD56889","mainstem, BON to MCN",2013-07-26 08:14:30,"BON (adult)","2012-04-24",458.1,"possible_kelt",2013-07-26 08:14:30,0,"upstream","downstream",17078,"eventual_repeat",3
+"196","3D9.1C2DD56889","mainstem, mouth to BON",2014-04-14 05:59:09,"BON_fallback_arrays","2012-04-24",720,"kelt",2013-07-26 08:14:30,261.9,"downstream","upstream",17078,"eventual_repeat",3
+"197","3D9.1C2DD56889","mainstem, BON to MCN",2014-07-21 05:03:52,"BON (adult)","2012-04-24",817.9,"repeat",2013-07-26 08:14:30,359.9,"upstream","downstream",17078,"eventual_repeat",3
+"198","3D9.1C2DD56889","mainstem, MCN to ICH or PRA",2014-09-29 05:44:02,"MCN (adult)","2012-04-24",887.9,"repeat",2013-07-26 08:14:30,429.9,"upstream","downstream",17078,"eventual_repeat",3
+"199","3D9.1C2DD56889","mainstem, ICH to LGR",2014-10-02 10:52:09,"ICH_LGR_inriver","2012-04-24",891.2,"repeat",2013-07-26 08:14:30,433.1,"upstream","downstream",17078,"eventual_repeat",3
+"200","3D9.1C2DD56889","mainstem, upstream of LGR",2014-10-06 18:14:47,"LGR (adult)","2012-04-24",895.5,"repeat",2013-07-26 08:14:30,437.4,"upstream","downstream",17078,"eventual_repeat",3
+"201","3D9.1C2DD727C3","mainstem, BON to MCN",2015-07-19 11:27:13,"BON (adult)","2012-09-13",1039.2,"Adult",2015-07-19 11:27:13,0,"upstream","downstream",17288,"eventual_repeat",13
+"202","3D9.1C2DD727C3","mainstem, MCN to ICH or PRA",2015-07-25 09:12:09,"MCN (adult)","2012-09-13",1045.1,"Adult",2015-07-19 11:27:13,5.9,"upstream","downstream",17288,"eventual_repeat",13
+"203","3D9.1C2DD727C3","mainstem, PRA to RIS",2015-07-31 14:16:06,"PRA (adult)","2012-09-13",1051.3,"Adult",2015-07-19 11:27:13,12.1,"upstream","downstream",17288,"eventual_repeat",13
+"204","3D9.1C2DD727C3","mainstem, RIS to RRE",2015-08-04 12:29:09,"RIS (adult)","2012-09-13",1055.2,"Adult",2015-07-19 11:27:13,16,"upstream","downstream",17288,"eventual_repeat",13
+"205","3D9.1C2DD727C3","mainstem, RRE to WEL",2015-11-02 15:09:07,"RRE (adult)","2012-09-13",1145.3,"Adult",2015-07-19 11:27:13,106.2,"upstream","downstream",17288,"eventual_repeat",13
+"206","3D9.1C2DD727C3","Entiat River",2015-11-14 16:57:46,"ENT_sites","2012-09-13",1157.4,"Adult",2015-07-19 11:27:13,118.2,"upstream","downstream",17288,"eventual_repeat",13
+"207","3D9.1C2DD727C3","mainstem, RRE to WEL",2016-05-27 19:15:32,"implicit","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"208","3D9.1C2DD727C3","mainstem, RIS to RRE",2016-05-27 19:15:32,"implicit","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"209","3D9.1C2DD727C3","mainstem, PRA to RIS",2016-05-27 19:15:32,"implicit","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"210","3D9.1C2DD727C3","mainstem, MCN to ICH or PRA",2016-05-27 19:15:32,"implicit","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"211","3D9.1C2DD727C3","mainstem, BON to MCN",2016-05-27 19:15:32,"implicit","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"212","3D9.1C2DD727C3","mainstem, mouth to BON",2016-05-27 19:15:32,"BON_fallback_arrays","2012-09-13",1352.5,"kelt",2015-07-19 11:27:13,313.3,"downstream","upstream",17288,"eventual_repeat",13
+"213","3D9.1C2DD727C3","mainstem, BON to MCN",2016-09-01 13:52:10,"BON (adult)","2012-09-13",1449.3,"possible_kelt",2015-07-19 11:27:13,410.1,"upstream","downstream",17288,"eventual_repeat",13
+"214","3D9.1C2E0412AE","mainstem, BON to MCN",2015-08-16 07:01:40,"BON (adult)","2013-05-14",824,"Adult",2015-08-16 07:01:40,0,"upstream","downstream",18968,"eventual_repeat",5
+"215","3D9.1C2E0412AE","Fifteenmile Creek",2016-03-05 17:28:54,"FIF_sites","2013-05-14",1026.4,"Adult",2015-08-16 07:01:40,202.4,"upstream","downstream",18968,"eventual_repeat",5
+"216","3D9.1C2E0412AE","mainstem, BON to MCN",2016-08-02 13:32:14,"implicit","2013-05-14",1176.3,"kelt",2015-08-16 07:01:40,352.3,"downstream","upstream",18968,"eventual_repeat",5
+"217","3D9.1C2E0412AE","mainstem, mouth to BON",2016-08-02 13:32:14,"implicit","2013-05-14",1176.3,"kelt",2015-08-16 07:01:40,352.3,"downstream","upstream",18968,"eventual_repeat",5
+"218","3D9.1C2E0412AE","mainstem, BON to MCN",2016-08-02 13:32:14,"BON (adult)","2013-05-14",1176.3,"possible_kelt",2015-08-16 07:01:40,352.3,"upstream","downstream",18968,"eventual_repeat",5
+"219","3D9.257C5A09DB","mainstem, BON to MCN",2007-08-14 13:32:47,"BON (adult)","2006-04-14",487.3,"possible_kelt",2007-08-14 13:32:47,0,"upstream","downstream",19404,"eventual_repeat",3
+"220","3D9.257C5A09DB","mainstem, mouth to BON",2008-04-28 10:11:12,"BON_fallback_arrays","2006-04-14",745.1,"kelt",2007-08-14 13:32:47,257.9,"downstream","upstream",19404,"eventual_repeat",3
+"221","3D9.257C5A09DB","mainstem, BON to MCN",2008-07-27 07:33:14,"BON (adult)","2006-04-14",835,"possible_kelt",2007-08-14 13:32:47,347.8,"upstream","downstream",19404,"eventual_repeat",3
+"222","3DD.007744B85F","mainstem, BON to MCN",2015-07-25 12:31:51,"BON (adult)","2014-04-23",458.2,"Adult",2015-07-25 12:31:51,0,"upstream","downstream",21612,"eventual_repeat",9
+"223","3DD.007744B85F","Deschutes River",2015-07-29 07:34:12,"DES_sites","2014-04-23",462,"Adult",2015-07-25 12:31:51,3.8,"upstream","downstream",21612,"eventual_repeat",9
+"224","3DD.007744B85F","mainstem, BON to MCN",2015-10-31 13:55:54,"implicit","2014-04-23",556.3,"Adult",2015-07-25 12:31:51,98.1,"downstream","upstream",21612,"eventual_repeat",9
+"225","3DD.007744B85F","mainstem, MCN to ICH or PRA",2015-10-31 13:55:54,"MCN (adult)","2014-04-23",556.3,"Adult",2015-07-25 12:31:51,98.1,"upstream","downstream",21612,"eventual_repeat",9
+"226","3DD.007744B85F","mainstem, BON to MCN",2015-11-25 15:37:12,"MCN_fallback_arrays","2014-04-23",581.4,"Adult",2015-07-25 12:31:51,123.1,"downstream","upstream",21612,"eventual_repeat",9
+"227","3DD.007744B85F","Umatilla River",2015-12-13 15:34:35,"UMA_sites","2014-04-23",599.4,"Adult",2015-07-25 12:31:51,141.1,"upstream","downstream",21612,"eventual_repeat",9
+"228","3DD.007744B85F","mainstem, BON to MCN",2016-04-24 07:24:46,"implicit","2014-04-23",732,"kelt",2015-07-25 12:31:51,273.8,"downstream","upstream",21612,"eventual_repeat",9
+"229","3DD.007744B85F","mainstem, mouth to BON",2016-04-24 07:24:46,"BON_fallback_arrays","2014-04-23",732,"kelt",2015-07-25 12:31:51,273.8,"downstream","upstream",21612,"eventual_repeat",9
+"230","3DD.007744B85F","mainstem, BON to MCN",2016-07-20 05:25:14,"BON (adult)","2014-04-23",818.9,"possible_kelt",2015-07-25 12:31:51,360.7,"upstream","downstream",21612,"eventual_repeat",9
+"231","3DD.0077451B94","mainstem, BON to MCN",2015-10-11 06:14:56,"BON (adult)","2014-04-25",534,"Adult",2015-10-11 06:14:56,0,"upstream","downstream",21658,"eventual_repeat",7
+"232","3DD.0077451B94","mainstem, MCN to ICH or PRA",2015-10-17 11:18:00,"MCN (adult)","2014-04-25",540.2,"Adult",2015-10-11 06:14:56,6.2,"upstream","downstream",21658,"eventual_repeat",7
+"233","3DD.0077451B94","mainstem, BON to MCN",2016-04-22 12:46:55,"implicit","2014-04-25",728.2,"Adult",2015-10-11 06:14:56,194.3,"downstream","upstream",21658,"eventual_repeat",7
+"234","3DD.0077451B94","Umatilla River",2016-04-22 12:46:55,"UMA_sites","2014-04-25",728.2,"Adult",2015-10-11 06:14:56,194.3,"upstream","downstream",21658,"eventual_repeat",7
+"235","3DD.0077451B94","mainstem, BON to MCN",2016-08-06 10:45:46,"implicit","2014-04-25",834.2,"kelt",2015-10-11 06:14:56,300.2,"downstream","upstream",21658,"eventual_repeat",7
+"236","3DD.0077451B94","mainstem, mouth to BON",2016-08-06 10:45:46,"implicit","2014-04-25",834.2,"kelt",2015-10-11 06:14:56,300.2,"downstream","upstream",21658,"eventual_repeat",7
+"237","3DD.0077451B94","mainstem, BON to MCN",2016-08-06 10:45:46,"BON (adult)","2014-04-25",834.2,"possible_kelt",2015-10-11 06:14:56,300.2,"upstream","downstream",21658,"eventual_repeat",7
+"238","3DD.007748E9CA","mainstem, BON to MCN",2016-08-12 13:15:16,"BON (adult)","2015-04-30",470.3,"Adult",2016-08-12 13:15:16,0,"upstream","downstream",21792,"eventual_repeat",7
+"239","3DD.007748E9CA","mainstem, MCN to ICH or PRA",2016-09-18 15:34:17,"MCN (adult)","2015-04-30",507.4,"Adult",2016-08-12 13:15:16,37.1,"upstream","downstream",21792,"eventual_repeat",7
+"240","3DD.007748E9CA","mainstem, BON to MCN",2017-06-08 02:36:24,"implicit","2015-04-30",769.8,"Adult",2016-08-12 13:15:16,299.6,"downstream","upstream",21792,"eventual_repeat",7
+"241","3DD.007748E9CA","Umatilla River",2017-06-08 02:36:24,"UMA_sites","2015-04-30",769.8,"Adult",2016-08-12 13:15:16,299.6,"upstream","downstream",21792,"eventual_repeat",7
+"242","3DD.007748E9CA","mainstem, BON to MCN",2018-07-29 08:04:51,"implicit","2015-04-30",1186,"kelt",2016-08-12 13:15:16,715.8,"downstream","upstream",21792,"eventual_repeat",7
+"243","3DD.007748E9CA","mainstem, mouth to BON",2018-07-29 08:04:51,"implicit","2015-04-30",1186,"kelt",2016-08-12 13:15:16,715.8,"downstream","upstream",21792,"eventual_repeat",7
+"244","3DD.007748E9CA","mainstem, BON to MCN",2018-07-29 08:04:51,"BON (adult)","2015-04-30",1186,"possible_kelt",2016-08-12 13:15:16,715.8,"upstream","downstream",21792,"eventual_repeat",7
+"245","3DD.0077C7CBBE","mainstem, BON to MCN",2019-08-14 09:52:57,"BON (adult)","2018-04-20",481.1,"Adult",2019-08-14 09:52:57,0,"upstream","downstream",24536,"eventual_repeat",5
+"246","3DD.0077C7CBBE","John Day River",2019-11-15 03:09:22,"JDR_sites","2018-04-20",573.8,"Adult",2019-08-14 09:52:57,92.7,"upstream","downstream",24536,"eventual_repeat",5
+"247","3DD.0077C7CBBE","mainstem, BON to MCN",2021-09-21 16:20:49,"implicit","2018-04-20",1250.4,"kelt",2019-08-14 09:52:57,769.3,"downstream","upstream",24536,"eventual_repeat",5
+"248","3DD.0077C7CBBE","mainstem, mouth to BON",2021-09-21 16:20:49,"implicit","2018-04-20",1250.4,"kelt",2019-08-14 09:52:57,769.3,"downstream","upstream",24536,"eventual_repeat",5
+"249","3DD.0077C7CBBE","mainstem, BON to MCN",2021-09-21 16:20:49,"BON (adult)","2018-04-20",1250.4,"possible_kelt",2019-08-14 09:52:57,769.3,"upstream","downstream",24536,"eventual_repeat",5

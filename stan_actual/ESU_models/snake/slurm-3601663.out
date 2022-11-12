@@ -1,0 +1,505 @@
+This is cmdstanr version 0.5.2
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+- CmdStan version: 2.30.1
+This is posterior version 1.2.2
+
+Attaching package: ‘posterior’
+
+The following objects are masked from ‘package:stats’:
+
+    mad, sd, var
+
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+real b0_matrix_2_1;
+real b0_matrix_1_2;
+real b0_matrix_3_2;
+real b0_matrix_10_2;
+real b0_matrix_11_2;
+real b0_matrix_12_2;
+real b0_matrix_13_2;
+real b0_matrix_14_2;
+real b0_matrix_27_2;
+real b0_matrix_2_3;
+real b0_matrix_4_3;
+real b0_matrix_8_3;
+real b0_matrix_15_3;
+real b0_matrix_16_3;
+real b0_matrix_3_4;
+real b0_matrix_5_4;
+real b0_matrix_4_5;
+real b0_matrix_6_5;
+real b0_matrix_17_5;
+real b0_matrix_5_6;
+real b0_matrix_7_6;
+real b0_matrix_18_6;
+real b0_matrix_6_7;
+real b0_matrix_19_7;
+real b0_matrix_20_7;
+real b0_matrix_28_7;
+real b0_matrix_3_8;
+real b0_matrix_9_8;
+real b0_matrix_21_8;
+real b0_matrix_8_9;
+real b0_matrix_22_9;
+real b0_matrix_23_9;
+real b0_matrix_24_9;
+real b0_matrix_25_9;
+real b0_matrix_26_9;
+real b0_matrix_2_10;
+real b0_matrix_2_11;
+real b0_matrix_2_12;
+real b0_matrix_2_13;
+real b0_matrix_2_14;
+real b0_matrix_3_15;
+real b0_matrix_3_16;
+real b0_matrix_5_17;
+real b0_matrix_6_18;
+real b0_matrix_7_19;
+real b0_matrix_7_20;
+real b0_matrix_8_21;
+real b0_matrix_9_22;
+real b0_matrix_9_23;
+real b0_matrix_9_24;
+real b0_matrix_9_25;
+real b0_matrix_9_26;
+real b0_matrix_2_27;
+real b0_matrix_7_28;
+real borigin1_matrix_8_3;
+real borigin1_matrix_3_8;
+real borigin1_matrix_9_8;
+real borigin1_matrix_21_8;
+real borigin1_matrix_8_9;
+real borigin1_matrix_22_9;
+real borigin1_matrix_23_9;
+real borigin1_matrix_24_9;
+real borigin1_matrix_25_9;
+real borigin1_matrix_26_9;
+real borigin1_matrix_8_21;
+real borigin1_matrix_9_22;
+real borigin1_matrix_9_23;
+real borigin1_matrix_9_24;
+real borigin1_matrix_9_25;
+real borigin1_matrix_9_26;
+
+real borigin2_matrix_8_3;
+real borigin2_matrix_3_8;
+real borigin2_matrix_9_8;
+real borigin2_matrix_21_8;
+real borigin2_matrix_8_9;
+real borigin2_matrix_22_9;
+real borigin2_matrix_23_9;
+real borigin2_matrix_24_9;
+real borigin2_matrix_25_9;
+real borigin2_matrix_26_9;
+real borigin2_matrix_8_21;
+real borigin2_matrix_9_22;
+real borigin2_matrix_9_23;
+real borigin2_matrix_9_24;
+real borigin2_matrix_9_25;
+real borigin2_matrix_9_26;
+
+real borigin3_matrix_8_3;
+real borigin3_matrix_3_8;
+real borigin3_matrix_9_8;
+real borigin3_matrix_21_8;
+real borigin3_matrix_8_9;
+real borigin3_matrix_22_9;
+real borigin3_matrix_23_9;
+real borigin3_matrix_24_9;
+real borigin3_matrix_25_9;
+real borigin3_matrix_26_9;
+real borigin3_matrix_8_21;
+real borigin3_matrix_9_22;
+real borigin3_matrix_9_23;
+real borigin3_matrix_9_24;
+real borigin3_matrix_9_25;
+real borigin3_matrix_9_26;
+
+real borigin4_matrix_8_3;
+real borigin4_matrix_3_8;
+real borigin4_matrix_9_8;
+real borigin4_matrix_21_8;
+real borigin4_matrix_8_9;
+real borigin4_matrix_22_9;
+real borigin4_matrix_23_9;
+real borigin4_matrix_24_9;
+real borigin4_matrix_25_9;
+real borigin4_matrix_26_9;
+real borigin4_matrix_8_21;
+real borigin4_matrix_9_22;
+real borigin4_matrix_9_23;
+real borigin4_matrix_9_24;
+real borigin4_matrix_9_25;
+real borigin4_matrix_9_26;
+
+real borigin5_matrix_8_3;
+real borigin5_matrix_3_8;
+real borigin5_matrix_9_8;
+real borigin5_matrix_21_8;
+real borigin5_matrix_8_9;
+real borigin5_matrix_22_9;
+real borigin5_matrix_23_9;
+real borigin5_matrix_24_9;
+real borigin5_matrix_25_9;
+real borigin5_matrix_26_9;
+real borigin5_matrix_8_21;
+real borigin5_matrix_9_22;
+real borigin5_matrix_9_23;
+real borigin5_matrix_9_24;
+real borigin5_matrix_9_25;
+real borigin5_matrix_9_26;
+
+b0_matrix[2,1] = b0_matrix_2_1;
+b0_matrix[1,2] = b0_matrix_1_2;
+b0_matrix[3,2] = b0_matrix_3_2;
+b0_matrix[10,2] = b0_matrix_10_2;
+b0_matrix[11,2] = b0_matrix_11_2;
+b0_matrix[12,2] = b0_matrix_12_2;
+b0_matrix[13,2] = b0_matrix_13_2;
+b0_matrix[14,2] = b0_matrix_14_2;
+b0_matrix[27,2] = b0_matrix_27_2;
+b0_matrix[2,3] = b0_matrix_2_3;
+b0_matrix[4,3] = b0_matrix_4_3;
+b0_matrix[8,3] = b0_matrix_8_3;
+b0_matrix[15,3] = b0_matrix_15_3;
+b0_matrix[16,3] = b0_matrix_16_3;
+b0_matrix[3,4] = b0_matrix_3_4;
+b0_matrix[5,4] = b0_matrix_5_4;
+b0_matrix[4,5] = b0_matrix_4_5;
+b0_matrix[6,5] = b0_matrix_6_5;
+b0_matrix[17,5] = b0_matrix_17_5;
+b0_matrix[5,6] = b0_matrix_5_6;
+b0_matrix[7,6] = b0_matrix_7_6;
+b0_matrix[18,6] = b0_matrix_18_6;
+b0_matrix[6,7] = b0_matrix_6_7;
+b0_matrix[19,7] = b0_matrix_19_7;
+b0_matrix[20,7] = b0_matrix_20_7;
+b0_matrix[28,7] = b0_matrix_28_7;
+b0_matrix[3,8] = b0_matrix_3_8;
+b0_matrix[9,8] = b0_matrix_9_8;
+b0_matrix[21,8] = b0_matrix_21_8;
+b0_matrix[8,9] = b0_matrix_8_9;
+b0_matrix[22,9] = b0_matrix_22_9;
+b0_matrix[23,9] = b0_matrix_23_9;
+b0_matrix[24,9] = b0_matrix_24_9;
+b0_matrix[25,9] = b0_matrix_25_9;
+b0_matrix[26,9] = b0_matrix_26_9;
+b0_matrix[2,10] = b0_matrix_2_10;
+b0_matrix[2,11] = b0_matrix_2_11;
+b0_matrix[2,12] = b0_matrix_2_12;
+b0_matrix[2,13] = b0_matrix_2_13;
+b0_matrix[2,14] = b0_matrix_2_14;
+b0_matrix[3,15] = b0_matrix_3_15;
+b0_matrix[3,16] = b0_matrix_3_16;
+b0_matrix[5,17] = b0_matrix_5_17;
+b0_matrix[6,18] = b0_matrix_6_18;
+b0_matrix[7,19] = b0_matrix_7_19;
+b0_matrix[7,20] = b0_matrix_7_20;
+b0_matrix[8,21] = b0_matrix_8_21;
+b0_matrix[9,22] = b0_matrix_9_22;
+b0_matrix[9,23] = b0_matrix_9_23;
+b0_matrix[9,24] = b0_matrix_9_24;
+b0_matrix[9,25] = b0_matrix_9_25;
+b0_matrix[9,26] = b0_matrix_9_26;
+b0_matrix[2,27] = b0_matrix_2_27;
+b0_matrix[7,28] = b0_matrix_7_28;
+borigin1_matrix[8,3] = borigin1_matrix_8_3;
+borigin1_matrix[3,8] = borigin1_matrix_3_8;
+borigin1_matrix[9,8] = borigin1_matrix_9_8;
+borigin1_matrix[21,8] = borigin1_matrix_21_8;
+borigin1_matrix[8,9] = borigin1_matrix_8_9;
+borigin1_matrix[22,9] = borigin1_matrix_22_9;
+borigin1_matrix[23,9] = borigin1_matrix_23_9;
+borigin1_matrix[24,9] = borigin1_matrix_24_9;
+borigin1_matrix[25,9] = borigin1_matrix_25_9;
+borigin1_matrix[26,9] = borigin1_matrix_26_9;
+borigin1_matrix[8,21] = borigin1_matrix_8_21;
+borigin1_matrix[9,22] = borigin1_matrix_9_22;
+borigin1_matrix[9,23] = borigin1_matrix_9_23;
+borigin1_matrix[9,24] = borigin1_matrix_9_24;
+borigin1_matrix[9,25] = borigin1_matrix_9_25;
+borigin1_matrix[9,26] = borigin1_matrix_9_26;
+
+borigin2_matrix[8,3] = borigin2_matrix_8_3;
+borigin2_matrix[3,8] = borigin2_matrix_3_8;
+borigin2_matrix[9,8] = borigin2_matrix_9_8;
+borigin2_matrix[21,8] = borigin2_matrix_21_8;
+borigin2_matrix[8,9] = borigin2_matrix_8_9;
+borigin2_matrix[22,9] = borigin2_matrix_22_9;
+borigin2_matrix[23,9] = borigin2_matrix_23_9;
+borigin2_matrix[24,9] = borigin2_matrix_24_9;
+borigin2_matrix[25,9] = borigin2_matrix_25_9;
+borigin2_matrix[26,9] = borigin2_matrix_26_9;
+borigin2_matrix[8,21] = borigin2_matrix_8_21;
+borigin2_matrix[9,22] = borigin2_matrix_9_22;
+borigin2_matrix[9,23] = borigin2_matrix_9_23;
+borigin2_matrix[9,24] = borigin2_matrix_9_24;
+borigin2_matrix[9,25] = borigin2_matrix_9_25;
+borigin2_matrix[9,26] = borigin2_matrix_9_26;
+
+borigin3_matrix[8,3] = borigin3_matrix_8_3;
+borigin3_matrix[3,8] = borigin3_matrix_3_8;
+borigin3_matrix[9,8] = borigin3_matrix_9_8;
+borigin3_matrix[21,8] = borigin3_matrix_21_8;
+borigin3_matrix[8,9] = borigin3_matrix_8_9;
+borigin3_matrix[22,9] = borigin3_matrix_22_9;
+borigin3_matrix[23,9] = borigin3_matrix_23_9;
+borigin3_matrix[24,9] = borigin3_matrix_24_9;
+borigin3_matrix[25,9] = borigin3_matrix_25_9;
+borigin3_matrix[26,9] = borigin3_matrix_26_9;
+borigin3_matrix[8,21] = borigin3_matrix_8_21;
+borigin3_matrix[9,22] = borigin3_matrix_9_22;
+borigin3_matrix[9,23] = borigin3_matrix_9_23;
+borigin3_matrix[9,24] = borigin3_matrix_9_24;
+borigin3_matrix[9,25] = borigin3_matrix_9_25;
+borigin3_matrix[9,26] = borigin3_matrix_9_26;
+
+borigin4_matrix[8,3] = borigin4_matrix_8_3;
+borigin4_matrix[3,8] = borigin4_matrix_3_8;
+borigin4_matrix[9,8] = borigin4_matrix_9_8;
+borigin4_matrix[21,8] = borigin4_matrix_21_8;
+borigin4_matrix[8,9] = borigin4_matrix_8_9;
+borigin4_matrix[22,9] = borigin4_matrix_22_9;
+borigin4_matrix[23,9] = borigin4_matrix_23_9;
+borigin4_matrix[24,9] = borigin4_matrix_24_9;
+borigin4_matrix[25,9] = borigin4_matrix_25_9;
+borigin4_matrix[26,9] = borigin4_matrix_26_9;
+borigin4_matrix[8,21] = borigin4_matrix_8_21;
+borigin4_matrix[9,22] = borigin4_matrix_9_22;
+borigin4_matrix[9,23] = borigin4_matrix_9_23;
+borigin4_matrix[9,24] = borigin4_matrix_9_24;
+borigin4_matrix[9,25] = borigin4_matrix_9_25;
+borigin4_matrix[9,26] = borigin4_matrix_9_26;
+
+borigin5_matrix[8,3] = borigin5_matrix_8_3;
+borigin5_matrix[3,8] = borigin5_matrix_3_8;
+borigin5_matrix[9,8] = borigin5_matrix_9_8;
+borigin5_matrix[21,8] = borigin5_matrix_21_8;
+borigin5_matrix[8,9] = borigin5_matrix_8_9;
+borigin5_matrix[22,9] = borigin5_matrix_22_9;
+borigin5_matrix[23,9] = borigin5_matrix_23_9;
+borigin5_matrix[24,9] = borigin5_matrix_24_9;
+borigin5_matrix[25,9] = borigin5_matrix_25_9;
+borigin5_matrix[26,9] = borigin5_matrix_26_9;
+borigin5_matrix[8,21] = borigin5_matrix_8_21;
+borigin5_matrix[9,22] = borigin5_matrix_9_22;
+borigin5_matrix[9,23] = borigin5_matrix_9_23;
+borigin5_matrix[9,24] = borigin5_matrix_9_24;
+borigin5_matrix[9,25] = borigin5_matrix_9_25;
+borigin5_matrix[9,26] = borigin5_matrix_9_26;
+
+b0_matrix_2_1 ~ normal(0,10);
+b0_matrix_1_2 ~ normal(0,10);
+b0_matrix_3_2 ~ normal(0,10);
+b0_matrix_10_2 ~ normal(0,10);
+b0_matrix_11_2 ~ normal(0,10);
+b0_matrix_12_2 ~ normal(0,10);
+b0_matrix_13_2 ~ normal(0,10);
+b0_matrix_14_2 ~ normal(0,10);
+b0_matrix_27_2 ~ normal(0,10);
+b0_matrix_2_3 ~ normal(0,10);
+b0_matrix_4_3 ~ normal(0,10);
+b0_matrix_8_3 ~ normal(0,10);
+b0_matrix_15_3 ~ normal(0,10);
+b0_matrix_16_3 ~ normal(0,10);
+b0_matrix_3_4 ~ normal(0,10);
+b0_matrix_5_4 ~ normal(0,10);
+b0_matrix_4_5 ~ normal(0,10);
+b0_matrix_6_5 ~ normal(0,10);
+b0_matrix_17_5 ~ normal(0,10);
+b0_matrix_5_6 ~ normal(0,10);
+b0_matrix_7_6 ~ normal(0,10);
+b0_matrix_18_6 ~ normal(0,10);
+b0_matrix_6_7 ~ normal(0,10);
+b0_matrix_19_7 ~ normal(0,10);
+b0_matrix_20_7 ~ normal(0,10);
+b0_matrix_28_7 ~ normal(0,10);
+b0_matrix_3_8 ~ normal(0,10);
+b0_matrix_9_8 ~ normal(0,10);
+b0_matrix_21_8 ~ normal(0,10);
+b0_matrix_8_9 ~ normal(0,10);
+b0_matrix_22_9 ~ normal(0,10);
+b0_matrix_23_9 ~ normal(0,10);
+b0_matrix_24_9 ~ normal(0,10);
+b0_matrix_25_9 ~ normal(0,10);
+b0_matrix_26_9 ~ normal(0,10);
+b0_matrix_2_10 ~ normal(0,10);
+b0_matrix_2_11 ~ normal(0,10);
+b0_matrix_2_12 ~ normal(0,10);
+b0_matrix_2_13 ~ normal(0,10);
+b0_matrix_2_14 ~ normal(0,10);
+b0_matrix_3_15 ~ normal(0,10);
+b0_matrix_3_16 ~ normal(0,10);
+b0_matrix_5_17 ~ normal(0,10);
+b0_matrix_6_18 ~ normal(0,10);
+b0_matrix_7_19 ~ normal(0,10);
+b0_matrix_7_20 ~ normal(0,10);
+b0_matrix_8_21 ~ normal(0,10);
+b0_matrix_9_22 ~ normal(0,10);
+b0_matrix_9_23 ~ normal(0,10);
+b0_matrix_9_24 ~ normal(0,10);
+b0_matrix_9_25 ~ normal(0,10);
+b0_matrix_9_26 ~ normal(0,10);
+b0_matrix_2_27 ~ normal(0,10);
+b0_matrix_7_28 ~ normal(0,10);
+borigin1_matrix_8_3 ~ normal(0,10);
+borigin1_matrix_3_8 ~ normal(0,10);
+borigin1_matrix_9_8 ~ normal(0,10);
+borigin1_matrix_21_8 ~ normal(0,10);
+borigin1_matrix_8_9 ~ normal(0,10);
+borigin1_matrix_22_9 ~ normal(0,10);
+borigin1_matrix_23_9 ~ normal(0,10);
+borigin1_matrix_24_9 ~ normal(0,10);
+borigin1_matrix_25_9 ~ normal(0,10);
+borigin1_matrix_26_9 ~ normal(0,10);
+borigin1_matrix_8_21 ~ normal(0,10);
+borigin1_matrix_9_22 ~ normal(0,10);
+borigin1_matrix_9_23 ~ normal(0,10);
+borigin1_matrix_9_24 ~ normal(0,10);
+borigin1_matrix_9_25 ~ normal(0,10);
+borigin1_matrix_9_26 ~ normal(0,10);
+
+borigin2_matrix_8_3 ~ normal(0,10);
+borigin2_matrix_3_8 ~ normal(0,10);
+borigin2_matrix_9_8 ~ normal(0,10);
+borigin2_matrix_21_8 ~ normal(0,10);
+borigin2_matrix_8_9 ~ normal(0,10);
+borigin2_matrix_22_9 ~ normal(0,10);
+borigin2_matrix_23_9 ~ normal(0,10);
+borigin2_matrix_24_9 ~ normal(0,10);
+borigin2_matrix_25_9 ~ normal(0,10);
+borigin2_matrix_26_9 ~ normal(0,10);
+borigin2_matrix_8_21 ~ normal(0,10);
+borigin2_matrix_9_22 ~ normal(0,10);
+borigin2_matrix_9_23 ~ normal(0,10);
+borigin2_matrix_9_24 ~ normal(0,10);
+borigin2_matrix_9_25 ~ normal(0,10);
+borigin2_matrix_9_26 ~ normal(0,10);
+
+borigin3_matrix_8_3 ~ normal(0,10);
+borigin3_matrix_3_8 ~ normal(0,10);
+borigin3_matrix_9_8 ~ normal(0,10);
+borigin3_matrix_21_8 ~ normal(0,10);
+borigin3_matrix_8_9 ~ normal(0,10);
+borigin3_matrix_22_9 ~ normal(0,10);
+borigin3_matrix_23_9 ~ normal(0,10);
+borigin3_matrix_24_9 ~ normal(0,10);
+borigin3_matrix_25_9 ~ normal(0,10);
+borigin3_matrix_26_9 ~ normal(0,10);
+borigin3_matrix_8_21 ~ normal(0,10);
+borigin3_matrix_9_22 ~ normal(0,10);
+borigin3_matrix_9_23 ~ normal(0,10);
+borigin3_matrix_9_24 ~ normal(0,10);
+borigin3_matrix_9_25 ~ normal(0,10);
+borigin3_matrix_9_26 ~ normal(0,10);
+
+borigin4_matrix_8_3 ~ normal(0,10);
+borigin4_matrix_3_8 ~ normal(0,10);
+borigin4_matrix_9_8 ~ normal(0,10);
+borigin4_matrix_21_8 ~ normal(0,10);
+borigin4_matrix_8_9 ~ normal(0,10);
+borigin4_matrix_22_9 ~ normal(0,10);
+borigin4_matrix_23_9 ~ normal(0,10);
+borigin4_matrix_24_9 ~ normal(0,10);
+borigin4_matrix_25_9 ~ normal(0,10);
+borigin4_matrix_26_9 ~ normal(0,10);
+borigin4_matrix_8_21 ~ normal(0,10);
+borigin4_matrix_9_22 ~ normal(0,10);
+borigin4_matrix_9_23 ~ normal(0,10);
+borigin4_matrix_9_24 ~ normal(0,10);
+borigin4_matrix_9_25 ~ normal(0,10);
+borigin4_matrix_9_26 ~ normal(0,10);
+
+borigin5_matrix_8_3 ~ normal(0,10);
+borigin5_matrix_3_8 ~ normal(0,10);
+borigin5_matrix_9_8 ~ normal(0,10);
+borigin5_matrix_21_8 ~ normal(0,10);
+borigin5_matrix_8_9 ~ normal(0,10);
+borigin5_matrix_22_9 ~ normal(0,10);
+borigin5_matrix_23_9 ~ normal(0,10);
+borigin5_matrix_24_9 ~ normal(0,10);
+borigin5_matrix_25_9 ~ normal(0,10);
+borigin5_matrix_26_9 ~ normal(0,10);
+borigin5_matrix_8_21 ~ normal(0,10);
+borigin5_matrix_9_22 ~ normal(0,10);
+borigin5_matrix_9_23 ~ normal(0,10);
+borigin5_matrix_9_24 ~ normal(0,10);
+borigin5_matrix_9_25 ~ normal(0,10);
+borigin5_matrix_9_26 ~ normal(0,10);
+
+[1] "2022-08-18 22:02:27 PDT"
+[1] "2022-08-18 22:03:03 PDT"
+[1] "2022-08-18 22:03:10 PDT"
+Warning in '/tmp/RtmpeV1j1K/model-5a3c73c654b.stan', line 36, column 28: Comments
+    beginning with # are deprecated and this syntax will be removed in Stan
+    2.32.0. Use // to begin line comments; this can be done automatically
+    using the auto-format flag to stanc
+Warning in '/tmp/RtmpeV1j1K/model-5a3c73c654b.stan', line 53, column 4: Comments
+    beginning with # are deprecated and this syntax will be removed in Stan
+    2.32.0. Use // to begin line comments; this can be done automatically
+    using the auto-format flag to stanc
+Warning in '/tmp/RtmpeV1j1K/model-5a3c73c654b.stan', line 489, column 0: Comments
+    beginning with # are deprecated and this syntax will be removed in Stan
+    2.32.0. Use // to begin line comments; this can be done automatically
+    using the auto-format flag to stanc
+Warning in '/tmp/RtmpeV1j1K/model-5a3c73c654b.stan', line 503, column 2: Comments
+    beginning with # are deprecated and this syntax will be removed in Stan
+    2.32.0. Use // to begin line comments; this can be done automatically
+    using the auto-format flag to stanc
+Warning in '/tmp/RtmpeV1j1K/model-5a3c73c654b.stan', line 517, column 0: Comments
+    beginning with # are deprecated and this syntax will be removed in Stan
+    2.32.0. Use // to begin line comments; this can be done automatically
+    using the auto-format flag to stanc
+
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 Iteration:   1 / 400 [  0%]  (Warmup) 
+Chain 1 Iteration:  10 / 400 [  2%]  (Warmup) 
+Chain 1 Iteration:  20 / 400 [  5%]  (Warmup) 
+Chain 1 Iteration:  30 / 400 [  7%]  (Warmup) 
+Chain 1 Iteration:  40 / 400 [ 10%]  (Warmup) 
+Chain 1 Iteration:  50 / 400 [ 12%]  (Warmup) 
+Chain 1 Iteration:  60 / 400 [ 15%]  (Warmup) 
+Chain 1 Iteration:  70 / 400 [ 17%]  (Warmup) 
+Chain 1 Iteration:  80 / 400 [ 20%]  (Warmup) 
+Chain 1 Iteration:  90 / 400 [ 22%]  (Warmup) 
+Chain 1 Iteration: 100 / 400 [ 25%]  (Warmup) 
+Chain 1 Iteration: 110 / 400 [ 27%]  (Warmup) 
+Chain 1 Iteration: 120 / 400 [ 30%]  (Warmup) 
+Chain 1 Iteration: 130 / 400 [ 32%]  (Warmup) 
+Chain 1 Iteration: 140 / 400 [ 35%]  (Warmup) 
+Chain 1 Iteration: 150 / 400 [ 37%]  (Warmup) 
+Chain 1 Iteration: 160 / 400 [ 40%]  (Warmup) 
+Chain 1 Iteration: 170 / 400 [ 42%]  (Warmup) 
+Chain 1 Iteration: 180 / 400 [ 45%]  (Warmup) 
+Chain 1 Iteration: 190 / 400 [ 47%]  (Warmup) 
+Chain 1 Iteration: 200 / 400 [ 50%]  (Warmup) 
+Chain 1 Iteration: 201 / 400 [ 50%]  (Sampling) 
+Chain 1 Iteration: 210 / 400 [ 52%]  (Sampling) 
+Chain 1 Iteration: 220 / 400 [ 55%]  (Sampling) 
+Chain 1 Iteration: 230 / 400 [ 57%]  (Sampling) 
+Chain 1 Iteration: 240 / 400 [ 60%]  (Sampling) 
+Chain 1 Iteration: 250 / 400 [ 62%]  (Sampling) 
+Chain 1 Iteration: 260 / 400 [ 65%]  (Sampling) 
+Chain 1 Iteration: 270 / 400 [ 67%]  (Sampling) 
+Chain 1 Iteration: 280 / 400 [ 70%]  (Sampling) 
+Chain 1 Iteration: 290 / 400 [ 72%]  (Sampling) 
+Chain 1 Iteration: 300 / 400 [ 75%]  (Sampling) 
+Chain 1 Iteration: 310 / 400 [ 77%]  (Sampling) 
+Chain 1 Iteration: 320 / 400 [ 80%]  (Sampling) 
+slurmstepd: error: *** JOB 3601663 ON n2345 CANCELLED AT 2022-08-19T01:57:13 DUE TO TIME LIMIT ***

@@ -1,0 +1,54 @@
+"","from","to","mean","q5","q95"
+"1","mainstem, mouth to BON","mainstem, BON to MCN",0.98022953,0.97280425,0.9864442
+"2","mainstem, mouth to BON","loss",0.019770448,0.01355609,0.027195455
+"3","mainstem, BON to MCN","mainstem, mouth to BON",0.0201465175,0.018996465,0.021388605
+"4","mainstem, BON to MCN","mainstem, MCN to ICH or PRA",0.745705,0.74167135,0.74939145
+"5","mainstem, BON to MCN","Deschutes River",0.037077563,0.03556045,0.038622005
+"6","mainstem, BON to MCN","John Day River",0.0035066597,0.0029810565,0.0040047665
+"7","mainstem, BON to MCN","Hood River",0.0005177669,0.00034511525,0.00074456635
+"8","mainstem, BON to MCN","Fifteenmile Creek",0.0001129875235,4.585839e-05,0.00021124655
+"9","mainstem, BON to MCN","Umatilla River",0.00094424631,0.0007087541,0.001193467
+"10","mainstem, BON to MCN","BON to MCN other tributaries",0.001128747905,0.0008663121,0.001396963
+"11","mainstem, BON to MCN","loss",0.190860455,0.18745675,0.19488715
+"12","mainstem, PRA to RIS","mainstem, MCN to ICH or PRA",0.46842268,0.43709605,0.5024079
+"13","mainstem, PRA to RIS","mainstem, RIS to RRE",0.47593961,0.4447766,0.50672605
+"14","mainstem, PRA to RIS","loss",0.055637737,0.03931455,0.07056112
+"15","mainstem, RIS to RRE","mainstem, PRA to RIS",0.377583255,0.336353,0.4130043
+"16","mainstem, RIS to RRE","mainstem, RRE to WEL",0.56919282,0.5316552,0.61242825
+"17","mainstem, RIS to RRE","Wenatchee River",0.005502880015,0.001092453,0.011776895
+"18","mainstem, RIS to RRE","loss",0.0477210005,0.03157384,0.06780486
+"19","mainstem, RRE to WEL","mainstem, RIS to RRE",0.260593025,0.2193209,0.3070401
+"20","mainstem, RRE to WEL","mainstem, upstream of WEL",0.62689612,0.5732136,0.67710095
+"21","mainstem, RRE to WEL","Entiat River",0.0128174404,0.0038837065,0.02671623
+"22","mainstem, RRE to WEL","loss",0.0996934255,0.07661551,0.1262942
+"23","mainstem, upstream of WEL","mainstem, RRE to WEL",0.306461825,0.24827165,0.3747604
+"24","mainstem, upstream of WEL","Okanogan River",0.1095139175,0.071221715,0.1585337
+"25","mainstem, upstream of WEL","Methow River",0.159997664,0.1170829,0.20106345
+"26","mainstem, upstream of WEL","Upstream WEL other tributaries",0.00613402856,0.000431717,0.017255535
+"27","mainstem, upstream of WEL","loss",0.41789259,0.3622324,0.480239
+"28","Deschutes River","mainstem, BON to MCN",0.797361485,0.7812229,0.81487435
+"29","Deschutes River","loss",0.202638515,0.18512565,0.2187771
+"30","John Day River","mainstem, BON to MCN",0.26181661,0.19667675,0.32968185
+"31","John Day River","loss",0.73818339,0.67031815,0.80332325
+"32","Hood River","mainstem, BON to MCN",0.73391871,0.5763167,0.8741413
+"33","Hood River","loss",0.266081291,0.1258587,0.4236833
+"34","Fifteenmile Creek","mainstem, BON to MCN",0.0195586098510773,1.804293e-09,0.105548
+"35","Fifteenmile Creek","loss",0.980441405,0.894452,1
+"36","Umatilla River","mainstem, BON to MCN",0.142240837,0.061328915,0.2303685
+"37","Umatilla River","loss",0.857759165,0.7696315,0.93867145
+"38","Yakima River","mainstem, MCN to ICH or PRA",0.35463585,0.1516089,0.54109165
+"39","Yakima River","loss",0.64536415,0.45890835,0.8483911
+"40","Walla Walla River","mainstem, MCN to ICH or PRA",0.212761387,0.12407035,0.3120647
+"41","Walla Walla River","loss",0.78723862,0.6879353,0.87592965
+"42","Wenatchee River","mainstem, RIS to RRE",0.488355384,0.05521908,0.94563235
+"43","Wenatchee River","loss",0.51164462868,0.054367295,0.944781
+"44","Entiat River","mainstem, RRE to WEL",0.028875792493005,1.4645105e-08,0.1499475
+"45","Entiat River","loss",0.97112417,0.8500525,1
+"46","Okanogan River","mainstem, upstream of WEL",0.11728066775,0.01676516,0.27812055
+"47","Okanogan River","loss",0.882719325,0.72187945,0.98323455
+"48","Methow River","mainstem, upstream of WEL",0.2379265745,0.1280542,0.37696845
+"49","Methow River","loss",0.76207343,0.62303155,0.8719458
+"50","BON to MCN other tributaries","mainstem, BON to MCN",0.233427985,0.1335625,0.35725175
+"51","BON to MCN other tributaries","loss",0.766572015,0.64274825,0.8664375
+"52","Upstream WEL other tributaries","mainstem, upstream of WEL",0.0829877939532714,1.060023e-09,0.5608863
+"53","Upstream WEL other tributaries","loss",0.9170121915,0.4391137,1
