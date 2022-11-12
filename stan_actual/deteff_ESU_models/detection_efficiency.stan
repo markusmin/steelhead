@@ -63,9 +63,10 @@ model {
   //detection probability at zero discharge (a biologically nonsensical parameter)
   // note that a value of 5 gives you 99%; a value of 0 gives you 0.5, and a value of -5 gives you
   // 0.6%. So I think normal(0,5) is reasonable.
-  beta ~ normal(0, 1); // this is the prior on the slopes; we would expect it to be around 0. All 
+  beta ~ normal(0, 2); // this is the prior on the slopes; we would expect it to be around 0. All 
   // of our slopes in the Rmd are really close to 1, like under 0.1. So let's go normal (0,1),
-  // which is honestly still too much. Hopefully it runs
+  // which is honestly still too much.
+  // now with the z-score, I think this is probably still fine, but could be a bit larger - let's go to (0,2)
   
   
   

@@ -10,38 +10,45 @@ library(lubridate)
 library(janitor)
 
 # load tributary data
-tributary_data <- read.csv(here::here("covariate_data", "tributary_discharge_data.csv"))
+# tributary_data <- read.csv(here::here("covariate_data", "tributary_discharge_data.csv"))
+tributary_data <- read.csv(here::here("covariate_data", "tributary_discharge_data_zscore.csv"))
 
 # split the data up by tributary
 
 subset(tributary_data, tributary == "Asotin Creek") %>% 
-  dplyr::select(-tributary) -> asotin_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> asotin_discharge
 subset(tributary_data, tributary == "Deschutes River") %>% 
-  dplyr::select(-tributary) -> deschutes_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> deschutes_discharge
 subset(tributary_data, tributary == "Entiat River") %>% 
-  dplyr::select(-tributary) -> entiat_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> entiat_discharge
 subset(tributary_data, tributary == "Fifteenmile Creek") %>% 
-  dplyr::select(-tributary) -> fifteenmile_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> fifteenmile_discharge
+# Create fake data for fifteenmile, with all zeros for discharge - allows fitting of intercept-only model
+fifteenmile_discharge <- data.frame(run_year = asotin_discharge$run_year, mean_discharge_zscore = 0)
+
 subset(tributary_data, tributary == "Hood River") %>% 
-  dplyr::select(-tributary) -> hood_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> hood_discharge
 subset(tributary_data, tributary == "Imnaha River") %>% 
-  dplyr::select(-tributary) -> imnaha_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> imnaha_discharge
+# Create fake data for imnaha, with all zeros for discharge - allows fitting of intercept-only model
+imnaha_discharge <- data.frame(run_year = asotin_discharge$run_year, mean_discharge_zscore = 0)
+
 subset(tributary_data, tributary == "John Day River") %>% 
-  dplyr::select(-tributary) -> john_day_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> john_day_discharge
 subset(tributary_data, tributary == "Methow River") %>% 
-  dplyr::select(-tributary) -> methow_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> methow_discharge
 subset(tributary_data, tributary == "Okanogan River") %>% 
-  dplyr::select(-tributary) -> okanogan_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> okanogan_discharge
 subset(tributary_data, tributary == "Tucannon River") %>% 
-  dplyr::select(-tributary) -> tucannon_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> tucannon_discharge
 subset(tributary_data, tributary == "Umatilla River") %>% 
-  dplyr::select(-tributary) -> umatilla_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> umatilla_discharge
 subset(tributary_data, tributary == "Walla Walla River") %>% 
-  dplyr::select(-tributary) -> walla_walla_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> walla_walla_discharge
 subset(tributary_data, tributary == "Wenatchee River") %>% 
-  dplyr::select(-tributary) -> wenatchee_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> wenatchee_discharge
 subset(tributary_data, tributary == "Yakima River") %>% 
-  dplyr::select(-tributary) -> yakima_discharge
+  dplyr::select(-c(tributary, mean_discharge_cfs)) -> yakima_discharge
 
 # load fish detections
 states_complete <- read.csv(here::here("stan_actual", "adults_states_complete.csv"), row.names = 1)
@@ -384,72 +391,72 @@ for (i in 1:nrow(deteff_data)){
   }
   # Betas
   if (deteff_data$tributary[i] == "Asotin") {
-    design_matrix[i,21] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,21] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,21] <- 0
   }
   if (deteff_data$tributary[i] == "Deschutes") {
-    design_matrix[i,22] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,22] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,22] <- 0
   }
   if (deteff_data$tributary[i] == "Entiat") {
-    design_matrix[i,23] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,23] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,23] <- 0
   }
   if (deteff_data$tributary[i] == "Fifteenmile") {
-    design_matrix[i,24] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,24] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,24] <- 0
   }
   if (deteff_data$tributary[i] == "Hood") {
-    design_matrix[i,25] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,25] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,25] <- 0
   }
   if (deteff_data$tributary[i] == "Imnaha") {
-    design_matrix[i,26] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,26] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,26] <- 0
   }
   if (deteff_data$tributary[i] == "John Day") {
-    design_matrix[i,27] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,27] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,27] <- 0
   }
   if (deteff_data$tributary[i] == "Methow") {
-    design_matrix[i,28] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,28] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,28] <- 0
   }
   if (deteff_data$tributary[i] == "Okanogan") {
-    design_matrix[i,29] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,29] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,29] <- 0
   }
   if (deteff_data$tributary[i] == "Tucannon") {
-    design_matrix[i,30] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,30] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,30] <- 0
   }
   if (deteff_data$tributary[i] == "Umatilla") {
-    design_matrix[i,31] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,31] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,31] <- 0
   }
   if (deteff_data$tributary[i] == "Walla Walla") {
-    design_matrix[i,32] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,32] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,32] <- 0
   }
   if (deteff_data$tributary[i] == "Wenatchee") {
-    design_matrix[i,33] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,33] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,33] <- 0
   }
   if (deteff_data$tributary[i] == "Yakima") {
-    design_matrix[i,34] <- deteff_data$mean_discharge_cfs[i]
+    design_matrix[i,34] <- deteff_data$mean_discharge_zscore[i]
   } else {
     design_matrix[i,34] <- 0
   }
@@ -457,17 +464,18 @@ for (i in 1:nrow(deteff_data)){
 
 # Remove all rows from design that have missing data (is there a way around this 
 # in the future to still estimate an intercept but no slope?)
-na.omit(design_matrix) -> design_matrix2
+# na.omit(design_matrix) -> design_matrix2
 
 
 ##### Fit stan model #####
 
 # step 0: data in a list #
-data <- list(N = nrow(design_matrix2),
-             y = subset(deteff_data, !(is.na(mean_discharge_cfs)))$detected,
+data <- list(N = nrow(design_matrix),
+             # y = subset(deteff_data, !(is.na(mean_discharge_cfs)))$detected,
+             y = deteff_data$detected,
              J = 20,
              K = 14,
-             X = design_matrix2)
+             X = design_matrix)
 
 # Step 1: load the model
 # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
@@ -500,7 +508,7 @@ mcmc_trace(fit$draws(), pars = c("alpha[1]"))
 # Extract parameter estimates
 fit$save_object(file = here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
 
-fit <- readRDS(here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
+# fit <- readRDS(here::here("stan_actual", "deteff_ESU_models", "detection_efficiency_stan_fit.rds"))
 
 # Calculate detection probability from parameter estimates
 deteff_stan_fit_summary <- fit$summary()
@@ -514,8 +522,8 @@ deteff_stan_fit_summary[1:10,]
 ##### EXPORT PARAMETER ESTIMATES TO USE AS PRIORS IN PRIMARY MODEL #####
 # create matrix to store values
 det_eff_param_posteriors <- matrix(nrow = 34, ncol = 2)
-det_eff_param_posteriors[,1] <- snake_deteff_stan_fit_summary$mean[2:35]
-det_eff_param_posteriors[,2] <- snake_deteff_stan_fit_summary$sd[2:35]
+det_eff_param_posteriors[,1] <- deteff_stan_fit_summary$mean[2:35]
+det_eff_param_posteriors[,2] <- deteff_stan_fit_summary$sd[2:35]
 
 write.csv(det_eff_param_posteriors, here::here("stan_actual", "deteff_ESU_models", "det_eff_param_posteriors.csv"))
 
