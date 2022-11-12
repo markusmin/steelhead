@@ -9,7 +9,7 @@
 # This script will fit an intercept + origin model using stan to the actual dataset
 
 # FOR TESTING: setwd
-setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/deteff_ESU_models/snake/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/deteff_ESU_models/snake/")
 
 # library("rstan")
 library(cmdstanr)
@@ -1578,8 +1578,8 @@ n.ind <- dim(state_data)[3]
     refresh = 10, # print update every iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 200,
-    iter_sampling = 200,
+    iter_warmup = 20,
+    iter_sampling = 20,
     threads_per_chain = 28,
     init = 1
   )
