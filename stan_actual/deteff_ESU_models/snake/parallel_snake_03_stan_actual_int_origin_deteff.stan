@@ -92,6 +92,8 @@ functions{
     // j is the index of the observation (i.e., each individual state transition)
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
+          print("i = ",i);
+            print("j = ",j);
 
         // vector for logits
         vector[43] logits;
@@ -162,6 +164,8 @@ functions{
                       DE_correction[k] = 0;
                       }
                       
+                      print("i==1; logits = ",logits);
+                      
           
           } else {
             // If we're in a state/run year combo that needs DE correction, correct for it
@@ -209,6 +213,7 @@ functions{
                     DE_correction[k] = 0;
                     }
                     
+                    
           }
           
           
@@ -222,8 +227,14 @@ functions{
           // declare vector to store observed movement probabilities, which are a product of the true probabilities, mulitplied by detection efficiency
           vector[43] p_vec_observed;
           
+          print("i!=1; logits = ",logits);
+          
           // proportion vector, uncorrected for detection efficiency
           p_vec_actual = softmax(logits);
+          
+          print("p_vec_actual: ", p_vec_actual);
+        print("i = ",i);
+        print("j = ",j);
           
           // now, loop through transitions again, and calculate detection efficiency for each where DE_correction == 1
           // declare one vector for linear predictors and one for actual detection efficiency
@@ -233,8 +244,12 @@ functions{
           if (DE_correction[k] == 1) {
             // the exception for if i = 1 for the indexing:
             if (i == 1){
-            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * det_eff_param_vector; 
-            // det_eff_eta[k] = tributary_design_vector * det_eff_param_vector; 
+              // because we're now multiplying them as vectors, we need to sum to get the same results as if it was a design matrix
+              // vector[34] trib_design_matrix_result;
+            // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * det_eff_param_vector;
+            // det_eff_eta[k] = sum(trib_design_matrix_result);
+            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * to_vector(det_eff_param_vector);
+            // det_eff_eta[k] = tributary_design_vector * det_eff_param_vector;
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
               
             } else {
@@ -261,7 +276,10 @@ functions{
             // get the actual run year
             int run_year_actual;
             run_year_actual = transition_run_years[run_year_index];
-            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector; 
+            vector[34] trib_design_matrix_result;
+            // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector;
+            // det_eff_eta[k] = sum(trib_design_matrix_result);
+            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * to_vector(det_eff_param_vector);
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
               
             }
@@ -279,12 +297,19 @@ functions{
           
           
           // now loop through transitions and modify p_vec to account for this
+        
+          
+          // Create a vector to store all of the loss corrections for detection efficiency
+          vector[42] loss_term_DE_corrections;
+          
         for (k in 1:42){
           if (DE_correction[k] == 1) {
             p_vec_observed[k] = p_vec_actual[k] * det_eff[k];
+            // p_vec_observed[k] = p_vec_actual[k]; // again this is just for testing - remove det eff correction for now
             
             // each time you modify a term, modify the loss term by the same amount
-            p_vec_actual[43] = p_vec_actual[43] + p_vec_actual[k] * (1 - det_eff[k]);
+            // p_vec_observed[43] = p_vec_observed[43] + p_vec_actual[k] * (1 - det_eff[k]);
+            loss_term_DE_corrections[k] = p_vec_actual[k] * (1 - det_eff[k]);
             
           } else {
             p_vec_observed[k] = p_vec_actual[k];
@@ -294,10 +319,17 @@ functions{
           
         }
         
-            
-        // print("p_vec: ", p_vec);
-        // print("i = ",i);
-        // print("j = ",j);
+        // Once you've looped through all states, correct loss term
+        
+        p_vec_observed[43] = p_vec_actual[43] + sum(loss_term_DE_corrections);
+        // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the 
+        // above line isn't the cause of the errors
+        
+        print("det eff eta: ", det_eff_eta);
+        print("det eff: ", det_eff);
+        print("p_vec_observed: ", p_vec_observed);
+        print("i = ",i);
+        print("j = ",j);
         // print("slice_y[i,j]: ", slice_y[i,j+1]);
         // Store the log probability of that individual transition in the vector that we declared
         // lp_fish[j] = categorical_lpmf(slice_y[i,j+1] | p_vec);
@@ -340,7 +372,7 @@ data {
   matrix[34,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   
   // array that contains design matrices for each tributary
-  array[14,17,34] int tributary_design_matrices_array;
+  array[18,34,42] int tributary_design_matrices_array;
   
   // vector that contains the run years in which each individual transition occurred
   int ntransitions;
@@ -1006,7 +1038,7 @@ borigin5_matrix_DE[40,9] = borigin5_matrix_39_9;
 borigin5_matrix_NDE[40,9] = borigin5_matrix_39_9;
 
 // detection efficiency - create a vector that stores all parameters
-vector[43] det_eff_param_vector;
+vector[34] det_eff_param_vector; // this is length 34 because that's how many det eff params we have
 
 // populate the vector
 det_eff_param_vector[1] = asotin_alpha1;
@@ -1291,43 +1323,42 @@ borigin5_matrix_9_38 ~ normal(0,10);
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
 // the outputs from that model will be the first column [,1] containing central tendency (mean)
 // and the second column [,2] containing the standard deviation
-// need to fix indexing!
 asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-asotin_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-deschutes_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-entiat_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-hood_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-imnaha_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-john_day_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-methow_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-methow_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-okanogan_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-tucannon_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-tucannon_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-umatilla_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-umatilla_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-walla_walla_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-walla_walla_alpha2 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-walla_walla_alpha3 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-wenatchee_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-yakima_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+asotin_alpha2 ~ normal(det_eff_param_posteriors[2,1], det_eff_param_posteriors[2,2]);
+deschutes_alpha1 ~ normal(det_eff_param_posteriors[3,1], det_eff_param_posteriors[3,2]);
+entiat_alpha1 ~ normal(det_eff_param_posteriors[4,1], det_eff_param_posteriors[4,2]);
+fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[5,1], det_eff_param_posteriors[5,2]);
+hood_alpha1 ~ normal(det_eff_param_posteriors[6,1], det_eff_param_posteriors[6,2]);
+imnaha_alpha1 ~ normal(det_eff_param_posteriors[7,1], det_eff_param_posteriors[7,2]);
+john_day_alpha1 ~ normal(det_eff_param_posteriors[8,1], det_eff_param_posteriors[8,2]);
+methow_alpha1 ~ normal(det_eff_param_posteriors[9,1], det_eff_param_posteriors[9,2]);
+methow_alpha2 ~ normal(det_eff_param_posteriors[10,1], det_eff_param_posteriors[10,2]);
+okanogan_alpha1 ~ normal(det_eff_param_posteriors[11,1], det_eff_param_posteriors[11,2]);
+tucannon_alpha1 ~ normal(det_eff_param_posteriors[12,1], det_eff_param_posteriors[12,2]);
+tucannon_alpha2 ~ normal(det_eff_param_posteriors[13,1], det_eff_param_posteriors[13,2]);
+umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posteriors[14,2]);
+umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
+walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
+walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
+walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
+wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
+yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
 
 // 14 terms for discharge relationship, one for each tributary
-asotin_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-deschutes_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-entiat_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-fifteenmile_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-hood_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-imnaha_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-john_day_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-methow_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-okanogan_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-tucannon_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-umatilla_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-walla_walla_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-wenatchee_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-yakima_beta ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
+deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
+entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
+fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
+imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
+methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
+okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
+tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
+umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
+walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
+wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
+yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
 
 
 
