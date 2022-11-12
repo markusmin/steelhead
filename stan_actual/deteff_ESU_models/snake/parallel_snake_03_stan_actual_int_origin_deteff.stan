@@ -92,8 +92,8 @@ functions{
     // j is the index of the observation (i.e., each individual state transition)
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
-          print("i = ",i);
-            print("j = ",j);
+          // print("i = ",i);
+            // print("j = ",j);
 
         // vector for logits
         vector[43] logits;
@@ -164,7 +164,7 @@ functions{
                       DE_correction[k] = 0;
                       }
                       
-                      print("i==1; logits = ",logits);
+                      // print("i==1; logits = ",logits);
                       
           
           } else {
@@ -227,14 +227,14 @@ functions{
           // declare vector to store observed movement probabilities, which are a product of the true probabilities, mulitplied by detection efficiency
           vector[43] p_vec_observed;
           
-          print("i!=1; logits = ",logits);
+          // print("i!=1; logits = ",logits);
           
           // proportion vector, uncorrected for detection efficiency
           p_vec_actual = softmax(logits);
           
-          print("p_vec_actual: ", p_vec_actual);
-        print("i = ",i);
-        print("j = ",j);
+          // print("p_vec_actual: ", p_vec_actual);
+        // print("i = ",i);
+        // print("j = ",j);
           
           // now, loop through transitions again, and calculate detection efficiency for each where DE_correction == 1
           // declare one vector for linear predictors and one for actual detection efficiency
@@ -317,6 +317,9 @@ functions{
           } else {
             p_vec_observed[k] = p_vec_actual[k];
             
+            // Just put a zero there, otherwise it'll be NAs
+            loss_term_DE_corrections[k] = 0;
+            
             // testing
             // p_vec_observed_test[k] = p_vec_actual[k];
             
@@ -331,13 +334,13 @@ functions{
         // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the
         // above line isn't the cause of the errors
         
-        print("DE_correction: ", DE_correction);
-        print("det eff eta: ", det_eff_eta);
-        print("det eff: ", det_eff);
-        print("p_vec_observed: ", p_vec_observed);
+        // print("DE_correction: ", DE_correction);
+        // print("det eff eta: ", det_eff_eta);
+        // print("det eff: ", det_eff);
+        // print("p_vec_observed: ", p_vec_observed);
         // print("p_vec_observed_test: ", p_vec_observed_test);
-        print("i = ",i);
-        print("j = ",j);
+        // print("i = ",i);
+        // print("j = ",j);
         // print("slice_y[i,j]: ", slice_y[i,j+1]);
         // Store the log probability of that individual transition in the vector that we declared
         // lp_fish[j] = categorical_lpmf(slice_y[i,j+1] | p_vec);
