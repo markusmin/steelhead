@@ -276,7 +276,7 @@ functions{
             // get the actual run year
             int run_year_actual;
             run_year_actual = transition_run_years[run_year_index];
-            vector[34] trib_design_matrix_result;
+            // vector[34] trib_design_matrix_result;
             // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector;
             // det_eff_eta[k] = sum(trib_design_matrix_result);
             det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * to_vector(det_eff_param_vector);
@@ -302,6 +302,9 @@ functions{
           // Create a vector to store all of the loss corrections for detection efficiency
           vector[42] loss_term_DE_corrections;
           
+          // for testing: create a vector of p_vec_observed_test that we can fill
+          // vector[42] p_vec_observed_test;
+          
         for (k in 1:42){
           if (DE_correction[k] == 1) {
             p_vec_observed[k] = p_vec_actual[k] * det_eff[k];
@@ -314,6 +317,9 @@ functions{
           } else {
             p_vec_observed[k] = p_vec_actual[k];
             
+            // testing
+            // p_vec_observed_test[k] = p_vec_actual[k];
+            
           }
           
           
@@ -322,12 +328,14 @@ functions{
         // Once you've looped through all states, correct loss term
         
         p_vec_observed[43] = p_vec_actual[43] + sum(loss_term_DE_corrections);
-        // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the 
+        // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the
         // above line isn't the cause of the errors
         
+        print("DE_correction: ", DE_correction);
         print("det eff eta: ", det_eff_eta);
         print("det eff: ", det_eff);
         print("p_vec_observed: ", p_vec_observed);
+        // print("p_vec_observed_test: ", p_vec_observed_test);
         print("i = ",i);
         print("j = ",j);
         // print("slice_y[i,j]: ", slice_y[i,j+1]);
@@ -706,18 +714,23 @@ b0_matrix_DE[2,3] = b0_matrix_2_3;
 b0_matrix_NDE[2,3] = b0_matrix_2_3;
 b0_matrix_DE[2,10] = b0_matrix_2_10_DE;
 b0_matrix_NDE[2,10] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,11] = -100000;
 b0_matrix_NDE[2,11] = b0_matrix_2_10_NDE;
 b0_matrix_DE[2,12] = b0_matrix_2_12_DE;
 b0_matrix_NDE[2,12] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,13] = -100000;
 b0_matrix_NDE[2,13] = b0_matrix_2_12_NDE;
 b0_matrix_DE[2,14] = b0_matrix_2_14_DE;
 b0_matrix_NDE[2,14] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,15] = -100000;
 b0_matrix_NDE[2,15] = b0_matrix_2_14_NDE;
 b0_matrix_DE[2,16] = b0_matrix_2_16_DE;
 b0_matrix_NDE[2,16] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,17] = -100000;
 b0_matrix_NDE[2,17] = b0_matrix_2_16_NDE;
 b0_matrix_DE[2,18] = b0_matrix_2_18_DE;
 b0_matrix_NDE[2,18] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,19] = -100000;
 b0_matrix_NDE[2,19] = b0_matrix_2_18_NDE;
 b0_matrix_DE[2,41] = b0_matrix_2_41;
 b0_matrix_NDE[2,41] = b0_matrix_2_41;
@@ -729,9 +742,11 @@ b0_matrix_DE[3,8] = b0_matrix_3_8;
 b0_matrix_NDE[3,8] = b0_matrix_3_8;
 b0_matrix_DE[3,20] = b0_matrix_3_20_DE;
 b0_matrix_NDE[3,20] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,21] = -100000;
 b0_matrix_NDE[3,21] = b0_matrix_3_20_NDE;
 b0_matrix_DE[3,22] = b0_matrix_3_22_DE;
 b0_matrix_NDE[3,22] = b0_matrix_3_22_NDE;
+b0_matrix_DE[3,23] = -100000;
 b0_matrix_NDE[3,23] = b0_matrix_3_22_NDE;
 b0_matrix_DE[4,3] = b0_matrix_4_3;
 b0_matrix_NDE[4,3] = b0_matrix_4_3;
@@ -743,6 +758,7 @@ b0_matrix_DE[5,6] = b0_matrix_5_6;
 b0_matrix_NDE[5,6] = b0_matrix_5_6;
 b0_matrix_DE[5,24] = b0_matrix_5_24_DE;
 b0_matrix_NDE[5,24] = b0_matrix_5_24_NDE;
+b0_matrix_DE[5,25] = -100000;
 b0_matrix_NDE[5,25] = b0_matrix_5_24_NDE;
 b0_matrix_DE[6,5] = b0_matrix_6_5;
 b0_matrix_NDE[6,5] = b0_matrix_6_5;
@@ -750,14 +766,17 @@ b0_matrix_DE[6,7] = b0_matrix_6_7;
 b0_matrix_NDE[6,7] = b0_matrix_6_7;
 b0_matrix_DE[6,26] = b0_matrix_6_26_DE;
 b0_matrix_NDE[6,26] = b0_matrix_6_26_NDE;
+b0_matrix_DE[6,27] = -100000;
 b0_matrix_NDE[6,27] = b0_matrix_6_26_NDE;
 b0_matrix_DE[7,6] = b0_matrix_7_6;
 b0_matrix_NDE[7,6] = b0_matrix_7_6;
 b0_matrix_DE[7,28] = b0_matrix_7_28_DE;
 b0_matrix_NDE[7,28] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,29] = -100000;
 b0_matrix_NDE[7,29] = b0_matrix_7_28_NDE;
 b0_matrix_DE[7,30] = b0_matrix_7_30_DE;
 b0_matrix_NDE[7,30] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,31] = -100000;
 b0_matrix_NDE[7,31] = b0_matrix_7_30_NDE;
 b0_matrix_DE[7,42] = b0_matrix_7_42;
 b0_matrix_NDE[7,42] = b0_matrix_7_42;
@@ -767,11 +786,13 @@ b0_matrix_DE[8,9] = b0_matrix_8_9;
 b0_matrix_NDE[8,9] = b0_matrix_8_9;
 b0_matrix_DE[8,32] = b0_matrix_8_32_DE;
 b0_matrix_NDE[8,32] = b0_matrix_8_32_NDE;
+b0_matrix_DE[8,33] = -100000;
 b0_matrix_NDE[8,33] = b0_matrix_8_32_NDE;
 b0_matrix_DE[9,8] = b0_matrix_9_8;
 b0_matrix_NDE[9,8] = b0_matrix_9_8;
 b0_matrix_DE[9,34] = b0_matrix_9_34_DE;
 b0_matrix_NDE[9,34] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,35] = -100000;
 b0_matrix_NDE[9,35] = b0_matrix_9_34_NDE;
 b0_matrix_DE[9,36] = b0_matrix_9_36;
 b0_matrix_NDE[9,36] = b0_matrix_9_36;
@@ -1348,9 +1369,12 @@ yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[
 asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
 deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
 entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
-fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+// fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+// note that fifteenmile and imnaha don't have any discharge data, so they just get intercepts and the beta term is fixed to zero
+fifteenmile_beta ~ normal(0,0.000001);
 hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
-imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+// imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+imnaha_beta ~ normal(0,0.000001);
 john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
 methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
 okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
