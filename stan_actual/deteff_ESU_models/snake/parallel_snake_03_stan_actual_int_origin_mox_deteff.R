@@ -183,8 +183,8 @@ transition_matrix["mainstem, upstream of LGR", "Clearwater River"] <- 1
 transition_matrix["mainstem, upstream of LGR", "Salmon River"] <- 1
 transition_matrix["mainstem, upstream of LGR", "Grande Ronde River"] <- 1
 # transition_matrix["mainstem, upstream of LGR", "Imnaha River"] <- 1
-transition_matrix["mainstem, upstream of LGR", "Asotin Creek Mouth"] <- 1
-transition_matrix["mainstem, upstream of LGR", "Asotin Creek Upstream"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Imnaha River Mouth"] <- 1
+transition_matrix["mainstem, upstream of LGR", "Imnaha River Upstream"] <- 1
 
 
 # Deschutes River
@@ -389,6 +389,7 @@ possible_movements <- rowSums(transition_matrix)
 # Get the indices that are 1s (except loss, since that's 1 minus the others)
 movements <- which(transition_matrix[,1:(nstates-1)] == 1, arr.ind = TRUE)
 nmovements <- dim(movements)[1]
+
 # Now get all of the movements which are fixed to zero
 not_movements <- which(transition_matrix[,1:(nstates-1)] == 0, arr.ind = TRUE)
 n_notmovements <- dim(not_movements)[1]
@@ -452,11 +453,11 @@ movements_df %>%
 
 # snake_movements <- subset(movements_df, row %in% c(8,9,21,22,23,24,25,26) |
 #                                      col %in% c(8,9,21,22,23,24,25,26))
-snake_movements <- subset(movements_df, row %in% c(8,9,seq(32,39,1)) |
-                            col %in% c(8,9,seq(32,39,1)))
+snake_movements <- subset(movements_df, row %in% c(8,9,seq(32,40,1)) |
+                            col %in% c(8,9,seq(32,40,1)))
 
-non_snake_movements  <- subset(movements_df, !(row %in% c(8,9,seq(32,39,1))) &
-                                 !(col %in% c(8,9,seq(32,39,1))))
+non_snake_movements  <- subset(movements_df, !(row %in% c(8,9,seq(32,40,1))) &
+                                 !(col %in% c(8,9,seq(32,40,1))))
 
 # I think these both need to be order by from (rows), to (columns)
 snake_movements %>% 
@@ -483,11 +484,14 @@ for (i in 1:(nrow(b0_matrix_names))){
     cat("real ", b0_matrix_names$b0_matrix_name[i], "_NDE", ";", "\n", sep = "")
   }
   
-  # If it's a within tributary movement - we don't want it
+  # If it's a within tributary movement - we don't want it. These have been
+  # removed from the data (we don't care about them!)
   else if (b0_matrix_names$within_trib_movement[i] == 1){
     # do nothing!
   }
-  # If it's a movement from mainstem to upstream - we also don't want it
+  # If it's a movement from mainstem to upstream - we don't want a parameter for it,
+  # because it'll share the same parameter (see transformed parameters block) 
+  # as the movement from mainstem to river mouth
   else if (b0_matrix_names$mainstem_upstream_movement[i] == 1){
     # do nothing!
   }
@@ -718,8 +722,8 @@ states_complete %>%
 print(Sys.time())
 
 # write this to csv, to speed up code later
-write.csv(states_complete, "states_complete_run_year.csv")
-states_complete <- read.csv("states_complete_run_year.csv")
+# write.csv(states_complete, "states_complete_run_year.csv")
+# states_complete <- read.csv("states_complete_run_year.csv", row.names = 1)
 
 
 # SAVE THIS AS A MODEL INPUT - to index which matrix to use
@@ -735,6 +739,8 @@ run_year_2223_fish <- unique(subset(states_complete, is.na(run_year_index))$tag_
 states_complete %>% 
   subset(., !(tag_code %in% run_year_2223_fish)) -> states_complete
 
+
+# get a vector of run years that transitions occurred within
 transition_run_years <- states_complete$run_year_index
 
 # Create a data frame for when each tributary has detection efficiency capability
@@ -814,13 +820,96 @@ deschutes_river_trib_det_eff_capability %>%
 
 # join by state and run year
 states_complete %>% 
-  left_join(.,trib_det_eff_capability, by = c("state", "run_year")) %>% 
-  mutate(DE = ifelse(is.na(DE), 0,1))-> states_complete
+  left_join(.,trib_det_eff_capability, by = c("state", "run_year")) -> states_complete
 
-# KEY STEP - in all run years in upstream states where DE = 1, remove the upstream state
+# table(subset(states_complete, DE == 1)$state)
+# table(subset(states_complete, DE == 0)$state)
+
+# check on our Snake River tribs with detection efficiency
+# table(subset(states_complete, state == "Tucannon River Upstream")$run_year_index) # no individuals at upstream sites in run years without DE
+# table(subset(states_complete, state == "Asotin Creek Upstream")$run_year_index) # definitely individuals in years without DE
+# table(subset(states_complete, state == "Asotin Creek Upstream")$DE) # so then why are they all coming out as DE = 1?
+# table(subset(states_complete, state == "Imnaha River Upstream")$run_year_index)
+
+# remove transitions within tributaries (we don't care about these!)
+# states_complete %>% 
+#   # group_by(tag_code_2) %>% 
+#   subset(state == "Asotin Creek Upstream" & lead(state) == "Asotin Creek Mouth" |
+#            lag(state) == "Asotin Creek Upstream" & state == "Asotin Creek Mouth") -> AC_test
+
+# Here's the root of our problem: this fish goes mouth - upstream - mouth - upstream.
+# If we were to only remove upstream states, you would be left with mouth-mouth transitions, which are not allowed
+# subset(states_complete, tag_code == "384.3B23B18C05")
+
+
+# Solution: 1) Remove any transitions that occur between mouth and upstream or upstream and mouth; 2) remove all only upstream transitions
+# that occur in years where DE = 0
+
+# KEY STEP - in all run years in upstream states where DE = 1, remove the upstream state, and remove all transitions between mouth-upstream and upstream-mouth
+states_complete_orig <- states_complete # this for testing
+# states_complete <- states_complete_orig
+
+# get all of the upstream states in a vector
+upstream_states <- model_states[upstream_indices]
+
+# get all of the river mouth states in a vector
+river_mouth_states <- model_states[river_mouth_indices]
+
+# get all mainstem states in a vector
+mainstem_states <- model_states[mainstem_indices]
+
+
 states_complete %>% 
-  subset(., DE != 1) -> states_complete
+  # step 1): remove states where the tag code and the next tag code are the same (therefore same fish)
+  subset(., !(tag_code == lag(tag_code) & 
+                # and where the next state is an upstream state and the last state is a river mouth state
+                state %in% upstream_states & lag(state) %in% river_mouth_states |
+                # OR where the next state is a river mouth state and the last state is an upstream state
+                tag_code == lag(tag_code) & 
+                state %in% river_mouth_states & lag(state) %in% upstream_states)) %>% 
+  # step 1.5): for fish that go mainstem - upstream - mainstem - remove the second two states
+  subset(., !(tag_code == lag(tag_code) & 
+                tag_code == lead(tag_code) &
+                state %in% upstream_states & 
+                lag(state) %in% mainstem_states & 
+                lead(state) %in% mainstem_states |
+           lag(tag_code) == tag_code & 
+           lag(tag_code, n = 2) == tag_code & 
+           state %in% mainstem_states & 
+           lag(state) %in% upstream_states &
+           lag(state, 2) %in% mainstem_states)) %>% 
+  # step 2): remove only upstream states in years where DE == 1
+  # keep NAs and zeros, which will remove 1s
+  subset(., is.na(DE) | DE == 0 ) -> states_complete
 
+# this introduces an issue - if a fish goes straight to an upstream state and then comes back to the mainstem in a DE = 1 year,
+# we end up with consecutive mainstem states because the intervening state got removed.
+# Solution: See step 1.5 above. If a fish goes mainstem - upstream - mainstem, remove the upstream state and the next mainstem state
+
+# Now - we have to check to make sure everything makes sense
+states_complete %>% 
+  ungroup() %>% 
+  mutate(current_tag_code = tag_code_2) %>% 
+  mutate(next_tag_code = lead(tag_code_2)) %>% 
+  mutate(current_state = state) %>% 
+  mutate(next_state = lead(state)) %>% 
+  mutate(transition = paste0(current_state, " - ", next_state)) %>% 
+  subset(current_tag_code == next_tag_code) -> transitions_df
+  # dplyr::select(tag_code_2, state, transition, run_year) -> transitions_df
+
+table(transitions_df$transition)
+
+# table(subset(transitions_df, state %in% mainstem_states)$transition)
+
+
+# here's a problem: mainstem, BON to MCN - mainstem, BON to MCN. Also other consecutive mainstem transitions
+problem_tag_codes <-  subset(transitions_df, transition %in% c("mainstem, BON to MCN - mainstem, BON to MCN",
+                                                               "mainstem, ICH to LGR - mainstem, ICH to LGR",
+                                                               "mainstem, MCN to ICH or PRA - mainstem, MCN to ICH or PRA"))$tag_code_2
+
+# subset(states_complete, tag_code_2 %in% problem_tag_codes) -> investigate
+# subset(states_complete_orig, tag_code_2 %in% problem_tag_codes) -> investigate_orig
+# subset(transitions_df, tag_code %in% problem_tag_codes)
 
 
 ##### Get values to pass as data for stan model #####
@@ -1563,8 +1652,12 @@ n.ind <- dim(state_data)[3]
   # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
   mod <- cmdstan_model("parallel_snake_03_stan_actual_int_origin_deteff.stan", compile = FALSE)
   
+  print("Compiling model")
   # Step 2: Compile the model, set up to run in parallel
   mod$compile(cpp_options = list(stan_threads = TRUE))
+  
+  print("model compiled at")
+  print(Sys.time())
   
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
@@ -1578,10 +1671,10 @@ n.ind <- dim(state_data)[3]
     refresh = 10, # print update every iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 20,
-    iter_sampling = 20,
-    threads_per_chain = 28,
-    init = 1
+    iter_warmup = 50,
+    iter_sampling = 50,
+    # init = 1,
+    threads_per_chain = 28
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
