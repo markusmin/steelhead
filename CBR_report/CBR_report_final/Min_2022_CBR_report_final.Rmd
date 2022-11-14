@@ -1,0 +1,261 @@
+---
+title: "2022 Columbia Basin Research Report"
+subtitle: "A Bayesian multidirectional, multistate model to resolve the migration pathways of adult Steelhead within the Columbia River Basin"
+author: "Markus Min"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  word_document:
+    reference_docx: CBR_template.docx
+  pdf_document: default
+documentclass: report
+toc: TRUE
+toc-depth: 2
+geometry: margin=1in
+linestretch: 1.1
+fontsize: 12pt
+header-includes:
+  - \usepackage{lineno}
+  - \linenumbers
+urlcolor: blue
+bibliography: Steelhead.bib
+csl: jpe.csl
+always_allow_html: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ">"
+)
+```
+
+
+# Notes from Mark
+
+I added a few options to the YAML to help with readability, but presumably you'll want to remove the line numbers on the version. Also I assume you're going to the include the `.bib` and `csl` files with the references and formatting template, respectively. For example,
+
+
+# Introduction
+
+Steelhead (anadromous *Oncorhynchus mykiss*) in the Columbia River Basin, including all those found above Bonneville Dam, are listed under the Endangered Species Act. The five Columbia River Basin distinct population segments (DPSs) were first listed in the late 1990s, and are all currently listed as threatened. Despite their protected status and continued recovery efforts, counts of returning Steelhead to Bonneville Dam are currently lower than they were at the time of listing, and recently completed 5-year reviews for Columbia River Steelhead reaffirmed their status as threatened.
+
+One element of the life history of Columbia River Basin Steelhead that may make them more vulnerable to anthropogenic modifications of the Columbia River is their adult migration. Relative to other salmonids, Steelhead from the Columbia River Basin spend longer in freshwater as adults. Essentially all populations of Steelhead in the Columbia River Basin are stream-maturing [@Busby1996], meaning that these fish enter freshwater in a sexually immature state and then spend up to a year in freshwater prior to spawning. Also known as summer Steelhead, these fish enter freshwater between May and October and spawn the following spring, typically between March and May [@Busby1996]. Between their entry into freshwater and arrival at spawning grounds, Columbia River Steelhead exhibit considerable variability in their migration patterns. Virtually all interior Columbia River Steelhead overwinter in freshwater; the majority of individuals are known to overwinter in tributaries, but up to 20% of individuals in a given year have been observed to overwinter within the hydrosystem [@Keefer2008]. Additionally, as individuals migrate upstream toward natal tributaries, the majority of individuals have been observed to temporarily stage in nonnatal tributaries downstream of their natal tributary [@High2006]. This behavior increases with increasing mainstem river temperature, indicating the use of these colder waters as coldwater refugia [@High2006]. These highly variable movement patterns and increased duration in freshwater make Steelhead more vulnerable to the hazards faced in freshwater.
+
+Descending dams, also known as fallback [@Boggs2004], is another common behavior observed in Steelhead, with about 20% of Steelhead observed to fall back over at at least one mainstem dam [@Boggs2004]. This behavior can occur as individuals are migrating upstream to natal tributaries, but can also occur once individuals have ascended mainstem dams upstream of natal tributaries (a behavior known as overshoot), in which case this fallback is called post-overshoot fallback and is necessary for individuals to return to natal tributaries. Overshoot and fallback affect the ability of individuals to successfully spawn, and therefore are consequential for the persistence of ESA-listed populations. Individuals that fall back during their upstream migration are less likely to return to their natal tributaries or hatcheries [@Bjornn2000; @Keefer2005]. Furthermore, migration success to natal tributaries decreases with overshooting rates [@Richins2018], and many overshooting fish are observed to stray to tributaries upstream of the overshoot dam.
+
+The decreased migration success associated with overshoot and fallback is likely due to the hazardous nature of downstream passage for adults, which is often limited to the powerhouse during the primary months that Steelhead are overwintering [@Khan2013]. Mortality rates for Steelhead passing downstream at dams are highly variable, but recent estimates of 48-hour survival at McNary Dam indicate around 90% survival for individuals passing through turbines and 97% survival for individuals passing through the spillway [@Normandeau2014]. Mortality in downstream passage routes is implicated by low survival rates of Steelhead kelts, which decrease with increasing number of dams that must be navigated as they move downstream to the ocean, with mortality rates of 84-96% for kelts released at Lower Granite Dam, 38-40% at McNary Dam, and 20-37% at John Day Dam [@Westrheim2005].
+
+Because of the association between overshoot and fallback and decreased migration success, previous studies have investigated the influence of various factors on these rates. Rates of overshoot have been shown to vary considerably among populations, but have a positive relationship with increasing mainstem water temperature and hatchery rearing upstream of the natal tributary [@Richins2018]. In spring-summer Chinook, fallback rates have a positive relationship with river discharge [@Boggs2004]. (_MDS: I would add a sentence or two here with the objectives of this study._)
+
+
+
+# Methods
+
+## Modeling overview
+
+![The model schematic.](.//figures/full_model_diagram.jpg){width=100%}
+
+In our model, the Columbia River and its tributaries are modeled as a series of connected states, with states defined as either reaches of the mainstem Columbia or Snake River between dams with PIT tag detection capabilities in the adult ladders or tributaries with PIT tag detectors. Fig. 1 shows all of the states in our model; movements over some dams (e.g., The Dalles or John Day Dams) were not explicitly modeled due to these dams not having PIT tag detection capabilities for the duration of our study period.
+
+## Accessing PIT tag data
+
+
+PIT tag data were obtained from PTAGIS (_MDS: spell out PTAGIS on first mention._). Only known-origin individuals (based on known release sites) were included in this dataset. To ensure that only individuals marked as juveniles were kept in the dataset, all individuals that were greater than 350 mm at time of marking were removed. To select returning adults, only individuals that were seen in the adult fishways at Bonneville Dam were selected. To ensure that there was enough data for each population included in this dataset, only populations (defined as tributaries in which PIT-tagged juveniles were released) that had at least 250 individuals distributed across 8 run years were kept. Additionally, only populations with instream PIT tag detections sites in their natal tributaries were kept; if sufficient instream detection sites only became available during the later part of our study period, only individuals from those years were kept. Run years were separated by June 1 of each year, and run year 2005/2006 (beginning on June 1, 2005) was selected as the first year in our dataset. In total, populations from 17 natal tributaries met this criteria; 11 tributaries of the Columbia (Deschutes River, John Day River, Hood River, Fifteenmile Creek, Umatilla River, Yakima River, Walla Walla River, Wenatchee River, Entiat River, Okanogan River, and Methow River) and six tributaries of the Snake (Tucannon River, Asotin Creek, Clearwater River, Salmon River, Grande Ronde River, and Imnaha River). Once the tag codes were identified for each of these tributary populations, a complete tag history report was run in PTAGIS for all of the tag codes in our dataset.
+
+
+## Processing PIT tag data into detections at various sites
+
+In order to convert detections of fish at individual PIT tag antennas into a history of movements between different reaches of the Columbia, Snake, and their tributaries, the first step with the PIT tag data from PTAGIS was to interpret detections at different PIT tag antennas. For instream tributary detection sites, as well as mainstem sites in between dams, no processing was required, and these detections were interpreted as the fish being in that associated state. For detection sites at dams, additional processing was required to interpret detections.
+
+The first step in interpreting detections at dams was to identify the multiple passage routes associated with each dam. In many cases, multiple passage routes were grouped together into a single interrogation site, and assigning antennas to these different passage routes was necessary to interpret how fish were utilizing these passage routes. For example, antennas at Ice Harbor Dam are all grouped together in PTAGIS as "Ice Harbor Dam (combined)", when these antennas are actually in three different passage routes: the North Shore Ladder, the South Shore Ladder, and the Juvenile Bypass System.
+
+The second step was to identify, when possible, entrance and exit antennas within each upstream passage route. Entrance and exit antennas were only distinguished when either two distinct groupings of antennas existed in separate parts of the same passage route, or in the case of Bonneville Dam, when there are enough consecutive weirs with PIT tag detection antennas to separate these weirs into entrance and exit antennas. By distinguishing entrance and exit antennas, we were able to identify when fish detections in adult fishways were not ascents, but were rather aborted ascent attempts or descents. When fish were only seen at entrance antennas, this was noted to be an aborted ascension attempt. When fish were first seen at the exit antennas at an adult fish ladder and last seen at the entrance antennas of the same fish ladder, this was noted to be a descent through the ladder. If a fish was first seen at the entrance antennas and last seen at the exit antennas, this was noted to be an ascent. Entrance and exit antennas were identified at all adult fishways except for McNary Dam Washington Shore Ladder (prior to March 2006), Priest Rapids Dam, Rock Island Dam, Rocky Reach Dam, Wells Dam (prior to 2013), and Ice Harbor Dam.
+
+For most dams, detections in the adult fish facility were treated the same as detections in other parts of the adult ladder, as trapping did not take place and thus fish were not removed. However, in the case of Wells Dam, fish that were trapped were removed and either moved to the hatchery or trucked off-site. As such, any terminal detections in the trap at Wells Dam were treated as trapping events.
+
+Once the antennas had been appropriately assigned, a 48 hour threshold was utilized to distinguish separate visits to a site. However, in some passage routes, due to fish being observed in the same route for days at a time, no time threshold was utilized, and instead the sequence of antennas was used to distinguish separate visits to a site. For example, because individual fish were observed not exiting the Washington shore passage route at Bonneville Dam for upwards of 100 days, new visits to this site were only distinguished as new visits to the entrance antennas, regardless of time between detections at other antennas in the passage route.
+
+
+## Turning detections at different sites into state visits
+
+With antennas appropriately assigned to different passage routes and the sequence of antenna detections used at the adult fishways to interpret directionality, the output from the previous script was used as input into the next script, which converted a history of detections at sites into a history of movements between states, as defined in Figure 1. For instream detection sites in either the mainstem or the tributaries, detections at these sites were interpreted as the fish being in the appropriate state. For detections at sites in the fish passage routes at dams, the directionality of movement, as assigned in the previous script, was used to inform transitions between states. Ascents at dams indicated a transition from the downstream state to the upstream state; descents at dams (either through the juvenile bypass system or through descents through the ladder) indicated a transition from the upstream state to the downstream state. Aborted ascension attempts were noted, but interpreted as no transition from the current state.
+
+Until the installation of the PIT tag antennas in the spillway at Lower Granite Dam in 2020, PIT tag detection capabilities were limited to the adult fish ladders and the juvenile bypass system at each dam. As such, PIT tag antennas have historically been unable to directly monitor fallback at dams, unless an individual subsequently reascends the dam [@Boggs2004]. With the installation of instream antennas in natal tributaries, fallback to home has been monitored [@Richins2018], by noting when individuals entered natal tributaries downstream of a dam that was previously ascended. In this study, we monitored fallback to the greatest extent possible with the current configuration of PIT tag antennas by using our knowledge of the connections between states in our model to note when downstream movements must have occurred. In this way, we included fallback that occurred on the mainstem downstream of the natal tributary (similar to [@Boggs2004]), fallback to home (similar to [@Richins2018]), and other fallback movements, such as fallback upstream of the natal tributary that did not end in homing.
+
+
+Once we determined a history of movement between states, we then subset this movement history to eliminate any movement that occurred as a juvenile or as a kelt in order to isolate only the portion of the adult migration prior to reaching spawning areas. Juvenile history was identified as any detections within 90 days of release or on or before June 15 of the release year. Kelt movement was identified as any downstream movement occurring between March and July (following spawning). Repeat spawners were also identified in the dataset based on detections at the Bonneville adult ladders occurring at least 180 days after they were initially seen at Bonneville. For the purposes of our analysis, repeat spawners were treated as new fish when they returned to Bonneville.
+
+## The model in stan
+![The model schematic.](.//figures/full_model_diagram.jpg){width=100%}
+
+The history of state transitions for each individual PIT-tagged fish, as well as the information on that fish's natal origin, were the inputs for the multistate model. The multistate model was implemented in a Bayesian framework using the Stan programming language [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Figure 1). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current states. This probability is evaluated through a multinomial logit.
+
+(_MDS: This would be a good place to add/introduce the actual equations._)
+
+Due to the computational requirements of evaluating the detection histories of over 60,000 individual fish, the model was fit to three different datasets, corresponding to the three Steelhead DPSs found exclusively upstream of Bonneville Dam: the Middle Columbia DPS, the Upper Columbia DPS, and the Snake River Basin DPS. To reduce the number of parameters in the model, 
+
+
+The history of state transitions for each individual PIT-tagged fish, as well as the information on that fish's natal origin, were the inputs for the multistate model. The multistate model was implemented in a Bayesian framework in Stan [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Fig. 1). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current states, or into the absorbing loss category, which a fish enters once the detection history ends. Each of these probabilities is evaluated through a multinomial logit, with the loss probability calculated as 1 - the sum of the other probabilities, enforcing a constraint that all movement probabilities have to sum to 1.
+
+Due to the computational requirements of evaluating the detection histories of over 60,000 individual fish, the model was fit to three different datasets, corresponding to the three Steelhead DPSs found exclusively upstream of Bonneville Dam: the Middle Columbia DPS, the Upper Columbia DPS, and the Snake River Basin DPS. To reduce the number of parameters in the model, an effect of natal origin was only included for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed different natal origins to differentiate as they neared natal tributaries.
+
+All code is available at https://github.com/markusmin/steelhead.
+
+
+# Results
+A total of 662 different movement probabilities, based on the combination of state transition and origin/DPS, were estimated by the model (Tables 1-6). The model schematic in Fig. 1 is necessary to interpret the ecological significance of these movement probabilities, in terms of which movements constitute the probabilities of certain movements, such as overshoot, fallback, homing, or straying. Furthermore, each movement probability represents only the probability of an individual making that movement conditional on it already being in the "from" state. Due to poor detection probabilities in tributaries and in downstream passage routes, only overshoot probabilities (which have near 100% detection probability) are discussed in the Results; see [Current Limitations](#current-limitations) for a discussion of these issues and future directions to address them. Overshoot probabilities, or the probability of ascending the dam upstream of the natal tributary in the model schematic (Fig. 1), varied considerably by natal origin.
+
+## Middle Columbia River Steelhead
+Of the natal tributaries downstream of McNary Dam, John Day River and Umatilla River Steelhead each had a high mean probability of overshooting McNary Dam (46.4% and 33.8%, respectively; Table 2), while Deschutes River and Fifteenmile Creek Steelhead had a low mean probability (0.7% and 9%, respectively; Table 2). Conditional on overshooting McNary Dam, John Day River and Umatilla River Steelhead had an approximately 20% chance of additionally overshooting Ice Harbor Dam on the Snake River, but only a very low probability of overshooting Priest Rapids Dam on the Columbia River (Table 2). For Yakima River and Walla Walla River Steelhead, whose natal tributaries are upstream of McNary Dam, Yakima River Steelhead were more likely to overshoot Priest Rapids Dam (13.8% mean probability) than Ice Harbor Dam (3.5% mean probabiltiy) whereas Wallla Walla River Steelhead were much more likely to overshoot Ice Harbor Dam (57.4% mean probability) than Priest Rapids Dam (2% mean probability) (Table 2).
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+library(here)
+library(kableExtra)
+library(tidyverse)
+library(flextable)
+
+# Middle Columbia
+middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_DPS_probs.csv"), row.names = 1)
+middle_columbia_DPS_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) -> middle_columbia_DPS_probs
+
+middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_origin_probs.csv"), row.names = 1)
+middle_columbia_origin_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) %>% 
+  relocate(origin) %>% 
+  mutate(origin = gsub("_", " ", origin)) -> middle_columbia_origin_probs
+
+kable(middle_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
+      caption = "Movement probabilities for Middle Columbia Steelhead, outside of the DPS boundaries.") %>% 
+  kable_styling(latex_options = c("repeat_header"))
+kable(middle_columbia_origin_probs, longtable = TRUE, booktabs = T, linesep = c("", "", "", "", "", '\\addlinespace'),
+      caption = "Movement probabilities for Middle Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+  kable_styling(latex_options = c("repeat_header"))
+```
+
+## Upper Columbia River Steelhead
+Wenatchee River Steelhead, whose natal tributary is between Rock Island Dam and Rocky Reach Dam, had a 58.3% (90% CI 57%-59.6%) probability of overshooting Rocky Reach Dam. Entiat River Steelhead, whose natal tribuatry is between Rocky Reach Dam and Wells Dam, had a 36.3% (90% CI 33%-39.5%) probability of overshooting Wells Dam. Because no dam with PIT tag detectors in the adult fishways exists above Wells Dam, overshoot probabilities on the Columbia River could not be calculated for Okanogan River or Methow River Steelhead. Overshoot probabilities at Ice Harbor Dam for all four Upper Columbia River origins were exceedingly low (0-0.1%).
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+library(here)
+library(kableExtra)
+library(tidyverse)
+# Upper Columbia
+
+upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_DPS_probs.csv"), row.names = 1)
+upper_columbia_DPS_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) -> upper_columbia_DPS_probs
+
+upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_origin_probs.csv"), row.names = 1)
+upper_columbia_origin_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) %>% 
+  relocate(origin) %>% 
+  mutate(origin = gsub("_", " ", origin)) -> upper_columbia_origin_probs
+
+# kable(upper_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
+#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
+# kable(upper_columbia_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
+#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
+
+# testing:
+flextable(upper_columbia_DPS_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
+
+# 
+# regulartable(upper_columbia_origin_probs)
+```
+
+<br>
+<br>
+<br>
+
+```{r upper_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
+flextable(upper_columbia_origin_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
+```
+
+## Snake River Basin Steelhead
+Tucannon River Steelhead are the only Snake River Steelhead population for which overshoot probabiltiies at the upstream dam could be calculated. Tucannon River Steelhead had a 57% (90% CI 55.8%-58.2%) probability of overshooting Lower Granite Dam. All six origins had probabilities of overshooting Priest Rapids Dam on the Columbia River between 1% and 3%.
+
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+library(here)
+library(kableExtra)
+library(tidyverse)
+
+# Snake
+
+snake_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_DPS_probs.csv"), row.names = 1)
+snake_DPS_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) -> snake_DPS_probs
+
+snake_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_origin_probs.csv"), row.names = 1)
+snake_origin_probs %>% 
+  mutate(mean = round(mean, 3),
+         q5 = round(q5, 3),
+         q95 = round(q95, 3)) %>% 
+  relocate(origin) %>% 
+  mutate(origin = gsub("_", " ", origin)) -> snake_origin_probs
+
+kable(snake_DPS_probs, longtable = TRUE, booktabs = T, escape = F, linesep = "",
+      caption = "Movement probabilities for Snake River Basin Steelhead, outside of the DPS boundaries.") %>% 
+  kable_styling(latex_options = c("repeat_header"))
+
+
+kable(snake_origin_probs, longtable = TRUE, booktabs = T, escape = F, linesep = c("", "", "", "", "", '\\addlinespace'),
+      caption = "Movement probabilities for Snake River Basin Steelhead by natal origin, inside the DPS boundaries.") %>% 
+  kable_styling(latex_options = c("repeat_header"))
+```
+
+
+
+
+
+# Discussion
+
+## Current limitations and next steps
+
+### Detection probabilties in tributaries
+Over the course of our study period, detection efficiencies in tributaries varied wildly as arrays were installed and decommissioned. For example, from 2010 to 2018, the number of tag detection arrays in tributaries almost tripled [@Morrisett2018]. In some years of our study, the tributaries in our model had no active antennas at all [@Richins2017]. However, our current model configuration does not explicitly account for detection efficiency in any state transition. The consequences of this are that movement probabilities into tributaries will be biased low, whereas loss probabilities both from the mainstem state that is connected to the tributary and any mainstem states that are overshoot states will be biased high, as missed detections in tributaries will be interpreted as loss from the state in which an individual was last detected. As a result, post-overshoot fallback to natal tributaries is also biased low, as this type of fallback is not able to be captured well due to low detection efficiencies in tributaries.
+
+In future iterations of the model, detection probabilities in tributaries, as well as when tributaries had active arrays, will be explicitly modeled. When tributaries had multiple active arrays, detection probabilities will be calculated for the array furthest downstream (closest to the confluence with the mainstem) by examining what percentage of fish that were eventually seen at upstream arrays were also seen at the furthest downstream array. The model will account for years in which tributaries had no active arrays by removing those states from the model for movements occurring in that year.
+
+### Detection probabilities in downstream passage routes
+Steelhead fallback is difficult to monitor using PIT tags because of the lack of detection capabilities in the primary downstream passage routes for Steelhead, which include spillways, the Juvenile Bypass System (JBS), navigation locks, ice/trash sluiceways, and turbines. While some passage routes, such as the JBS, the corner collector at Bonneville Dam, and as of 2020, the spillway at Lower Granite Dam, have PIT tag detection capability, the majority of downstream movements are only detected by examining the rest of the detection history. For example, @Boggs2004 used consecutive detections in the same adult fish ladder to monitor rates of fallback, whereas @Richins2018 calculated fallback to home following overshoot as detections in tributaries following detections in the adult fish ladder at a dam upstream of the tributary. Our modeling framework includes both of these ways of detecting fallback, but this is still an underestimate of total fallback. Fallback such as fallback that leads to mortality cannot be detected using PIT tags, and any time a fish is not seen after fallback (i.e., either due to a fish entering a tributary with PIT tag arrays but not being detected, entering a tributary without PIT tag arrays, spawning in the mainstem, or mortality following fallback), the fallback event will not be observed. While accounting for detection probability in tributaries in future iterations of the model should allow us to achieve a better estimate of post-overshoot fallback, the current network of PIT tag arrays is incapable of monitoring all fallback, and as such all estimates of fallback from this model will be lower bound estimates. However, the current modeling framework will give us the closest estimate of fallback possible using PIT tag data.
+
+
+### Final fates
+The final fate of an individual fish is of central concern to the management and conservation of Steelhead. Whether an individual strayed (and to which tributary), reached its natal tributary, or died before spawning (and where) is one of the core questions that we set out to answer with this model. Final fates are not directly estimated directly as parameters in this model, but can be derived from the stepwise movement probabilities presented in Tables 1-6. This can be done either using a simulation-based approach, where a large number of simulated fish (e.g., 1,000,000) enter the model at Bonneville Dam and subsequently move through the states, with movements governed by random draws from the movement probabilities estimated in the model. It can also be calculated analytically by multiplying out the probabilities of each possible sequence of movements. It is of note that the biases for certain movements mentioned in the preceding sections will be perpetuated in any calculation of final fates, and thus some final fates (primarily associated with entering tributaries) would currently be underestimated due to detection probability issues.
+
+
+### Adding additional covariates
+The model structure and the use of the multinomial logit to evaluate movement probabilities allows for the inclusion of both categorical and continuous covariates in the model. The next covariates that we plan to include in future iterations of the model are rear type (hatchery or wild), temperature (mainstem temperatures from dam tailraces), flow, and spill. We are also considering the addition of covariates related to juvenile experiences (barged vs. not barged, acclimated vs. not acclimated hatchery releases). The inclusion of these covariates will further our understanding of what environmental conditions (e.g., temperature or flow conditions) lead to increased probability of Steelhead choosing more dangerous migration pathways to natal tributaries, such as overshooting natal tributaries, and the inclusion of covariates that can be influenced by hydropower managers (e.g., spill or flow) or fishery managers (e.g., hatchery practices or assisted juvenile migration) would help inform how we can help Steelhead return safely to natal tributaries. Given the increased interest in assisting downstream Steelhead passage, such as via spill practices [@Ham2021], the inclusion of these covariates would improve our understanding of how to help recover these populations by informing management practices.
+
+# References
+
+\setlength{\parindent}{-0.375in}
+\setlength{\leftskip}{0.375in}
+\setlength{\parskip}{8pt}
+\noindent
