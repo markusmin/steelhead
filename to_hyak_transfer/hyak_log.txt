@@ -1771,7 +1771,98 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake
 # Looks like these chains didn't move at all (no chains finished successfully)
 
 # Set seed to 123, bumped adapt_delta to 0.85, increased chains to 200 warmup + 200 iter. So let's see if any of that helps.
+scp ./parallel_snake_03_stan_actual_int_origin_mox_deteff.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/
 
+# more likely though it's a model issue. But let's just try this first.
+
+# okay, so results are not good:
+Chain 1 Iteration:   1 / 400 [  0%]  (Warmup)
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities parameter) = -nan, but should be 1 (in '/tmp/RtmpiETiWp/model-245c5415e0c8.stan', lin$
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 1
+Chain 1 Iteration:  10 / 400 [  2%]  (Warmup)
+Chain 1 Iteration:  20 / 400 [  5%]  (Warmup)
+Chain 1 Iteration:  30 / 400 [  7%]  (Warmup)
+Chain 1 Iteration:  40 / 400 [ 10%]  (Warmup)
+Chain 1 Iteration:  50 / 400 [ 12%]  (Warmup)
+Chain 1 Iteration:  60 / 400 [ 15%]  (Warmup)
+Chain 1 Iteration:  70 / 400 [ 17%]  (Warmup)
+Chain 1 Iteration:  80 / 400 [ 20%]  (Warmup)
+Chain 1 Iteration:  90 / 400 [ 22%]  (Warmup)
+Chain 1 Iteration: 100 / 400 [ 25%]  (Warmup)
+Chain 1 Iteration: 110 / 400 [ 27%]  (Warmup)
+Chain 1 Iteration: 120 / 400 [ 30%]  (Warmup)
+Chain 1 Iteration: 130 / 400 [ 32%]  (Warmup)
+Chain 1 Iteration: 140 / 400 [ 35%]  (Warmup)
+Chain 1 Iteration: 150 / 400 [ 37%]  (Warmup)
+Chain 1 Iteration: 160 / 400 [ 40%]  (Warmup)
+Chain 1 Iteration: 170 / 400 [ 42%]  (Warmup)
+Chain 1 Iteration: 180 / 400 [ 45%]  (Warmup)
+Chain 1 Iteration: 190 / 400 [ 47%]  (Warmup)
+Chain 1 Iteration: 200 / 400 [ 50%]  (Warmup)
+Chain 1 Iteration: 201 / 400 [ 50%]  (Sampling)
+Chain 1 Iteration: 210 / 400 [ 52%]  (Sampling)
+Chain 1 Iteration: 220 / 400 [ 55%]  (Sampling)
+Chain 1 Iteration: 230 / 400 [ 57%]  (Sampling)
+Chain 1 Iteration: 240 / 400 [ 60%]  (Sampling)
+Chain 1 Iteration: 250 / 400 [ 62%]  (Sampling)
+Chain 1 Iteration: 260 / 400 [ 65%]  (Sampling)
+Chain 1 Iteration: 270 / 400 [ 67%]  (Sampling)
+Chain 1 Iteration: 280 / 400 [ 70%]  (Sampling)
+Chain 1 Iteration: 290 / 400 [ 72%]  (Sampling)
+Chain 1 Iteration: 300 / 400 [ 75%]  (Sampling)
+Chain 1 Iteration: 310 / 400 [ 77%]  (Sampling)
+Chain 1 Iteration: 320 / 400 [ 80%]  (Sampling)
+Chain 1 Iteration: 330 / 400 [ 82%]  (Sampling)
+Chain 1 Iteration: 340 / 400 [ 85%]  (Sampling)
+Chain 1 Iteration: 350 / 400 [ 87%]  (Sampling)
+Chain 1 Iteration: 360 / 400 [ 90%]  (Sampling)
+Chain 1 Iteration: 370 / 400 [ 92%]  (Sampling)
+Chain 1 Iteration: 380 / 400 [ 95%]  (Sampling)
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling)
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling)
+Chain 1 finished in 9064.3 seconds.
+Warning: 198 of 200 (99.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+Warning: 2 of 200 (1.0%) transitions hit the maximum treedepth limit of 10.
+See https://mc-stan.org/misc/warnings for details.
+
+# 198 of 200 transitions ended with a divergence, and the two that didn't hit a the maximum treedepth limit.
+# this isn't as concerning, since this is an efficiency issue. Divergent transitions definitely are though.
+
+# I found one typo in the model. I fixed it, now reupload the folder
+- I deleted the old snake folder, then re-upload
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# then resubmit the ckpt run
+
+### 11-14-2022 ###
+
+This unfortunately doesn't look like it fixed the issue. Pull the run to the diagnostics folder
+# From within the diagnostics folder:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+# rename run as snake3
+
+# All divergent transitions
+
+Alright, I found one indexing typo with Fifteenmile Creek. Maybe that fixes it?
+
+I also removed all upstream -> RM and RM -> upstream transitions from the transition matrix.
+I also removed a bunch of upstream states that no fish have ever been in (in our states_complete data, which we subset to
+remove upstream states in DE years)
+I also made a temporary change for the Yakima, where we remove run year 04/05 from the DE years. That's because
+we don't currently have discharge data for that year, so it'll just get confused.
+
+Alright, let's try moving the run again
+
+# First remove old run
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
 
 
 
