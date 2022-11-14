@@ -65,6 +65,10 @@ subset_streams <- c(CRB_stream_names$GNIS_NAME[grep("Columbia", CRB_stream_names
                     CRB_stream_names$GNIS_NAME[grep("Looking", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Lapwai", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Klickitat", CRB_stream_names$GNIS_NAME)],
+                    # Add three missing streams: Asotin Creek, Methow, and Okanogan
+                    CRB_stream_names$GNIS_NAME[grep("Asotin", CRB_stream_names$GNIS_NAME)],
+                    CRB_stream_names$GNIS_NAME[grep("Okanogan", CRB_stream_names$GNIS_NAME)],
+                    CRB_stream_names$GNIS_NAME[grep("Methow", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Trout", CRB_stream_names$GNIS_NAME)])
 
 
@@ -90,6 +94,9 @@ CRB_streams_fort <- tidy(CRB_streams_spdf_transform_subset)
 ## Figure out which of these rivers we need to subset
 # NOTE: Need to clip out the coastline.
 
+# currently, we're missing: Okanogan, Methow, Asotin Creek
+# I'm not sure that Asotin Creek is in there?
+
 subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123.35 |
          lat < 46 & lat > 45.95 & long < -122.72 & long > -122.9 |
          lat < 45.61 & lat > 45.5 & long < -122.16 & long > -122.31 |
@@ -104,7 +111,11 @@ subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123
          lat < 47.95 & lat > 47.9 & long < -118.5 & long > -118.8 |
          lat < 48.4 & lat > 48.2 & long < -117.9 & long > -118.4 |
          lat < 46.75 & lat > 46.6 & long < -117.35 & long > -117.8 |
-         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33) -> columbia_fragments
+         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33 |
+         # here are the new rivers:
+         lat < 48.5 & lat > 48.07 & long < -120 & long > -119.5 | # Okanogan
+         lat < 48.3 & lat > 48.03 & long < -120.5 & long > -119.93 | # Methow
+         lat < 46.36 & lat > 46 & long < -117.4 & long > -117.03) -> columbia_fragments   # Asotin Creek
 subset(rivers_spdf_fort, id %in% unique(columbia_fragments$id)) -> rivers_subset
 
 CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
@@ -297,13 +308,21 @@ ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height =
 # ggsave(here("figures", "CRB_map_pres_nodams.png"), CRB_map_pres_nodams, height = 7.5, width  = 13.33) 
 
 CRB_map_pres_dams <- CRB_map_pres_nodams +
-  # Add dams
-  geom_point(data = subset(complete_event_det_counts, dam == "dam"), 
+  # Add dams - but grey out TDA and JDA, since they're not currently included as state delineators (and therefore we aren't estimating overshoot/fallback at them)
+  geom_point(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA"))), 
              aes(x = event_site_longitude, y = event_site_latitude), 
              shape = 73, size = 7, inherit.aes = FALSE) +
-  geom_text(data = subset(complete_event_det_counts, dam == "dam"), 
+  geom_text(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA"))), 
             aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
-            size = 6, inherit.aes = FALSE)
+            size = 6, inherit.aes = FALSE) +
+  # grey out JDA and TDA
+  geom_point(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA")), 
+             aes(x = event_site_longitude, y = event_site_latitude), 
+             shape = 73, size = 7, color = "gray50", inherit.aes = FALSE) +
+  geom_text(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA")), 
+            aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
+            size = 6, color = "gray50", inherit.aes = FALSE)
+  
 
 ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 7.5, width  = 13.33)
 # So saving as PNG makes the figure look quite different - just export the PDF as PNG in preview instead
