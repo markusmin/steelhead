@@ -1662,7 +1662,7 @@ n.ind <- dim(state_data)[3]
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
-    # seed = 123, # this seed gets stuck around 22-24, goes really fast and then at that iteration it slows way down
+    seed = 123, 
     # seed = 456,
     # chains = 3, 
     chains = 1,
@@ -1671,8 +1671,9 @@ n.ind <- dim(state_data)[3]
     refresh = 10, # print update every iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 50,
-    iter_sampling = 50,
+    iter_warmup = 200,
+    iter_sampling = 200,
+    adapt_delta = 0.85,
     # init = 1,
     threads_per_chain = 28
   )
