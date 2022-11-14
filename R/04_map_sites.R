@@ -65,11 +65,11 @@ subset_streams <- c(CRB_stream_names$GNIS_NAME[grep("Columbia", CRB_stream_names
                     CRB_stream_names$GNIS_NAME[grep("Looking", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Lapwai", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Klickitat", CRB_stream_names$GNIS_NAME)],
-                    # Add three missing streams: Asotin Creek, Methow, and Okanogan
                     CRB_stream_names$GNIS_NAME[grep("Asotin", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Okanogan", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Methow", CRB_stream_names$GNIS_NAME)],
                     CRB_stream_names$GNIS_NAME[grep("Trout", CRB_stream_names$GNIS_NAME)])
+# Add three missing streams: Asotin Creek, Methow, and Okanogan
 
 
 # Remove the incorrectly selected ones
@@ -96,6 +96,11 @@ CRB_streams_fort <- tidy(CRB_streams_spdf_transform_subset)
 
 # currently, we're missing: Okanogan, Methow, Asotin Creek
 # I'm not sure that Asotin Creek is in there?
+# here are the new rivers:
+# lat < 49 & lat > 48.07 & long < -120 & long > -119.5 | # Okanogan
+# lat < 48.5 & lat > 48.03 & long < -120.5 & long > -119.93 | # Methow
+# lat < 46.36 & lat > 46 & long < -117.4 & long > -117.03# Asotin Creek
+# actually, we need to get these out of the streams data, not the rivers data
 
 subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123.35 |
          lat < 46 & lat > 45.95 & long < -122.72 & long > -122.9 |
@@ -111,12 +116,12 @@ subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123
          lat < 47.95 & lat > 47.9 & long < -118.5 & long > -118.8 |
          lat < 48.4 & lat > 48.2 & long < -117.9 & long > -118.4 |
          lat < 46.75 & lat > 46.6 & long < -117.35 & long > -117.8 |
-         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33 |
-         # here are the new rivers:
-         lat < 48.5 & lat > 48.07 & long < -120 & long > -119.5 | # Okanogan
-         lat < 48.3 & lat > 48.03 & long < -120.5 & long > -119.93 | # Methow
-         lat < 46.36 & lat > 46 & long < -117.4 & long > -117.03) -> columbia_fragments   # Asotin Creek
+         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33 ) -> columbia_fragments   
+
 subset(rivers_spdf_fort, id %in% unique(columbia_fragments$id)) -> rivers_subset
+
+
+
 
 CRB_map <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   ylab("Latitude")+
@@ -249,7 +254,9 @@ rivers_subset_new <- subset(rivers_subset, long > -123.6)
 CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = group))+
   ylab("Latitude")+
   xlab("Longitude")+
-  coord_fixed(ylim = c(44.3,48.51),  xlim = c(-124.9,-115.2), ratio = 1.3)+
+  # coord_fixed(ylim = c(44.3,48.51),  xlim = c(-124.9,-115.2), ratio = 1.3)+
+  # choose new, larger boundaries, to include Okanogan and Methow Rivers on the Upper Columbia
+  coord_fixed(ylim = c(44.3,49),  xlim = c(-124.9,-115.2), ratio = 1.3)+
   # Polygons for base map
   geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
   # Polygons for CRB streams
