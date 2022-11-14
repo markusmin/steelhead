@@ -1,0 +1,36 @@
+---
+title: "Example Vignette test"
+output:
+  word_document:
+    reference_docx: CBR_template.docx
+  pdf_document: default
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ">"
+)
+```
+
+# Iris data set
+This famous (Fisher's or Anderson's) iris data set gives the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species of iris. The species are Iris setosa, versicolor, and virginica.
+
+## loading data
+The `data` command is used to load an example data set called "iris", which describes.
+
+```{r ex_first1}
+data(iris)
+```
+
+
+Visualizing the distribution of pedal lengths
+```{r ex_first3,fig.cap="Histogram of tag failure times for Sockeye data set"}
+hist(iris$Petal.Length,xlab="Days")
+```
+
+### Bivariate plot
+
+```{r fig1, fig.width=11, fig.height=5,echo=TRUE,warning=FALSE,fig.width=5, fig.height=5,fig.cap="Figure shows fit of the 2-parameter Weibull model"}
+plot(Petal.Width~Petal.Length,iris)
+```
