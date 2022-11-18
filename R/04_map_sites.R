@@ -85,7 +85,16 @@ subset_streams <- subset_streams[!(subset_streams %in% incorrect_streams)]
 CRB_streams_spdf_transform_subset <- subset(CRB_streams_spdf_transform, GNIS_NAME %in% subset_streams)
 
 # proj4string(CRB_streams_spdf)
-CRB_streams_fort <- tidy(CRB_streams_spdf_transform_subset)
+# Doing it all at one time apparently is too much for R - gives you a vector memory exhausted error. So let's split it in half
+CRB_streams_spdf_transform_subset1 <- subset(CRB_streams_spdf_transform, GNIS_NAME %in% subset_streams[1:round(length(subset_streams)/2,0)])
+CRB_streams_spdf_transform_subset2 <- subset(CRB_streams_spdf_transform, GNIS_NAME %in% subset_streams[(round(length(subset_streams)/2,0) + 1):length(subset_streams)])
+
+CRB_streams_fort1 <- tidy(CRB_streams_spdf_transform_subset1)
+CRB_streams_fort2 <- tidy(CRB_streams_spdf_transform_subset2)
+
+CRB_streams_fort1 %>% 
+  bind_rows(., CRB_streams_fort2) -> CRB_streams_fort
+# CRB_streams_fort <- tidy(CRB_streams_spdf_transform_subset)
 # Remove shapefiles to save space in workspace
 # rm(CRB_streams_spdf_transform_subset, CRB_streams_spdf_transform)
 
@@ -116,7 +125,8 @@ subset(rivers_spdf_fort, lat < 46.2 & lat > 46.15 & long < -123.10 & long > -123
          lat < 47.95 & lat > 47.9 & long < -118.5 & long > -118.8 |
          lat < 48.4 & lat > 48.2 & long < -117.9 & long > -118.4 |
          lat < 46.75 & lat > 46.6 & long < -117.35 & long > -117.8 |
-         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33 ) -> columbia_fragments   
+         lat < 46.67 & lat > 46.6 & long < -116 & long > -116.33 |
+         lat < 48.85 & lat > 48 & long < -118.4 & long > -117.86) -> columbia_fragments   
 
 subset(rivers_spdf_fort, id %in% unique(columbia_fragments$id)) -> rivers_subset
 
@@ -256,7 +266,7 @@ CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = grou
   xlab("Longitude")+
   # coord_fixed(ylim = c(44.3,48.51),  xlim = c(-124.9,-115.2), ratio = 1.3)+
   # choose new, larger boundaries, to include Okanogan and Methow Rivers on the Upper Columbia
-  coord_fixed(ylim = c(44.3,49),  xlim = c(-124.9,-115.2), ratio = 1.3)+
+  coord_fixed(ylim = c(44.3,48.75),  xlim = c(-124.9,-115.2), ratio = 1.3)+
   # Polygons for base map
   geom_polygon(color = "gray70", size = 0.2, fill = rgb(251, 234, 194, max=255))+
   # Polygons for CRB streams
@@ -276,11 +286,14 @@ CRB_map_pres_nodams <- ggplot(usa_spdf_fort, aes(x = long, y = lat, group = grou
   annotate("text", x = -117.3, y = 45.50, label = "Grande Ronde R.", size = 5.5, fontface = 'italic', hjust = 1) + # Grande Ronde R.
   annotate("text", x = -115.2, y = 46.475, label = "Clearwater R.", size = 5.5, fontface = 'italic', hjust = 1) + # Clearwater R.
   annotate("text", x = -116.93, y = 44.97, label = "Imnaha R.", size = 5.5, fontface = 'italic', hjust = 1) + # Imnaha R.
-  annotate("text", x = -116.5, y = 46.65, label = "Snake R.", size = 7, fontface = 'italic', hjust = 1) + # Snake R.
+  annotate("text", x = -116.49, y = 46.65, label = "Snake R.", size = 7, fontface = 'italic', hjust = 1) + # Snake R.
   annotate("text", x = -115.35, y = 45.55, label = "Salmon R.", size = 5.5, fontface = 'italic', hjust = 1) + # Salmon R.
-  annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 5.5, fontface = 'italic', hjust = 1) + # Yakima R.
+  annotate("text", x = -120.55, y = 46.65, label = "Yakima R.", size = 5.5, fontface = 'italic', hjust = 1) + # Yakima R.
   annotate("text", x = -120.62, y = 47.50, label = "Wenatchee R.", size = 5.5, fontface = 'italic', hjust = 1) + # Wenatchee R.
   annotate("text", x = -120.5, y = 48.17, label = "Entiat R.", size = 5.5, fontface = 'italic', hjust = 1) + # Entiat R.
+  annotate("text", x = -116.98, y = 46.3, label = "Asotin Cr.", size = 5.5, fontface = 'italic', hjust = 1, angle = 30) + # Asotin Cr.
+  annotate("text", x = -120.4, y = 48.48, label = "Methow R.", size = 5.5, fontface = 'italic', hjust = 1) + # Methow R.
+  annotate("text", x = -118.4, y = 48.6, label = "Okanogan R.", size = 5.5, fontface = 'italic', hjust = 1) + # Okanogan R.
   theme(plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill="white", color = "white"),
         panel.border = element_rect(colour = "white", fill=NA, size=1),
@@ -331,6 +344,6 @@ CRB_map_pres_dams <- CRB_map_pres_nodams +
             size = 6, color = "gray50", inherit.aes = FALSE)
   
 
-ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 7.5, width  = 13.33)
+ggsave(here("figures", "CRB_map_pres_dams.pdf"), CRB_map_pres_dams, height = 7.5, width  = 12.5)
 # So saving as PNG makes the figure look quite different - just export the PDF as PNG in preview instead
 # ggsave(here("figures", "CRB_map_pres_dams.png"), CRB_map_pres_dams, height = 7.5, width  = 13.33)
