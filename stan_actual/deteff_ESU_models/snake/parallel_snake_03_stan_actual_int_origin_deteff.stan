@@ -105,6 +105,32 @@ functions{
         
         // here: create a vector with the length of the states, where we will store whether or not they are affected by DE
         vector[42] DE_correction;
+        
+            // Get the current run year
+            
+            // indexing is different if i == 1
+              int run_year_index;      
+              int run_year_actual;
+            if (i == 1) {
+              // now, sum the vector to get a single integer value for indexing the run year vector
+              run_year_index = j;
+              // get the actual run year
+              run_year_actual = transition_run_years[run_year_index];
+            } else {
+                // indexing tweaks
+                // first: declare a vector that stores all of the indices that we need to sum to get the right run year
+                array[i] int run_year_indices_vector;
+                // then populate: first elements are all the number of transitions from all previous fish
+                run_year_indices_vector[1:(i-1)] = n_obs[1:(i-1)];
+                // last element is the transition number of the current fish  
+                run_year_indices_vector[i] = j;
+                // now, sum the vector to get a single integer value for indexing the run year vector
+                run_year_index = sum(run_year_indices_vector);
+                // get the actual run year
+                run_year_actual = transition_run_years[run_year_index];
+
+            }
+          
 
         // Populate each of the first 42 (non-loss)
         for (k in 1:42){
@@ -122,72 +148,15 @@ functions{
           // If we are in a run year in a state transition where we are estimating DE, use that matrix;
           // for indexing by run year - some up all n_obs prior to this fish, plus whatever index we're on for the current fish
           // need to make an exception for the first fish, which uses only the index j
-          if (i == 1){
-            int run_year_index;
-            // now, sum the vector to get a single integer value for indexing the run year vector
-            run_year_index = j;
-            // get the actual run year
-            int run_year_actual;
-            run_year_actual = transition_run_years[run_year_index];
-                    // if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
-                      // need to declare another intermediate value: an integer that takes either 0 or 1, for whether it's DE or NDE
-                      int DE_index;
-                      // now, determine if it's 0 or 1
-                      DE_index = run_year_DE_array[current,k,run_year_actual];
-                      // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
-                        if (DE_index == 1){
-                        
-                        
-                        
-                      logits[k] = b0_matrix_DE[current, k]+ 
-                      // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
-                      cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
-                      cat_X_mat[i,4] * borigin2_matrix_DE[current,k] +
-                      cat_X_mat[i,5] * borigin3_matrix_DE[current,k] +
-                      cat_X_mat[i,6] * borigin4_matrix_DE[current,k] +
-                      cat_X_mat[i,7] * borigin5_matrix_DE[current,k];
-                      
-                      // store in the vector that it's DE
-                      DE_correction[k] = 1;
-                      
-                      // Else, use the NDE matrix
-                      } else {
-                      logits[k] = b0_matrix_NDE[current, k]+ 
-                      // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
-                      cat_X_mat[i,3] * borigin1_matrix_NDE[current,k] +
-                      cat_X_mat[i,4] * borigin2_matrix_NDE[current,k] +
-                      cat_X_mat[i,5] * borigin3_matrix_NDE[current,k] +
-                      cat_X_mat[i,6] * borigin4_matrix_NDE[current,k] +
-                      cat_X_mat[i,7] * borigin5_matrix_NDE[current,k];
-                      
-                      // otherwise, store in the vector that it's not DE
-                      DE_correction[k] = 0;
-                      }
-                      
-                      // print("i==1; logits = ",logits);
-                      
-          
-          } else {
+
             // If we're in a state/run year combo that needs DE correction, correct for it
-            // first: declare a vector that stores all of the indices that we need to sum to get the right run year
-            array[i] int run_year_indices_vector;
-            // then populate: first elements are all the number of transitions from all previous fish
-            run_year_indices_vector[1:(i-1)] = n_obs[1:i-1];
-            // last element is the transition number of the current fish  
-            run_year_indices_vector[i] = j;
-            int run_year_index;
-            // now, sum the vector to get a single integer value for indexing the run year vector
-            run_year_index = sum(run_year_indices_vector);
-            // get the actual run year
-            int run_year_actual;
-            run_year_actual = transition_run_years[run_year_index];
                     // if (run_year_DE_array[current,k,transition_run_years[sum(n_obs[1:i-1], j)]] == 1){
                       // need to declare another intermediate value: an integer that takes either 0 or 1, for whether it's DE or NDE
                       int DE_index;
                       // now, determine if it's 0 or 1
                       DE_index = run_year_DE_array[current,k,run_year_actual];
                       // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
-                        if (DE_index == 1){
+                  if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
                     // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
                     cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
@@ -200,7 +169,7 @@ functions{
                     DE_correction[k] = 1;
                     
                     // Else, use the NDE matrix, and don't correct for detection efficiency
-                    } else {
+                  } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
                     // cat_X_mat[i,2] * borigin1_matrix[current,k] + # this is rear, which we are currently not using
                     cat_X_mat[i,3] * borigin1_matrix_NDE[current,k] +
@@ -214,7 +183,6 @@ functions{
                     }
                     
                     
-          }
           
           
         }
@@ -240,20 +208,10 @@ functions{
           // declare one vector for linear predictors and one for actual detection efficiency
           vector[42] det_eff_eta;
           vector[42] det_eff;
+          
         for (k in 1:42){
           if (DE_correction[k] == 1) {
-            // the exception for if i = 1 for the indexing:
-            if (i == 1){
-              // because we're now multiplying them as vectors, we need to sum to get the same results as if it was a design matrix
-              // vector[34] trib_design_matrix_result;
-            // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * det_eff_param_vector;
-            // det_eff_eta[k] = sum(trib_design_matrix_result);
-            det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[transition_run_years[j],,k]) * to_vector(det_eff_param_vector);
-            // det_eff_eta[k] = tributary_design_vector * det_eff_param_vector;
-            det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
-              
-            } else {
-              
+            
             // to calculate detection efficiency by indexing:
             // The tributary design matrices array will have the same number of slices as states (42, for 43 - loss).
             // Only 14 of these slices (the 14 tributaries that have DE calculations) will have non-zero values, but this will make the indexing simpler.
@@ -262,29 +220,12 @@ functions{
             // the columns will then be the appropriate row of the design matrix, for that state and tributary.
             // That will then be multiplied by the full, 34 length parameter vector. This will be written out in
             // the transformed parameters section, and will have 20 alpha terms and 14 beta terms.
-            
-            // indexing tweaks
-            // first: declare a vector that stores all of the indices that we need to sum to get the right run year
-            array[i] int run_year_indices_vector;
-            // then populate: first elements are all the number of transitions from all previous fish
-            run_year_indices_vector[1:(i-1)] = n_obs[1:i-1];
-            // last element is the transition number of the current fish  
-            run_year_indices_vector[i] = j;
-            int run_year_index;
-            // now, sum the vector to get a single integer value for indexing the run year vector
-            run_year_index = sum(run_year_indices_vector);
-            // get the actual run year
-            int run_year_actual;
-            run_year_actual = transition_run_years[run_year_index];
+          
             // vector[34] trib_design_matrix_result;
             // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector;
             // det_eff_eta[k] = sum(trib_design_matrix_result);
             det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * to_vector(det_eff_param_vector);
             det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
-              
-            }
-            
-
 
             
           } else {
@@ -333,16 +274,22 @@ functions{
         p_vec_observed[43] = p_vec_actual[43] + sum(loss_term_DE_corrections);
         // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the
         // above line isn't the cause of the errors
-        
-        // print("DE_correction: ", DE_correction);
-        // print("det eff eta: ", det_eff_eta);
-        // print("det eff: ", det_eff);
-        // print("p_vec_actual: ", p_vec_actual);
-        // print("p_vec_observed: ", p_vec_observed);
-        // print("p_vec_observed_test: ", p_vec_observed_test);
-        // print("i = ",i);
-        // print("j = ",j);
-        // print("slice_y[i,j]: ", slice_y[i,j+1]);
+        print("i = ",i);
+        print("j = ",j);
+        print("current state: ", current);
+        print("run year actual = ", run_year_actual);
+        print("DE_correction: ", DE_correction);
+        print("det eff eta: ", det_eff_eta);
+        print("det eff: ", det_eff);
+        print("b0_matrix_DE[current,]: ", b0_matrix_DE[current,]);
+        print("b0_matrix_NDE[current,]: ", b0_matrix_NDE[current,]);
+        print("logits: ", logits);
+        print("p_vec_actual: ", p_vec_actual);
+        print("p_vec_observed: ", p_vec_observed);
+        // print("sum p_vec_observed = ", sum(p_vec_observed));
+
+        print("slice_y[i - start + 1,j+1]: ", slice_y[i - start + 1,j+1]);
+        print("next state: ", slice_y[i - start + 1,j+1], "; prob of next state = ", p_vec_observed[slice_y[i - start + 1,j+1]]);
         // Store the log probability of that individual transition in the vector that we declared
         // lp_fish[j] = categorical_lpmf(slice_y[i,j+1] | p_vec);
         // Changed the indexing here, based on:https://discourse.mc-stan.org/t/help-with-multi-threading-a-simple-ordinal-probit-model-using-reduce-sum/15353
@@ -579,42 +526,42 @@ real borigin5_matrix_39_9;
 
 // here, write out all of the parameters for detection efficiency
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
-real asotin_alpha1;
-real asotin_alpha2;
-real deschutes_alpha1;
-real entiat_alpha1;
-real fifteenmile_alpha1;
-real hood_alpha1;
-real imnaha_alpha1;
-real john_day_alpha1;
-real methow_alpha1;
-real methow_alpha2;
-real okanogan_alpha1;
-real tucannon_alpha1;
-real tucannon_alpha2;
-real umatilla_alpha1;
-real umatilla_alpha2;
-real walla_walla_alpha1;
-real walla_walla_alpha2;
-real walla_walla_alpha3;
-real wenatchee_alpha1;
-real yakima_alpha1;
+// real asotin_alpha1;
+// real asotin_alpha2;
+// real deschutes_alpha1;
+// real entiat_alpha1;
+// real fifteenmile_alpha1;
+// real hood_alpha1;
+// real imnaha_alpha1;
+// real john_day_alpha1;
+// real methow_alpha1;
+// real methow_alpha2;
+// real okanogan_alpha1;
+// real tucannon_alpha1;
+// real tucannon_alpha2;
+// real umatilla_alpha1;
+// real umatilla_alpha2;
+// real walla_walla_alpha1;
+// real walla_walla_alpha2;
+// real walla_walla_alpha3;
+// real wenatchee_alpha1;
+// real yakima_alpha1;
 
 // 14 terms for discharge relationship, one for each tributary
-real asotin_beta;
-real deschutes_beta;
-real entiat_beta;
-real fifteenmile_beta;
-real hood_beta;
-real imnaha_beta;
-real john_day_beta;
-real methow_beta;
-real okanogan_beta;
-real tucannon_beta;
-real umatilla_beta;
-real walla_walla_beta;
-real wenatchee_beta;
-real yakima_beta;
+// real asotin_beta;
+// real deschutes_beta;
+// real entiat_beta;
+// real fifteenmile_beta;
+// real hood_beta;
+// real imnaha_beta;
+// real john_day_beta;
+// real methow_beta;
+// real okanogan_beta;
+// real tucannon_beta;
+// real umatilla_beta;
+// real walla_walla_beta;
+// real wenatchee_beta;
+// real yakima_beta;
 
   
 }
@@ -830,32 +777,22 @@ b0_matrix_DE[11,2] = b0_matrix_10_2;
 b0_matrix_NDE[11,2] = b0_matrix_10_2;
 b0_matrix_DE[12,2] = b0_matrix_12_2;
 b0_matrix_NDE[12,2] = b0_matrix_12_2;
-b0_matrix_DE[13,2] = b0_matrix_12_2;
-b0_matrix_NDE[13,2] = b0_matrix_12_2;
 b0_matrix_DE[14,2] = b0_matrix_14_2;
 b0_matrix_NDE[14,2] = b0_matrix_14_2;
 b0_matrix_DE[16,2] = b0_matrix_16_2;
 b0_matrix_NDE[16,2] = b0_matrix_16_2;
-b0_matrix_DE[17,2] = b0_matrix_16_2;
-b0_matrix_NDE[17,2] = b0_matrix_16_2;
 b0_matrix_DE[18,2] = b0_matrix_18_2;
 b0_matrix_NDE[18,2] = b0_matrix_18_2;
 b0_matrix_DE[19,2] = b0_matrix_18_2;
 b0_matrix_NDE[19,2] = b0_matrix_18_2;
 b0_matrix_DE[20,3] = b0_matrix_20_3;
 b0_matrix_NDE[20,3] = b0_matrix_20_3;
-b0_matrix_DE[21,3] = b0_matrix_20_3;
-b0_matrix_NDE[21,3] = b0_matrix_20_3;
 b0_matrix_DE[22,3] = b0_matrix_22_3;
 b0_matrix_NDE[22,3] = b0_matrix_22_3;
-b0_matrix_DE[23,3] = b0_matrix_22_3;
-b0_matrix_NDE[23,3] = b0_matrix_22_3;
 b0_matrix_DE[24,5] = b0_matrix_24_5;
 b0_matrix_NDE[24,5] = b0_matrix_24_5;
 b0_matrix_DE[26,6] = b0_matrix_26_6;
 b0_matrix_NDE[26,6] = b0_matrix_26_6;
-b0_matrix_DE[27,6] = b0_matrix_26_6;
-b0_matrix_NDE[27,6] = b0_matrix_26_6;
 b0_matrix_DE[28,7] = b0_matrix_28_7;
 b0_matrix_NDE[28,7] = b0_matrix_28_7;
 b0_matrix_DE[29,7] = b0_matrix_28_7;
@@ -866,8 +803,6 @@ b0_matrix_DE[31,7] = b0_matrix_30_7;
 b0_matrix_NDE[31,7] = b0_matrix_30_7;
 b0_matrix_DE[32,8] = b0_matrix_32_8;
 b0_matrix_NDE[32,8] = b0_matrix_32_8;
-b0_matrix_DE[33,8] = b0_matrix_32_8;
-b0_matrix_NDE[33,8] = b0_matrix_32_8;
 b0_matrix_DE[34,9] = b0_matrix_34_9;
 b0_matrix_NDE[34,9] = b0_matrix_34_9;
 b0_matrix_DE[35,9] = b0_matrix_34_9;
@@ -880,8 +815,6 @@ b0_matrix_DE[38,9] = b0_matrix_38_9;
 b0_matrix_NDE[38,9] = b0_matrix_38_9;
 b0_matrix_DE[39,9] = b0_matrix_39_9;
 b0_matrix_NDE[39,9] = b0_matrix_39_9;
-b0_matrix_DE[40,9] = b0_matrix_39_9;
-b0_matrix_NDE[40,9] = b0_matrix_39_9;
 b0_matrix_DE[41,2] = b0_matrix_41_2;
 b0_matrix_NDE[41,2] = b0_matrix_41_2;
 b0_matrix_DE[42,7] = b0_matrix_42_7;
@@ -912,8 +845,6 @@ borigin1_matrix_NDE[9,39] = borigin1_matrix_9_39_NDE;
 borigin1_matrix_NDE[9,40] = borigin1_matrix_9_39_NDE;
 borigin1_matrix_DE[32,8] = borigin1_matrix_32_8;
 borigin1_matrix_NDE[32,8] = borigin1_matrix_32_8;
-borigin1_matrix_DE[33,8] = borigin1_matrix_32_8;
-borigin1_matrix_NDE[33,8] = borigin1_matrix_32_8;
 borigin1_matrix_DE[34,9] = borigin1_matrix_34_9;
 borigin1_matrix_NDE[34,9] = borigin1_matrix_34_9;
 borigin1_matrix_DE[35,9] = borigin1_matrix_34_9;
@@ -926,8 +857,6 @@ borigin1_matrix_DE[38,9] = borigin1_matrix_38_9;
 borigin1_matrix_NDE[38,9] = borigin1_matrix_38_9;
 borigin1_matrix_DE[39,9] = borigin1_matrix_39_9;
 borigin1_matrix_NDE[39,9] = borigin1_matrix_39_9;
-borigin1_matrix_DE[40,9] = borigin1_matrix_39_9;
-borigin1_matrix_NDE[40,9] = borigin1_matrix_39_9;
 
 borigin2_matrix_DE[3,8] = borigin2_matrix_3_8;
 borigin2_matrix_NDE[3,8] = borigin2_matrix_3_8;
@@ -954,8 +883,6 @@ borigin2_matrix_NDE[9,39] = borigin2_matrix_9_39_NDE;
 borigin2_matrix_NDE[9,40] = borigin2_matrix_9_39_NDE;
 borigin2_matrix_DE[32,8] = borigin2_matrix_32_8;
 borigin2_matrix_NDE[32,8] = borigin2_matrix_32_8;
-borigin2_matrix_DE[33,8] = borigin2_matrix_32_8;
-borigin2_matrix_NDE[33,8] = borigin2_matrix_32_8;
 borigin2_matrix_DE[34,9] = borigin2_matrix_34_9;
 borigin2_matrix_NDE[34,9] = borigin2_matrix_34_9;
 borigin2_matrix_DE[35,9] = borigin2_matrix_34_9;
@@ -968,8 +895,6 @@ borigin2_matrix_DE[38,9] = borigin2_matrix_38_9;
 borigin2_matrix_NDE[38,9] = borigin2_matrix_38_9;
 borigin2_matrix_DE[39,9] = borigin2_matrix_39_9;
 borigin2_matrix_NDE[39,9] = borigin2_matrix_39_9;
-borigin2_matrix_DE[40,9] = borigin2_matrix_39_9;
-borigin2_matrix_NDE[40,9] = borigin2_matrix_39_9;
 
 borigin3_matrix_DE[3,8] = borigin3_matrix_3_8;
 borigin3_matrix_NDE[3,8] = borigin3_matrix_3_8;
@@ -996,8 +921,6 @@ borigin3_matrix_NDE[9,39] = borigin3_matrix_9_39_NDE;
 borigin3_matrix_NDE[9,40] = borigin3_matrix_9_39_NDE;
 borigin3_matrix_DE[32,8] = borigin3_matrix_32_8;
 borigin3_matrix_NDE[32,8] = borigin3_matrix_32_8;
-borigin3_matrix_DE[33,8] = borigin3_matrix_32_8;
-borigin3_matrix_NDE[33,8] = borigin3_matrix_32_8;
 borigin3_matrix_DE[34,9] = borigin3_matrix_34_9;
 borigin3_matrix_NDE[34,9] = borigin3_matrix_34_9;
 borigin3_matrix_DE[35,9] = borigin3_matrix_34_9;
@@ -1010,8 +933,6 @@ borigin3_matrix_DE[38,9] = borigin3_matrix_38_9;
 borigin3_matrix_NDE[38,9] = borigin3_matrix_38_9;
 borigin3_matrix_DE[39,9] = borigin3_matrix_39_9;
 borigin3_matrix_NDE[39,9] = borigin3_matrix_39_9;
-borigin3_matrix_DE[40,9] = borigin3_matrix_39_9;
-borigin3_matrix_NDE[40,9] = borigin3_matrix_39_9;
 
 borigin4_matrix_DE[3,8] = borigin4_matrix_3_8;
 borigin4_matrix_NDE[3,8] = borigin4_matrix_3_8;
@@ -1038,8 +959,6 @@ borigin4_matrix_NDE[9,39] = borigin4_matrix_9_39_NDE;
 borigin4_matrix_NDE[9,40] = borigin4_matrix_9_39_NDE;
 borigin4_matrix_DE[32,8] = borigin4_matrix_32_8;
 borigin4_matrix_NDE[32,8] = borigin4_matrix_32_8;
-borigin4_matrix_DE[33,8] = borigin4_matrix_32_8;
-borigin4_matrix_NDE[33,8] = borigin4_matrix_32_8;
 borigin4_matrix_DE[34,9] = borigin4_matrix_34_9;
 borigin4_matrix_NDE[34,9] = borigin4_matrix_34_9;
 borigin4_matrix_DE[35,9] = borigin4_matrix_34_9;
@@ -1052,8 +971,6 @@ borigin4_matrix_DE[38,9] = borigin4_matrix_38_9;
 borigin4_matrix_NDE[38,9] = borigin4_matrix_38_9;
 borigin4_matrix_DE[39,9] = borigin4_matrix_39_9;
 borigin4_matrix_NDE[39,9] = borigin4_matrix_39_9;
-borigin4_matrix_DE[40,9] = borigin4_matrix_39_9;
-borigin4_matrix_NDE[40,9] = borigin4_matrix_39_9;
 
 borigin5_matrix_DE[3,8] = borigin5_matrix_3_8;
 borigin5_matrix_NDE[3,8] = borigin5_matrix_3_8;
@@ -1080,8 +997,6 @@ borigin5_matrix_NDE[9,39] = borigin5_matrix_9_39_NDE;
 borigin5_matrix_NDE[9,40] = borigin5_matrix_9_39_NDE;
 borigin5_matrix_DE[32,8] = borigin5_matrix_32_8;
 borigin5_matrix_NDE[32,8] = borigin5_matrix_32_8;
-borigin5_matrix_DE[33,8] = borigin5_matrix_32_8;
-borigin5_matrix_NDE[33,8] = borigin5_matrix_32_8;
 borigin5_matrix_DE[34,9] = borigin5_matrix_34_9;
 borigin5_matrix_NDE[34,9] = borigin5_matrix_34_9;
 borigin5_matrix_DE[35,9] = borigin5_matrix_34_9;
@@ -1094,49 +1009,90 @@ borigin5_matrix_DE[38,9] = borigin5_matrix_38_9;
 borigin5_matrix_NDE[38,9] = borigin5_matrix_38_9;
 borigin5_matrix_DE[39,9] = borigin5_matrix_39_9;
 borigin5_matrix_NDE[39,9] = borigin5_matrix_39_9;
-borigin5_matrix_DE[40,9] = borigin5_matrix_39_9;
-borigin5_matrix_NDE[40,9] = borigin5_matrix_39_9;
 
 // detection efficiency - create a vector that stores all parameters
 vector[34] det_eff_param_vector; // this is length 34 because that's how many det eff params we have
 
 // populate the vector
-det_eff_param_vector[1] = asotin_alpha1;
-det_eff_param_vector[2] = asotin_alpha2;
-det_eff_param_vector[3] = deschutes_alpha1;
-det_eff_param_vector[4] = entiat_alpha1;
-det_eff_param_vector[5] = fifteenmile_alpha1;
-det_eff_param_vector[6] = hood_alpha1;
-det_eff_param_vector[7] = imnaha_alpha1;
-det_eff_param_vector[8] = john_day_alpha1;
-det_eff_param_vector[9] = methow_alpha1;
-det_eff_param_vector[10] = methow_alpha2;
-det_eff_param_vector[11] = okanogan_alpha1;
-det_eff_param_vector[12] = tucannon_alpha1;
-det_eff_param_vector[13] = tucannon_alpha2;
-det_eff_param_vector[14] = umatilla_alpha1;
-det_eff_param_vector[15] = umatilla_alpha2;
-det_eff_param_vector[16] = walla_walla_alpha1;
-det_eff_param_vector[17] = walla_walla_alpha2;
-det_eff_param_vector[18] = walla_walla_alpha3;
-det_eff_param_vector[19] = wenatchee_alpha1;
-det_eff_param_vector[20] = yakima_alpha1;
+// det_eff_param_vector[1] = asotin_alpha1;
+// det_eff_param_vector[2] = asotin_alpha2;
+// det_eff_param_vector[3] = deschutes_alpha1;
+// det_eff_param_vector[4] = entiat_alpha1;
+// det_eff_param_vector[5] = fifteenmile_alpha1;
+// det_eff_param_vector[6] = hood_alpha1;
+// det_eff_param_vector[7] = imnaha_alpha1;
+// det_eff_param_vector[8] = john_day_alpha1;
+// det_eff_param_vector[9] = methow_alpha1;
+// det_eff_param_vector[10] = methow_alpha2;
+// det_eff_param_vector[11] = okanogan_alpha1;
+// det_eff_param_vector[12] = tucannon_alpha1;
+// det_eff_param_vector[13] = tucannon_alpha2;
+// det_eff_param_vector[14] = umatilla_alpha1;
+// det_eff_param_vector[15] = umatilla_alpha2;
+// det_eff_param_vector[16] = walla_walla_alpha1;
+// det_eff_param_vector[17] = walla_walla_alpha2;
+// det_eff_param_vector[18] = walla_walla_alpha3;
+// det_eff_param_vector[19] = wenatchee_alpha1;
+// det_eff_param_vector[20] = yakima_alpha1;
+
+det_eff_param_vector[1] = det_eff_param_posteriors[1,1];
+det_eff_param_vector[2] = det_eff_param_posteriors[2,1];
+det_eff_param_vector[3] = det_eff_param_posteriors[3,1];
+det_eff_param_vector[4] = det_eff_param_posteriors[4,1];
+det_eff_param_vector[5] = det_eff_param_posteriors[5,1];
+det_eff_param_vector[6] = det_eff_param_posteriors[6,1];
+det_eff_param_vector[7] = det_eff_param_posteriors[7,1];
+det_eff_param_vector[8] = det_eff_param_posteriors[8,1];
+det_eff_param_vector[9] = det_eff_param_posteriors[9,1];
+det_eff_param_vector[10] = det_eff_param_posteriors[10,1];
+det_eff_param_vector[11] = det_eff_param_posteriors[11,1];
+det_eff_param_vector[12] = det_eff_param_posteriors[12,1];
+det_eff_param_vector[13] = det_eff_param_posteriors[13,1];
+det_eff_param_vector[14] = det_eff_param_posteriors[14,1];
+det_eff_param_vector[15] = det_eff_param_posteriors[15,1];
+det_eff_param_vector[16] = det_eff_param_posteriors[16,1];
+det_eff_param_vector[17] = det_eff_param_posteriors[17,1];
+det_eff_param_vector[18] = det_eff_param_posteriors[18,1];
+det_eff_param_vector[19] = det_eff_param_posteriors[19,1];
+det_eff_param_vector[20] = det_eff_param_posteriors[20,1];
 
 // 14 terms for discharge relationship, one for each tributary
-det_eff_param_vector[21] = asotin_beta;
-det_eff_param_vector[22] = deschutes_beta;
-det_eff_param_vector[23] = entiat_beta;
-det_eff_param_vector[24] = fifteenmile_beta;
-det_eff_param_vector[25] = hood_beta;
-det_eff_param_vector[26] = imnaha_beta;
-det_eff_param_vector[27] = john_day_beta;
-det_eff_param_vector[28] = methow_beta;
-det_eff_param_vector[29] = okanogan_beta;
-det_eff_param_vector[30] = tucannon_beta;
-det_eff_param_vector[31] = umatilla_beta;
-det_eff_param_vector[32] = walla_walla_beta;
-det_eff_param_vector[33] = wenatchee_beta;
-det_eff_param_vector[34] = yakima_beta;
+// det_eff_param_vector[21] = asotin_beta;
+// det_eff_param_vector[22] = deschutes_beta;
+// det_eff_param_vector[23] = entiat_beta;
+// // det_eff_param_vector[24] = fifteenmile_beta;
+// // fix these to zero
+// det_eff_param_vector[24] = 0;
+// det_eff_param_vector[25] = hood_beta;
+// // det_eff_param_vector[26] = imnaha_beta;
+// det_eff_param_vector[26] = 0;
+// det_eff_param_vector[27] = john_day_beta;
+// det_eff_param_vector[28] = methow_beta;
+// det_eff_param_vector[29] = okanogan_beta;
+// det_eff_param_vector[30] = tucannon_beta;
+// det_eff_param_vector[31] = umatilla_beta;
+// det_eff_param_vector[32] = walla_walla_beta;
+// det_eff_param_vector[33] = wenatchee_beta;
+// det_eff_param_vector[34] = yakima_beta;
+
+
+det_eff_param_vector[21] = 0;
+det_eff_param_vector[22] = 0;
+det_eff_param_vector[23] = 0;
+// det_eff_param_vector[24] = fifteenmile_beta;
+// fix these to zero
+det_eff_param_vector[24] = 0;
+det_eff_param_vector[25] = 0;
+// det_eff_param_vector[26] = imnaha_beta;
+det_eff_param_vector[26] = 0;
+det_eff_param_vector[27] = 0;
+det_eff_param_vector[28] = 0;
+det_eff_param_vector[29] = 0;
+det_eff_param_vector[30] = 0;
+det_eff_param_vector[31] = 0;
+det_eff_param_vector[32] = 0;
+det_eff_param_vector[33] = 0;
+det_eff_param_vector[34] = 0;
 
 
 
@@ -1398,45 +1354,45 @@ borigin5_matrix_39_9 ~ normal(0,10);
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
 // the outputs from that model will be the first column [,1] containing central tendency (mean)
 // and the second column [,2] containing the standard deviation
-asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-asotin_alpha2 ~ normal(det_eff_param_posteriors[2,1], det_eff_param_posteriors[2,2]);
-deschutes_alpha1 ~ normal(det_eff_param_posteriors[3,1], det_eff_param_posteriors[3,2]);
-entiat_alpha1 ~ normal(det_eff_param_posteriors[4,1], det_eff_param_posteriors[4,2]);
-fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[5,1], det_eff_param_posteriors[5,2]);
-hood_alpha1 ~ normal(det_eff_param_posteriors[6,1], det_eff_param_posteriors[6,2]);
-imnaha_alpha1 ~ normal(det_eff_param_posteriors[7,1], det_eff_param_posteriors[7,2]);
-john_day_alpha1 ~ normal(det_eff_param_posteriors[8,1], det_eff_param_posteriors[8,2]);
-methow_alpha1 ~ normal(det_eff_param_posteriors[9,1], det_eff_param_posteriors[9,2]);
-methow_alpha2 ~ normal(det_eff_param_posteriors[10,1], det_eff_param_posteriors[10,2]);
-okanogan_alpha1 ~ normal(det_eff_param_posteriors[11,1], det_eff_param_posteriors[11,2]);
-tucannon_alpha1 ~ normal(det_eff_param_posteriors[12,1], det_eff_param_posteriors[12,2]);
-tucannon_alpha2 ~ normal(det_eff_param_posteriors[13,1], det_eff_param_posteriors[13,2]);
-umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posteriors[14,2]);
-umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
-walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
-walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
-walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
-wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
-yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
+// asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+// asotin_alpha2 ~ normal(det_eff_param_posteriors[2,1], det_eff_param_posteriors[2,2]);
+// deschutes_alpha1 ~ normal(det_eff_param_posteriors[3,1], det_eff_param_posteriors[3,2]);
+// entiat_alpha1 ~ normal(det_eff_param_posteriors[4,1], det_eff_param_posteriors[4,2]);
+// fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[5,1], det_eff_param_posteriors[5,2]);
+// hood_alpha1 ~ normal(det_eff_param_posteriors[6,1], det_eff_param_posteriors[6,2]);
+// imnaha_alpha1 ~ normal(det_eff_param_posteriors[7,1], det_eff_param_posteriors[7,2]);
+// john_day_alpha1 ~ normal(det_eff_param_posteriors[8,1], det_eff_param_posteriors[8,2]);
+// methow_alpha1 ~ normal(det_eff_param_posteriors[9,1], det_eff_param_posteriors[9,2]);
+// methow_alpha2 ~ normal(det_eff_param_posteriors[10,1], det_eff_param_posteriors[10,2]);
+// okanogan_alpha1 ~ normal(det_eff_param_posteriors[11,1], det_eff_param_posteriors[11,2]);
+// tucannon_alpha1 ~ normal(det_eff_param_posteriors[12,1], det_eff_param_posteriors[12,2]);
+// tucannon_alpha2 ~ normal(det_eff_param_posteriors[13,1], det_eff_param_posteriors[13,2]);
+// umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posteriors[14,2]);
+// umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
+// walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
+// walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
+// walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
+// wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
+// yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
 
 // 14 terms for discharge relationship, one for each tributary
-asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
-deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
-entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
-// fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
-// note that fifteenmile and imnaha don't have any discharge data, so they just get intercepts and the beta term is fixed to zero
-fifteenmile_beta ~ normal(0,0.000001);
-hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
-// imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
-imnaha_beta ~ normal(0,0.000001);
-john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
-methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
-okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
-tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
-umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
-walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
-wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
-yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
+// asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
+// deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
+// entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
+// // fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+// // note that fifteenmile and imnaha don't have any discharge data, so they just get intercepts and the beta term is fixed to zero
+// // fifteenmile_beta ~ normal(0,0.000001);
+// hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
+// // imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+// // imnaha_beta ~ normal(0,0.000001);
+// john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
+// methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
+// okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
+// tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
+// umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
+// walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
+// wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
+// yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
 
 
 
