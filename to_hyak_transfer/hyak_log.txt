@@ -1864,10 +1864,151 @@ rm -r snake/
 Move the new folder onto hyak:
 scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
 
+# snake 5 has printed p_vec - but that doesn't seem to be the issue, since sum p_vec_observed is always 1
 
 
+# Okay - after meeting with Mark, I'm going to try multiple runs, only 100 iter each, with different
+stan run settings (adapt_delta, step_size) and see if we can get something to work.
 
+adapt_delta = 0.95
+adapt_delta = 0.9
+step_size = 0.5
+step_size = 1
 
+Made a new folder called snake2022-11-14-1436 to store all of these permutations
+# move it to hyak
+scp -r ./snake2022-11-14-1436/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
 
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake2022-11-14-1436/ ./
+Didn't work. Let's look again in the model for errors.
 
+# Ok, line 270 has an indexing typo - everything is off by one.
+run_year_indices_vector[1:(i-1)] = n_obs[1:i-1];
+# Change it to this:
+run_year_indices_vector[1:(i-1)] = n_obs[1:(i-1)];
 
+# Try uploading and running this new model, with only 50 iter
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# Still getting lots of divergences. Pull the run, rename it as snake6
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+# Made a couple of changes to model code - removed imnaha and fifteenmile betas entirely, fixed those values in det_eff_param_vector to zero.
+# Don't think that was the issue but probably good to do anyway.
+# I also took out some of the transitions that we no longer observed (just upstream states) from the transformed parameters block. But I also 
+# don't think that was the issue.
+
+# I can't find any other glaring issues. Let's just try running the model in its current configuration.
+# First remove old run
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# things we can still try: 
+1) fix all det eff beta terms in the param vector to their posterior medians
+2) fix all det eff alpha terms to their posterior medians
+3) fix all det eff beta terms to zero (so in theory would ignore discharge)
+
+# might help us eliminate different possible problems
+
+### 11-15-2022 ###
+There was a typo that I fixed. Reupload and run.
+# First remove old run
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# This run also has divergent transitions. Pull it and rename as snake7
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+# Okay, I found an indexing error in the transition_run_years vector. It was using a version of the
+states_complete df that wasn't the final one, so I moved the creation of the vector to right before
+the data call. So that should fix that issue.Reupload and run.
+# First remove old run
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# Pull the new run, rename as snake8
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Still 100% divergent transitions. Frick!!
+
+Okay, so for this run, I removed all beta terms - took them out of the parameters block, set them to zero in transformed parameters, commented out priors block
+
+Try running this:
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+### 11-16-21 ###
+# Pull the new run, rename as snake9
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+All still divergent transitions, even without discharge in there.
+Comment out the priors on alpha terms, and remove them as parameters. In the transformed parameters block, assign them directly their mean values
+from the last script.
+
+Try running this:
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# Pull the new run, rename as snake10
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+98/100 transitions ended in a divergence. But we didn't get the message at the beginning that sum(p_vec_observed) is -nan. So
+it seems like perhaps that value was related to sampling from priors on those alpha terms?
+
+Can't figure out what's wrong. Turned on all of the print statements again. Also added print run year statement.
+Also added print current state. Also moved run year indexing outside of k loop (should help with efficiency, but won't fix the bug)
+
+Try running this:
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# Ran it for 30 minutes, now pull it and rename as snake11
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Not immediately clear if there are any issues. Updated the print statements, reupload and re-run
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# didn't run, need to reupload and run again
+
+# pull it! and rename as snake12
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Okay, this new print statement is super helpful. There are a bunch of transitions where the probability of the next state is either 0 or 1.
+
+Another odd thing: It has multiple times where it goes back to the same fish (searching for i = 1 in the output reveals multiples times).
+Is that a warmup thing?
+Yeah I think so - this from Bob Carpenter: "There's a description in the part of the manual about algorithms. We 
+recommend running at least 100 warmup iterations. Usually the first 
+few don't do much because the scale's off. Then they hit increments where 
+step size is fit, and the result is often a perceived hang on Stan's part 
+because it moves to doing way more steps per iteration to get stability. "
+
+There are some infrequent probabilities that get close to zero or 1. Those should be fine. What's concerning
+is that there are long stretches of iterations, it seems like starting with i = 1,  that keep returning 1 or 0 probabilities.
