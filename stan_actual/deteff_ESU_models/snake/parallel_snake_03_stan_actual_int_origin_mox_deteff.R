@@ -584,9 +584,10 @@ for (i in 1:(nrow(b0_matrix_names))){
   # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
   # And note - that these are not DE or NDE parameters
   # Because of order, we need -2 here instead of -1, to pick the right from state
+  # NO WE DON'T, just use -1
   else if (b0_matrix_names$upstream_mainstem_movement[i] == 1){
-    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-2],";", "\n", sep = "")
-    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-2],";", "\n", sep = "")
+    cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1],";", "\n", sep = "")
+    cat("b0_matrix_NDE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i-1],";", "\n", sep = "")
   # If it's not, store the same parameter in both matrices
   } else {
     cat("b0_matrix_DE[", b0_matrix_names$row[i], ",", b0_matrix_names$col[i], "]", " = ", b0_matrix_names$b0_matrix_name[i], ";", "\n", sep = "")
@@ -752,9 +753,6 @@ run_year_2223_fish <- unique(subset(states_complete, is.na(run_year_index))$tag_
 states_complete %>% 
   subset(., !(tag_code %in% run_year_2223_fish)) -> states_complete
 
-
-# get a vector of run years that transitions occurred within
-transition_run_years <- states_complete$run_year_index
 
 # Create a data frame for when each tributary has detection efficiency capability
 
@@ -1267,7 +1265,7 @@ yakima_river_design_matrix[,34] <- tributary_design_matrix[,34]
 # will have any non-zero values.
 tributary_design_matrices_array <- array(0, dim = c(18,34,42))
 
-# Note that these are indices of only th mouth states (since these are the states that we are calculating detection efficiency at)
+# Note that these are indices of only the mouth states (since these are the states that we are calculating detection efficiency at)
 tributary_design_matrices_array[,,34] <- asotin_creek_design_matrix
 tributary_design_matrices_array[,,10] <- deschutes_river_design_matrix
 tributary_design_matrices_array[,,26] <- entiat_river_design_matrix
@@ -1639,6 +1637,10 @@ n.ind <- dim(state_data)[3]
   # Load the data from the detection efficiency model to use as priors in this model
   det_eff_param_posteriors <- as.matrix(read.csv("det_eff_param_posteriors.csv", row.names = 1))
   
+  
+  # get a vector of run years that transitions occurred within - need to do this at the end, once you've made all changes to states_complete
+  transition_run_years <- states_complete$run_year_index
+  
   ntransitions = length(transition_run_years)
   
   
@@ -1686,18 +1688,18 @@ n.ind <- dim(state_data)[3]
     chains = 1,
     parallel_chains = 1,
     # parallel_chains = 3,
-    refresh = 10, # print update every iter
+    refresh = 10, # print update every 10 iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 200,
-    iter_sampling = 200,
-    adapt_delta = 0.85,
+    iter_warmup = 100,
+    iter_sampling = 100,
+    # adapt_delta = 0.95,
     # init = 1,
     threads_per_chain = 28
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
-fit$save_object(file = "200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented
