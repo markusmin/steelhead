@@ -247,8 +247,8 @@ states_complete %>%
 ##### Identify juvenile movements #####
 
 # Identify juvenile movements as:
-# 1) within 30 days of release; or
-# 2) On or before June 15 of the release year
+# 1) within 90 days of release; or
+# 2) On or before June 15 of the release year, or if the release was on or after July 1 of the previous year, then any movements before June 15 of this year
 
 states_complete %>% 
   mutate(life_stage = "Adult") %>% #first, classify all movement as adult (we will then change this to kelt, repeat spawner, and juvenile later if certain conditions are met)
