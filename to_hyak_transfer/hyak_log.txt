@@ -2012,3 +2012,70 @@ because it moves to doing way more steps per iteration to get stability. "
 
 There are some infrequent probabilities that get close to zero or 1. Those should be fine. What's concerning
 is that there are long stretches of iterations, it seems like starting with i = 1,  that keep returning 1 or 0 probabilities.
+
+
+# Okay - added a print(logits) statement to stan model, now reupload and run
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# pull it! and rename as snake 13
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+# Okay, clearly an isue with logits. Added another print statement to print b0_matrix itself.
+
+Run the new run after uploading
+
+### 11-20-2022 ###
+
+
+Pull the latest run and rename as snake14
+# pull it: (from within local diagnostics folder:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Okay, I found an issue in the stan code, where the return(total_lp) call was in the wrong loop.
+Moved it to the correct loop, re-upload and run.
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+
+
+### 11-22-2022 ###
+
+After meeting with Mark and Rebecca, decided to make two changes for troubleshooting:
+1) set det_eff = 1 in loop, and 2) set inits = 0. Upload and run:
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+### 11-28-2022 ###
+
+
+
+# Pull latest run, rename it as snake15
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Okay, so with inits set to 0, I can now see that the problem starts when we move off of the inits.
+Until that point, every value is set to 0 in each iteration. Once it starts sampling (?), the
+values immediately move to really crazy values and get stuck there. Then it eventually goes back
+to all zeros, once it moves back to the first fish.
+
+
+
+
+
+
+
+
+
+
+
+
