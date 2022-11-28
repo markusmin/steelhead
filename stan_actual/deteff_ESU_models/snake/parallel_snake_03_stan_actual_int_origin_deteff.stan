@@ -225,7 +225,10 @@ functions{
             // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector;
             // det_eff_eta[k] = sum(trib_design_matrix_result);
             det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * to_vector(det_eff_param_vector);
-            det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
+            // det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
+            
+            // for now - set det_eff[k] = 1
+            det_eff[k] = 1;
 
             
           } else {
@@ -307,8 +310,9 @@ functions{
     total_lp += lp_fish;
     
     
-    return total_lp;
 } // end looping through fish in this slice
+
+return total_lp;
 
 } // end partial_sum_lpmf function
 
@@ -665,9 +669,6 @@ transformed parameters {
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin5_matrix = rep_matrix(0, 43, 43);
   borigin5_matrix_NDE = rep_array(0, 43, 43);
-  
-  // Finally, declare the parameter vector for the detection probability calculation
-  vector[34] det_eff_params;
   
   
   
