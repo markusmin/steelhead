@@ -277,22 +277,22 @@ functions{
         p_vec_observed[43] = p_vec_actual[43] + sum(loss_term_DE_corrections);
         // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the
         // above line isn't the cause of the errors
-        print("i = ",i);
-        print("j = ",j);
-        print("current state: ", current);
-        print("run year actual = ", run_year_actual);
-        print("DE_correction: ", DE_correction);
-        print("det eff eta: ", det_eff_eta);
-        print("det eff: ", det_eff);
-        print("b0_matrix_DE[current,]: ", b0_matrix_DE[current,]);
-        print("b0_matrix_NDE[current,]: ", b0_matrix_NDE[current,]);
-        print("logits: ", logits);
-        print("p_vec_actual: ", p_vec_actual);
-        print("p_vec_observed: ", p_vec_observed);
-        // print("sum p_vec_observed = ", sum(p_vec_observed));
-
-        print("slice_y[i - start + 1,j+1]: ", slice_y[i - start + 1,j+1]);
-        print("next state: ", slice_y[i - start + 1,j+1], "; prob of next state = ", p_vec_observed[slice_y[i - start + 1,j+1]]);
+        // print("i = ",i);
+        // print("j = ",j);
+        // print("current state: ", current);
+        // print("run year actual = ", run_year_actual);
+        // print("DE_correction: ", DE_correction);
+        // print("det eff eta: ", det_eff_eta);
+        // print("det eff: ", det_eff);
+        // print("b0_matrix_DE[current,]: ", b0_matrix_DE[current,]);
+        // print("b0_matrix_NDE[current,]: ", b0_matrix_NDE[current,]);
+        // print("logits: ", logits);
+        // print("p_vec_actual: ", p_vec_actual);
+        // print("p_vec_observed: ", p_vec_observed);
+        // // print("sum p_vec_observed = ", sum(p_vec_observed));
+        // 
+        // print("slice_y[i - start + 1,j+1]: ", slice_y[i - start + 1,j+1]);
+        // print("next state: ", slice_y[i - start + 1,j+1], "; prob of next state = ", p_vec_observed[slice_y[i - start + 1,j+1]]);
         // Store the log probability of that individual transition in the vector that we declared
         // lp_fish[j] = categorical_lpmf(slice_y[i,j+1] | p_vec);
         // Changed the indexing here, based on:https://discourse.mc-stan.org/t/help-with-multi-threading-a-simple-ordinal-probit-model-using-reduce-sum/15353
