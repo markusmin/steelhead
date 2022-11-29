@@ -2068,6 +2068,17 @@ Until that point, every value is set to 0 in each iteration. Once it starts samp
 values immediately move to really crazy values and get stuck there. Then it eventually goes back
 to all zeros, once it moves back to the first fish.
 
+Okay, so I found a spot where the return(total_lp) was in the wrong loop. Fixed that and reuploaded.
+
+# Pull the run, rename it as snake16
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+So in this run I don't see the values ever moving off the initial values, but they also don't ever go
+to zero or one. So that's perhaps an improvement?
+
+In the next version of the stan model, I commented out all of the print statements to allow it to actually run.
+
+Reuploaded. Then run on ckpt and stf.
 
 
 
