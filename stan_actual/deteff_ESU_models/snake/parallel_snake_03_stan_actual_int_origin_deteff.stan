@@ -200,18 +200,22 @@ functions{
           // proportion vector, uncorrected for detection efficiency
           p_vec_actual = softmax(logits);
           
+          // FOR TESTING - set p_vec_observed = p_vec_actual
+          p_vec_observed = p_vec_actual;
+          
           // print("p_vec_actual: ", p_vec_actual);
         // print("i = ",i);
         // print("j = ",j);
           
           // now, loop through transitions again, and calculate detection efficiency for each where DE_correction == 1
           // declare one vector for linear predictors and one for actual detection efficiency
+          
           vector[42] det_eff_eta;
           vector[42] det_eff;
-          
+        
         for (k in 1:42){
           if (DE_correction[k] == 1) {
-            
+
             // to calculate detection efficiency by indexing:
             // The tributary design matrices array will have the same number of slices as states (42, for 43 - loss).
             // Only 14 of these slices (the 14 tributaries that have DE calculations) will have non-zero values, but this will make the indexing simpler.
@@ -220,61 +224,55 @@ functions{
             // the columns will then be the appropriate row of the design matrix, for that state and tributary.
             // That will then be multiplied by the full, 34 length parameter vector. This will be written out in
             // the transformed parameters section, and will have 20 alpha terms and 14 beta terms.
-          
+
             // vector[34] trib_design_matrix_result;
             // trib_design_matrix_result = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * det_eff_param_vector;
             // det_eff_eta[k] = sum(trib_design_matrix_result);
             det_eff_eta[k] = to_row_vector(tributary_design_matrices_array[run_year_actual,,k]) * to_vector(det_eff_param_vector);
-            // det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
-            
-            // for now - set det_eff[k] = 1
-            det_eff[k] = 1;
+            det_eff[k] = exp(det_eff_eta[k])/(1 + exp(det_eff_eta[k]));
 
-            
+
           } else {
             // If we don't have to calculate a detection efficiency, don't do anything
-            
+
           }
-          
-          
+
+
         }
           
           
           // now loop through transitions and modify p_vec to account for this
         
           
-          // Create a vector to store all of the loss corrections for detection efficiency
+          // // Create a vector to store all of the loss corrections for detection efficiency
           vector[42] loss_term_DE_corrections;
           
           // for testing: create a vector of p_vec_observed_test that we can fill
           // vector[42] p_vec_observed_test;
-          
+       
         for (k in 1:42){
           if (DE_correction[k] == 1) {
             p_vec_observed[k] = p_vec_actual[k] * det_eff[k];
             // p_vec_observed[k] = p_vec_actual[k]; // again this is just for testing - remove det eff correction for now
-            
+
             // each time you modify a term, modify the loss term by the same amount
             // p_vec_observed[43] = p_vec_observed[43] + p_vec_actual[k] * (1 - det_eff[k]);
             loss_term_DE_corrections[k] = p_vec_actual[k] * (1 - det_eff[k]);
-            
+
           } else {
             p_vec_observed[k] = p_vec_actual[k];
-            
+
             // Just put a zero there, otherwise it'll be NAs
             loss_term_DE_corrections[k] = 0;
-            
-            // testing
-            // p_vec_observed_test[k] = p_vec_actual[k];
-            
+
           }
-          
-          
+
+
         }
         
         // Once you've looped through all states, correct loss term
-        
         p_vec_observed[43] = p_vec_actual[43] + sum(loss_term_DE_corrections);
+        
         // p_vec_observed[43] = p_vec_actual[43]; // this line is just for testing - not actually the right loss term, but I just need to make sure that the
         // above line isn't the cause of the errors
         // print("i = ",i);
@@ -300,6 +298,8 @@ functions{
         // inspect the data vs. the vector of probabilities
         // print("data: ", slice_y[i - start + 1,j+1]);
         
+        // 2022-11-29 edits for performance:
+        // We are going to try to vectorize this and sum it outside of the loop, rather than repeatedly updating a variable.
         lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
         // lp_fish += categorical_lpmf(slice_y[i,j+1] | p_vec);
       
@@ -530,42 +530,42 @@ real borigin5_matrix_39_9;
 
 // here, write out all of the parameters for detection efficiency
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
-// real asotin_alpha1;
-// real asotin_alpha2;
-// real deschutes_alpha1;
-// real entiat_alpha1;
-// real fifteenmile_alpha1;
-// real hood_alpha1;
-// real imnaha_alpha1;
-// real john_day_alpha1;
-// real methow_alpha1;
-// real methow_alpha2;
-// real okanogan_alpha1;
-// real tucannon_alpha1;
-// real tucannon_alpha2;
-// real umatilla_alpha1;
-// real umatilla_alpha2;
-// real walla_walla_alpha1;
-// real walla_walla_alpha2;
-// real walla_walla_alpha3;
-// real wenatchee_alpha1;
-// real yakima_alpha1;
+real asotin_alpha1;
+real asotin_alpha2;
+real deschutes_alpha1;
+real entiat_alpha1;
+real fifteenmile_alpha1;
+real hood_alpha1;
+real imnaha_alpha1;
+real john_day_alpha1;
+real methow_alpha1;
+real methow_alpha2;
+real okanogan_alpha1;
+real tucannon_alpha1;
+real tucannon_alpha2;
+real umatilla_alpha1;
+real umatilla_alpha2;
+real walla_walla_alpha1;
+real walla_walla_alpha2;
+real walla_walla_alpha3;
+real wenatchee_alpha1;
+real yakima_alpha1;
 
 // 14 terms for discharge relationship, one for each tributary
-// real asotin_beta;
-// real deschutes_beta;
-// real entiat_beta;
+real asotin_beta;
+real deschutes_beta;
+real entiat_beta;
 // real fifteenmile_beta;
-// real hood_beta;
+real hood_beta;
 // real imnaha_beta;
-// real john_day_beta;
-// real methow_beta;
-// real okanogan_beta;
-// real tucannon_beta;
-// real umatilla_beta;
-// real walla_walla_beta;
-// real wenatchee_beta;
-// real yakima_beta;
+real john_day_beta;
+real methow_beta;
+real okanogan_beta;
+real tucannon_beta;
+real umatilla_beta;
+real walla_walla_beta;
+real wenatchee_beta;
+real yakima_beta;
 
   
 }
@@ -1015,66 +1015,66 @@ borigin5_matrix_NDE[39,9] = borigin5_matrix_39_9;
 vector[34] det_eff_param_vector; // this is length 34 because that's how many det eff params we have
 
 // populate the vector
-// det_eff_param_vector[1] = asotin_alpha1;
-// det_eff_param_vector[2] = asotin_alpha2;
-// det_eff_param_vector[3] = deschutes_alpha1;
-// det_eff_param_vector[4] = entiat_alpha1;
-// det_eff_param_vector[5] = fifteenmile_alpha1;
-// det_eff_param_vector[6] = hood_alpha1;
-// det_eff_param_vector[7] = imnaha_alpha1;
-// det_eff_param_vector[8] = john_day_alpha1;
-// det_eff_param_vector[9] = methow_alpha1;
-// det_eff_param_vector[10] = methow_alpha2;
-// det_eff_param_vector[11] = okanogan_alpha1;
-// det_eff_param_vector[12] = tucannon_alpha1;
-// det_eff_param_vector[13] = tucannon_alpha2;
-// det_eff_param_vector[14] = umatilla_alpha1;
-// det_eff_param_vector[15] = umatilla_alpha2;
-// det_eff_param_vector[16] = walla_walla_alpha1;
-// det_eff_param_vector[17] = walla_walla_alpha2;
-// det_eff_param_vector[18] = walla_walla_alpha3;
-// det_eff_param_vector[19] = wenatchee_alpha1;
-// det_eff_param_vector[20] = yakima_alpha1;
+det_eff_param_vector[1] = asotin_alpha1;
+det_eff_param_vector[2] = asotin_alpha2;
+det_eff_param_vector[3] = deschutes_alpha1;
+det_eff_param_vector[4] = entiat_alpha1;
+det_eff_param_vector[5] = fifteenmile_alpha1;
+det_eff_param_vector[6] = hood_alpha1;
+det_eff_param_vector[7] = imnaha_alpha1;
+det_eff_param_vector[8] = john_day_alpha1;
+det_eff_param_vector[9] = methow_alpha1;
+det_eff_param_vector[10] = methow_alpha2;
+det_eff_param_vector[11] = okanogan_alpha1;
+det_eff_param_vector[12] = tucannon_alpha1;
+det_eff_param_vector[13] = tucannon_alpha2;
+det_eff_param_vector[14] = umatilla_alpha1;
+det_eff_param_vector[15] = umatilla_alpha2;
+det_eff_param_vector[16] = walla_walla_alpha1;
+det_eff_param_vector[17] = walla_walla_alpha2;
+det_eff_param_vector[18] = walla_walla_alpha3;
+det_eff_param_vector[19] = wenatchee_alpha1;
+det_eff_param_vector[20] = yakima_alpha1;
 
-det_eff_param_vector[1] = det_eff_param_posteriors[1,1];
-det_eff_param_vector[2] = det_eff_param_posteriors[2,1];
-det_eff_param_vector[3] = det_eff_param_posteriors[3,1];
-det_eff_param_vector[4] = det_eff_param_posteriors[4,1];
-det_eff_param_vector[5] = det_eff_param_posteriors[5,1];
-det_eff_param_vector[6] = det_eff_param_posteriors[6,1];
-det_eff_param_vector[7] = det_eff_param_posteriors[7,1];
-det_eff_param_vector[8] = det_eff_param_posteriors[8,1];
-det_eff_param_vector[9] = det_eff_param_posteriors[9,1];
-det_eff_param_vector[10] = det_eff_param_posteriors[10,1];
-det_eff_param_vector[11] = det_eff_param_posteriors[11,1];
-det_eff_param_vector[12] = det_eff_param_posteriors[12,1];
-det_eff_param_vector[13] = det_eff_param_posteriors[13,1];
-det_eff_param_vector[14] = det_eff_param_posteriors[14,1];
-det_eff_param_vector[15] = det_eff_param_posteriors[15,1];
-det_eff_param_vector[16] = det_eff_param_posteriors[16,1];
-det_eff_param_vector[17] = det_eff_param_posteriors[17,1];
-det_eff_param_vector[18] = det_eff_param_posteriors[18,1];
-det_eff_param_vector[19] = det_eff_param_posteriors[19,1];
-det_eff_param_vector[20] = det_eff_param_posteriors[20,1];
+// det_eff_param_vector[1] = det_eff_param_posteriors[1,1];
+// det_eff_param_vector[2] = det_eff_param_posteriors[2,1];
+// det_eff_param_vector[3] = det_eff_param_posteriors[3,1];
+// det_eff_param_vector[4] = det_eff_param_posteriors[4,1];
+// det_eff_param_vector[5] = det_eff_param_posteriors[5,1];
+// det_eff_param_vector[6] = det_eff_param_posteriors[6,1];
+// det_eff_param_vector[7] = det_eff_param_posteriors[7,1];
+// det_eff_param_vector[8] = det_eff_param_posteriors[8,1];
+// det_eff_param_vector[9] = det_eff_param_posteriors[9,1];
+// det_eff_param_vector[10] = det_eff_param_posteriors[10,1];
+// det_eff_param_vector[11] = det_eff_param_posteriors[11,1];
+// det_eff_param_vector[12] = det_eff_param_posteriors[12,1];
+// det_eff_param_vector[13] = det_eff_param_posteriors[13,1];
+// det_eff_param_vector[14] = det_eff_param_posteriors[14,1];
+// det_eff_param_vector[15] = det_eff_param_posteriors[15,1];
+// det_eff_param_vector[16] = det_eff_param_posteriors[16,1];
+// det_eff_param_vector[17] = det_eff_param_posteriors[17,1];
+// det_eff_param_vector[18] = det_eff_param_posteriors[18,1];
+// det_eff_param_vector[19] = det_eff_param_posteriors[19,1];
+// det_eff_param_vector[20] = det_eff_param_posteriors[20,1];
 
 // 14 terms for discharge relationship, one for each tributary
-// det_eff_param_vector[21] = asotin_beta;
-// det_eff_param_vector[22] = deschutes_beta;
-// det_eff_param_vector[23] = entiat_beta;
-// // det_eff_param_vector[24] = fifteenmile_beta;
+det_eff_param_vector[21] = asotin_beta;
+det_eff_param_vector[22] = deschutes_beta;
+det_eff_param_vector[23] = entiat_beta;
+// det_eff_param_vector[24] = fifteenmile_beta;
 // // fix these to zero
-// det_eff_param_vector[24] = 0;
-// det_eff_param_vector[25] = hood_beta;
-// // det_eff_param_vector[26] = imnaha_beta;
-// det_eff_param_vector[26] = 0;
-// det_eff_param_vector[27] = john_day_beta;
-// det_eff_param_vector[28] = methow_beta;
-// det_eff_param_vector[29] = okanogan_beta;
-// det_eff_param_vector[30] = tucannon_beta;
-// det_eff_param_vector[31] = umatilla_beta;
-// det_eff_param_vector[32] = walla_walla_beta;
-// det_eff_param_vector[33] = wenatchee_beta;
-// det_eff_param_vector[34] = yakima_beta;
+det_eff_param_vector[24] = 0;
+det_eff_param_vector[25] = hood_beta;
+// det_eff_param_vector[26] = imnaha_beta;
+det_eff_param_vector[26] = 0;
+det_eff_param_vector[27] = john_day_beta;
+det_eff_param_vector[28] = methow_beta;
+det_eff_param_vector[29] = okanogan_beta;
+det_eff_param_vector[30] = tucannon_beta;
+det_eff_param_vector[31] = umatilla_beta;
+det_eff_param_vector[32] = walla_walla_beta;
+det_eff_param_vector[33] = wenatchee_beta;
+det_eff_param_vector[34] = yakima_beta;
 
 
 det_eff_param_vector[21] = 0;
@@ -1355,45 +1355,45 @@ borigin5_matrix_39_9 ~ normal(0,10);
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
 // the outputs from that model will be the first column [,1] containing central tendency (mean)
 // and the second column [,2] containing the standard deviation
-// asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
-// asotin_alpha2 ~ normal(det_eff_param_posteriors[2,1], det_eff_param_posteriors[2,2]);
-// deschutes_alpha1 ~ normal(det_eff_param_posteriors[3,1], det_eff_param_posteriors[3,2]);
-// entiat_alpha1 ~ normal(det_eff_param_posteriors[4,1], det_eff_param_posteriors[4,2]);
-// fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[5,1], det_eff_param_posteriors[5,2]);
-// hood_alpha1 ~ normal(det_eff_param_posteriors[6,1], det_eff_param_posteriors[6,2]);
-// imnaha_alpha1 ~ normal(det_eff_param_posteriors[7,1], det_eff_param_posteriors[7,2]);
-// john_day_alpha1 ~ normal(det_eff_param_posteriors[8,1], det_eff_param_posteriors[8,2]);
-// methow_alpha1 ~ normal(det_eff_param_posteriors[9,1], det_eff_param_posteriors[9,2]);
-// methow_alpha2 ~ normal(det_eff_param_posteriors[10,1], det_eff_param_posteriors[10,2]);
-// okanogan_alpha1 ~ normal(det_eff_param_posteriors[11,1], det_eff_param_posteriors[11,2]);
-// tucannon_alpha1 ~ normal(det_eff_param_posteriors[12,1], det_eff_param_posteriors[12,2]);
-// tucannon_alpha2 ~ normal(det_eff_param_posteriors[13,1], det_eff_param_posteriors[13,2]);
-// umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posteriors[14,2]);
-// umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
-// walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
-// walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
-// walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
-// wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
-// yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
+asotin_alpha1 ~ normal(det_eff_param_posteriors[1,1], det_eff_param_posteriors[1,2]);
+asotin_alpha2 ~ normal(det_eff_param_posteriors[2,1], det_eff_param_posteriors[2,2]);
+deschutes_alpha1 ~ normal(det_eff_param_posteriors[3,1], det_eff_param_posteriors[3,2]);
+entiat_alpha1 ~ normal(det_eff_param_posteriors[4,1], det_eff_param_posteriors[4,2]);
+fifteenmile_alpha1 ~ normal(det_eff_param_posteriors[5,1], det_eff_param_posteriors[5,2]);
+hood_alpha1 ~ normal(det_eff_param_posteriors[6,1], det_eff_param_posteriors[6,2]);
+imnaha_alpha1 ~ normal(det_eff_param_posteriors[7,1], det_eff_param_posteriors[7,2]);
+john_day_alpha1 ~ normal(det_eff_param_posteriors[8,1], det_eff_param_posteriors[8,2]);
+methow_alpha1 ~ normal(det_eff_param_posteriors[9,1], det_eff_param_posteriors[9,2]);
+methow_alpha2 ~ normal(det_eff_param_posteriors[10,1], det_eff_param_posteriors[10,2]);
+okanogan_alpha1 ~ normal(det_eff_param_posteriors[11,1], det_eff_param_posteriors[11,2]);
+tucannon_alpha1 ~ normal(det_eff_param_posteriors[12,1], det_eff_param_posteriors[12,2]);
+tucannon_alpha2 ~ normal(det_eff_param_posteriors[13,1], det_eff_param_posteriors[13,2]);
+umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posteriors[14,2]);
+umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
+walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
+walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
+walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
+wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
+yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
 
 // 14 terms for discharge relationship, one for each tributary
-// asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
-// deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
-// entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
+asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
+deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
+entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
 // // fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
 // // note that fifteenmile and imnaha don't have any discharge data, so they just get intercepts and the beta term is fixed to zero
 // // fifteenmile_beta ~ normal(0,0.000001);
-// hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
+hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
 // // imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
 // // imnaha_beta ~ normal(0,0.000001);
-// john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
-// methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
-// okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
-// tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
-// umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
-// walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
-// wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
-// yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
+john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
+methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
+okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
+tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
+umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
+walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
+wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
+yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
 
 
 

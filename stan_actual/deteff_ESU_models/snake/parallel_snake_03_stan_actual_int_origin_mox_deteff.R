@@ -1691,8 +1691,8 @@ n.ind <- dim(state_data)[3]
     refresh = 10, # print update every 10 iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 200,
-    iter_sampling = 200,
+    iter_warmup = 20,
+    iter_sampling = 20,
     # adapt_delta = 0.95,
     init = 0,
     threads_per_chain = 28
