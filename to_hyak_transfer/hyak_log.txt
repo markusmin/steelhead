@@ -2080,6 +2080,86 @@ In the next version of the stan model, I commented out all of the print statemen
 
 Reuploaded. Then run on ckpt and stf.
 
+### 11-29-2022 ###
+
+Only the ckpt run ran overnight - stf run still waiting in the queue.
+
+# Pull it and rename as snake17
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Okay, so it only got through 40 iterations in 4 hours. That is way slower than the model with bugs,
+which might actually be a good sign. However, it's way slower than the original model without detection
+efficiency, and given that the current version doesn't even have detection efficiency, that's not a great sign.
+
+# Okay so I commented out all of the detection efficiency loops. Let's see how much that improves performance.
+
+Removed old folder, reuploaded. Then run on ckpt
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+# Pull run, rename it as snake18
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+Still completed 40 iter in 4 hours. So commenting out det eff blocks didn't change anything.
+
+Bumped up stf run time to 48 hours, submitted it.
+
+Create a new run folder, to run 40 iter (20 warmup and 20 sampling) on ckpt so we can see how it looks.
+
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake40iter/
+
+# Pull the run, rename as snake19
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake40iter/ ./
+
+This run didn't have any divergent transitions! We just get the maximum treedepth issue.
+
+So, let's try running a 40iter version with det eff
+
+I canceled the STF run that was in the queue.
+
+Removed old folder, reuploaded. Then 40iter, with deteff (but fixed values, no priors, and only intercept and therefore no relationship with discharge), run on ckpt
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+### 2022-11-30 ###
+
+Pull the latest run, rename as snake20
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+
+40 iter.
+This run worked. Run time went up, but only very minor amount.
+Last run, without det eff: Chain 1 finished in 10864.8 seconds.
+This run, with det eff (but these not included as parameters): Chain 1 finished in 11176.9 seconds.
+So like five minutes longer
+
+Looking at modeling results.
+
+Made some edits, added back in det eff parameters (no longer fixed, but using priors on the alphas, still no betas). Then upload and run.
+# First remove old run from mox
+rm -r snake/
+
+Move the new folder onto hyak:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
