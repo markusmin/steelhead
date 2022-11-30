@@ -347,6 +347,7 @@ transition_matrix["Upstream WEL other tributaries", "mainstem, upstream of WEL"]
 # Now - remove all upstream states
 transition_matrix2 <- transition_matrix[seq(1,43,1)[-grep("Creek Upstream|River Upstream", rownames(transition_matrix))], seq(1,43,1)[-grep("Creek Upstream|River Upstream", colnames(transition_matrix))]]
 
+upstream_indices <- grep("Creek Upstream|River Upstream", rownames(transition_matrix))
 
 ##### now do final fates (?) #####
 
@@ -361,40 +362,62 @@ transition_matrix2 <- transition_matrix[seq(1,43,1)[-grep("Creek Upstream|River 
 # But don't include any upstream states, since we don't care about those (they don't get a separate probability from the RM states)
 final_fate_probabilities <- data.frame(final_state = rownames(transition_matrix2), total_prob = 0)
 
+# Load the movement estimates from the stan model output
+# Temporarily, use estimates from this intermediate stan model:
+snake_fit <- readRDS(here::here("stan_actual", "deteff_ESU_models", "diagnostics", "snake20", "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds"))
 
-# Loop through 50 possible transitions
+# Get the summary object (this takes a while)
+snake_summary <- snake_fit$summary()
 
-# Okay I don't think that this will work - if you do this, you'll end up with something in the neighborhood of 6^50 (like 10^38) different possible transition pathways. Which is intractable
-# I think that you might have more luck with a transition simulation, honestly.
-for (i in 1:50){
-  # If it's the first iteration:
-  if (i == 1){
-    # Start them in state 2 (mainstem, BON to MCN)
-    state <- 2
-    # get the probability of going to loss from this state (which is 1 right now)
-    final_fate_probabilities[final_fate_probabilities$final_state == "loss", 2] <- transition_matrix2["mainstem, BON to MCN", "loss"]
-    
-    # Figure out what all of the connecting states are
-    next_states = which(transition_matrix2[state,] == 1)
-    
-    # remove loss from this
-    next_states <- next_states[1:(length(next_states)-1)]
-    
-  } else {
-    # If it's any other iteration, then we have to loop through all of the possible states
-    # figure out all possible transitions
-    for (i in 1:length(next_states)){
-      
-    }
-    
-    
-  }
+# Subset all of the different origins (since they each have different probabilities)
+# For the Snake:
+# Origin 1 = Tucannon River
+# Origin 2 = Asotin Creek
+# Origin 3 = Clearwater River
+# Origin 4 = Salmon River
+# Origin 5 = Grande Ronde River
+# Origin 6 = Imnaha River
+
+subset(snake_summary, grepl("origin1_probs_DE", variable)) -> origin1_DE_movement_probs
+subset(snake_summary, grepl("origin2_probs_DE", variable)) -> origin2_DE_movement_probs
+subset(snake_summary, grepl("origin3_probs_DE", variable)) -> origin3_DE_movement_probs
+subset(snake_summary, grepl("origin4_probs_DE", variable)) -> origin4_DE_movement_probs
+subset(snake_summary, grepl("origin5_probs_DE", variable)) -> origin5_DE_movement_probs
+subset(snake_summary, grepl("origin6_probs_DE", variable)) -> origin6_DE_movement_probs
+
+# Create a function to reformat these into a transition matrix
+
+transition_matrix_reformat <- function(movement_probs, variable_prefix){
+  movement_probs %>% 
+    mutate(from = gsub(",.*$", "", variable)) %>% 
+    mutate(from = gsub(paste0(variable_prefix, "\\["), "", from)) %>% 
+    mutate(to = gsub(paste0(variable_prefix, "\\[.*,"), "", variable)) %>% 
+    mutate(to = gsub("\\]", "", to)) -> movement_probs
+  
+  # distribute into a matrix
+  # populate with means
+  movement_probs %>% 
+    dplyr::select(mean, from, to) %>% 
+    pivot_wider(., names_from = to, values_from = mean) %>% 
+    column_to_rownames("from") %>% 
+    as.matrix() -> transition_matrix
+  
+  return(transition_matrix)
   
 }
 
+transition_matrix_reformat(movement_probs = origin1_DE_movement_probs, variable_prefix = "origin1_probs_DE") -> origin1_DE_transition_matrix
 
+# Take out the upstream states
+origin1_DE_transition_matrix <- origin1_DE_transition_matrix[-upstream_indices, -upstream_indices] 
+# Manually change it so that transition probability from loss to loss is 1
+origin1_DE_transition_matrix[29,29] <- 1
+# rownames(origin1_DE_transition_matrix) <- seq(1,29)
+# colnames(origin1_DE_transition_matrix) <- seq(1,29)
+# check that the rows still sum to 1 - yep!
+rowSums(origin1_DE_transition_matrix)
 
-##### Final fates - simulation-based approach #####
+##### Final fates - simulation-based approach function #####
 
 final_fates_simulation <- function(nsim, transition_matrix){
   trans <- transition_matrix
@@ -451,7 +474,7 @@ final_fates_simulation <- function(nsim, transition_matrix){
     }
   }
   
-  data.frame(colSums(final_fate_matrix[,1:14])) %>% 
+  data.frame(colSums(final_fate_matrix[,1:28])) %>% 
     dplyr::rename(count = colSums.final_fate_matrix...1.28..) %>% 
     mutate(prop = count/nsim)-> final_fates
   
@@ -460,4 +483,8 @@ final_fates_simulation <- function(nsim, transition_matrix){
   return(outputs)
   
 }
+
+##### Calculate final fates #####
+final_fates_simulation(nsim = 10, transition_matrix = origin1_DE_transition_matrix)
+
 
