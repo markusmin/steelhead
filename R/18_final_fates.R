@@ -485,6 +485,7 @@ final_fates_simulation <- function(nsim, transition_matrix){
 }
 
 ##### Calculate final fates #####
-final_fates_simulation(nsim = 10, transition_matrix = origin1_DE_transition_matrix)
-
-
+print(paste0("final fate start time: ", Sys.time()))
+tuc_river_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = origin1_DE_transition_matrix)[2]
+print(paste0("final fate end time: ", Sys.time()))
+# for one million fish, this only takes four seconds
