@@ -1691,15 +1691,15 @@ n.ind <- dim(state_data)[3]
     refresh = 10, # print update every 10 iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 20,
-    iter_sampling = 20,
+    iter_warmup = 500,
+    iter_sampling = 500,
     # adapt_delta = 0.95,
     init = 0,
     threads_per_chain = 28
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
-fit$save_object(file = "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "500iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented
