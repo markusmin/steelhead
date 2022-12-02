@@ -2148,15 +2148,74 @@ rm -r snake/
 Move the new folder onto hyak:
 scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/
 
+Simultaneously, we're going to run the next version of the model on mox hyak - using betas and discharge data.
+
+Made a directory called snake_alpha_beta for this run.
+Move the new folder onto hyak into that directory:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_alpha_beta/
+
+Pull both of the above runs:
+
+# The run with det eff parameters - alphas only, no betas:
+# Pull and rename as snake21:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake/ ./
+
+# The run with det eff parameters - alphas and betas:
+# Pull and rename as snake22:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_alpha_beta/snake/ ./
+
+Okay, so both of these runs finished in about the same time as models without detection probability (this doesn't completely
+make sense to me, since aren't you monitoring more parameters?):
+snake 21: Chain 1 finished in 11012.5 seconds.
+snake 22: Chain 1 finished in 11853.8 seconds.
+
+However, both have the not a valid simplex issue:
+Chain 1 Iteration:  1 / 40 [  2%]  (Warmup) 
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities parameter) = -nan, but should be 1 (in '/tmp/RtmpeUJp9k/model-790b48db88cc.stan', line 303, column 8 to column 81) (in '/tmp/RtmpeUJp9k/model-790b48db88cc.stan', line 1405, column 2 to line 1408, column 98)
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+But no divergent transitions.
+
+Inspecting the chains in shinystan:
+
+snake21 (alphas, not betas) looks fine!
+snake22 (alphas and betas) looks fine as well!
 
 
+Next model run:
+There appears to be no queue on stf right now, so should submit some jobs!
+snake22 is the full model. Let's run it for 100, 200, and 500 sampling iterations.
+
+# Just keep changing the number of iterations in the R script and then reupload
+# 100 iter:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake100iter/
+
+# 200 iter:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake200iter/
+
+# 500 iter:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake500iter/
+
+# submitted all three jobs on stf. Had to update amount of time requested. All are running!
+
+### 2022-12-01 ###
+
+Updated the upper columbia model. Upload and run on STF
+
+# 100 iter:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/upper_columbia100iter/
+
+# 200 iter:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/upper_columbia200iter/
+
+# 500 iter:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/upper_columbia500iter/
 
 
-
-
-
-
-
+So - upper columbia is running at a rate of 70 iterations in 3:10. It's definitely a bit faster than the snake model,
+which makes sense given that there are less fish in this dataset.
 
 
 
