@@ -523,7 +523,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 }
 
 # There are six origins in this model, so we will have five origin parameters.
-# We will only allow an origin effect within the ESU (so after PRA). Before, they will only have an intercept term
+# We will only allow an origin effect within the ESU (so after ICH). Before, they will only have an intercept term
 # print declaration of borigin parameters
 for (i in 1:5){
   for (j in 1:nrow(snake_movements)){
