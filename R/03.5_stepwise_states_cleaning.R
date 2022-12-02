@@ -549,6 +549,7 @@ states_complete %>%
 # Fix the misidentified kelt movements in the middle of adult histories
 # Get the direction indices of when individuals kelts
 kelts <- subset(states_complete, life_stage == "kelt")
+# Note - this is not the final list of kelts!
 
 # Put in a checkpoint in case we need to make edits
 # states_complete_orig <- states_complete
@@ -593,9 +594,19 @@ states_complete %>%
   mutate(life_stage = ifelse(life_stage == "kelt" & next_direction == "upstream" & direction_index != max_direction_index & eventual_repeat == "single",
                              "Adult", life_stage)) -> states_complete
 
-# edit 2022-08-12 - make the fix for tag code 3D9.1C2D7EBE8B, which is the only repeat spawner with fallback that's not kelt movement
+# edit 2022-08-12 - make the fix for tag code 3D9.1C2D7EBE8B, which is one repeat spawner with fallback that's not kelt movement
 states_complete %>% 
   mutate(life_stage = ifelse(tag_code == "3D9.1C2D7EBE8B" & event_year == 2012 & event_month == 4 & event_day == 11, "Adult", life_stage)) -> states_complete
+
+# edit 2022-12-01 - tag code 3D9.1C2D9303CC is also a repeat spawner with fallback that's not kelt movement
+states_complete %>% 
+  mutate(life_stage = ifelse(tag_code == "3D9.1C2D9303CC" & event_year == 2014 & event_month == 3 & event_day == 14, "Adult", life_stage)) -> states_complete
+
+# edit 2022-12-01 - TEMPORARY FIX. For tag code 3D9.1C2D80D61A, there's some weird glitch (not sure what the origin is)
+# where it's missing a state. Just fill that in for now. GBAF! (go back and fix)
+states_complete %>% 
+  add_row(tag_code = "3D9.1C2D80D61A", state = "mainstem, BON to MCN", date_time = "2015-05-07 21:11:46", pathway = "implicit", release_date = "2012-05-20",
+          .before = 157235) -> states_complete_test
 
 # states_complete_ckpt <- states_complete
 
@@ -855,11 +866,6 @@ snake_tags <- subset(tag_code_metadata, ESU == "snake")$tag_code
 upper_columbia_tags <- subset(tag_code_metadata, ESU == "upper_columbia")$tag_code
 middle_columbia_tags <- subset(tag_code_metadata, ESU == "middle_columbia")$tag_code
 lower_columbia_tags <- subset(tag_code_metadata, ESU == "lower_columbia")$tag_code
-
-length(unique(adults_only_states_for_export$tag_code_2))
-length(unique(snake_adults_only_states$tag_code_2))
-
-snake_adults_only_states
 
 subset(adults_only_states_for_export, tag_code %in% snake_tags) -> snake_adults_only_states
 
