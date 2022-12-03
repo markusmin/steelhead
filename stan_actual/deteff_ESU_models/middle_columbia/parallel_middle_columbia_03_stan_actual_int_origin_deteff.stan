@@ -200,8 +200,6 @@ functions{
           // proportion vector, uncorrected for detection efficiency
           p_vec_actual = softmax(logits);
           
-          // FOR TESTING - set p_vec_observed = p_vec_actual
-          p_vec_observed = p_vec_actual;
           
           // print("p_vec_actual: ", p_vec_actual);
         // print("i = ",i);
