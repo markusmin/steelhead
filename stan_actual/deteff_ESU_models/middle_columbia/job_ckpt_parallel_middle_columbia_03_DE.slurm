@@ -3,7 +3,7 @@
 
 
 ## Job name
-#SBATCH --job-name=03_snake
+#SBATCH --job-name=03_MC_500iter
 
 ## Partition and Allocation
 #SBATCH -p ckpt
@@ -23,4 +23,4 @@ module load contrib/gcc/6.2.0
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-Rscript parallel_snake_03_stan_actual_int_origin_mox_deteff.R
+Rscript parallel_middle_columbia_03_stan_actual_int_origin_mox_deteff.R

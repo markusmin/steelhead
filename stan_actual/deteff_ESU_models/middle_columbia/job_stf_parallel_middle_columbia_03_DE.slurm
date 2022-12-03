@@ -3,7 +3,7 @@
 
 
 ## Job name
-#SBATCH --job-name=03_snake
+#SBATCH --job-name=03_MC_500iter
 
 ## Partition and Allocation
 #SBATCH -p stf
@@ -11,7 +11,7 @@
 
 ## Resources
 #SBATCH --nodes=1
-#SBATCH --time=48:00:00
+#SBATCH --time=120:00:00
 #SBATCH --ntasks=28
 #SBATCH --mem=120G
 
@@ -23,4 +23,4 @@ module load contrib/gcc/6.2.0
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-Rscript parallel_snake_03_stan_actual_int_origin_mox_deteff.R
+Rscript parallel_middle_columbia_03_stan_actual_int_origin_mox_deteff.R
