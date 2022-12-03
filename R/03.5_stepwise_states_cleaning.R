@@ -103,6 +103,13 @@ states_complete_part1 %>%
 states_complete %>% 
   subset(tag_code != "dummy_fish") -> states_complete
 
+# edit 2022-12-01 - TEMPORARY FIX. For tag code 3D9.1C2D80D61A, there's some weird glitch (not sure what the origin is)
+# where it's missing a state. Just fill that in for now. GBAF! (go back and fix)
+states_complete %>% 
+  ungroup() %>% 
+  add_row(tag_code = "3D9.1C2D80D61A", state = "mainstem, BON to MCN", date_time = "2015-05-07 21:11:46", pathway = "implicit",
+            .before = which(states_complete$tag_code == "3D9.1C2D80D61A" & states_complete$pathway == "UMA_RM")) -> states_complete
+
 # Read in tag code metadata
 read.csv(here::here("covariate_data", "tag_code_metadata.csv")) -> tag_code_metadata
 
@@ -601,12 +608,6 @@ states_complete %>%
 # edit 2022-12-01 - tag code 3D9.1C2D9303CC is also a repeat spawner with fallback that's not kelt movement
 states_complete %>% 
   mutate(life_stage = ifelse(tag_code == "3D9.1C2D9303CC" & event_year == 2014 & event_month == 3 & event_day == 14, "Adult", life_stage)) -> states_complete
-
-# edit 2022-12-01 - TEMPORARY FIX. For tag code 3D9.1C2D80D61A, there's some weird glitch (not sure what the origin is)
-# where it's missing a state. Just fill that in for now. GBAF! (go back and fix)
-states_complete %>% 
-  add_row(tag_code = "3D9.1C2D80D61A", state = "mainstem, BON to MCN", date_time = "2015-05-07 21:11:46", pathway = "implicit", release_date = "2012-05-20",
-          .before = 157235) -> states_complete_test
 
 # states_complete_ckpt <- states_complete
 
