@@ -2218,11 +2218,17 @@ So - upper columbia is running at a rate of 70 iterations in 3:10. It's definite
 which makes sense given that there are less fish in this dataset.
 
 
+### 12-02-2022 ###
 
+Tried making an edit for performance, by vectorizing part of a loop.
 
+# Okay, so I got the snake model to compile and start running locally. Let's run it for 40iter on ckpt to benchmark 
+# the performance against the other version of the model.
+Upload and try:
 
-
-
+# create a directory: snake_vectorized_20iter
+# Upload:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_20iter/
 
 
 
