@@ -419,7 +419,9 @@ rowSums(origin1_DE_transition_matrix)
 
 ##### Final fates - simulation-based approach function #####
 
-final_fates_simulation <- function(nsim, transition_matrix){
+# Start state argument is default to 2 (BON to MCN, ie fish once we sae them at BON), 
+# but can be others (so for example, can start fish in an overshoot state)
+final_fates_simulation <- function(nsim, transition_matrix, start_state = 2){
   trans <- transition_matrix
   
   # Create an empty state matrix
@@ -436,7 +438,7 @@ final_fates_simulation <- function(nsim, transition_matrix){
   
   
   # start all individuals above Bonneville (release site in multistate model)
-  state_matrix[2,2] <- nsim
+  state_matrix[2,start_state] <- nsim
   
   # create a final fate matrix
   final_fate_matrix <- matrix(rep(0, 29), nrow = 1, ncol = 29)
