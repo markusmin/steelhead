@@ -1,0 +1,1054 @@
+This is cmdstanr version 0.5.2
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+- CmdStan version: 2.30.1
+This is posterior version 1.2.2
+
+Attaching package: ‘posterior’
+
+The following objects are masked from ‘package:stats’:
+
+    mad, sd, var
+
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+ [1] "1 - mainstem, mouth to BON"          "2 - mainstem, BON to MCN"           
+ [3] "3 - mainstem, MCN to ICH or PRA"     "4 - mainstem, PRA to RIS"           
+ [5] "5 - mainstem, RIS to RRE"            "6 - mainstem, RRE to WEL"           
+ [7] "7 - mainstem, upstream of WEL"       "8 - mainstem, ICH to LGR"           
+ [9] "9 - mainstem, upstream of LGR"       "10 - Deschutes River Mouth"         
+[11] "11 - Deschutes River Upstream"       "12 - John Day River Mouth"          
+[13] "13 - John Day River Upstream"        "14 - Hood River Mouth"              
+[15] "15 - Hood River Upstream"            "16 - Fifteenmile Creek Mouth"       
+[17] "17 - Fifteenmile Creek Upstream"     "18 - Umatilla River Mouth"          
+[19] "19 - Umatilla River Upstream"        "20 - Yakima River Mouth"            
+[21] "21 - Yakima River Upstream"          "22 - Walla Walla River Mouth"       
+[23] "23 - Walla Walla River Upstream"     "24 - Wenatchee River Mouth"         
+[25] "25 - Wenatchee River Upstream"       "26 - Entiat River Mouth"            
+[27] "27 - Entiat River Upstream"          "28 - Okanogan River Mouth"          
+[29] "29 - Okanogan River Upstream"        "30 - Methow River Mouth"            
+[31] "31 - Methow River Upstream"          "32 - Tucannon River Mouth"          
+[33] "33 - Tucannon River Upstream"        "34 - Asotin Creek Mouth"            
+[35] "35 - Asotin Creek Upstream"          "36 - Clearwater River"              
+[37] "37 - Salmon River"                   "38 - Grande Ronde River"            
+[39] "39 - Imnaha River Mouth"             "40 - Imnaha River Upstream"         
+[41] "41 - BON to MCN other tributaries"   "42 - Upstream WEL other tributaries"
+[43] "43 - loss"                          
+real b0_matrix_1_2;
+real b0_matrix_2_1;
+real b0_matrix_2_3;
+real b0_matrix_2_10_DE;
+real b0_matrix_2_10_NDE;
+real b0_matrix_2_12_DE;
+real b0_matrix_2_12_NDE;
+real b0_matrix_2_14_DE;
+real b0_matrix_2_14_NDE;
+real b0_matrix_2_16_DE;
+real b0_matrix_2_16_NDE;
+real b0_matrix_2_18_DE;
+real b0_matrix_2_18_NDE;
+real b0_matrix_2_41;
+real b0_matrix_3_2;
+real b0_matrix_3_4;
+real b0_matrix_3_8;
+real b0_matrix_3_20_DE;
+real b0_matrix_3_20_NDE;
+real b0_matrix_3_22_DE;
+real b0_matrix_3_22_NDE;
+real b0_matrix_4_3;
+real b0_matrix_4_5;
+real b0_matrix_5_4;
+real b0_matrix_5_6;
+real b0_matrix_5_24_DE;
+real b0_matrix_5_24_NDE;
+real b0_matrix_6_5;
+real b0_matrix_6_7;
+real b0_matrix_6_26_DE;
+real b0_matrix_6_26_NDE;
+real b0_matrix_7_6;
+real b0_matrix_7_28_DE;
+real b0_matrix_7_28_NDE;
+real b0_matrix_7_30_DE;
+real b0_matrix_7_30_NDE;
+real b0_matrix_7_42;
+real b0_matrix_8_3;
+real b0_matrix_8_9;
+real b0_matrix_8_32_DE;
+real b0_matrix_8_32_NDE;
+real b0_matrix_9_8;
+real b0_matrix_9_34_DE;
+real b0_matrix_9_34_NDE;
+real b0_matrix_9_36;
+real b0_matrix_9_37;
+real b0_matrix_9_38;
+real b0_matrix_9_39_DE;
+real b0_matrix_9_39_NDE;
+real b0_matrix_10_2;
+real b0_matrix_12_2;
+real b0_matrix_14_2;
+real b0_matrix_16_2;
+real b0_matrix_18_2;
+real b0_matrix_20_3;
+real b0_matrix_22_3;
+real b0_matrix_24_5;
+real b0_matrix_26_6;
+real b0_matrix_28_7;
+real b0_matrix_30_7;
+real b0_matrix_32_8;
+real b0_matrix_34_9;
+real b0_matrix_36_9;
+real b0_matrix_37_9;
+real b0_matrix_38_9;
+real b0_matrix_39_9;
+real b0_matrix_41_2;
+real b0_matrix_42_7;
+real borigin1_matrix_3_8;
+real borigin1_matrix_8_3;
+real borigin1_matrix_8_9;
+real borigin1_matrix_8_32_DE;
+real borigin1_matrix_8_32_NDE;
+real borigin1_matrix_9_8;
+real borigin1_matrix_9_34_DE;
+real borigin1_matrix_9_34_NDE;
+real borigin1_matrix_9_36;
+real borigin1_matrix_9_37;
+real borigin1_matrix_9_38;
+real borigin1_matrix_9_39_DE;
+real borigin1_matrix_9_39_NDE;
+real borigin1_matrix_32_8;
+real borigin1_matrix_34_9;
+real borigin1_matrix_36_9;
+real borigin1_matrix_37_9;
+real borigin1_matrix_38_9;
+real borigin1_matrix_39_9;
+
+real borigin2_matrix_3_8;
+real borigin2_matrix_8_3;
+real borigin2_matrix_8_9;
+real borigin2_matrix_8_32_DE;
+real borigin2_matrix_8_32_NDE;
+real borigin2_matrix_9_8;
+real borigin2_matrix_9_34_DE;
+real borigin2_matrix_9_34_NDE;
+real borigin2_matrix_9_36;
+real borigin2_matrix_9_37;
+real borigin2_matrix_9_38;
+real borigin2_matrix_9_39_DE;
+real borigin2_matrix_9_39_NDE;
+real borigin2_matrix_32_8;
+real borigin2_matrix_34_9;
+real borigin2_matrix_36_9;
+real borigin2_matrix_37_9;
+real borigin2_matrix_38_9;
+real borigin2_matrix_39_9;
+
+real borigin3_matrix_3_8;
+real borigin3_matrix_8_3;
+real borigin3_matrix_8_9;
+real borigin3_matrix_8_32_DE;
+real borigin3_matrix_8_32_NDE;
+real borigin3_matrix_9_8;
+real borigin3_matrix_9_34_DE;
+real borigin3_matrix_9_34_NDE;
+real borigin3_matrix_9_36;
+real borigin3_matrix_9_37;
+real borigin3_matrix_9_38;
+real borigin3_matrix_9_39_DE;
+real borigin3_matrix_9_39_NDE;
+real borigin3_matrix_32_8;
+real borigin3_matrix_34_9;
+real borigin3_matrix_36_9;
+real borigin3_matrix_37_9;
+real borigin3_matrix_38_9;
+real borigin3_matrix_39_9;
+
+real borigin4_matrix_3_8;
+real borigin4_matrix_8_3;
+real borigin4_matrix_8_9;
+real borigin4_matrix_8_32_DE;
+real borigin4_matrix_8_32_NDE;
+real borigin4_matrix_9_8;
+real borigin4_matrix_9_34_DE;
+real borigin4_matrix_9_34_NDE;
+real borigin4_matrix_9_36;
+real borigin4_matrix_9_37;
+real borigin4_matrix_9_38;
+real borigin4_matrix_9_39_DE;
+real borigin4_matrix_9_39_NDE;
+real borigin4_matrix_32_8;
+real borigin4_matrix_34_9;
+real borigin4_matrix_36_9;
+real borigin4_matrix_37_9;
+real borigin4_matrix_38_9;
+real borigin4_matrix_39_9;
+
+real borigin5_matrix_3_8;
+real borigin5_matrix_8_3;
+real borigin5_matrix_8_9;
+real borigin5_matrix_8_32_DE;
+real borigin5_matrix_8_32_NDE;
+real borigin5_matrix_9_8;
+real borigin5_matrix_9_34_DE;
+real borigin5_matrix_9_34_NDE;
+real borigin5_matrix_9_36;
+real borigin5_matrix_9_37;
+real borigin5_matrix_9_38;
+real borigin5_matrix_9_39_DE;
+real borigin5_matrix_9_39_NDE;
+real borigin5_matrix_32_8;
+real borigin5_matrix_34_9;
+real borigin5_matrix_36_9;
+real borigin5_matrix_37_9;
+real borigin5_matrix_38_9;
+real borigin5_matrix_39_9;
+
+b0_matrix_DE[1,2] = b0_matrix_1_2;
+b0_matrix_NDE[1,2] = b0_matrix_1_2;
+b0_matrix_DE[2,1] = b0_matrix_2_1;
+b0_matrix_NDE[2,1] = b0_matrix_2_1;
+b0_matrix_DE[2,3] = b0_matrix_2_3;
+b0_matrix_NDE[2,3] = b0_matrix_2_3;
+b0_matrix_DE[2,10] = b0_matrix_2_10_DE;
+b0_matrix_NDE[2,10] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,11] = -100000;
+b0_matrix_NDE[2,11] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,12] = b0_matrix_2_12_DE;
+b0_matrix_NDE[2,12] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,13] = -100000;
+b0_matrix_NDE[2,13] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,14] = b0_matrix_2_14_DE;
+b0_matrix_NDE[2,14] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,15] = -100000;
+b0_matrix_NDE[2,15] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,16] = b0_matrix_2_16_DE;
+b0_matrix_NDE[2,16] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,17] = -100000;
+b0_matrix_NDE[2,17] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,18] = b0_matrix_2_18_DE;
+b0_matrix_NDE[2,18] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,19] = -100000;
+b0_matrix_NDE[2,19] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,41] = b0_matrix_2_41;
+b0_matrix_NDE[2,41] = b0_matrix_2_41;
+b0_matrix_DE[3,2] = b0_matrix_3_2;
+b0_matrix_NDE[3,2] = b0_matrix_3_2;
+b0_matrix_DE[3,4] = b0_matrix_3_4;
+b0_matrix_NDE[3,4] = b0_matrix_3_4;
+b0_matrix_DE[3,8] = b0_matrix_3_8;
+b0_matrix_NDE[3,8] = b0_matrix_3_8;
+b0_matrix_DE[3,20] = b0_matrix_3_20_DE;
+b0_matrix_NDE[3,20] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,21] = -100000;
+b0_matrix_NDE[3,21] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,22] = b0_matrix_3_22_DE;
+b0_matrix_NDE[3,22] = b0_matrix_3_22_NDE;
+b0_matrix_DE[3,23] = -100000;
+b0_matrix_NDE[3,23] = b0_matrix_3_22_NDE;
+b0_matrix_DE[4,3] = b0_matrix_4_3;
+b0_matrix_NDE[4,3] = b0_matrix_4_3;
+b0_matrix_DE[4,5] = b0_matrix_4_5;
+b0_matrix_NDE[4,5] = b0_matrix_4_5;
+b0_matrix_DE[5,4] = b0_matrix_5_4;
+b0_matrix_NDE[5,4] = b0_matrix_5_4;
+b0_matrix_DE[5,6] = b0_matrix_5_6;
+b0_matrix_NDE[5,6] = b0_matrix_5_6;
+b0_matrix_DE[5,24] = b0_matrix_5_24_DE;
+b0_matrix_NDE[5,24] = b0_matrix_5_24_NDE;
+b0_matrix_DE[5,25] = -100000;
+b0_matrix_NDE[5,25] = b0_matrix_5_24_NDE;
+b0_matrix_DE[6,5] = b0_matrix_6_5;
+b0_matrix_NDE[6,5] = b0_matrix_6_5;
+b0_matrix_DE[6,7] = b0_matrix_6_7;
+b0_matrix_NDE[6,7] = b0_matrix_6_7;
+b0_matrix_DE[6,26] = b0_matrix_6_26_DE;
+b0_matrix_NDE[6,26] = b0_matrix_6_26_NDE;
+b0_matrix_DE[6,27] = -100000;
+b0_matrix_NDE[6,27] = b0_matrix_6_26_NDE;
+b0_matrix_DE[7,6] = b0_matrix_7_6;
+b0_matrix_NDE[7,6] = b0_matrix_7_6;
+b0_matrix_DE[7,28] = b0_matrix_7_28_DE;
+b0_matrix_NDE[7,28] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,29] = -100000;
+b0_matrix_NDE[7,29] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,30] = b0_matrix_7_30_DE;
+b0_matrix_NDE[7,30] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,31] = -100000;
+b0_matrix_NDE[7,31] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,42] = b0_matrix_7_42;
+b0_matrix_NDE[7,42] = b0_matrix_7_42;
+b0_matrix_DE[8,3] = b0_matrix_8_3;
+b0_matrix_NDE[8,3] = b0_matrix_8_3;
+b0_matrix_DE[8,9] = b0_matrix_8_9;
+b0_matrix_NDE[8,9] = b0_matrix_8_9;
+b0_matrix_DE[8,32] = b0_matrix_8_32_DE;
+b0_matrix_NDE[8,32] = b0_matrix_8_32_NDE;
+b0_matrix_DE[8,33] = -100000;
+b0_matrix_NDE[8,33] = b0_matrix_8_32_NDE;
+b0_matrix_DE[9,8] = b0_matrix_9_8;
+b0_matrix_NDE[9,8] = b0_matrix_9_8;
+b0_matrix_DE[9,34] = b0_matrix_9_34_DE;
+b0_matrix_NDE[9,34] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,35] = -100000;
+b0_matrix_NDE[9,35] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,36] = b0_matrix_9_36;
+b0_matrix_NDE[9,36] = b0_matrix_9_36;
+b0_matrix_DE[9,37] = b0_matrix_9_37;
+b0_matrix_NDE[9,37] = b0_matrix_9_37;
+b0_matrix_DE[9,38] = b0_matrix_9_38;
+b0_matrix_NDE[9,38] = b0_matrix_9_38;
+b0_matrix_DE[9,39] = b0_matrix_9_39_DE;
+b0_matrix_NDE[9,39] = b0_matrix_9_39_NDE;
+b0_matrix_DE[9,40] = -100000;
+b0_matrix_NDE[9,40] = b0_matrix_9_39_NDE;
+b0_matrix_DE[10,2] = b0_matrix_10_2;
+b0_matrix_NDE[10,2] = b0_matrix_10_2;
+b0_matrix_DE[11,2] = b0_matrix_10_2;
+b0_matrix_NDE[11,2] = b0_matrix_10_2;
+b0_matrix_DE[12,2] = b0_matrix_12_2;
+b0_matrix_NDE[12,2] = b0_matrix_12_2;
+b0_matrix_DE[14,2] = b0_matrix_14_2;
+b0_matrix_NDE[14,2] = b0_matrix_14_2;
+b0_matrix_DE[16,2] = b0_matrix_16_2;
+b0_matrix_NDE[16,2] = b0_matrix_16_2;
+b0_matrix_DE[18,2] = b0_matrix_18_2;
+b0_matrix_NDE[18,2] = b0_matrix_18_2;
+b0_matrix_DE[19,2] = b0_matrix_18_2;
+b0_matrix_NDE[19,2] = b0_matrix_18_2;
+b0_matrix_DE[20,3] = b0_matrix_20_3;
+b0_matrix_NDE[20,3] = b0_matrix_20_3;
+b0_matrix_DE[22,3] = b0_matrix_22_3;
+b0_matrix_NDE[22,3] = b0_matrix_22_3;
+b0_matrix_DE[24,5] = b0_matrix_24_5;
+b0_matrix_NDE[24,5] = b0_matrix_24_5;
+b0_matrix_DE[26,6] = b0_matrix_26_6;
+b0_matrix_NDE[26,6] = b0_matrix_26_6;
+b0_matrix_DE[28,7] = b0_matrix_28_7;
+b0_matrix_NDE[28,7] = b0_matrix_28_7;
+b0_matrix_DE[29,7] = b0_matrix_28_7;
+b0_matrix_NDE[29,7] = b0_matrix_28_7;
+b0_matrix_DE[30,7] = b0_matrix_30_7;
+b0_matrix_NDE[30,7] = b0_matrix_30_7;
+b0_matrix_DE[31,7] = b0_matrix_30_7;
+b0_matrix_NDE[31,7] = b0_matrix_30_7;
+b0_matrix_DE[32,8] = b0_matrix_32_8;
+b0_matrix_NDE[32,8] = b0_matrix_32_8;
+b0_matrix_DE[34,9] = b0_matrix_34_9;
+b0_matrix_NDE[34,9] = b0_matrix_34_9;
+b0_matrix_DE[35,9] = b0_matrix_34_9;
+b0_matrix_NDE[35,9] = b0_matrix_34_9;
+b0_matrix_DE[36,9] = b0_matrix_36_9;
+b0_matrix_NDE[36,9] = b0_matrix_36_9;
+b0_matrix_DE[37,9] = b0_matrix_37_9;
+b0_matrix_NDE[37,9] = b0_matrix_37_9;
+b0_matrix_DE[38,9] = b0_matrix_38_9;
+b0_matrix_NDE[38,9] = b0_matrix_38_9;
+b0_matrix_DE[39,9] = b0_matrix_39_9;
+b0_matrix_NDE[39,9] = b0_matrix_39_9;
+b0_matrix_DE[41,2] = b0_matrix_41_2;
+b0_matrix_NDE[41,2] = b0_matrix_41_2;
+b0_matrix_DE[42,7] = b0_matrix_42_7;
+b0_matrix_NDE[42,7] = b0_matrix_42_7;
+borigin1_matrix_DE[3,8] = borigin1_matrix_3_8;
+borigin1_matrix_NDE[3,8] = borigin1_matrix_3_8;
+borigin1_matrix_DE[8,3] = borigin1_matrix_8_3;
+borigin1_matrix_NDE[8,3] = borigin1_matrix_8_3;
+borigin1_matrix_DE[8,9] = borigin1_matrix_8_9;
+borigin1_matrix_NDE[8,9] = borigin1_matrix_8_9;
+borigin1_matrix_DE[8,32] = borigin1_matrix_8_32_DE;
+borigin1_matrix_NDE[8,32] = borigin1_matrix_8_32_NDE;
+borigin1_matrix_NDE[8,33] = borigin1_matrix_8_32_NDE;
+borigin1_matrix_DE[9,8] = borigin1_matrix_9_8;
+borigin1_matrix_NDE[9,8] = borigin1_matrix_9_8;
+borigin1_matrix_DE[9,34] = borigin1_matrix_9_34_DE;
+borigin1_matrix_NDE[9,34] = borigin1_matrix_9_34_NDE;
+borigin1_matrix_NDE[9,35] = borigin1_matrix_9_34_NDE;
+borigin1_matrix_DE[9,36] = borigin1_matrix_9_36;
+borigin1_matrix_NDE[9,36] = borigin1_matrix_9_36;
+borigin1_matrix_DE[9,37] = borigin1_matrix_9_37;
+borigin1_matrix_NDE[9,37] = borigin1_matrix_9_37;
+borigin1_matrix_DE[9,38] = borigin1_matrix_9_38;
+borigin1_matrix_NDE[9,38] = borigin1_matrix_9_38;
+borigin1_matrix_DE[9,39] = borigin1_matrix_9_39_DE;
+borigin1_matrix_NDE[9,39] = borigin1_matrix_9_39_NDE;
+borigin1_matrix_NDE[9,40] = borigin1_matrix_9_39_NDE;
+borigin1_matrix_DE[32,8] = borigin1_matrix_32_8;
+borigin1_matrix_NDE[32,8] = borigin1_matrix_32_8;
+borigin1_matrix_DE[34,9] = borigin1_matrix_34_9;
+borigin1_matrix_NDE[34,9] = borigin1_matrix_34_9;
+borigin1_matrix_DE[35,9] = borigin1_matrix_34_9;
+borigin1_matrix_NDE[35,9] = borigin1_matrix_34_9;
+borigin1_matrix_DE[36,9] = borigin1_matrix_36_9;
+borigin1_matrix_NDE[36,9] = borigin1_matrix_36_9;
+borigin1_matrix_DE[37,9] = borigin1_matrix_37_9;
+borigin1_matrix_NDE[37,9] = borigin1_matrix_37_9;
+borigin1_matrix_DE[38,9] = borigin1_matrix_38_9;
+borigin1_matrix_NDE[38,9] = borigin1_matrix_38_9;
+borigin1_matrix_DE[39,9] = borigin1_matrix_39_9;
+borigin1_matrix_NDE[39,9] = borigin1_matrix_39_9;
+
+borigin2_matrix_DE[3,8] = borigin2_matrix_3_8;
+borigin2_matrix_NDE[3,8] = borigin2_matrix_3_8;
+borigin2_matrix_DE[8,3] = borigin2_matrix_8_3;
+borigin2_matrix_NDE[8,3] = borigin2_matrix_8_3;
+borigin2_matrix_DE[8,9] = borigin2_matrix_8_9;
+borigin2_matrix_NDE[8,9] = borigin2_matrix_8_9;
+borigin2_matrix_DE[8,32] = borigin2_matrix_8_32_DE;
+borigin2_matrix_NDE[8,32] = borigin2_matrix_8_32_NDE;
+borigin2_matrix_NDE[8,33] = borigin2_matrix_8_32_NDE;
+borigin2_matrix_DE[9,8] = borigin2_matrix_9_8;
+borigin2_matrix_NDE[9,8] = borigin2_matrix_9_8;
+borigin2_matrix_DE[9,34] = borigin2_matrix_9_34_DE;
+borigin2_matrix_NDE[9,34] = borigin2_matrix_9_34_NDE;
+borigin2_matrix_NDE[9,35] = borigin2_matrix_9_34_NDE;
+borigin2_matrix_DE[9,36] = borigin2_matrix_9_36;
+borigin2_matrix_NDE[9,36] = borigin2_matrix_9_36;
+borigin2_matrix_DE[9,37] = borigin2_matrix_9_37;
+borigin2_matrix_NDE[9,37] = borigin2_matrix_9_37;
+borigin2_matrix_DE[9,38] = borigin2_matrix_9_38;
+borigin2_matrix_NDE[9,38] = borigin2_matrix_9_38;
+borigin2_matrix_DE[9,39] = borigin2_matrix_9_39_DE;
+borigin2_matrix_NDE[9,39] = borigin2_matrix_9_39_NDE;
+borigin2_matrix_NDE[9,40] = borigin2_matrix_9_39_NDE;
+borigin2_matrix_DE[32,8] = borigin2_matrix_32_8;
+borigin2_matrix_NDE[32,8] = borigin2_matrix_32_8;
+borigin2_matrix_DE[34,9] = borigin2_matrix_34_9;
+borigin2_matrix_NDE[34,9] = borigin2_matrix_34_9;
+borigin2_matrix_DE[35,9] = borigin2_matrix_34_9;
+borigin2_matrix_NDE[35,9] = borigin2_matrix_34_9;
+borigin2_matrix_DE[36,9] = borigin2_matrix_36_9;
+borigin2_matrix_NDE[36,9] = borigin2_matrix_36_9;
+borigin2_matrix_DE[37,9] = borigin2_matrix_37_9;
+borigin2_matrix_NDE[37,9] = borigin2_matrix_37_9;
+borigin2_matrix_DE[38,9] = borigin2_matrix_38_9;
+borigin2_matrix_NDE[38,9] = borigin2_matrix_38_9;
+borigin2_matrix_DE[39,9] = borigin2_matrix_39_9;
+borigin2_matrix_NDE[39,9] = borigin2_matrix_39_9;
+
+borigin3_matrix_DE[3,8] = borigin3_matrix_3_8;
+borigin3_matrix_NDE[3,8] = borigin3_matrix_3_8;
+borigin3_matrix_DE[8,3] = borigin3_matrix_8_3;
+borigin3_matrix_NDE[8,3] = borigin3_matrix_8_3;
+borigin3_matrix_DE[8,9] = borigin3_matrix_8_9;
+borigin3_matrix_NDE[8,9] = borigin3_matrix_8_9;
+borigin3_matrix_DE[8,32] = borigin3_matrix_8_32_DE;
+borigin3_matrix_NDE[8,32] = borigin3_matrix_8_32_NDE;
+borigin3_matrix_NDE[8,33] = borigin3_matrix_8_32_NDE;
+borigin3_matrix_DE[9,8] = borigin3_matrix_9_8;
+borigin3_matrix_NDE[9,8] = borigin3_matrix_9_8;
+borigin3_matrix_DE[9,34] = borigin3_matrix_9_34_DE;
+borigin3_matrix_NDE[9,34] = borigin3_matrix_9_34_NDE;
+borigin3_matrix_NDE[9,35] = borigin3_matrix_9_34_NDE;
+borigin3_matrix_DE[9,36] = borigin3_matrix_9_36;
+borigin3_matrix_NDE[9,36] = borigin3_matrix_9_36;
+borigin3_matrix_DE[9,37] = borigin3_matrix_9_37;
+borigin3_matrix_NDE[9,37] = borigin3_matrix_9_37;
+borigin3_matrix_DE[9,38] = borigin3_matrix_9_38;
+borigin3_matrix_NDE[9,38] = borigin3_matrix_9_38;
+borigin3_matrix_DE[9,39] = borigin3_matrix_9_39_DE;
+borigin3_matrix_NDE[9,39] = borigin3_matrix_9_39_NDE;
+borigin3_matrix_NDE[9,40] = borigin3_matrix_9_39_NDE;
+borigin3_matrix_DE[32,8] = borigin3_matrix_32_8;
+borigin3_matrix_NDE[32,8] = borigin3_matrix_32_8;
+borigin3_matrix_DE[34,9] = borigin3_matrix_34_9;
+borigin3_matrix_NDE[34,9] = borigin3_matrix_34_9;
+borigin3_matrix_DE[35,9] = borigin3_matrix_34_9;
+borigin3_matrix_NDE[35,9] = borigin3_matrix_34_9;
+borigin3_matrix_DE[36,9] = borigin3_matrix_36_9;
+borigin3_matrix_NDE[36,9] = borigin3_matrix_36_9;
+borigin3_matrix_DE[37,9] = borigin3_matrix_37_9;
+borigin3_matrix_NDE[37,9] = borigin3_matrix_37_9;
+borigin3_matrix_DE[38,9] = borigin3_matrix_38_9;
+borigin3_matrix_NDE[38,9] = borigin3_matrix_38_9;
+borigin3_matrix_DE[39,9] = borigin3_matrix_39_9;
+borigin3_matrix_NDE[39,9] = borigin3_matrix_39_9;
+
+borigin4_matrix_DE[3,8] = borigin4_matrix_3_8;
+borigin4_matrix_NDE[3,8] = borigin4_matrix_3_8;
+borigin4_matrix_DE[8,3] = borigin4_matrix_8_3;
+borigin4_matrix_NDE[8,3] = borigin4_matrix_8_3;
+borigin4_matrix_DE[8,9] = borigin4_matrix_8_9;
+borigin4_matrix_NDE[8,9] = borigin4_matrix_8_9;
+borigin4_matrix_DE[8,32] = borigin4_matrix_8_32_DE;
+borigin4_matrix_NDE[8,32] = borigin4_matrix_8_32_NDE;
+borigin4_matrix_NDE[8,33] = borigin4_matrix_8_32_NDE;
+borigin4_matrix_DE[9,8] = borigin4_matrix_9_8;
+borigin4_matrix_NDE[9,8] = borigin4_matrix_9_8;
+borigin4_matrix_DE[9,34] = borigin4_matrix_9_34_DE;
+borigin4_matrix_NDE[9,34] = borigin4_matrix_9_34_NDE;
+borigin4_matrix_NDE[9,35] = borigin4_matrix_9_34_NDE;
+borigin4_matrix_DE[9,36] = borigin4_matrix_9_36;
+borigin4_matrix_NDE[9,36] = borigin4_matrix_9_36;
+borigin4_matrix_DE[9,37] = borigin4_matrix_9_37;
+borigin4_matrix_NDE[9,37] = borigin4_matrix_9_37;
+borigin4_matrix_DE[9,38] = borigin4_matrix_9_38;
+borigin4_matrix_NDE[9,38] = borigin4_matrix_9_38;
+borigin4_matrix_DE[9,39] = borigin4_matrix_9_39_DE;
+borigin4_matrix_NDE[9,39] = borigin4_matrix_9_39_NDE;
+borigin4_matrix_NDE[9,40] = borigin4_matrix_9_39_NDE;
+borigin4_matrix_DE[32,8] = borigin4_matrix_32_8;
+borigin4_matrix_NDE[32,8] = borigin4_matrix_32_8;
+borigin4_matrix_DE[34,9] = borigin4_matrix_34_9;
+borigin4_matrix_NDE[34,9] = borigin4_matrix_34_9;
+borigin4_matrix_DE[35,9] = borigin4_matrix_34_9;
+borigin4_matrix_NDE[35,9] = borigin4_matrix_34_9;
+borigin4_matrix_DE[36,9] = borigin4_matrix_36_9;
+borigin4_matrix_NDE[36,9] = borigin4_matrix_36_9;
+borigin4_matrix_DE[37,9] = borigin4_matrix_37_9;
+borigin4_matrix_NDE[37,9] = borigin4_matrix_37_9;
+borigin4_matrix_DE[38,9] = borigin4_matrix_38_9;
+borigin4_matrix_NDE[38,9] = borigin4_matrix_38_9;
+borigin4_matrix_DE[39,9] = borigin4_matrix_39_9;
+borigin4_matrix_NDE[39,9] = borigin4_matrix_39_9;
+
+borigin5_matrix_DE[3,8] = borigin5_matrix_3_8;
+borigin5_matrix_NDE[3,8] = borigin5_matrix_3_8;
+borigin5_matrix_DE[8,3] = borigin5_matrix_8_3;
+borigin5_matrix_NDE[8,3] = borigin5_matrix_8_3;
+borigin5_matrix_DE[8,9] = borigin5_matrix_8_9;
+borigin5_matrix_NDE[8,9] = borigin5_matrix_8_9;
+borigin5_matrix_DE[8,32] = borigin5_matrix_8_32_DE;
+borigin5_matrix_NDE[8,32] = borigin5_matrix_8_32_NDE;
+borigin5_matrix_NDE[8,33] = borigin5_matrix_8_32_NDE;
+borigin5_matrix_DE[9,8] = borigin5_matrix_9_8;
+borigin5_matrix_NDE[9,8] = borigin5_matrix_9_8;
+borigin5_matrix_DE[9,34] = borigin5_matrix_9_34_DE;
+borigin5_matrix_NDE[9,34] = borigin5_matrix_9_34_NDE;
+borigin5_matrix_NDE[9,35] = borigin5_matrix_9_34_NDE;
+borigin5_matrix_DE[9,36] = borigin5_matrix_9_36;
+borigin5_matrix_NDE[9,36] = borigin5_matrix_9_36;
+borigin5_matrix_DE[9,37] = borigin5_matrix_9_37;
+borigin5_matrix_NDE[9,37] = borigin5_matrix_9_37;
+borigin5_matrix_DE[9,38] = borigin5_matrix_9_38;
+borigin5_matrix_NDE[9,38] = borigin5_matrix_9_38;
+borigin5_matrix_DE[9,39] = borigin5_matrix_9_39_DE;
+borigin5_matrix_NDE[9,39] = borigin5_matrix_9_39_NDE;
+borigin5_matrix_NDE[9,40] = borigin5_matrix_9_39_NDE;
+borigin5_matrix_DE[32,8] = borigin5_matrix_32_8;
+borigin5_matrix_NDE[32,8] = borigin5_matrix_32_8;
+borigin5_matrix_DE[34,9] = borigin5_matrix_34_9;
+borigin5_matrix_NDE[34,9] = borigin5_matrix_34_9;
+borigin5_matrix_DE[35,9] = borigin5_matrix_34_9;
+borigin5_matrix_NDE[35,9] = borigin5_matrix_34_9;
+borigin5_matrix_DE[36,9] = borigin5_matrix_36_9;
+borigin5_matrix_NDE[36,9] = borigin5_matrix_36_9;
+borigin5_matrix_DE[37,9] = borigin5_matrix_37_9;
+borigin5_matrix_NDE[37,9] = borigin5_matrix_37_9;
+borigin5_matrix_DE[38,9] = borigin5_matrix_38_9;
+borigin5_matrix_NDE[38,9] = borigin5_matrix_38_9;
+borigin5_matrix_DE[39,9] = borigin5_matrix_39_9;
+borigin5_matrix_NDE[39,9] = borigin5_matrix_39_9;
+
+b0_matrix_1_2 ~ normal(0,10);
+b0_matrix_2_1 ~ normal(0,10);
+b0_matrix_2_3 ~ normal(0,10);
+b0_matrix_2_10_DE ~ normal(0,10);
+b0_matrix_2_10_NDE ~ normal(0,10);
+b0_matrix_2_12_DE ~ normal(0,10);
+b0_matrix_2_12_NDE ~ normal(0,10);
+b0_matrix_2_14_DE ~ normal(0,10);
+b0_matrix_2_14_NDE ~ normal(0,10);
+b0_matrix_2_16_DE ~ normal(0,10);
+b0_matrix_2_16_NDE ~ normal(0,10);
+b0_matrix_2_18_DE ~ normal(0,10);
+b0_matrix_2_18_NDE ~ normal(0,10);
+b0_matrix_2_41 ~ normal(0,10);
+b0_matrix_3_2 ~ normal(0,10);
+b0_matrix_3_4 ~ normal(0,10);
+b0_matrix_3_8 ~ normal(0,10);
+b0_matrix_3_20_DE ~ normal(0,10);
+b0_matrix_3_20_NDE ~ normal(0,10);
+b0_matrix_3_22_DE ~ normal(0,10);
+b0_matrix_3_22_NDE ~ normal(0,10);
+b0_matrix_4_3 ~ normal(0,10);
+b0_matrix_4_5 ~ normal(0,10);
+b0_matrix_5_4 ~ normal(0,10);
+b0_matrix_5_6 ~ normal(0,10);
+b0_matrix_5_24_DE ~ normal(0,10);
+b0_matrix_5_24_NDE ~ normal(0,10);
+b0_matrix_6_5 ~ normal(0,10);
+b0_matrix_6_7 ~ normal(0,10);
+b0_matrix_6_26_DE ~ normal(0,10);
+b0_matrix_6_26_NDE ~ normal(0,10);
+b0_matrix_7_6 ~ normal(0,10);
+b0_matrix_7_28_DE ~ normal(0,10);
+b0_matrix_7_28_NDE ~ normal(0,10);
+b0_matrix_7_30_DE ~ normal(0,10);
+b0_matrix_7_30_NDE ~ normal(0,10);
+b0_matrix_7_42 ~ normal(0,10);
+b0_matrix_8_3 ~ normal(0,10);
+b0_matrix_8_9 ~ normal(0,10);
+b0_matrix_8_32_DE ~ normal(0,10);
+b0_matrix_8_32_NDE ~ normal(0,10);
+b0_matrix_9_8 ~ normal(0,10);
+b0_matrix_9_34_DE ~ normal(0,10);
+b0_matrix_9_34_NDE ~ normal(0,10);
+b0_matrix_9_36 ~ normal(0,10);
+b0_matrix_9_37 ~ normal(0,10);
+b0_matrix_9_38 ~ normal(0,10);
+b0_matrix_9_39_DE ~ normal(0,10);
+b0_matrix_9_39_NDE ~ normal(0,10);
+b0_matrix_10_2 ~ normal(0,10);
+b0_matrix_12_2 ~ normal(0,10);
+b0_matrix_14_2 ~ normal(0,10);
+b0_matrix_16_2 ~ normal(0,10);
+b0_matrix_18_2 ~ normal(0,10);
+b0_matrix_20_3 ~ normal(0,10);
+b0_matrix_22_3 ~ normal(0,10);
+b0_matrix_24_5 ~ normal(0,10);
+b0_matrix_26_6 ~ normal(0,10);
+b0_matrix_28_7 ~ normal(0,10);
+b0_matrix_30_7 ~ normal(0,10);
+b0_matrix_32_8 ~ normal(0,10);
+b0_matrix_34_9 ~ normal(0,10);
+b0_matrix_36_9 ~ normal(0,10);
+b0_matrix_37_9 ~ normal(0,10);
+b0_matrix_38_9 ~ normal(0,10);
+b0_matrix_39_9 ~ normal(0,10);
+b0_matrix_41_2 ~ normal(0,10);
+b0_matrix_42_7 ~ normal(0,10);
+borigin1_matrix_3_8 ~ normal(0,10);
+borigin1_matrix_8_3 ~ normal(0,10);
+borigin1_matrix_8_9 ~ normal(0,10);
+borigin1_matrix_8_32_DE ~ normal(0,10);
+borigin1_matrix_8_32_NDE ~ normal(0,10);
+borigin1_matrix_9_8 ~ normal(0,10);
+borigin1_matrix_9_34_DE ~ normal(0,10);
+borigin1_matrix_9_34_NDE ~ normal(0,10);
+borigin1_matrix_9_36 ~ normal(0,10);
+borigin1_matrix_9_37 ~ normal(0,10);
+borigin1_matrix_9_38 ~ normal(0,10);
+borigin1_matrix_9_39_DE ~ normal(0,10);
+borigin1_matrix_9_39_NDE ~ normal(0,10);
+borigin1_matrix_32_8 ~ normal(0,10);
+borigin1_matrix_34_9 ~ normal(0,10);
+borigin1_matrix_36_9 ~ normal(0,10);
+borigin1_matrix_37_9 ~ normal(0,10);
+borigin1_matrix_38_9 ~ normal(0,10);
+borigin1_matrix_39_9 ~ normal(0,10);
+
+borigin2_matrix_3_8 ~ normal(0,10);
+borigin2_matrix_8_3 ~ normal(0,10);
+borigin2_matrix_8_9 ~ normal(0,10);
+borigin2_matrix_8_32_DE ~ normal(0,10);
+borigin2_matrix_8_32_NDE ~ normal(0,10);
+borigin2_matrix_9_8 ~ normal(0,10);
+borigin2_matrix_9_34_DE ~ normal(0,10);
+borigin2_matrix_9_34_NDE ~ normal(0,10);
+borigin2_matrix_9_36 ~ normal(0,10);
+borigin2_matrix_9_37 ~ normal(0,10);
+borigin2_matrix_9_38 ~ normal(0,10);
+borigin2_matrix_9_39_DE ~ normal(0,10);
+borigin2_matrix_9_39_NDE ~ normal(0,10);
+borigin2_matrix_32_8 ~ normal(0,10);
+borigin2_matrix_34_9 ~ normal(0,10);
+borigin2_matrix_36_9 ~ normal(0,10);
+borigin2_matrix_37_9 ~ normal(0,10);
+borigin2_matrix_38_9 ~ normal(0,10);
+borigin2_matrix_39_9 ~ normal(0,10);
+
+borigin3_matrix_3_8 ~ normal(0,10);
+borigin3_matrix_8_3 ~ normal(0,10);
+borigin3_matrix_8_9 ~ normal(0,10);
+borigin3_matrix_8_32_DE ~ normal(0,10);
+borigin3_matrix_8_32_NDE ~ normal(0,10);
+borigin3_matrix_9_8 ~ normal(0,10);
+borigin3_matrix_9_34_DE ~ normal(0,10);
+borigin3_matrix_9_34_NDE ~ normal(0,10);
+borigin3_matrix_9_36 ~ normal(0,10);
+borigin3_matrix_9_37 ~ normal(0,10);
+borigin3_matrix_9_38 ~ normal(0,10);
+borigin3_matrix_9_39_DE ~ normal(0,10);
+borigin3_matrix_9_39_NDE ~ normal(0,10);
+borigin3_matrix_32_8 ~ normal(0,10);
+borigin3_matrix_34_9 ~ normal(0,10);
+borigin3_matrix_36_9 ~ normal(0,10);
+borigin3_matrix_37_9 ~ normal(0,10);
+borigin3_matrix_38_9 ~ normal(0,10);
+borigin3_matrix_39_9 ~ normal(0,10);
+
+borigin4_matrix_3_8 ~ normal(0,10);
+borigin4_matrix_8_3 ~ normal(0,10);
+borigin4_matrix_8_9 ~ normal(0,10);
+borigin4_matrix_8_32_DE ~ normal(0,10);
+borigin4_matrix_8_32_NDE ~ normal(0,10);
+borigin4_matrix_9_8 ~ normal(0,10);
+borigin4_matrix_9_34_DE ~ normal(0,10);
+borigin4_matrix_9_34_NDE ~ normal(0,10);
+borigin4_matrix_9_36 ~ normal(0,10);
+borigin4_matrix_9_37 ~ normal(0,10);
+borigin4_matrix_9_38 ~ normal(0,10);
+borigin4_matrix_9_39_DE ~ normal(0,10);
+borigin4_matrix_9_39_NDE ~ normal(0,10);
+borigin4_matrix_32_8 ~ normal(0,10);
+borigin4_matrix_34_9 ~ normal(0,10);
+borigin4_matrix_36_9 ~ normal(0,10);
+borigin4_matrix_37_9 ~ normal(0,10);
+borigin4_matrix_38_9 ~ normal(0,10);
+borigin4_matrix_39_9 ~ normal(0,10);
+
+borigin5_matrix_3_8 ~ normal(0,10);
+borigin5_matrix_8_3 ~ normal(0,10);
+borigin5_matrix_8_9 ~ normal(0,10);
+borigin5_matrix_8_32_DE ~ normal(0,10);
+borigin5_matrix_8_32_NDE ~ normal(0,10);
+borigin5_matrix_9_8 ~ normal(0,10);
+borigin5_matrix_9_34_DE ~ normal(0,10);
+borigin5_matrix_9_34_NDE ~ normal(0,10);
+borigin5_matrix_9_36 ~ normal(0,10);
+borigin5_matrix_9_37 ~ normal(0,10);
+borigin5_matrix_9_38 ~ normal(0,10);
+borigin5_matrix_9_39_DE ~ normal(0,10);
+borigin5_matrix_9_39_NDE ~ normal(0,10);
+borigin5_matrix_32_8 ~ normal(0,10);
+borigin5_matrix_34_9 ~ normal(0,10);
+borigin5_matrix_36_9 ~ normal(0,10);
+borigin5_matrix_37_9 ~ normal(0,10);
+borigin5_matrix_38_9 ~ normal(0,10);
+borigin5_matrix_39_9 ~ normal(0,10);
+
+[1] "2022-11-30 21:40:24 PST"
+[1] "2022-11-30 21:48:45 PST"
+
+            Asotin Creek Mouth - mainstem, upstream of LGR 
+                                                         6 
+       BON to MCN other tributaries - mainstem, BON to MCN 
+                                                        10 
+              Clearwater River - mainstem, upstream of LGR 
+                                                         5 
+              Deschutes River Mouth - mainstem, BON to MCN 
+                                                      1061 
+                   Hood River Mouth - mainstem, BON to MCN 
+                                                        14 
+            Imnaha River Mouth - mainstem, upstream of LGR 
+                                                         2 
+               John Day River Mouth - mainstem, BON to MCN 
+                                                        34 
+       mainstem, BON to MCN - BON to MCN other tributaries 
+                                                        41 
+              mainstem, BON to MCN - Deschutes River Mouth 
+                                                      1265 
+           mainstem, BON to MCN - Deschutes River Upstream 
+                                                        56 
+            mainstem, BON to MCN - Fifteenmile Creek Mouth 
+                                                         4 
+                   mainstem, BON to MCN - Hood River Mouth 
+                                                        19 
+               mainstem, BON to MCN - John Day River Mouth 
+                                                       118 
+        mainstem, BON to MCN - mainstem, MCN to ICH or PRA 
+                                                     27486 
+             mainstem, BON to MCN - mainstem, mouth to BON 
+                                                       746 
+               mainstem, BON to MCN - Umatilla River Mouth 
+                                                        33 
+            mainstem, BON to MCN - Umatilla River Upstream 
+                                                         2 
+        mainstem, ICH to LGR - mainstem, MCN to ICH or PRA 
+                                                       618 
+          mainstem, ICH to LGR - mainstem, upstream of LGR 
+                                                     24265 
+               mainstem, ICH to LGR - Tucannon River Mouth 
+                                                       937 
+        mainstem, MCN to ICH or PRA - mainstem, BON to MCN 
+                                                      1239 
+        mainstem, MCN to ICH or PRA - mainstem, ICH to LGR 
+                                                     25945 
+        mainstem, MCN to ICH or PRA - mainstem, PRA to RIS 
+                                                       469 
+     mainstem, MCN to ICH or PRA - Walla Walla River Mouth 
+                                                        42 
+          mainstem, MCN to ICH or PRA - Yakima River Mouth 
+                                                        14 
+             mainstem, mouth to BON - mainstem, BON to MCN 
+                                                       984 
+        mainstem, PRA to RIS - mainstem, MCN to ICH or PRA 
+                                                       282 
+               mainstem, PRA to RIS - mainstem, RIS to RRE 
+                                                       285 
+               mainstem, RIS to RRE - mainstem, PRA to RIS 
+                                                       132 
+               mainstem, RIS to RRE - mainstem, RRE to WEL 
+                                                       200 
+              mainstem, RIS to RRE - Wenatchee River Mouth 
+                                                         2 
+                 mainstem, RRE to WEL - Entiat River Mouth 
+                                                         3 
+                               mainstem, RRE to WEL - loss 
+                                                         5 
+               mainstem, RRE to WEL - mainstem, RIS to RRE 
+                                                        65 
+          mainstem, RRE to WEL - mainstem, upstream of WEL 
+                                                       157 
+            mainstem, upstream of LGR - Asotin Creek Mouth 
+                                                       238 
+         mainstem, upstream of LGR - Asotin Creek Upstream 
+                                                        52 
+              mainstem, upstream of LGR - Clearwater River 
+                                                      1577 
+            mainstem, upstream of LGR - Grande Ronde River 
+                                                       429 
+            mainstem, upstream of LGR - Imnaha River Mouth 
+                                                      1546 
+          mainstem, upstream of LGR - mainstem, ICH to LGR 
+                                                      1286 
+                  mainstem, upstream of LGR - Salmon River 
+                                                      2332 
+          mainstem, upstream of WEL - mainstem, RRE to WEL 
+                                                        50 
+            mainstem, upstream of WEL - Methow River Mouth 
+                                                        19 
+         mainstem, upstream of WEL - Methow River Upstream 
+                                                         1 
+          mainstem, upstream of WEL - Okanogan River Mouth 
+                                                        12 
+       mainstem, upstream of WEL - Okanogan River Upstream 
+                                                         2 
+mainstem, upstream of WEL - Upstream WEL other tributaries 
+                                                         1 
+            Methow River Mouth - mainstem, upstream of WEL 
+                                                         5 
+          Okanogan River Mouth - mainstem, upstream of WEL 
+                                                         2 
+                  Salmon River - mainstem, upstream of LGR 
+                                                         3 
+               Tucannon River Mouth - mainstem, ICH to LGR 
+                                                        40 
+               Umatilla River Mouth - mainstem, BON to MCN 
+                                                         5 
+     Walla Walla River Mouth - mainstem, MCN to ICH or PRA 
+                                                        10 
+              Wenatchee River Mouth - mainstem, RIS to RRE 
+                                                         1 
+          Yakima River Mouth - mainstem, MCN to ICH or PRA 
+                                                         5 
+[1] "2022-11-30 21:48:48 PST"
+[1] "2022-11-30 21:49:22 PST"
+ [1] "1 - mainstem, mouth to BON"          "2 - mainstem, BON to MCN"           
+ [3] "3 - mainstem, MCN to ICH or PRA"     "4 - mainstem, PRA to RIS"           
+ [5] "5 - mainstem, RIS to RRE"            "6 - mainstem, RRE to WEL"           
+ [7] "7 - mainstem, upstream of WEL"       "8 - mainstem, ICH to LGR"           
+ [9] "9 - mainstem, upstream of LGR"       "10 - Deschutes River Mouth"         
+[11] "11 - Deschutes River Upstream"       "12 - John Day River Mouth"          
+[13] "13 - John Day River Upstream"        "14 - Hood River Mouth"              
+[15] "15 - Hood River Upstream"            "16 - Fifteenmile Creek Mouth"       
+[17] "17 - Fifteenmile Creek Upstream"     "18 - Umatilla River Mouth"          
+[19] "19 - Umatilla River Upstream"        "20 - Yakima River Mouth"            
+[21] "21 - Yakima River Upstream"          "22 - Walla Walla River Mouth"       
+[23] "23 - Walla Walla River Upstream"     "24 - Wenatchee River Mouth"         
+[25] "25 - Wenatchee River Upstream"       "26 - Entiat River Mouth"            
+[27] "27 - Entiat River Upstream"          "28 - Okanogan River Mouth"          
+[29] "29 - Okanogan River Upstream"        "30 - Methow River Mouth"            
+[31] "31 - Methow River Upstream"          "32 - Tucannon River Mouth"          
+[33] "33 - Tucannon River Upstream"        "34 - Asotin Creek Mouth"            
+[35] "35 - Asotin Creek Upstream"          "36 - Clearwater River"              
+[37] "37 - Salmon River"                   "38 - Grande Ronde River"            
+[39] "39 - Imnaha River Mouth"             "40 - Imnaha River Upstream"         
+[41] "41 - BON to MCN other tributaries"   "42 - Upstream WEL other tributaries"
+[43] "43 - loss"                          
+[1] "2022-11-30 21:49:38 PST"
+[1] "Compiling model"
+[1] "model compiled at"
+[1] "2022-11-30 21:50:54 PST"
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 Iteration:   1 / 400 [  0%]  (Warmup) 
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities parameter) = -nan, but should be 1 (in '/tmp/Rtmp5ev9To/model-54984b04d1b2.stan', line 303, column 8 to column 81) (in '/tmp/Rtmp5ev9To/model-54984b04d1b2.stan', line 1405, column 2 to line 1408, column 98)
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 1 
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities parameter) = -nan, but should be 1 (in '/tmp/Rtmp5ev9To/model-54984b04d1b2.stan', line 303, column 8 to column 81) (in '/tmp/Rtmp5ev9To/model-54984b04d1b2.stan', line 1405, column 2 to line 1408, column 98)
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 1 
+Chain 1 Iteration:  10 / 400 [  2%]  (Warmup) 
+Chain 1 Iteration:  20 / 400 [  5%]  (Warmup) 
+Chain 1 Iteration:  30 / 400 [  7%]  (Warmup) 
+Chain 1 Iteration:  40 / 400 [ 10%]  (Warmup) 
+Chain 1 Iteration:  50 / 400 [ 12%]  (Warmup) 
+Chain 1 Iteration:  60 / 400 [ 15%]  (Warmup) 
+Chain 1 Iteration:  70 / 400 [ 17%]  (Warmup) 
+Chain 1 Iteration:  80 / 400 [ 20%]  (Warmup) 
+Chain 1 Iteration:  90 / 400 [ 22%]  (Warmup) 
+Chain 1 Iteration: 100 / 400 [ 25%]  (Warmup) 
+Chain 1 Iteration: 110 / 400 [ 27%]  (Warmup) 
+Chain 1 Iteration: 120 / 400 [ 30%]  (Warmup) 
+Chain 1 Iteration: 130 / 400 [ 32%]  (Warmup) 
+Chain 1 Iteration: 140 / 400 [ 35%]  (Warmup) 
+Chain 1 Iteration: 150 / 400 [ 37%]  (Warmup) 
+Chain 1 Iteration: 160 / 400 [ 40%]  (Warmup) 
+Chain 1 Iteration: 170 / 400 [ 42%]  (Warmup) 
+Chain 1 Iteration: 180 / 400 [ 45%]  (Warmup) 
+Chain 1 Iteration: 190 / 400 [ 47%]  (Warmup) 
+Chain 1 Iteration: 200 / 400 [ 50%]  (Warmup) 
+Chain 1 Iteration: 201 / 400 [ 50%]  (Sampling) 
+Chain 1 Iteration: 210 / 400 [ 52%]  (Sampling) 
+Chain 1 Iteration: 220 / 400 [ 55%]  (Sampling) 
+Chain 1 Iteration: 230 / 400 [ 57%]  (Sampling) 
+Chain 1 Iteration: 240 / 400 [ 60%]  (Sampling) 
+Chain 1 Iteration: 250 / 400 [ 62%]  (Sampling) 
+Chain 1 Iteration: 260 / 400 [ 65%]  (Sampling) 
+Chain 1 Iteration: 270 / 400 [ 67%]  (Sampling) 
+Chain 1 Iteration: 280 / 400 [ 70%]  (Sampling) 
+Chain 1 Iteration: 290 / 400 [ 72%]  (Sampling) 
+Chain 1 Iteration: 300 / 400 [ 75%]  (Sampling) 
+Chain 1 Iteration: 310 / 400 [ 77%]  (Sampling) 
+Chain 1 Iteration: 320 / 400 [ 80%]  (Sampling) 
+Chain 1 Iteration: 330 / 400 [ 82%]  (Sampling) 
+Chain 1 Iteration: 340 / 400 [ 85%]  (Sampling) 
+Chain 1 Iteration: 350 / 400 [ 87%]  (Sampling) 
+Chain 1 Iteration: 360 / 400 [ 90%]  (Sampling) 
+Chain 1 Iteration: 370 / 400 [ 92%]  (Sampling) 
+Chain 1 Iteration: 380 / 400 [ 95%]  (Sampling) 
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling) 
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling) 
+Chain 1 finished in 181644.0 seconds.
+Warning: 200 of 200 (100.0%) transitions hit the maximum treedepth limit of 10.
+See https://mc-stan.org/misc/warnings for details.
+
+
+            Asotin Creek Mouth - mainstem, upstream of LGR 
+                                                         6 
+       BON to MCN other tributaries - mainstem, BON to MCN 
+                                                        10 
+              Clearwater River - mainstem, upstream of LGR 
+                                                         5 
+              Deschutes River Mouth - mainstem, BON to MCN 
+                                                      1061 
+                   Hood River Mouth - mainstem, BON to MCN 
+                                                        14 
+            Imnaha River Mouth - mainstem, upstream of LGR 
+                                                         2 
+               John Day River Mouth - mainstem, BON to MCN 
+                                                        34 
+       mainstem, BON to MCN - BON to MCN other tributaries 
+                                                        41 
+              mainstem, BON to MCN - Deschutes River Mouth 
+                                                      1265 
+           mainstem, BON to MCN - Deschutes River Upstream 
+                                                        56 
+            mainstem, BON to MCN - Fifteenmile Creek Mouth 
+                                                         4 
+                   mainstem, BON to MCN - Hood River Mouth 
+                                                        19 
+               mainstem, BON to MCN - John Day River Mouth 
+                                                       118 
+        mainstem, BON to MCN - mainstem, MCN to ICH or PRA 
+                                                     27486 
+             mainstem, BON to MCN - mainstem, mouth to BON 
+                                                       746 
+               mainstem, BON to MCN - Umatilla River Mouth 
+                                                        33 
+            mainstem, BON to MCN - Umatilla River Upstream 
+                                                         2 
+        mainstem, ICH to LGR - mainstem, MCN to ICH or PRA 
+                                                       618 
+          mainstem, ICH to LGR - mainstem, upstream of LGR 
+                                                     24265 
+               mainstem, ICH to LGR - Tucannon River Mouth 
+                                                       937 
+        mainstem, MCN to ICH or PRA - mainstem, BON to MCN 
+                                                      1239 
+        mainstem, MCN to ICH or PRA - mainstem, ICH to LGR 
+                                                     25945 
+        mainstem, MCN to ICH or PRA - mainstem, PRA to RIS 
+                                                       469 
+     mainstem, MCN to ICH or PRA - Walla Walla River Mouth 
+                                                        42 
+          mainstem, MCN to ICH or PRA - Yakima River Mouth 
+                                                        14 
+             mainstem, mouth to BON - mainstem, BON to MCN 
+                                                       984 
+        mainstem, PRA to RIS - mainstem, MCN to ICH or PRA 
+                                                       282 
+               mainstem, PRA to RIS - mainstem, RIS to RRE 
+                                                       285 
+               mainstem, RIS to RRE - mainstem, PRA to RIS 
+                                                       132 
+               mainstem, RIS to RRE - mainstem, RRE to WEL 
+                                                       200 
+              mainstem, RIS to RRE - Wenatchee River Mouth 
+                                                         2 
+                 mainstem, RRE to WEL - Entiat River Mouth 
+                                                         3 
+                               mainstem, RRE to WEL - loss 
+                                                         5 
+               mainstem, RRE to WEL - mainstem, RIS to RRE 
+                                                        65 
+          mainstem, RRE to WEL - mainstem, upstream of WEL 
+                                                       157 
+            mainstem, upstream of LGR - Asotin Creek Mouth 
+                                                       238 
+         mainstem, upstream of LGR - Asotin Creek Upstream 
+                                                        52 
+              mainstem, upstream of LGR - Clearwater River 
+                                                      1577 
+            mainstem, upstream of LGR - Grande Ronde River 
+                                                       429 
+            mainstem, upstream of LGR - Imnaha River Mouth 
+                                                      1546 
+          mainstem, upstream of LGR - mainstem, ICH to LGR 
+                                                      1286 
+                  mainstem, upstream of LGR - Salmon River 
+                                                      2332 
+          mainstem, upstream of WEL - mainstem, RRE to WEL 
+                                                        50 
+            mainstem, upstream of WEL - Methow River Mouth 
+                                                        19 
+         mainstem, upstream of WEL - Methow River Upstream 
+                                                         1 
+          mainstem, upstream of WEL - Okanogan River Mouth 
+                                                        12 
+       mainstem, upstream of WEL - Okanogan River Upstream 
+                                                         2 
+mainstem, upstream of WEL - Upstream WEL other tributaries 
+                                                         1 
+            Methow River Mouth - mainstem, upstream of WEL 
+                                                         5 
+          Okanogan River Mouth - mainstem, upstream of WEL 
+                                                         2 
+                  Salmon River - mainstem, upstream of LGR 
+                                                         3 
+               Tucannon River Mouth - mainstem, ICH to LGR 
+                                                        40 
+               Umatilla River Mouth - mainstem, BON to MCN 
+                                                         5 
+     Walla Walla River Mouth - mainstem, MCN to ICH or PRA 
+                                                        10 
+              Wenatchee River Mouth - mainstem, RIS to RRE 
+                                                         1 
+          Yakima River Mouth - mainstem, MCN to ICH or PRA 
+                                                         5 
+
+ 1 - 2 10 - 2 12 - 2 14 - 2 18 - 2  2 - 1 2 - 10 2 - 11 2 - 12 2 - 14 2 - 16 
+   984   1061     34     14      5    746   1265     56    118     19      4 
+2 - 18 2 - 19  2 - 3 2 - 41 20 - 3 22 - 3 24 - 5 28 - 7  3 - 2 3 - 20 3 - 22 
+    33      2  27486     41      5     10      1      2   1239     14     42 
+ 3 - 4  3 - 8 30 - 7 32 - 8 34 - 9 36 - 9 37 - 9 39 - 9  4 - 3  4 - 5 41 - 2 
+   469  25945      5     40      6      5      3      2    282    285     10 
+5 - 24  5 - 4  5 - 6 6 - 26 6 - 43  6 - 5  6 - 7 7 - 28 7 - 29 7 - 30 7 - 31 
+     2    132    200      3      5     65    157     12      2     19      1 
+7 - 42  7 - 6  8 - 3 8 - 32  8 - 9 9 - 34 9 - 35 9 - 36 9 - 37 9 - 38 9 - 39 
+     1     50    618    937  24265    238     52   1577   2332    429   1546 
+ 9 - 8 
+  1286 
+[1] "John Day River Upstream"    "Hood River Upstream"       
+[3] "Fifteenmile Creek Upstream" "Yakima River Upstream"     
+[5] "Walla Walla River Upstream" "Wenatchee River Upstream"  
+[7] "Entiat River Upstream"      "Tucannon River Upstream"   
+[9] "Imnaha River Upstream"     
+character(0)
