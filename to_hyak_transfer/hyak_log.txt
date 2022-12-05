@@ -2230,6 +2230,84 @@ Upload and try:
 # Upload:
 scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_20iter/
 
+# Middle Columbia - upload the three iter versions
+
+# 100 iter:
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/middle_columbia100iter/
+
+# 200 iter:
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/middle_columbia200iter/
+
+# 500 iter:
+scp -r ./middle_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/middle_columbia500iter/
+
+# Updated the slurm scripts
+
+# submitted jobs!
+
+### 12-03-2022 ###
+
+Alright, so vectorized (summing lp of fish) snake run:
+Chain 1 finished in 9513.2 seconds.
+This is about a 25% increase in performance from the model where this part of the loop is not vectorized (which took 11853 seconds).
+
+# Pull and rename as snake_vectorized_1_20iter/:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_20iter/snake/ ./
+
+Let's try vectorizing a second part of the loop (summing lp of individual observations of a fish), and then submitting that
+# Upload:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized2_20iter/
+
+Performance of different ESU models:
+Middle Columbia 100 iter: Chain 1 finished in 31098.0 seconds.
+Upper Columbia 100 iter: Chain 1 finished in 37228.0 seconds.
+Snake 100 iter: Chain 1 finished in 91096.9 seconds.
+
+Snake takes by far the longest.
+
+### 12-04-2022 ###
+
+# Pull second vectorized snake run, rename as snake_vectorized_2
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized2_20iter/ ./
+
+Oops, didn't work due to an indexing issue. Fixed the typo. Re run!
+
+# Created a results folder locally to store the outputs from the various runs:
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/deteff_ESU_models/results/
+
+# Make subfolders for run lengths - 200 iter
+
+# Import runs into them to inspect - 200iter runs are available now for all ESUs - 500iter only available for Upper Columbia
+
+# From within results/200iter/ folder:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake200iter/snake/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/upper_columbia200iter/upper_columbia/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/middle_columbia200iter/middle_columbia/ ./
+
+# Note that currently I have also only run a single chain for each of these. So ideally I would submit 
+three chains (separately) for each ESU
+
+# Inspecting 200iter runs in shiny_stan:
+All three look to give reasonable results, but some things don't look great with the chains, for example
+seeing a lot of autocorrelation in some (but not all) parameters
+
+Upon inspecting results, they all appear to make sense. Which is great news
+
+# Inspect vectorized2 run
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized2_20iter/ ./
+Chain 1 finished in 9939.3 seconds.
+Making this change appears to have actually increased the run time. That makes sense, given that we are 
+creating a new vector for every single fish, so it's not surprising that the cost of that line outweighed
+the benefits of vectorization. Removed this again.
+
+Let's see if we can run three chains on three nodes on mox.
+set this in R script: options(mc.cores=3)
+set parallel.chains to 3 in mod$sample()
+updated stf job script to request three nodes (--nodes = 3)
+Run 200 iter of snake vectorized_1:
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_200iter/
+
+
 
 
 
