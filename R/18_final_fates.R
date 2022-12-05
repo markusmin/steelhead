@@ -438,7 +438,7 @@ final_fates_simulation <- function(nsim, transition_matrix, start_state = 2){
   
   
   # start all individuals above Bonneville (release site in multistate model)
-  state_matrix[2,start_state] <- nsim
+  state_matrix[start_state,2] <- nsim
   
   # create a final fate matrix
   final_fate_matrix <- matrix(rep(0, 29), nrow = 1, ncol = 29)
