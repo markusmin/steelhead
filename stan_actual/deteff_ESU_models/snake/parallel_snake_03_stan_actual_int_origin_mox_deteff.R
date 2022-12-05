@@ -1679,6 +1679,8 @@ n.ind <- dim(state_data)[3]
   print("model compiled at")
   print(Sys.time())
   
+  options(mc.cores=3)
+  
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
@@ -1686,20 +1688,20 @@ n.ind <- dim(state_data)[3]
     # seed = 456,
     # chains = 3, 
     chains = 1,
-    parallel_chains = 1,
-    # parallel_chains = 3,
+    # parallel_chains = 1,
+    parallel_chains = 3,
     refresh = 10, # print update every 10 iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 20,
-    iter_sampling = 20,
+    iter_warmup = 200,
+    iter_sampling = 200,
     # adapt_delta = 0.95,
     init = 0,
     threads_per_chain = 28
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
-fit$save_object(file = "20iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented
