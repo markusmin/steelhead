@@ -1615,6 +1615,8 @@ det_eff_glm(variables = "discharge and gage height",
 ## Umatilla River
 [TMF PTAGIS](https://www.ptagis.org/Sites/InterrogationSites?code=TMF)
 
+**PLEASE NOTE: THIS IS NOT REFLECTED IN THE BELOW ANALYSIS, BUT A RECENT EMAIL FROM ODFW INDICATED A CHANGE IN DETECTION EFFICIENCY AT THREE MILE FALLS DAM IN 2014, WHEN A NEW ANTENNA WAS ADDED AT THE LADDER ENTRANCE**
+
 - TMF combined at RKM 5, active Nov 2006
 - TMA adult fishway was separate until Nov 2006
 ```{r umatilla_river, echo = FALSE}
