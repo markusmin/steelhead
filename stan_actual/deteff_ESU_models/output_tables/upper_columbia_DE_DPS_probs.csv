@@ -1,0 +1,32 @@
+"","from","to","mean","q5","q95"
+"1","mainstem, mouth to BON","mainstem, BON to MCN",0.9773761,0.9621244,0.99038995
+"2","mainstem, mouth to BON","loss",0.0226238902,0.009610146,0.037875865
+"3","mainstem, BON to MCN","mainstem, mouth to BON",0.0111343941,0.0098253025,0.01243492
+"4","mainstem, BON to MCN","mainstem, MCN to ICH or PRA",0.702168825,0.69234015,0.71386465
+"5","mainstem, BON to MCN","Deschutes River Mouth",0.081617093,0.069965525,0.092452675
+"6","mainstem, BON to MCN","John Day River Mouth",6.83213510803757e-05,3.014634e-13,0.00045853915
+"7","mainstem, BON to MCN","Hood River Mouth",0.0004383149912,4.733759e-05,0.0010000247
+"8","mainstem, BON to MCN","Fifteenmile Creek Mouth",2.71968974248069e-05,2.5753205e-11,0.0001779733
+"9","mainstem, BON to MCN","Umatilla River Mouth",1.47265257922891e-05,3.1486044e-12,8.45081999999999e-05
+"10","mainstem, BON to MCN","BON to MCN other tributaries",1.20256676378252e-05,6.8285665e-12,5.6711715e-05
+"11","mainstem, BON to MCN","loss",0.204519155,0.1979938,0.2102373
+"12","mainstem, PRA to RIS","mainstem, MCN to ICH or PRA",0.01439848155,0.011107385,0.017577895
+"13","mainstem, PRA to RIS","mainstem, RIS to RRE",0.9512991,0.94566605,0.9568798
+"14","mainstem, PRA to RIS","loss",0.0343024435,0.0297193,0.039147445
+"15","mainstem, RIS to RRE","mainstem, PRA to RIS",0.01083132155,0.008759176,0.01303137
+"16","mainstem, RIS to RRE","mainstem, RRE to WEL",0.48727857,0.466396,0.50682885
+"17","mainstem, RIS to RRE","Wenatchee River Mouth",0.39618371,0.3764668,0.4206323
+"18","mainstem, RIS to RRE","loss",0.105706394,0.09702025,0.11597885
+"19","mainstem, RRE to WEL","mainstem, RIS to RRE",0.225793855,0.213006,0.23728355
+"20","mainstem, RRE to WEL","mainstem, upstream of WEL",0.56179289,0.5442668,0.576458
+"21","mainstem, RRE to WEL","Entiat River Mouth",0.0337006555,0.02818166,0.039995445
+"22","mainstem, RRE to WEL","loss",0.17871265,0.16789715,0.18940335
+"23","mainstem, upstream of WEL","mainstem, RRE to WEL",0.196601295,0.18137395,0.211274
+"24","mainstem, upstream of WEL","Okanogan River Mouth",0.000634999939618277,3.3004305e-13,0.004517899
+"25","mainstem, upstream of WEL","Methow River Mouth",0.1795192,0.1572214,0.19994445
+"26","mainstem, upstream of WEL","Upstream WEL other tributaries",0.00299472717,0.001270041,0.0052679875
+"27","mainstem, upstream of WEL","loss",0.620249835,0.59477255,0.64506365
+"28","BON to MCN other tributaries","mainstem, BON to MCN",0.511069637313163,9.2037705e-07,1
+"29","BON to MCN other tributaries","loss",0.488930372312276,4.2976485e-07,0.999999
+"30","Upstream WEL other tributaries","mainstem, upstream of WEL",0.00963165286850146,3.250597e-14,0.0483201499999997
+"31","Upstream WEL other tributaries","loss",0.99036836,0.95167985,1
