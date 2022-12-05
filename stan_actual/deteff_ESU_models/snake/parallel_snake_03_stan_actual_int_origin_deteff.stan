@@ -101,6 +101,7 @@ functions{
     // Let's initialize this instead as a real value starting at zero
     real lp_fish = 0;
     // j is the index of the observation (i.e., each individual state transition)
+    
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
           // print("i = ",i);
@@ -306,10 +307,7 @@ functions{
         // inspect the data vs. the vector of probabilities
         // print("data: ", slice_y[i - start + 1,j+1]);
         
-        // 2022-11-29 edits for performance:
-        // We are going to try to vectorize this and sum it outside of the loop, rather than repeatedly updating a variable.
         lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
-        // lp_fish += categorical_lpmf(slice_y[i,j+1] | p_vec);
       
     }
     
