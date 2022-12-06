@@ -2307,7 +2307,8 @@ updated stf job script to request three nodes (--nodes = 3)
 Run 200 iter of snake vectorized_1:
 scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_200iter/
 
-
+Run 20 iter of snake vectorized_1, on ckpt, with 3 chains - to see if it even works
+scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_200iter/
 
 
 
