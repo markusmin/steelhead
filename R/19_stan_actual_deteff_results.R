@@ -158,18 +158,24 @@ snake_DE_derived_probabilities %>%
 # subset the probabilities shared across the DPS
 snake_DE_prob_table %>% 
   subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River Mouth",             
+                     "John Day River Mouth",  "Hood River Mouth",  "Fifteenmile Creek Mouth",  "Umatilla River Mouth", "Yakima River Mouth",
+                     "Walla Walla River Mouth", "Wenatchee River Mouth", "Entiat River Mouth",     "Okanogan River Mouth",    "Methow River Mouth",
+                     "Deschutes River Upstream",             
+                     "John Day River Upstream",  "Hood River Upstream",  "Fifteenmile Creek Upstream",  "Umatilla River Upstream", "Yakima River Upstream",
+                     "Walla Walla River Upstream", "Wenatchee River Upstream", "Entiat River Upstream",     "Okanogan River Upstream",    "Methow River Upstream",
                      "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> snake_DE_DPS_probs
 
 snake_DE_prob_table %>% 
   subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River Mouth",             
+                       "John Day River Mouth",  "Hood River Mouth",  "Fifteenmile Creek Mouth",  "Umatilla River Mouth", "Yakima River Mouth",
+                       "Walla Walla River Mouth", "Wenatchee River Mouth", "Entiat River Mouth",     "Okanogan River Mouth",    "Methow River Mouth",
+                       "Deschutes River Upstream",             
+                       "John Day River Upstream",  "Hood River Upstream",  "Fifteenmile Creek Upstream",  "Umatilla River Upstream", "Yakima River Upstream",
+                       "Walla Walla River Upstream", "Wenatchee River Upstream", "Entiat River Upstream",     "Okanogan River Upstream",    "Methow River Upstream",
                        "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> snake_DE_origin_probs
 
 # export both tables
@@ -190,18 +196,24 @@ snake_NDE_derived_probabilities %>%
 # subset the probabilities shared across the DPS
 snake_NDE_prob_table %>% 
   subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River Mouth",             
+                     "John Day River Mouth",  "Hood River Mouth",  "Fifteenmile Creek Mouth",  "Umatilla River Mouth", "Yakima River Mouth",
+                     "Walla Walla River Mouth", "Wenatchee River Mouth", "Entiat River Mouth",     "Okanogan River Mouth",    "Methow River Mouth",
+                     "Deschutes River Upstream",             
+                     "John Day River Upstream",  "Hood River Upstream",  "Fifteenmile Creek Upstream",  "Umatilla River Upstream", "Yakima River Upstream",
+                     "Walla Walla River Upstream", "Wenatchee River Upstream", "Entiat River Upstream",     "Okanogan River Upstream",    "Methow River Upstream",
                      "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> snake_NDE_DPS_probs
 
 snake_NDE_prob_table %>% 
   subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
+                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River Mouth",             
+                       "John Day River Mouth",  "Hood River Mouth",  "Fifteenmile Creek Mouth",  "Umatilla River Mouth", "Yakima River Mouth",
+                       "Walla Walla River Mouth", "Wenatchee River Mouth", "Entiat River Mouth",     "Okanogan River Mouth",    "Methow River Mouth",
+                       "Deschutes River Upstream",             
+                       "John Day River Upstream",  "Hood River Upstream",  "Fifteenmile Creek Upstream",  "Umatilla River Upstream", "Yakima River Upstream",
+                       "Walla Walla River Upstream", "Wenatchee River Upstream", "Entiat River Upstream",     "Okanogan River Upstream",    "Methow River Upstream",
                        "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> snake_NDE_origin_probs
 
 # export both tables
@@ -221,20 +233,22 @@ middle_columbia_DE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 middle_columbia_DE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                     "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
+  subset(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                     "mainstem, upstream of LGR", "Wenatchee River Mouth",  "Entiat River Mouth",
+                     "Okanogan River Mouth", "Methow River Mouth",  "Tucannon River Mouth",  "Asotin Creek Mouth",
+                     "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River Mouth",
+                     "Wenatchee River Upstream",  "Entiat River Upstream","Okanogan River Upstream", "Methow River Upstream",  
+                     "Tucannon River Upstream",  "Asotin Creek Upstream", "Imnaha River Upstream")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> middle_columbia_DE_DPS_probs
 
 middle_columbia_DE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                       "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> middle_columbia_DE_origin_probs
+  subset(!(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                       "mainstem, upstream of LGR", "Wenatchee River Mouth",  "Entiat River Mouth",
+                       "Okanogan River Mouth", "Methow River Mouth",  "Tucannon River Mouth",  "Asotin Creek Mouth",
+                       "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River Mouth",
+                       "Wenatchee River Upstream",  "Entiat River Upstream","Okanogan River Upstream", "Methow River Upstream",  
+                       "Tucannon River Upstream",  "Asotin Creek Upstream", "Imnaha River Upstream"))) -> middle_columbia_DE_origin_probs
 
 # export both tables
 write.csv(middle_columbia_DE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"))
@@ -253,20 +267,22 @@ middle_columbia_NDE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 middle_columbia_NDE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                     "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
+  subset(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                     "mainstem, upstream of LGR", "Wenatchee River Mouth",  "Entiat River Mouth",
+                     "Okanogan River Mouth", "Methow River Mouth",  "Tucannon River Mouth",  "Asotin Creek Mouth",
+                     "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River Mouth",
+                     "Wenatchee River Upstream",  "Entiat River Upstream","Okanogan River Upstream", "Methow River Upstream",  
+                     "Tucannon River Upstream",  "Asotin Creek Upstream", "Imnaha River Upstream")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> middle_columbia_NDE_DPS_probs
 
 middle_columbia_NDE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                       "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> middle_columbia_NDE_origin_probs
+  subset(!(from %in% c("mainstem, RIS to RRE", "mainstem, RRE to WEL", "mainstem, upstream of WEL",
+                       "mainstem, upstream of LGR", "Wenatchee River Mouth",  "Entiat River Mouth",
+                       "Okanogan River Mouth", "Methow River Mouth",  "Tucannon River Mouth",  "Asotin Creek Mouth",
+                       "Clearwater River", "Salmon River", "Grande Ronde River", "Imnaha River Mouth",
+                       "Wenatchee River Upstream",  "Entiat River Upstream","Okanogan River Upstream", "Methow River Upstream",  
+                       "Tucannon River Upstream",  "Asotin Creek Upstream", "Imnaha River Upstream"))) -> middle_columbia_NDE_origin_probs
 
 # export both tables
 write.csv(middle_columbia_NDE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_NDE_DPS_probs.csv"))
@@ -285,20 +301,22 @@ upper_columbia_DE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 upper_columbia_DE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                     "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
+  subset(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
+                     "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+                     "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
+                     "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
+                     "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
+                     "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> upper_columbia_DE_DPS_probs
 
 upper_columbia_DE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                       "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> upper_columbia_DE_origin_probs
+  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
+                       "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+                       "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
+                       "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
+                       "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
+                       "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> upper_columbia_DE_origin_probs
 
 # export both tables
 write.csv(upper_columbia_DE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_DPS_probs.csv"))
@@ -317,20 +335,22 @@ upper_columbia_NDE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 upper_columbia_NDE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                     "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                     "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                     "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                     "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
+  subset(c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
+           "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+           "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
+           "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
+           "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
+           "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> upper_columbia_NDE_DPS_probs
 
 upper_columbia_NDE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON", "mainstem, BON to MCN", "mainstem, PRA to RIS",  "mainstem, RIS to RRE",
-                       "mainstem, RRE to WEL", "mainstem, upstream of WEL",  "Deschutes River",             
-                       "John Day River",  "Hood River",  "Fifteenmile Creek",  "Umatilla River", "Yakima River",
-                       "Walla Walla River", "Wenatchee River", "Entiat River",     "Okanogan River",    "Methow River",                
-                       "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> upper_columbia_NDE_origin_probs
+  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
+                       "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+                       "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
+                       "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
+                       "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
+                       "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries"))) -> upper_columbia_NDE_origin_probs
 
 # export both tables
 write.csv(upper_columbia_NDE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_NDE_DPS_probs.csv"))
@@ -463,19 +483,12 @@ imnaha_DE_transition_matrix[29,29] <- 1
 
 # Get final fates of fish for each origin, starting at BON
 
-tucannon_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = tucannon_DE_transition_matrix)[2]
-asotin_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = asotin_DE_transition_matrix)[2]
-clearwater_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = clearwater_DE_transition_matrix)[2]
-salmon_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = salmon_DE_transition_matrix)[2]
-grande_ronde_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = grande_ronde_DE_transition_matrix)[2]
-imnaha_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = imnaha_DE_transition_matrix)[2]
-
-# Get final fates of fish - conditional on overshoot
-
-# For Snake River fish, we can only really look at this for Tucannon River fish
-tucannon_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = tucannon_DE_transition_matrix, start_state = 9)[2]
-# How do we compare to non-overshoot fish? Start them at ICH to LGR? But then subtract out any overshoot movements manually?
-tucannon_non_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = tucannon_DE_transition_matrix, start_state = 8)[2]
+tucannon_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = tucannon_DE_transition_matrix)[2][[1]]
+asotin_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = asotin_DE_transition_matrix)[2][[1]]
+clearwater_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = clearwater_DE_transition_matrix)[2][[1]]
+salmon_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = salmon_DE_transition_matrix)[2][[1]]
+grande_ronde_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = grande_ronde_DE_transition_matrix)[2][[1]]
+imnaha_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = imnaha_DE_transition_matrix)[2][[1]]
 
 ##### MIDDLE COLUMBIA - Calculate final fates for different origins ####
 
@@ -513,19 +526,12 @@ walla_walla_DE_transition_matrix[29,29] <- 1
 
 # Get final fates of fish for each origin, starting at BON
 
-deschutes_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = deschutes_DE_transition_matrix)[2]
-fifteenmile_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = fifteenmile_DE_transition_matrix)[2]
-john_day_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = john_day_DE_transition_matrix)[2]
-umatilla_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = umatilla_DE_transition_matrix)[2]
-yakima_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = yakima_DE_transition_matrix)[2]
-walla_walla_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = walla_walla_DE_transition_matrix)[2]
-
-# Get final fates of fish - conditional on overshoot
-
-# For Snake River fish, we can only really look at this for Tucannon River fish
-deschutes_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = deschutes_DE_transition_matrix, start_state = 9)[2]
-# How do we compare to non-overshoot fish? Start them at ICH to LGR? But then subtract out any overshoot movements manually?
-deschutes_non_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = deschutes_DE_transition_matrix, start_state = 8)[2]
+deschutes_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = deschutes_DE_transition_matrix)[2][[1]]
+fifteenmile_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = fifteenmile_DE_transition_matrix)[2][[1]]
+john_day_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = john_day_DE_transition_matrix)[2][[1]]
+umatilla_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = umatilla_DE_transition_matrix)[2][[1]]
+yakima_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = yakima_DE_transition_matrix)[2][[1]]
+walla_walla_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = walla_walla_DE_transition_matrix)[2][[1]]
 
 ##### UPPER COLUMBIA - Calculate final fates for different origins ####
 
@@ -555,17 +561,105 @@ methow_DE_transition_matrix[29,29] <- 1
 
 # Get final fates of fish for each origin, starting at BON
 
-wenatchee_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = wenatchee_DE_transition_matrix)[2]
-entiat_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = entiat_DE_transition_matrix)[2]
-okanogan_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = okanogan_DE_transition_matrix)[2]
-methow_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = methow_DE_transition_matrix)[2]
+wenatchee_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = wenatchee_DE_transition_matrix)[2][[1]]
+entiat_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = entiat_DE_transition_matrix)[2][[1]]
+okanogan_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = okanogan_DE_transition_matrix)[2][[1]]
+methow_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = methow_DE_transition_matrix)[2][[1]]
 
-# Get final fates of fish - conditional on overshoot
 
-# For Snake River fish, we can only really look at this for Tucannon River fish
-wenatchee_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = wenatchee_DE_transition_matrix, start_state = 9)[2]
-# How do we compare to non-overshoot fish? Start them at ICH to LGR? But then subtract out any overshoot movements manually?
-wenatchee_non_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = wenatchee_DE_transition_matrix, start_state = 8)[2]
+##### FINAL FATES/DISTRIBUTION - where do fish end up? Export for report #####
+final_fates_reformat <- function(final_fates, trib_name){
+  final_fates %>% 
+    rownames_to_column("state") %>% 
+    mutate(percent = round(prop*100,2)) %>% 
+    dplyr::select(state,percent) %>% 
+    dplyr::rename(!!quo_name(trib_name) := percent) -> final_fates_table
+  
+  return(final_fates_table)
+}
+
+
+# Middle Columbia
+final_fates_reformat(final_fates = deschutes_final_fates, trib_name = "Deschutes River") -> deschutes_final_distribution
+final_fates_reformat(final_fates = fifteenmile_final_fates, trib_name = "Fifteenmile Creek") -> fifteenmile_final_distribution
+final_fates_reformat(final_fates = john_day_final_fates, trib_name = "John Day River") -> john_day_final_distribution
+final_fates_reformat(final_fates = umatilla_final_fates, trib_name = "Umatila River") -> umatilla_final_distribution
+final_fates_reformat(final_fates = yakima_final_fates, trib_name = "Yakima River") -> yakima_final_distribution
+final_fates_reformat(final_fates = walla_walla_final_fates, trib_name = "Walla Walla River") -> walla_walla_final_distribution
+
+# Upper Columbia
+final_fates_reformat(final_fates = wenatchee_final_fates, trib_name = "Wenatchee River") -> wenatchee_final_distribution
+final_fates_reformat(final_fates = entiat_final_fates, trib_name = "Entiat River") -> entiat_final_distribution
+final_fates_reformat(final_fates = okanogan_final_fates, trib_name = "Okanogan River") -> okanogan_final_distribution
+final_fates_reformat(final_fates = methow_final_fates, trib_name = "Methow River") -> methow_final_distribution
+
+# Snake River
+final_fates_reformat(final_fates = tucannon_final_fates, trib_name = "Tucannon River") -> tucannon_final_distribution
+final_fates_reformat(final_fates = asotin_final_fates, trib_name = "Asotin Creek") -> asotin_final_distribution
+final_fates_reformat(final_fates = clearwater_final_fates, trib_name = "Clearwater River") -> clearwater_final_distribution
+final_fates_reformat(final_fates = salmon_final_fates, trib_name = "Salmon River") -> salmon_final_distribution
+final_fates_reformat(final_fates = grande_ronde_final_fates, trib_name = "Grande Ronde River") -> grande_ronde_final_distribution
+final_fates_reformat(final_fates = imnaha_final_fates, trib_name = "Imnaha River") -> imnaha_final_distribution
+
+# Join these all together for export
+deschutes_final_distribution %>% 
+  left_join(., fifteenmile_final_distribution, by = "state") %>% 
+  left_join(., john_day_final_distribution, by = "state") %>% 
+  left_join(., umatilla_final_distribution, by = "state") %>% 
+  left_join(., yakima_final_distribution, by = "state") %>% 
+  left_join(., walla_walla_final_distribution, by = "state") %>% 
+  left_join(., wenatchee_final_distribution, by = "state") %>% 
+  left_join(., entiat_final_distribution, by = "state") %>% 
+  left_join(., okanogan_final_distribution, by = "state") %>% 
+  left_join(., methow_final_distribution, by = "state") %>% 
+  left_join(., tucannon_final_distribution, by = "state") %>% 
+  left_join(., asotin_final_distribution, by = "state") %>% 
+  left_join(., clearwater_final_distribution, by = "state") %>% 
+  left_join(., salmon_final_distribution, by = "state") %>% 
+  left_join(., grande_ronde_final_distribution, by = "state") %>% 
+  left_join(., imnaha_final_distribution, by = "state") %>% 
+  mutate(state = gsub(" Mouth", "", state)) -> all_origins_final_distribution
+
+write.csv(all_origins_final_distribution, here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_distribution.csv"))
+
+
+
+##### Get final fates of fish - conditional on overshoot #####
+
+# Populations that we can measure overshoot for: 
+# 1) AT MCN: Deschutes River, John Day River, Hood River, Fifteenmile Creek, Umatilla River
+# 2) At PRA or ICH: Yakima River and Walla Walla River
+# 3) At RRE: Wenatchee River
+# 4) At WEL: Entiat River
+# 5) At LGR: Tucannon River
+
+# Populations that we can't measure overshoot for:
+# Okanogan River, Methow River, Asotin Creek, Clearwater River, Salmon River, Grande Ronde River
+
+
+### MIDDLE COLUMBIA ###
+deschutes_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = deschutes_DE_transition_matrix, start_state = 3)[2][[1]]
+john_day_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = john_day_DE_transition_matrix, start_state = 3)[2][[1]]
+fifteenmile_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = fifteenmile_DE_transition_matrix, start_state = 3)[2][[1]]
+umatilla_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = umatilla_DE_transition_matrix, start_state = 3)[2][[1]]
+
+# Yakima and Walla Walla: Separately based on if they overshoot at PRA or ICH
+yakima_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = yakima_DE_transition_matrix, start_state = 4)[2][[1]]
+yakima_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = yakima_DE_transition_matrix, start_state = 8)[2][[1]]
+walla_walla_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = walla_walla_DE_transition_matrix, start_state = 4)[2][[1]]
+walla_walla_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = walla_walla_DE_transition_matrix, start_state = 8)[2][[1]]
+
+
+### UPPER COLUMBIA ###
+wenatchee_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = wenatchee_DE_transition_matrix, start_state = 6)[2][[1]]
+entiat_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = entiat_DE_transition_matrix, start_state = 7)[2][[1]]
+
+### SNAKE RIVER ###
+# Only Tucannon River
+tucannon_overshoot_final_fates <- final_fates_simulation(nsim = 1000000, transition_matrix = tucannon_DE_transition_matrix, start_state = 9)[2][[1]]
+
+
+
 
 ##### Plot detection efficiency #####
 
@@ -588,14 +682,23 @@ predict_DE <- function(alpha_term, beta_term, params_df){
   
   seq(-2,2, 0.01) -> zscore_discharge_values
   
-  predicted_DE <- data.frame(discharge = zscore_discharge_values, 
-                                 mean_DE = plogis(subset(params_df, variable == alpha_term)$mean + 
-                                                    subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
-                                 upper_DE = plogis(subset(params_df, variable == alpha_term)$q95 + 
-                                                     subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
-                                 lower_DE = plogis(subset(params_df, variable == alpha_term)$q5 + 
-                                                     subset(params_df, variable == beta_term)$mean * zscore_discharge_values))
+  # predicted_DE <- data.frame(discharge = zscore_discharge_values, 
+  #                                mean_DE = plogis(subset(params_df, variable == alpha_term)$mean + 
+  #                                                   subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
+  #                                upper_DE = plogis(subset(params_df, variable == alpha_term)$q95 + 
+  #                                                    subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
+  #                                lower_DE = plogis(subset(params_df, variable == alpha_term)$q5 + 
+  #                                                    subset(params_df, variable == beta_term)$mean * zscore_discharge_values))
   
+  predicted_DE <- data.frame(discharge = zscore_discharge_values, 
+                             mean_DE = plogis(subset(params_df, variable == alpha_term)$mean + 
+                                                subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
+                             upper_DE = plogis(subset(params_df, variable == alpha_term)$q95 + 
+                                                 subset(params_df, variable == beta_term)$q95 * zscore_discharge_values),
+                             lower_DE = plogis(subset(params_df, variable == alpha_term)$q5 + 
+                                                 subset(params_df, variable == beta_term)$q5 * zscore_discharge_values))
+  
+
   predicted_DE %>% 
     pivot_longer(., cols = c("mean_DE", "upper_DE", "lower_DE")) -> predicted_DE_long
   
@@ -619,8 +722,6 @@ DE_plot_function <- function(df, trib_name){
   
   return(plot)
 }
-
-
 
 
 # Step 4: Plot them
@@ -745,7 +846,7 @@ ggarrange(umatilla_DE_plot1,
           fifteenmile_DE_plot1,
                        imnaha_DE_plot1, ncol = 5, nrow = 4) -> DE_plots
 
-ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "DE_plots.pdf"), DE_plots, height = 15, width = 20)
+ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "DE_plots_v3.pdf"), DE_plots, height = 15, width = 20)
 
 
 
