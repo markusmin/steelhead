@@ -104,128 +104,11 @@ A total of 662 different movement probabilities, based on the combination of sta
 ## Middle Columbia River Steelhead
 Of the natal tributaries downstream of McNary Dam, John Day River and Umatilla River Steelhead each had a high mean probability of overshooting McNary Dam (46.4% and 33.8%, respectively; Table 2), while Deschutes River and Fifteenmile Creek Steelhead had a low mean probability (0.7% and 9%, respectively; Table 2). Conditional on overshooting McNary Dam, John Day River and Umatilla River Steelhead had an approximately 20% chance of additionally overshooting Ice Harbor Dam on the Snake River, but only a very low probability of overshooting Priest Rapids Dam on the Columbia River (Table 2). For Yakima River and Walla Walla River Steelhead, whose natal tributaries are upstream of McNary Dam, Yakima River Steelhead were more likely to overshoot Priest Rapids Dam (13.8% mean probability) than Ice Harbor Dam (3.5% mean probabiltiy) whereas Wallla Walla River Steelhead were much more likely to overshoot Ice Harbor Dam (57.4% mean probability) than Priest Rapids Dam (2% mean probability) (Table 2).
 
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
-library(flextable)
-
-# Middle Columbia
-middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_DPS_probs.csv"), row.names = 1)
-middle_columbia_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> middle_columbia_DPS_probs
-
-middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_origin_probs.csv"), row.names = 1)
-middle_columbia_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
-  mutate(origin = gsub("_", " ", origin)) -> middle_columbia_origin_probs
-
-kable(middle_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-      caption = "Movement probabilities for Middle Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
-kable(middle_columbia_origin_probs, longtable = TRUE, booktabs = T, linesep = c("", "", "", "", "", '\\addlinespace'),
-      caption = "Movement probabilities for Middle Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
-```
-
 ## Upper Columbia River Steelhead
 Wenatchee River Steelhead, whose natal tributary is between Rock Island Dam and Rocky Reach Dam, had a 58.3% (90% CI 57%-59.6%) probability of overshooting Rocky Reach Dam. Entiat River Steelhead, whose natal tribuatry is between Rocky Reach Dam and Wells Dam, had a 36.3% (90% CI 33%-39.5%) probability of overshooting Wells Dam. Because no dam with PIT tag detectors in the adult fishways exists above Wells Dam, overshoot probabilities on the Columbia River could not be calculated for Okanogan River or Methow River Steelhead. Overshoot probabilities at Ice Harbor Dam for all four Upper Columbia River origins were exceedingly low (0-0.1%).
 
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
-# Upper Columbia
-
-upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_DPS_probs.csv"), row.names = 1)
-upper_columbia_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> upper_columbia_DPS_probs
-
-upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_origin_probs.csv"), row.names = 1)
-upper_columbia_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
-  mutate(origin = gsub("_", " ", origin)) -> upper_columbia_origin_probs
-
-# kable(upper_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-# kable(upper_columbia_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
-#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-
-# testing:
-flextable(upper_columbia_DPS_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
-
-# 
-# regulartable(upper_columbia_origin_probs)
-```
-
-<br>
-<br>
-<br>
-
-```{r upper_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-flextable(upper_columbia_origin_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
-```
-
 ## Snake River Basin Steelhead
 Tucannon River Steelhead are the only Snake River Steelhead population for which overshoot probabiltiies at the upstream dam could be calculated. Tucannon River Steelhead had a 57% (90% CI 55.8%-58.2%) probability of overshooting Lower Granite Dam. All six origins had probabilities of overshooting Priest Rapids Dam on the Columbia River between 1% and 3%.
-
-
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
-
-# Snake
-
-snake_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_DPS_probs.csv"), row.names = 1)
-snake_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> snake_DPS_probs
-
-snake_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_origin_probs.csv"), row.names = 1)
-snake_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
-  mutate(origin = gsub("_", " ", origin)) -> snake_origin_probs
-
-kable(snake_DPS_probs, longtable = TRUE, booktabs = T, escape = F, linesep = "",
-      caption = "Movement probabilities for Snake River Basin Steelhead, outside of the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
-
-
-kable(snake_origin_probs, longtable = TRUE, booktabs = T, escape = F, linesep = c("", "", "", "", "", '\\addlinespace'),
-      caption = "Movement probabilities for Snake River Basin Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
-```
-
-
 
 
 
@@ -264,15 +147,15 @@ library(here)
 library(kableExtra)
 library(tidyverse)
 library(flextable)
+# Upper Columbia
 
-# Middle Columbia
-middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_DPS_probs.csv"), row.names = 1)
+middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"), row.names = 1)
 middle_columbia_DPS_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
          q95 = round(q95, 3)) -> middle_columbia_DPS_probs
 
-middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "middle_columbia_origin_probs.csv"), row.names = 1)
+middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_origin_probs.csv"), row.names = 1)
 middle_columbia_origin_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
@@ -280,28 +163,51 @@ middle_columbia_origin_probs %>%
   relocate(origin) %>% 
   mutate(origin = gsub("_", " ", origin)) -> middle_columbia_origin_probs
 
-kable(middle_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-      caption = "Movement probabilities for Middle Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
-kable(middle_columbia_origin_probs, longtable = TRUE, booktabs = T, linesep = c("", "", "", "", "", '\\addlinespace'),
-      caption = "Movement probabilities for Middle Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
+# kable(middle_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
+#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
+# kable(middle_columbia_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
+#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
+
+# testing:
+flextable(middle_columbia_DPS_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
+
+# 
+# regulartable(middle_columbia_origin_probs)
+```
+
+<br>
+  <br>
+  <br>
+  
+```{r middle_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
+flextable(middle_columbia_origin_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
 ```
 
 ## Appendix 1b. Upper Columbia River Steelhead
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
 # Upper Columbia
 
-upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_DPS_probs.csv"), row.names = 1)
+upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_DPS_probs.csv"), row.names = 1)
 upper_columbia_DPS_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
          q95 = round(q95, 3)) -> upper_columbia_DPS_probs
 
-upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "upper_columbia_origin_probs.csv"), row.names = 1)
+upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_origin_probs.csv"), row.names = 1)
 upper_columbia_origin_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
@@ -345,19 +251,15 @@ flextable(upper_columbia_origin_probs) %>%
 
 ## Appendix 1c. Snake River Basin Steelhead
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
+# Snake River
 
-# Snake
-
-snake_DPS_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_DPS_probs.csv"), row.names = 1)
+snake_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_DPS_probs.csv"), row.names = 1)
 snake_DPS_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
          q95 = round(q95, 3)) -> snake_DPS_probs
 
-snake_origin_probs <- read.csv(here::here("stan_actual", "ESU_models", "output_tables", "snake_origin_probs.csv"), row.names = 1)
+snake_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_origin_probs.csv"), row.names = 1)
 snake_origin_probs %>% 
   mutate(mean = round(mean, 3),
          q5 = round(q5, 3),
@@ -365,14 +267,38 @@ snake_origin_probs %>%
   relocate(origin) %>% 
   mutate(origin = gsub("_", " ", origin)) -> snake_origin_probs
 
-kable(snake_DPS_probs, longtable = TRUE, booktabs = T, escape = F, linesep = "",
-      caption = "Movement probabilities for Snake River Basin Steelhead, outside of the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
+# kable(snake_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
+#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
+# kable(snake_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
+#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
+#   kable_styling(latex_options = c("repeat_header"))
 
+# testing:
+flextable(snake_DPS_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
 
-kable(snake_origin_probs, longtable = TRUE, booktabs = T, escape = F, linesep = c("", "", "", "", "", '\\addlinespace'),
-      caption = "Movement probabilities for Snake River Basin Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  kable_styling(latex_options = c("repeat_header"))
+# 
+# regulartable(snake_origin_probs)
+```
+
+<br>
+  <br>
+  <br>
+  
+```{r snake_table_2, echo = FALSE, message = FALSE, warning = FALSE}
+flextable(snake_origin_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
 ```
 
 
