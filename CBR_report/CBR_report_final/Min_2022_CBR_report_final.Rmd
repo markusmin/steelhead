@@ -101,6 +101,65 @@ All code is available at https://github.com/markusmin/steelhead.
 # Results
 A total of 662 different movement probabilities, based on the combination of state transition and origin/DPS, were estimated by the model (Tables 1-6). The model schematic in Fig. 1 is necessary to interpret the ecological significance of these movement probabilities, in terms of which movements constitute the probabilities of certain movements, such as overshoot, fallback, homing, or straying. Furthermore, each movement probability represents only the probability of an individual making that movement conditional on it already being in the "from" state. Due to poor detection probabilities in tributaries and in downstream passage routes, only overshoot probabilities (which have near 100% detection probability) are discussed in the Results; see [Current Limitations](#current-limitations) for a discussion of these issues and future directions to address them. Overshoot probabilities, or the probability of ascending the dam upstream of the natal tributary in the model schematic (Fig. 1), varied considerably by natal origin.
 
+## Final population distribution probability
+
+### Middle Columbia River Steelhead
+
+![Figure 1. Fifteenmile Creek Final Fate Probabilities.](.//figures/final_fates_plots/fifteenmile_fates_plot.pdf){width=100%}
+
+![Figure 2. Deschutes River Final Fate Probabilities.](.//figures/final_fates_plots/deschutes_fates_plot.pdf){width=100%}
+
+![Figure 3. John Day River Final Fate Probabilities.](.//figures/final_fates_plots/john_day_fates_plot.pdf){width=100%}
+
+![Figure 4. Umatilla River Final Fate Probabilities.](.//figures/final_fates_plots/umatilla_fates_plot.pdf){width=100%}
+
+![Figure 5. Walla Walla River Final Fate Probabilities.](.//figures/final_fates_plots/walla_walla_fates_plot.pdf){width=100%}
+
+![Figure 6. Yakima River Final Fate Probabilities.](.//figures/final_fates_plots/yakima_fates_plot.pdf){width=100%}
+
+### Upper Columbia River Steelhead
+
+![Figure 7. Wenatchee River Final Fate Probabilities.](.//figures/final_fates_plots/wenatchee_fates_plot.pdf){width=100%}
+
+![Figure 8. Entiat River Final Fate Probabilities.](.//figures/final_fates_plots/entiat_fates_plot.pdf){width=100%}
+
+![Figure 9. Methow River Final Fate Probabilities.](.//figures/final_fates_plots/methow_fates_plot.pdf){width=100%}
+
+![Figure 10. Okanogan River Final Fate Probabilities.](.//figures/final_fates_plots/okanogan_fates_plot.pdf){width=100%}
+
+### Middle Columbia River Steelhead
+
+![Figure 11. Tucannon River Final Fate Probabilities.](.//figures/final_fates_plots/tucannon_fates_plot.pdf){width=100%}
+
+![Figure 12. Clearwater River Final Fate Probabilities.](.//figures/final_fates_plots/clearwater_fates_plot.pdf){width=100%}
+
+![Figure 13. Asotin Creek Final Fate Probabilities.](.//figures/final_fates_plots/asotin_fates_plot.pdf){width=100%}
+
+![Figure 14. Grande Ronde River Final Fate Probabilities.](.//figures/final_fates_plots/grande_ronde_fates_plot.pdf){width=100%}
+
+![Figure 15. Salmon River Final Fate Probabilities.](.//figures/final_fates_plots/salmon_fates_plot.pdf){width=100%}
+
+![Figure 16. Imnaha River Final Fate Probabilities.](.//figures/final_fates_plots/imnaha_fates_plot.pdf){width=100%}
+
+## Homing probabilities, conditional on overshoot
+```{r homing_probs, echo = FALSE, warning = FALSE, message = FALSE}
+library(flextable)
+library(tidyverse)
+read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_homing_probabilities.csv"), row.names = 1) %>% 
+  dplyr::rename("Natal Origin" = natal_origin, "Non-overshoot" = non_overshoot, "Overshoot" = overshoot) -> overshooting_homing_probs
+
+flextable(overshooting_homing_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Probability of successfully homing, conditional on making it to the section of mainstem into which the home tributary flows, or conditional on overshooting the dam directly upstream of the home tributary.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  autofit()
+```
+
+
+
+
 ## Middle Columbia River Steelhead
 Of the natal tributaries downstream of McNary Dam, John Day River and Umatilla River Steelhead each had a high mean probability of overshooting McNary Dam (46.4% and 33.8%, respectively; Table 2), while Deschutes River and Fifteenmile Creek Steelhead had a low mean probability (0.7% and 9%, respectively; Table 2). Conditional on overshooting McNary Dam, John Day River and Umatilla River Steelhead had an approximately 20% chance of additionally overshooting Ice Harbor Dam on the Snake River, but only a very low probability of overshooting Priest Rapids Dam on the Columbia River (Table 2). For Yakima River and Walla Walla River Steelhead, whose natal tributaries are upstream of McNary Dam, Yakima River Steelhead were more likely to overshoot Priest Rapids Dam (13.8% mean probability) than Ice Harbor Dam (3.5% mean probabiltiy) whereas Wallla Walla River Steelhead were much more likely to overshoot Ice Harbor Dam (57.4% mean probability) than Priest Rapids Dam (2% mean probability) (Table 2).
 
@@ -150,16 +209,16 @@ library(flextable)
 # Upper Columbia
 
 middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"), row.names = 1)
-middle_columbia_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> middle_columbia_DPS_probs
+# middle_columbia_DPS_probs %>% 
+#   mutate(mean = round(mean, 3),
+#          q5 = round(q5, 3),
+#          q95 = round(q95, 3)) -> middle_columbia_DPS_probs
 
 middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_origin_probs.csv"), row.names = 1)
 middle_columbia_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
+  # mutate(mean = round(mean, 3),
+  #        q5 = round(q5, 3),
+  #        q95 = round(q95, 3)) %>% 
   relocate(origin) %>% 
   mutate(origin = gsub("_", " ", origin)) -> middle_columbia_origin_probs
 
@@ -202,17 +261,17 @@ flextable(middle_columbia_origin_probs) %>%
 # Upper Columbia
 
 upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_DPS_probs.csv"), row.names = 1)
-upper_columbia_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> upper_columbia_DPS_probs
+# upper_columbia_DPS_probs %>% 
+#   mutate(mean = round(mean, 3),
+#          q5 = round(q5, 3),
+#          q95 = round(q95, 3)) -> upper_columbia_DPS_probs
 
 upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_origin_probs.csv"), row.names = 1)
 upper_columbia_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
+  # mutate(mean = round(mean, 3),
+  #        q5 = round(q5, 3),
+  #        q95 = round(q95, 3)) %>% 
+  relocate(origin) %>%
   mutate(origin = gsub("_", " ", origin)) -> upper_columbia_origin_probs
 
 # kable(upper_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
@@ -254,16 +313,16 @@ flextable(upper_columbia_origin_probs) %>%
 # Snake River
 
 snake_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_DPS_probs.csv"), row.names = 1)
-snake_DPS_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) -> snake_DPS_probs
+# snake_DPS_probs %>% 
+#   mutate(mean = round(mean, 3),
+#          q5 = round(q5, 3),
+#          q95 = round(q95, 3)) -> snake_DPS_probs
 
 snake_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_origin_probs.csv"), row.names = 1)
 snake_origin_probs %>% 
-  mutate(mean = round(mean, 3),
-         q5 = round(q5, 3),
-         q95 = round(q95, 3)) %>% 
+  # mutate(mean = round(mean, 3),
+  #        q5 = round(q5, 3),
+  #        q95 = round(q95, 3)) %>% 
   relocate(origin) %>% 
   mutate(origin = gsub("_", " ", origin)) -> snake_origin_probs
 
