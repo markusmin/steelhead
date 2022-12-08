@@ -1,53 +1,53 @@
-"","from","to","mean","q5","q95"
-"1","mainstem, RIS to RRE","mainstem, PRA to RIS",0.40866245,0.319669,0.49352735
-"2","mainstem, RIS to RRE","mainstem, RRE to WEL",0.415464735,0.3353793,0.4963333
-"3","mainstem, RIS to RRE","Wenatchee River Mouth",0.00095579039507216,1.655821e-10,0.00466523249999999
-"4","mainstem, RIS to RRE","Wenatchee River Upstream",0.00095579039507216,1.655821e-10,0.00466523249999999
-"5","mainstem, RIS to RRE","loss",0.173961246,0.104236695,0.25205685
-"6","mainstem, RRE to WEL","mainstem, RIS to RRE",0.32729943,0.1959996,0.4635078
-"7","mainstem, RRE to WEL","mainstem, upstream of WEL",0.453727995,0.31982765,0.6518081
-"8","mainstem, RRE to WEL","Entiat River Mouth",0.00232062849250281,6.8938935e-11,0.015473165
-"9","mainstem, RRE to WEL","Entiat River Upstream",0.00232062849250281,6.8938935e-11,0.015473165
-"10","mainstem, RRE to WEL","loss",0.214331352481,0.0003411249,0.36941345
-"11","mainstem, upstream of WEL","mainstem, RRE to WEL",0.58340967,0.39162285,0.8266736
-"12","mainstem, upstream of WEL","Okanogan River Mouth",0.00361697827922197,1.42704795e-09,0.020258985
-"13","mainstem, upstream of WEL","Okanogan River Upstream",0.00361697827922197,1.42704795e-09,0.020258985
-"14","mainstem, upstream of WEL","Methow River Mouth",0.00499731684866915,1.64462465e-09,0.037748965
-"15","mainstem, upstream of WEL","Methow River Upstream",0.00499731684866915,1.64462465e-09,0.037748965
-"16","mainstem, upstream of WEL","Upstream WEL other tributaries",0.00553943432371969,1.1648635e-09,0.037204305
-"17","mainstem, upstream of WEL","loss",0.39382232535,0.16314665,0.58721685
-"18","mainstem, upstream of LGR","mainstem, ICH to LGR",0.38325332,0.36135315,0.4061915
-"19","mainstem, upstream of LGR","Asotin Creek Mouth",0.002255949415,0.00059122205,0.00462716299999999
-"20","mainstem, upstream of LGR","Asotin Creek Upstream",0.002255949415,0.00059122205,0.00462716299999999
-"21","mainstem, upstream of LGR","Clearwater River",0.0176020515,0.01204072,0.0253445
-"22","mainstem, upstream of LGR","Salmon River",0.002231018635,0.0005662538,0.0054970975
-"23","mainstem, upstream of LGR","Grande Ronde River",0.01640827205,0.009959121,0.022587325
-"24","mainstem, upstream of LGR","Imnaha River Mouth",9.17756584807683e-05,7.98515950000001e-10,0.0005937672
-"25","mainstem, upstream of LGR","Imnaha River Upstream",9.17756584807683e-05,7.98515950000001e-10,0.0005937672
-"26","mainstem, upstream of LGR","loss",0.5758099,0.5507431,0.59779075
-"27","Wenatchee River Mouth","mainstem, RIS to RRE",0.659154312,0.18953,0.98012305
-"28","Wenatchee River Mouth","loss",0.3408457078,0.019877055,0.81047
-"29","Entiat River Mouth","mainstem, RRE to WEL",0.534284580199745,3.11853525e-07,1
-"30","Entiat River Mouth","loss",0.46571543131318,1.0543095e-07,1
-"31","Okanogan River Mouth","mainstem, upstream of WEL",0.0942414155605432,2.86108e-10,0.61073975
-"32","Okanogan River Mouth","loss",0.9057586255,0.38926025,1
-"33","Okanogan River Upstream","mainstem, upstream of WEL",0.0942414155605432,2.86108e-10,0.61073975
-"34","Okanogan River Upstream","loss",0.9057586255,0.38926025,1
-"35","Methow River Mouth","mainstem, upstream of WEL",0.6748363605,0.25465815,0.9784939
-"36","Methow River Mouth","loss",0.325163636941,0.021505895,0.74534185
-"37","Methow River Upstream","mainstem, upstream of WEL",0.6748363605,0.25465815,0.9784939
-"38","Methow River Upstream","loss",0.325163636941,0.021505895,0.74534185
-"39","Tucannon River Mouth","mainstem, ICH to LGR",0.104830374,0.078975825,0.13687495
-"40","Tucannon River Mouth","loss",0.895169615,0.86312505,0.92102445
-"41","Asotin Creek Mouth","mainstem, upstream of LGR",0.0125412659939069,8.576638e-09,0.0706383399999999
-"42","Asotin Creek Mouth","loss",0.98745875,0.92936145,1
-"43","Asotin Creek Upstream","mainstem, upstream of LGR",0.0125412659939069,8.576638e-09,0.0706383399999999
-"44","Asotin Creek Upstream","loss",0.98745875,0.92936145,1
-"45","Clearwater River","mainstem, upstream of LGR",0.062874985625,0.00251016,0.210308
-"46","Clearwater River","loss",0.93712503,0.789692,0.9974896
-"47","Salmon River","mainstem, upstream of LGR",0.0376674612110654,9.177722e-09,0.234684549999999
-"48","Salmon River","loss",0.962332565,0.76531545,1
-"49","Grande Ronde River","mainstem, upstream of LGR",0.00582929817604739,6.2436715e-10,0.039435255
-"50","Grande Ronde River","loss",0.994170705,0.96056435,1
-"51","Imnaha River Mouth","mainstem, upstream of LGR",0.023022473931996,1.2620336e-08,0.139682
-"52","Imnaha River Mouth","loss",0.97697751,0.860318,1
+"","from","to","probability"
+"1","mainstem, RIS to RRE","mainstem, PRA to RIS","0.41 (0.32 - 0.49)"
+"2","mainstem, RIS to RRE","mainstem, RRE to WEL","0.42 (0.34 - 0.5)"
+"3","mainstem, RIS to RRE","Wenatchee River Mouth","0.00096 (0.00000000017 - 0.0047)"
+"4","mainstem, RIS to RRE","Wenatchee River Upstream","0.00096 (0.00000000017 - 0.0047)"
+"5","mainstem, RIS to RRE","loss","0.17 (0.1 - 0.25)"
+"6","mainstem, RRE to WEL","mainstem, RIS to RRE","0.33 (0.2 - 0.46)"
+"7","mainstem, RRE to WEL","mainstem, upstream of WEL","0.45 (0.32 - 0.65)"
+"8","mainstem, RRE to WEL","Entiat River Mouth","0.0023 (0.000000000069 - 0.015)"
+"9","mainstem, RRE to WEL","Entiat River Upstream","0.0023 (0.000000000069 - 0.015)"
+"10","mainstem, RRE to WEL","loss","0.21 (0.00034 - 0.37)"
+"11","mainstem, upstream of WEL","mainstem, RRE to WEL","0.58 (0.39 - 0.83)"
+"12","mainstem, upstream of WEL","Okanogan River Mouth","0.0036 (0.0000000014 - 0.02)"
+"13","mainstem, upstream of WEL","Okanogan River Upstream","0.0036 (0.0000000014 - 0.02)"
+"14","mainstem, upstream of WEL","Methow River Mouth","0.005 (0.0000000016 - 0.038)"
+"15","mainstem, upstream of WEL","Methow River Upstream","0.005 (0.0000000016 - 0.038)"
+"16","mainstem, upstream of WEL","Upstream WEL other tributaries","0.0055 (0.0000000012 - 0.037)"
+"17","mainstem, upstream of WEL","loss","0.39 (0.16 - 0.59)"
+"18","mainstem, upstream of LGR","mainstem, ICH to LGR","0.38 (0.36 - 0.41)"
+"19","mainstem, upstream of LGR","Asotin Creek Mouth","0.0023 (0.00059 - 0.0046)"
+"20","mainstem, upstream of LGR","Asotin Creek Upstream","0.0023 (0.00059 - 0.0046)"
+"21","mainstem, upstream of LGR","Clearwater River","0.018 (0.012 - 0.025)"
+"22","mainstem, upstream of LGR","Salmon River","0.0022 (0.00057 - 0.0055)"
+"23","mainstem, upstream of LGR","Grande Ronde River","0.016 (0.01 - 0.023)"
+"24","mainstem, upstream of LGR","Imnaha River Mouth","0.000092 (0.0000000008 - 0.00059)"
+"25","mainstem, upstream of LGR","Imnaha River Upstream","0.000092 (0.0000000008 - 0.00059)"
+"26","mainstem, upstream of LGR","loss","0.58 (0.55 - 0.6)"
+"27","Wenatchee River Mouth","mainstem, RIS to RRE","0.66 (0.19 - 0.98)"
+"28","Wenatchee River Mouth","loss","0.34 (0.02 - 0.81)"
+"29","Entiat River Mouth","mainstem, RRE to WEL","0.53 (0.00000031 -   1)"
+"30","Entiat River Mouth","loss","0.47 (0.00000011 -   1)"
+"31","Okanogan River Mouth","mainstem, upstream of WEL","0.094 (0.00000000029 - 0.61)"
+"32","Okanogan River Mouth","loss","0.91 (0.39 -   1)"
+"33","Okanogan River Upstream","mainstem, upstream of WEL","0.094 (0.00000000029 - 0.61)"
+"34","Okanogan River Upstream","loss","0.91 (0.39 -   1)"
+"35","Methow River Mouth","mainstem, upstream of WEL","0.67 (0.25 - 0.98)"
+"36","Methow River Mouth","loss","0.33 (0.022 - 0.75)"
+"37","Methow River Upstream","mainstem, upstream of WEL","0.67 (0.25 - 0.98)"
+"38","Methow River Upstream","loss","0.33 (0.022 - 0.75)"
+"39","Tucannon River Mouth","mainstem, ICH to LGR","0.1 (0.079 - 0.14)"
+"40","Tucannon River Mouth","loss","0.9 (0.86 - 0.92)"
+"41","Asotin Creek Mouth","mainstem, upstream of LGR","0.013 (0.0000000086 - 0.071)"
+"42","Asotin Creek Mouth","loss","0.99 (0.93 -   1)"
+"43","Asotin Creek Upstream","mainstem, upstream of LGR","0.013 (0.0000000086 - 0.071)"
+"44","Asotin Creek Upstream","loss","0.99 (0.93 -   1)"
+"45","Clearwater River","mainstem, upstream of LGR","0.063 (0.0025 - 0.21)"
+"46","Clearwater River","loss","0.94 (0.79 -   1)"
+"47","Salmon River","mainstem, upstream of LGR","0.038 (0.0000000092 - 0.23)"
+"48","Salmon River","loss","0.96 (0.77 -   1)"
+"49","Grande Ronde River","mainstem, upstream of LGR","0.0058 (0.00000000062 - 0.039)"
+"50","Grande Ronde River","loss","0.99 (0.96 -   1)"
+"51","Imnaha River Mouth","mainstem, upstream of LGR","0.023 (0.000000013 - 0.14)"
+"52","Imnaha River Mouth","loss","0.98 (0.86 -   1)"
