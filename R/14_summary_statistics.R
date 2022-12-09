@@ -24,6 +24,41 @@ natal_origin_table <- read.csv(here::here("covariate_data", "natal_origin_table.
 tag_code_metadata %>% 
   left_join(natal_origin_table, by = "release_site_name") -> tag_code_metadata
 
+##### Fish x run year x origin #####
+
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_start <- seq(ymd_hms("2004-06-01 00:00:00"), ymd_hms("2022-06-01 00:00:00"), by = "years")
+run_year_end <- seq(ymd_hms("2005-05-31 23:59:59"), ymd_hms("2023-05-31 23:59:59"), by = "years")
+run_year_numeric = seq(4, 22, 1)
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end, run_year_numeric)
+
+# First, let's join the run year df with the states complete 
+# check how long this takes:
+# 15 minutes for the full dataset
+print(Sys.time())
+states_complete %>% 
+  rowwise() %>% # this is apparently crucial to getting this to work
+  dplyr::mutate(date_time = ymd_hms(date_time)) %>% 
+  dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) -> states_complete
+print(Sys.time())
+
+states_complete %>% 
+  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") %>% 
+  distinct(tag_code_2, .keep_all = TRUE) %>% 
+  ungroup() %>% 
+  count(natal_origin, run_year) %>% 
+  as.data.frame() %>% 
+  dplyr::rename(total = n) -> natal_origin_fish_counts
+
+### CREATE THE TABLE FOR REPORT - rows = natal origins, columns = natal origins, values = number of fish
+natal_origin_fish_counts %>% 
+  pivot_wider(., values_from = total, names_from = run_year) %>% 
+  relocate("05/06", .before = "06/07") %>% 
+  replace(is.na(.), 0) -> fish_year_origin_table
+
+write.csv(fish_year_origin_table, here::here("CBR_report", "CBR_report_final", "tables", "fish_year_origin_table.csv"))
+  
 
 ##### Overshoot summary statistics #####
 
@@ -75,7 +110,7 @@ overshoot_mainstem_sites <- data.frame(natal_origin = sort(unique(tag_code_metad
                                                                "Middle Columbia", # Walla Walla River
                                                                "Upper Columbia", # Wenatchee River
                                                                "Lower Columbia",  # Wind River
-                                                               "Middle columbia" # Yakima River
+                                                               "Middle Columbia" # Yakima River
                                        ),
                                        overshoot_state = c(NA, # Asotin Creek
                                                            NA, # Clearwater
@@ -197,53 +232,19 @@ states_complete_overshoot %>%
 
 table(states_complete_overshoot$overshoot_status)
 
-# How often did fish visit an ESU that they don't belong in?
-# Snake in the upper Columbia
+
+
+# Add a new column for directionality - this way we can count each overshoot movement
 states_complete_overshoot %>% 
-  subset(., natal_origin_region == "Snake") %>% 
   group_by(tag_code) %>% 
-  filter(any(state_region == "Upper Columbia")) -> snake_origin_upper_columbia
-
-length(unique(snake_origin_upper_columbia$tag_code_2))
-length(unique(subset(states_complete_overshoot, natal_origin_region == "Snake")$tag_code_2))
-460/33761
-
-# Upper columbia in the Snake
-states_complete_overshoot %>% 
-  subset(., natal_origin_region == "Upper Columbia") %>% 
-  group_by(tag_code) %>% 
-  filter(any(state_region == "Snake")) -> upper_columbia_origin_snake
-
-length(unique(upper_columbia_origin_snake$tag_code_2))
-length(unique(subset(states_complete_overshoot, natal_origin_region == "Upper Columbia")$tag_code_2))
-7/14093
-
-# Middle Columbia in the Snake or upper Columbia
-states_complete_overshoot %>% 
-  subset(., natal_origin_region == "Middle Columbia") %>% 
-  group_by(tag_code) %>% 
-  filter(any(state_region %in% c("Snake", "Upper Columbia"))) -> middle_columbia_origin_snake_upper_columbia
-
-length(unique(middle_columbia_origin_snake_upper_columbia$tag_code_2))
-length(unique(subset(states_complete_overshoot, natal_origin_region == "Middle Columbia")$tag_code_2))
- 2163/9185
+  mutate(direction = ifelse(lag(state_order) > state_order, "downstream", "upstream")) -> states_complete_overshoot
  
- # Lower Columbia in the Snake or middle Colubmia or upper Columbia
- states_complete_overshoot %>% 
-   subset(., natal_origin_region == "Lower Columbia") %>% 
-   group_by(tag_code) %>% 
-   filter(any(state_region %in% c("Snake", "Upper Columbia", "Middle Columbia"))) -> lower_columbia_origin_snake_upper_columbia_middle_columbia
- 
- length(unique(lower_columbia_origin_snake_upper_columbia_middle_columbia$tag_code_2))
- length(unique(subset(states_complete_overshoot, natal_origin_region == "Lower Columbia")$tag_code_2))
- 3/3007
-
 # Let's count how many fish overshot at all
 states_complete_overshoot %>% 
   group_by(tag_code) %>% 
   filter(any(overshoot == "overshoot")) -> overshooting_fish
 
-# count how many fish per origin in our dataset
+# count how many fish per origin x run_year in our dataset
 
 # first, get a count of how many fish we have per origin total
 states_complete %>% 
@@ -276,7 +277,107 @@ sqrt(sum(overshoot_natal_origin_table$n_overshot)/sum(overshoot_natal_origin_tab
 length(unique(overshooting_fish$tag_code_2))
 length(unique(states_complete$tag_code_2))
 
+### CREATE THE TABLE FOR REPORT - columns = overshoot at each dam + total (fish that overshoot at any), rows are natal origins
+overshooting_fish %>% 
+  ungroup() %>% 
+  subset(overshoot_status == "overshoot_state" & direction == "upstream") %>%
+  # change all upstream movements that don't have the dam in the pathway to indicate the dam
+  mutate(pathway = ifelse(pathway == "implicit" & state %in% c("mainstem, upstream of WEL", "mainstem, upstream of LGR"), gsub(".*\\s", "", state),
+                          ifelse(pathway == "ICH_LGR_inriver", "ICH",
+                                 ifelse(pathway == "implicit", gsub(" .*", "", gsub("mainstem, ", "", state)), pathway)))) %>% 
+  mutate(pathway = gsub(" \\(adult\\)", "", pathway)) %>% 
+  # Make sure you don't double count - only keep unique combinations of tag code + overshoot dam (pathway)
+  # This eliminates about 12.5% of the overshoot movements. But I think this is what we want - proportion of fish, not absolute number of overshoot events
+  filter(!(duplicated(paste0(tag_code_2, pathway)))) %>% 
+  count(natal_origin, pathway) %>% 
+  # add the total fish per origin, so we can calculate proportions
+  left_join(natal_origin_fish_counts, by = "natal_origin") %>% 
+  mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  dplyr::select(-c(n, total)) %>% 
+  pivot_wider(names_from = pathway, values_from = value) %>% 
+  replace(is.na(.), "0") %>% 
+  # reorder the dams
+  relocate(MCN, .before = PRA)-> overshoot_table_for_report
 
+write.csv(overshoot_table_for_report, here::here("CBR_report", "CBR_report_final", "tables", "overshoot_dam_origin_table.csv"))
+
+##### How often did fish visit an ESU that they don't belong in? #####
+# Snake in the upper Columbia
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Snake") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region == "Upper Columbia")) -> snake_origin_upper_columbia
+
+length(unique(snake_origin_upper_columbia$tag_code_2))/length(unique(subset(states_complete_overshoot, natal_origin_region == "Snake")$tag_code_2))
+460/33761
+
+# Upper columbia in the Snake
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Upper Columbia") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region == "Snake")) -> upper_columbia_origin_snake
+
+length(unique(upper_columbia_origin_snake$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Upper Columbia")$tag_code_2))
+7/14093
+
+# Middle Columbia in the Snake or upper Columbia
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Middle Columbia") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region %in% c("Snake", "Upper Columbia"))) -> middle_columbia_origin_snake_upper_columbia
+
+length(unique(middle_columbia_origin_snake_upper_columbia$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Middle Columbia")$tag_code_2))
+2163/9185
+
+### Table for report - rows = natal origins, columns = how many individuals were observed outside of the ESU
+snake_origin_upper_columbia %>% 
+  ungroup() %>% 
+  filter(!duplicated(tag_code_2)) %>% 
+  count(natal_origin) -> snake_origin_upper_columbia_counts
+
+upper_columbia_origin_snake %>% 
+  ungroup() %>% 
+  filter(!duplicated(tag_code_2)) %>% 
+  count(natal_origin) -> upper_columbia_origin_snake_counts
+
+middle_columbia_origin_snake_upper_columbia %>% 
+  ungroup() %>% 
+  filter(!duplicated(tag_code_2)) %>% 
+  count(natal_origin) -> middle_columbia_origin_snake_upper_columbia_counts
+
+middle_columbia_origin_snake_upper_columbia_counts %>% 
+  bind_rows(., upper_columbia_origin_snake_counts) %>% 
+  bind_rows(., snake_origin_upper_columbia_counts) -> out_of_ESU_counts
+
+natal_origin_fish_counts %>% 
+  group_by(natal_origin) %>% 
+  summarise(total = sum(total)) -> natal_origin_total_fish_counts
+
+out_of_ESU_counts %>% 
+  left_join(., natal_origin_total_fish_counts, by = "natal_origin") %>% 
+  mutate(proportion = formatC(n/total, digits = 2, format = "fg")) %>% 
+  mutate(out_of_ESU = paste0(proportion, " (N = ", n, ")")) %>% 
+  dplyr::select(natal_origin, out_of_ESU) -> out_of_ESU_counts_table
+
+## Add in the missing ones
+no_out_of_ESU <- data.frame(natal_origin = c("Hood_River", "Entiat_River"), out_of_ESU = c("0","0"))
+
+out_of_ESU_counts_table %>% 
+  bind_rows(., no_out_of_ESU) -> out_of_ESU_counts_table
+
+write.csv(out_of_ESU_counts_table, here::here("CBR_report", "CBR_report_final", "tables", "out_of_ESU_counts_table.csv"))
+
+# Lower Columbia in the Snake or middle Colubmia or upper Columbia
+states_complete_overshoot %>% 
+  subset(., natal_origin_region == "Lower Columbia") %>% 
+  group_by(tag_code) %>% 
+  filter(any(state_region %in% c("Snake", "Upper Columbia", "Middle Columbia"))) -> lower_columbia_origin_snake_upper_columbia_middle_columbia
+
+length(unique(lower_columbia_origin_snake_upper_columbia_middle_columbia$tag_code_2))
+length(unique(subset(states_complete_overshoot, natal_origin_region == "Lower Columbia")$tag_code_2))
+3/3007
 
 ##### Fallback summary statistics #####
 
@@ -318,8 +419,29 @@ fallback_movements %>%
 fallback_movements %>% 
   subset(fallback == "fallback") -> fallback_only_movements
 
+### CREATE THE TABLE FOR REPORT - columns = fallback at each dam + total (fish that overshoot at any), rows are natal origins
 fallback_only_movements %>% 
-  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") -> fallback_only_movements
+  ungroup() %>% 
+  # Make sure you don't double count - only keep unique combinations of tag code + fallback dam (pathway)
+  filter(!(duplicated(paste0(tag_code_2, fallback_dam)))) %>% 
+  count(natal_origin, fallback_dam) %>% 
+  # add the total fish per origin, so we can calculate proportions
+  left_join(natal_origin_fish_counts, by = "natal_origin") %>% 
+  mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  dplyr::select(-c(n, total)) %>% 
+  pivot_wider(names_from = fallback_dam, values_from = value) %>% 
+  replace(is.na(.), "0") %>% 
+  # reorder the dams
+  relocate(ICH, .after = WEL) %>% 
+  relocate(LGR, .after = ICH)-> fallback_table_for_report
+
+write.csv(fallback_table_for_report, here::here("CBR_report", "CBR_report_final", "tables", "fallback_dam_origin_table.csv"))
+
+
+
+# 
+# fallback_only_movements %>% 
+#   left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") -> fallback_only_movements
 
 # count the total number of fallback movements by natal origin
 table(fallback_only_movements$natal_origin)
