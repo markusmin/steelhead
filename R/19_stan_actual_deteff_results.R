@@ -347,8 +347,7 @@ upper_columbia_DE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 upper_columbia_DE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
-                     "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+  subset(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
                      "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
                      "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
                      "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
@@ -357,8 +356,7 @@ upper_columbia_DE_prob_table %>%
   dplyr::select(-origin) -> upper_columbia_DE_DPS_probs
 
 upper_columbia_DE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
-                       "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
                        "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
                        "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
                        "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
@@ -391,18 +389,16 @@ upper_columbia_NDE_derived_probabilities %>%
 
 # subset the probabilities shared across the DPS
 upper_columbia_NDE_prob_table %>% 
-  subset(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
-           "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
-           "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
-           "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
-           "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
-           "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
+  subset(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+                     "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
+                     "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
+                     "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
+                     "Salmon River", "Grande Ronde River", "Imnaha River Mouth", "BON to MCN other tributaries", "Upstream WEL other tributaries")) %>% 
   distinct(from, to, .keep_all = TRUE) %>% 
   dplyr::select(-origin) -> upper_columbia_NDE_DPS_probs
 
 upper_columbia_NDE_prob_table %>% 
-  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN",    "mainstem, MCN to ICH or PRA",    "mainstem, PRA to RIS",    "mainstem, RIS to RRE",    
-                       "mainstem, RRE to WEL",    "mainstem, upstream of WEL", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
+  subset(!(from %in% c("mainstem, mouth to BON",  "mainstem, BON to MCN", "mainstem, ICH to LGR",           "mainstem, upstream of LGR",      "Deschutes River Mouth",
                        "Deschutes River Upstream", "John Day River Mouth", "Hood River Mouth",  "Fifteenmile Creek Mouth",       
                        "Umatilla River Mouth", "Umatilla River Upstream",  "Yakima River Mouth",    "Walla Walla River Mouth",            
                        "Tucannon River Mouth", "Asotin Creek Mouth", "Asotin Creek Upstream", "Clearwater River",              
@@ -520,7 +516,7 @@ upstream_indices <- grep("Creek Upstream|River Upstream", model_states)
 
 transition_matrix_reformat_draws <- function(draws_object, variable_prefix, niter){
   draws_object %>% 
-    dplyr::select(colnames(snake_draws)[grepl(variable_prefix, colnames(snake_draws))]) %>%  # keep the actual probabilities
+    dplyr::select(colnames(draws_object)[grepl(variable_prefix, colnames(draws_object))]) %>%  # keep the actual probabilities
     t() %>% 
     as.data.frame() %>% 
     rownames_to_column("variable") %>% 
@@ -1422,41 +1418,45 @@ write.csv(overshoot_homing_probabilities, here::here("stan_actual", "deteff_ESU_
 
 
 ##### Fallback probabilities - dam + origin specific #####
+middle_columbia_origins <- c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River")
+upper_columbia_origins <- c("Wenatchee River", "Entiat River",    "Okanogan River",  "Methow River")
+snake_origins <- c("Tucannon River",   "Asotin Creek", "Clearwater River", "Salmon River",  "Grande Ronde", "Imnaha River")
+
 
 ### Bonneville Dam
 # from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON"
 # Origin specific for Middle Columbia only
-BON_fallback_rates <- data.frame(population = c("Snake River ESU", "Upper Columbia ESU", # Two ESUs
-                                                "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River"),
-                                 probability = c(subset(snake_DE_DPS_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON")$probability,
-                                                 subset(upper_columbia_DE_DPS_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Fifteenmile_Creek")$probability,
+BON_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Fifteenmile_Creek")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Deschutes_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "John_Day_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Umatilla_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Walla_Walla_River")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Yakima_River")$probability))
+                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON" & origin == "Yakima_River")$probability,
+                                                 rep(subset(upper_columbia_DE_DPS_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON")$probability, length(upper_columbia_origins)),
+                                                 rep(subset(snake_DE_DPS_probs, from == "mainstem, BON to MCN" & to == "mainstem, mouth to BON")$probability, length(snake_origins))))
 
 
 ### McNary Dam
 # from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN"
-# For McNary, Snake and middle Columbia connect directly to state 3, so they have individual probabilities. Upper Columbia doesn't
+# For McNary, each probability is unique, because this is the transition state between all ESUs
 
-MCN_fallback_rates <- data.frame(population = c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River",
-                                                # "Wenatchee River", "Entiat River",    "Okanogan River",  "Methow River",
-                                                "Upper Columbia ESU",
-                                                "Tucannon River",   "Asotin Creek", "Clearwater River", "Salmon River",  "Grande Ronde", "Imnaha River"),
+MCN_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
                                  probability = c(subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Fifteenmile_Creek")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Deschutes_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "John_Day_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Umatilla_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Walla_Walla_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Yakima_River")$probability,
-                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Wenatchee_River")$probability,
-                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Entiat_River")$probability,
-                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Okanogan_River")$probability,
-                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Methow_River")$probability,
-                                 subset(upper_columbia_DE_DPS_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN")$probability,
+                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Wenatchee_River")$probability,
+                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Entiat_River")$probability,
+                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Okanogan_River")$probability,
+                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Methow_River")$probability,
+                                 # rep(subset(upper_columbia_DE_DPS_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN")$probability, length(upper_columbia_origins)),
                                            subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Tucannon_River")$probability,
                                            subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Asotin_Creek")$probability,
                                            subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Clearwater_River")$probability,
@@ -1468,76 +1468,182 @@ MCN_fallback_rates <- data.frame(population = c("Fifteenmile Creek", "Deschutes 
 
 ### Priest Rapids Dam
 # from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA"
-# Only specific for Middle Columbia. Which isn't really intuitive since you'd think it would be for upper columbia
-PRA_fallback_rates <- data.frame(population = c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River",
-                                                "Upper Columbia ESU",
-                                                "Snake River ESU"),
+# Specific for middle and upper columbia
+PRA_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
                                  probability = c(subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Fifteenmile_Creek")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Deschutes_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "John_Day_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Umatilla_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Walla_Walla_River")$probability,
                                                  subset(middle_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Yakima_River")$probability,
-                                                 subset(upper_columbia_DE_DPS_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA")$probability,
-                                                 subset(snake_DE_DPS_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA")$probability))
+                                                 # rep(subset(upper_columbia_DE_DPS_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA")$probability, length(upper_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA" & origin == "Methow_River")$probability,
+                                                 rep(subset(snake_DE_DPS_probs, from == "mainstem, PRA to RIS" & to == "mainstem, MCN to ICH or PRA")$probability, length(snake_origins))))
 
 
 
 ### Rock Island Dam
 # Specific for Upper columbia only
 # from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS"
-RIS_fallback_rates <- data.frame(population = c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River",
-                                                # "Wenatchee River", "Entiat River",    "Okanogan River",  "Methow River",
-                                                "Upper Columbia ESU",
-                                                "Snake River ESU"),
-                                 probability = c(subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Fifteenmile_Creek")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Deschutes_River")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "John_Day_River")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Umatilla_River")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Walla_Walla_River")$probability,
-                                                 subset(middle_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Yakima_River")$probability,
-                                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Wenatchee_River")$probability,
-                                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Entiat_River")$probability,
-                                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Okanogan_River")$probability,
-                                                 # subset(upper_columbia_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Methow_River")$probability,
-                                                 subset(upper_columbia_DE_DPS_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN")$probability,
-                                                 subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Tucannon_River")$probability,
-                                                 subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Asotin_Creek")$probability,
-                                                 subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Clearwater_River")$probability,
-                                                 subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Salmon_River")$probability,
-                                                 subset(snake_DE_origin_probs, from == "mainstem, MCN to ICH or PRA" & to == "mainstem, BON to MCN" & origin == "Grande_Ronde")$probability,
-                                                 subset(snake_DE_DPS_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS")$probability))
+RIS_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
+                                 probability = c(rep(subset(middle_columbia_DE_DPS_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS")$probability, length(middle_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS" & origin == "Methow_River")$probability,
+                                                 rep(subset(snake_DE_DPS_probs, from == "mainstem, RIS to RRE" & to == "mainstem, PRA to RIS")$probability, length(snake_origins))))
 
 
 
 ### Rocky Reach Dam
-# from == "mainstem, RRE to WEL", to == "mainstem, RIS to RRE"
-
+# Specific for Upper columbia only
+# from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE"
+RRE_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
+                                probability = c(rep(subset(middle_columbia_DE_DPS_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE")$probability, length(middle_columbia_origins)),
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE" & origin == "Wenatchee_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE" & origin == "Entiat_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE" & origin == "Okanogan_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE" & origin == "Methow_River")$probability,
+                                                rep(subset(snake_DE_DPS_probs, from == "mainstem, RRE to WEL" & to == "mainstem, RIS to RRE")$probability, length(snake_origins))))
 
 
 
 ### Wells Dam
-# from == "mainstem, Upstream of Wel", to == "mainstem, RRE to WEL"
-
+# Specific for Upper columbia only
+# from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL"
+WEL_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
+                                probability = c(rep(subset(middle_columbia_DE_DPS_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL")$probability, length(middle_columbia_origins)),
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL" & origin == "Wenatchee_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL" & origin == "Entiat_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL" & origin == "Okanogan_River")$probability,
+                                                subset(upper_columbia_DE_origin_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL" & origin == "Methow_River")$probability,
+                                                rep(subset(snake_DE_DPS_probs, from == "mainstem, upstream of WEL" & to == "mainstem, RRE to WEL")$probability, length(snake_origins))))
 
 
 
 ### Ice Harbor Dam
-# from == "mainstem, ICH to LGR", to == "mainstem, MCN to ICH or PRA"
-
-
+# Specific for Snake and Middle Columbia
+# from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA"
+ICH_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
+                                probability = c(subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Fifteenmile_Creek")$probability,
+                                                subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Deschutes_River")$probability,
+                                                subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "John_Day_River")$probability,
+                                                subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Umatilla_River")$probability,
+                                                subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Walla_Walla_River")$probability,
+                                                subset(middle_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Yakima_River")$probability,
+                                                # subset(upper_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Wenatchee_River")$probability,
+                                                # subset(upper_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Entiat_River")$probability,
+                                                # subset(upper_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Okanogan_River")$probability,
+                                                # subset(upper_columbia_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Methow_River")$probability,
+                                                rep(subset(upper_columbia_DE_DPS_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA")$probability, length(upper_columbia_origins)),
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Tucannon_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Asotin_Creek")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Clearwater_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Salmon_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Grande_Ronde")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, ICH to LGR" & to == "mainstem, MCN to ICH or PRA" & origin == "Imnaha_River")$probability))
 
 
 ### Lower Granite Dam
-# from == "mainstem, Upstream of LGR", to == "mainstem, ICH to LGR"
+# Specific only for Snake
+# from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR"
+LGR_fallback_prob <- data.frame(population = c(middle_columbia_origins,
+                                               upper_columbia_origins,
+                                               snake_origins),
+                                probability = c(rep(subset(middle_columbia_DE_DPS_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR")$probability, length(middle_columbia_origins)),
+                                                rep(subset(upper_columbia_DE_DPS_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR")$probability, length(upper_columbia_origins)),
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Tucannon_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Asotin_Creek")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Clearwater_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Salmon_River")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Grande_Ronde")$probability,
+                                                subset(snake_DE_origin_probs, from == "mainstem, upstream of LGR" & to == "mainstem, ICH to LGR" & origin == "Imnaha_River")$probability))
+
+### Join all together
+dplyr::rename(BON_fallback_prob, BON = probability) %>% 
+  left_join(., dplyr::rename(MCN_fallback_prob, MCN = probability), by = "population") %>% 
+  left_join(., dplyr::rename(PRA_fallback_prob, PRA = probability), by = "population") %>% 
+  left_join(., dplyr::rename(RIS_fallback_prob, RIS = probability), by = "population") %>% 
+  left_join(., dplyr::rename(RRE_fallback_prob, RRE = probability), by = "population") %>% 
+  left_join(., dplyr::rename(WEL_fallback_prob, WEL = probability), by = "population") %>% 
+  left_join(., dplyr::rename(ICH_fallback_prob, ICH = probability), by = "population") %>% 
+  left_join(., dplyr::rename(LGR_fallback_prob, LGR = probability), by = "population") %>% 
+  dplyr::rename(origin = population) -> dam_specific_fallback_probs
 
 
+write.csv(dam_specific_fallback_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_fallback_probs.csv"), row.names = FALSE)
 
 
 
 
 
 ##### Plot detection efficiency #####
+
+# Version 2 - using draws
+deteff_draws <- function(draws_object, alpha, beta, niter){
+  
+  # Make this work even if we don't have discharge values - if beta = NA
+  if (is.na(beta)){
+    draws_object %>% 
+      dplyr::select(colnames(draws_object)[grepl(alpha, colnames(draws_object))]) %>%  # keep the actual probabilities
+      as.data.frame() -> DE_param_draws
+    DE_param_draws$beta <- 0
+  } else {
+    draws_object %>% 
+      dplyr::select(c(colnames(draws_object)[grepl(alpha, colnames(draws_object))],
+                      colnames(draws_object)[grepl(beta, colnames(draws_object))])) %>%  # keep the actual probabilities
+      as.data.frame() -> DE_param_draws
+    
+  }
+  
+
+  
+
+  
+  
+  # create a sequence of Z-scores
+  seq(-2,2, 0.01) -> zscore_discharge_values
+  
+  DE_predicted <- matrix(nrow = length(zscore_discharge_values), ncol = niter)
+  # Then predict detection probability at each draws of alpha and beta for each
+  for (i in 1:length(zscore_discharge_values)){
+    for (j in 1:niter){
+      DE_predicted[i,j] <- plogis(DE_param_draws[j,1] + DE_param_draws[j,2] * zscore_discharge_values[i])
+    }
+  }
+  
+  # Then get quantiles at each zscore
+  DE_predicted_quantiles <- data.frame(discharge = zscore_discharge_values,
+                                       median = NA,
+                                       q2.5 = NA,
+                                       q97.5 = NA)
+  
+  for (i in 1:nrow(DE_predicted)){
+    DE_predicted_quantiles$median[i] <- quantile(DE_predicted[i,], 0.5)
+    DE_predicted_quantiles$q2.5[i] <- quantile(DE_predicted[i,], 0.025)
+    DE_predicted_quantiles$q97.5[i] <- quantile(DE_predicted[i,], 0.975)
+  }
+  
+  DE_predicted_quantiles %>% 
+    pivot_longer(., names_to = "name", cols = c("q2.5", "median", "q97.5")) -> DE_predicted_quantiles_long
+  
+  DE_predicted_quantiles_long$name <- factor(DE_predicted_quantiles_long$name, levels = c("q2.5", "median", "q97.5"))
+  
+  return(DE_predicted_quantiles_long)
+}
 
 # Step 1: Extract correct parameters
 det_eff_params <- c("asotin_alpha1", "asotin_alpha2", "deschutes_alpha1", "entiat_alpha1"           ,
@@ -1546,41 +1652,6 @@ det_eff_params <- c("asotin_alpha1", "asotin_alpha2", "deschutes_alpha1", "entia
                     "walla_walla_alpha2", "walla_walla_alpha3", "wenatchee_alpha1", "yakima_alpha1", "asotin_beta", "deschutes_beta"         ,
                     "entiat_beta", "hood_beta", "john_day_beta", "methow_beta"  ,
                     "okanogan_beta", "tucannon_beta", "umatilla_beta", "walla_walla_beta", "wenatchee_beta", "yakima_beta")
-
-subset(snake_summary, variable %in% det_eff_params) -> snake_DE_params
-subset(middle_columbia_summary, variable %in% det_eff_params) -> middle_columbia_DE_params
-subset(upper_columbia_summary, variable %in% det_eff_params) -> upper_columbia_DE_params
-
-
-# Step 2: Make a function to predict DE from parameters + discharge
-predict_DE <- function(alpha_term, beta_term, params_df){
-  subset(params_df, variable %in% c(alpha_term, beta_term)) -> trib_DE
-  
-  seq(-2,2, 0.01) -> zscore_discharge_values
-  
-  # predicted_DE <- data.frame(discharge = zscore_discharge_values, 
-  #                                mean_DE = plogis(subset(params_df, variable == alpha_term)$mean + 
-  #                                                   subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
-  #                                upper_DE = plogis(subset(params_df, variable == alpha_term)$q95 + 
-  #                                                    subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
-  #                                lower_DE = plogis(subset(params_df, variable == alpha_term)$q5 + 
-  #                                                    subset(params_df, variable == beta_term)$mean * zscore_discharge_values))
-  
-  predicted_DE <- data.frame(discharge = zscore_discharge_values, 
-                             mean_DE = plogis(subset(params_df, variable == alpha_term)$mean + 
-                                                subset(params_df, variable == beta_term)$mean * zscore_discharge_values),
-                             upper_DE = plogis(subset(params_df, variable == alpha_term)$q95 + 
-                                                 subset(params_df, variable == beta_term)$q95 * zscore_discharge_values),
-                             lower_DE = plogis(subset(params_df, variable == alpha_term)$q5 + 
-                                                 subset(params_df, variable == beta_term)$q5 * zscore_discharge_values))
-  
-
-  predicted_DE %>% 
-    pivot_longer(., cols = c("mean_DE", "upper_DE", "lower_DE")) -> predicted_DE_long
-  
-  return(predicted_DE_long)
-  
-}
 
 # Step 3: Make a function to plot them
 DE_plot_function <- function(df, trib_name){
@@ -1602,100 +1673,70 @@ DE_plot_function <- function(df, trib_name){
 
 # Step 4: Plot them
 # Middle Columbia Tributaries
-predict_DE(alpha_term = "umatilla_alpha1", beta_term = "umatilla_beta", params_df = middle_columbia_DE_params) -> umatilla_predicted_DE1
+#  deteff_draws <- function(draws_object, alpha, beta, niter)
+deteff_draws(alpha = "umatilla_alpha1", beta = "umatilla_beta", draws_object = middle_columbia_draws, niter = 200) -> umatilla_predicted_DE1
 umatilla_DE_plot1 <- DE_plot_function(df = umatilla_predicted_DE1, trib_name = "Umatilla River (07/08-13/14)")
 
-predict_DE(alpha_term = "umatilla_alpha2", beta_term = "umatilla_beta", params_df = middle_columbia_DE_params) -> umatilla_predicted_DE2
+deteff_draws(alpha = "umatilla_alpha2", beta = "umatilla_beta", draws_object = middle_columbia_draws, niter = 200) -> umatilla_predicted_DE2
 umatilla_DE_plot2 <- DE_plot_function(df = umatilla_predicted_DE2, trib_name = "Umatilla River (14/15-21/22)")
 
-predict_DE(alpha_term = "walla_walla_alpha1", beta_term = "walla_walla_beta", params_df = middle_columbia_DE_params) -> walla_walla_predicted_DE1
+deteff_draws(alpha = "walla_walla_alpha1", beta = "walla_walla_beta", draws_object = middle_columbia_draws, niter = 200) -> walla_walla_predicted_DE1
 walla_walla_DE_plot1 <- DE_plot_function(df = walla_walla_predicted_DE1, trib_name = "Walla Walla River (05/06-11/12)")
 
-predict_DE(alpha_term = "walla_walla_alpha2", beta_term = "walla_walla_beta", params_df = middle_columbia_DE_params) -> walla_walla_predicted_DE2
+deteff_draws(alpha = "walla_walla_alpha2", beta = "walla_walla_beta", draws_object = middle_columbia_draws, niter = 200) -> walla_walla_predicted_DE2
 walla_walla_DE_plot2 <- DE_plot_function(df = walla_walla_predicted_DE2, trib_name = "Walla Walla River (12/13-18/19)")
 
-predict_DE(alpha_term = "walla_walla_alpha3", beta_term = "walla_walla_beta", params_df = middle_columbia_DE_params) -> walla_walla_predicted_DE3
+deteff_draws(alpha = "walla_walla_alpha3", beta = "walla_walla_beta", draws_object = middle_columbia_draws, niter = 200) -> walla_walla_predicted_DE3
 walla_walla_DE_plot3 <- DE_plot_function(df = walla_walla_predicted_DE3, trib_name = "Walla Walla River (19/20-21/22)")
 
-predict_DE(alpha_term = "yakima_alpha1", beta_term = "yakima_beta", params_df = middle_columbia_DE_params) -> yakima_predicted_DE1
+deteff_draws(alpha = "yakima_alpha1", beta = "yakima_beta", draws_object = middle_columbia_draws, niter = 200) -> yakima_predicted_DE1
 yakima_DE_plot1 <- DE_plot_function(df = yakima_predicted_DE1, trib_name = "Yakima River (04/05-21/22)")
 
-predict_DE(alpha_term = "deschutes_alpha1", beta_term = "deschutes_beta", params_df = middle_columbia_DE_params) -> deschutes_predicted_DE1
+deteff_draws(alpha = "deschutes_alpha1", beta = "deschutes_beta", draws_object = middle_columbia_draws, niter = 200) -> deschutes_predicted_DE1
 deschutes_DE_plot1 <- DE_plot_function(df = deschutes_predicted_DE1, trib_name = "Deschutes River (12/13-19/20)")
 
-predict_DE(alpha_term = "john_day_alpha1", beta_term = "john_day_beta", params_df = middle_columbia_DE_params) -> john_day_predicted_DE1
+deteff_draws(alpha = "john_day_alpha1", beta = "john_day_beta", draws_object = middle_columbia_draws, niter = 200) -> john_day_predicted_DE1
 john_day_DE_plot1 <- DE_plot_function(df = john_day_predicted_DE1, trib_name = "John Day River (12/13-21/22)")
 
+deteff_draws(alpha = "fifteenmile_alpha1", beta = NA, draws_object = middle_columbia_draws, niter = 200) -> fifteenmile_predicted_DE1
+fifteenmile_DE_plot1 <- DE_plot_function(df = fifteenmile_predicted_DE1, trib_name = "Fifteenmile Creek (12/13-18/19)")
+
 # Hood River is technically lower Columbia
-predict_DE(alpha_term = "hood_alpha1", beta_term = "hood_beta", params_df = middle_columbia_DE_params) -> hood_predicted_DE1
+deteff_draws(alpha = "hood_alpha1", beta = "hood_beta", draws_object = middle_columbia_draws, niter = 200) -> hood_predicted_DE1
 hood_DE_plot1 <- DE_plot_function(df = hood_predicted_DE1, trib_name = "Hood River (15/16-21/22)")
 
 
 # Upper Columbia Tributaries
-predict_DE(alpha_term = "okanogan_alpha1", beta_term = "okanogan_beta", params_df = upper_columbia_DE_params) -> okanogan_predicted_DE
+deteff_draws(alpha = "okanogan_alpha1", beta = "okanogan_beta", draws_object = upper_columbia_draws, niter = 200) -> okanogan_predicted_DE
 okanogan_DE_plot <- DE_plot_function(df = okanogan_predicted_DE, trib_name = "Okanogan (12/13-21/22)")
 
-predict_DE(alpha_term = "wenatchee_alpha1", beta_term = "wenatchee_beta", params_df = upper_columbia_DE_params) -> wenatchee_predicted_DE1
+deteff_draws(alpha = "wenatchee_alpha1", beta = "wenatchee_beta", draws_object = upper_columbia_draws, niter = 200) -> wenatchee_predicted_DE1
 wenatchee_DE_plot1 <- DE_plot_function(df = wenatchee_predicted_DE1, trib_name = "Wenatchee River (2010-2020)")
 
-predict_DE(alpha_term = "entiat_alpha1", beta_term = "entiat_beta", params_df = upper_columbia_DE_params) -> entiat_predicted_DE1
+deteff_draws(alpha = "entiat_alpha1", beta = "entiat_beta", draws_object = upper_columbia_draws, niter = 200) -> entiat_predicted_DE1
 entiat_DE_plot1 <- DE_plot_function(df = entiat_predicted_DE1, trib_name = "Entiat River (07/08-21/22)")
 
-predict_DE(alpha_term = "methow_alpha1", beta_term = "methow_beta", params_df = upper_columbia_DE_params) -> methow_predicted_DE1
+deteff_draws(alpha = "methow_alpha1", beta = "methow_beta", draws_object = upper_columbia_draws, niter = 200) -> methow_predicted_DE1
 methow_DE_plot1 <- DE_plot_function(df = methow_predicted_DE1, trib_name = "Methow River (09/10-16/17)")
 
-predict_DE(alpha_term = "methow_alpha2", beta_term = "methow_beta", params_df = upper_columbia_DE_params) -> methow_predicted_DE2
+deteff_draws(alpha = "methow_alpha2", beta = "methow_beta", draws_object = upper_columbia_draws, niter = 200) -> methow_predicted_DE2
 methow_DE_plot2 <- DE_plot_function(df = methow_predicted_DE2, trib_name = "Methow River (17/18-21/22)")
 
 
 # Snake River Tributaries
-predict_DE(alpha_term = "asotin_alpha1", beta_term = "asotin_beta", params_df = snake_DE_params) -> asotin_predicted_DE1
+deteff_draws(alpha = "asotin_alpha1", beta = "asotin_beta", draws_object = snake_draws, niter = 200) -> asotin_predicted_DE1
 asotin_DE_plot1 <- DE_plot_function(df = asotin_predicted_DE1, trib_name = "Asotin Creek (11/12-17/18)")
 
-predict_DE(alpha_term = "asotin_alpha2", beta_term = "asotin_beta", params_df = snake_DE_params) -> asotin_predicted_DE2
+deteff_draws(alpha = "asotin_alpha2", beta = "asotin_beta", draws_object = snake_draws, niter = 200) -> asotin_predicted_DE2
 asotin_DE_plot2 <- DE_plot_function(df = asotin_predicted_DE2, trib_name = "Asotin Creek (18/19-21/22)")
 
-predict_DE(alpha_term = "tucannon_alpha1", beta_term = "tucannon_beta", params_df = snake_DE_params) -> tucannon_predicted_DE1
+deteff_draws(alpha = "tucannon_alpha1", beta = "tucannon_beta", draws_object = snake_draws, niter = 200) -> tucannon_predicted_DE1
 tucannon_DE_plot1 <- DE_plot_function(df = tucannon_predicted_DE1, trib_name = "Tucannon River (10/11-19/20)")
 
-predict_DE(alpha_term = "tucannon_alpha2", beta_term = "tucannon_beta", params_df = snake_DE_params) -> tucannon_predicted_DE2
+deteff_draws(alpha = "tucannon_alpha2", beta = "tucannon_beta", draws_object = snake_draws, niter = 200) -> tucannon_predicted_DE2
 tucannon_DE_plot2 <- DE_plot_function(df = tucannon_predicted_DE2, trib_name = "Tucannon River (20/21-21/22)")
 
-# predict_DE(alpha_term = "imnaha_alpha1", beta_term = "imnaha_beta", params_df = snake_DE_params) -> imnaha_predicted_DE1
-# imnaha_DE_plot1 <- DE_plot_function(df = imnaha_predicted_DE1, trib_name = "Imnaha River (12/13-21/22)")
-# 
-# predict_DE(alpha_term = "fifteenmile_alpha1", beta_term = "fifteenmile_beta", params_df = middle_columbia_DE_params) -> fifteenmile_predicted_DE1
-# fifteenmile_DE_plot1 <- DE_plot_function(df = fifteenmile_predicted_DE1, trib_name = "Fifteenmile Creek (12/13-18/19)")
-
-# Fifteenmile and Imnaha have to be treated differently because they don't have discharge components
-# Fifteenmile
-subset(middle_columbia_DE_params, variable %in% c("fifteenmile_alpha1")) -> fifteenmile_DE
-  
-  seq(-2,2, 0.01) -> zscore_discharge_values
-  
-  fifteenmile_predicted_DE <- data.frame(discharge = zscore_discharge_values, 
-                             mean_DE = plogis(subset(middle_columbia_DE_params, variable == "fifteenmile_alpha1")$mean),
-                             upper_DE = plogis(subset(middle_columbia_DE_params, variable == "fifteenmile_alpha1")$q95),
-                             lower_DE = plogis(subset(middle_columbia_DE_params, variable == "fifteenmile_alpha1")$q5))
-  
-  fifteenmile_predicted_DE %>% 
-    pivot_longer(., cols = c("mean_DE", "upper_DE", "lower_DE")) -> fifteenmile_predicted_DE1
-  
-fifteenmile_DE_plot1 <- DE_plot_function(df = fifteenmile_predicted_DE1, trib_name = "Fifteenmile Creek (12/13-18/19)")
-
-# Imnaha
-subset(snake_DE_params, variable %in% c("imnaha_alpha1")) -> imnaha_DE
-
-seq(-2,2, 0.01) -> zscore_discharge_values
-
-imnaha_predicted_DE <- data.frame(discharge = zscore_discharge_values, 
-                                       mean_DE = plogis(subset(middle_columbia_DE_params, variable == "imnaha_alpha1")$mean),
-                                       upper_DE = plogis(subset(middle_columbia_DE_params, variable == "imnaha_alpha1")$q95),
-                                       lower_DE = plogis(subset(middle_columbia_DE_params, variable == "imnaha_alpha1")$q5))
-
-imnaha_predicted_DE %>% 
-  pivot_longer(., cols = c("mean_DE", "upper_DE", "lower_DE")) -> imnaha_predicted_DE1
-
+deteff_draws(alpha = "imnaha_alpha1", beta = NA, draws_object = snake_draws, niter = 200) -> imnaha_predicted_DE1
 imnaha_DE_plot1 <- DE_plot_function(df = imnaha_predicted_DE1, trib_name = "Imnaha River (12/13-21/22)")
 
 
@@ -1720,9 +1761,9 @@ ggarrange(umatilla_DE_plot1,
                        tucannon_DE_plot1,
                        tucannon_DE_plot2,
           fifteenmile_DE_plot1,
-                       imnaha_DE_plot1, ncol = 5, nrow = 4) -> DE_plots
+                       imnaha_DE_plot1, ncol = 4, nrow = 5) -> DE_plots
 
-ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "DE_plots_v3.pdf"), DE_plots, height = 15, width = 20)
+ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "DE_plots.pdf"), DE_plots, height = 15, width = 20)
 
 
 
