@@ -29,6 +29,131 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r load_functions_libraries, echo = FALSE, warning = FALSE, message = FALSE}
+library(here)
+library(kableExtra)
+library(tidyverse)
+library(flextable)
+
+# Make a function to actually fit the flextable
+FitFlextableToPage <- function(ft, pgwidth = 8){
+
+  ft_out <- ft %>% autofit()
+
+  ft_out <- width(ft_out, width = dim(ft_out)$widths*pgwidth /(flextable_dim(ft_out)$widths))
+  return(ft_out)
+}
+
+# Get the tributary order for plotting, to keep it consistent throughout the tables
+natal_origin_order <- c("Hood_River", "Fifteenmile_Creek", "Deschutes_River",  "John_Day_River",  "Umatilla_River", "Walla_Walla_River",
+                        "Yakima_River", "Wenatchee_River", "Entiat_River", "Methow_River", "Okanogan_River",                
+                        "Tucannon_River", "Clearwater_River", "Asotin_Creek", "Grande_Ronde_River", "Salmon_River", "Imnaha_River")
+
+# ORDER THE STATES
+model_states = c(
+  # Mainstem states (9)
+  "mainstem, mouth to BON",
+  "mainstem, BON to MCN",
+  "mainstem, MCN to ICH or PRA",
+  "mainstem, PRA to RIS",
+  "mainstem, RIS to RRE",
+  "mainstem, RRE to WEL",
+  "mainstem, upstream of WEL",
+  "mainstem, ICH to LGR",
+  "mainstem, upstream of LGR",
+  
+  # Tributary states ()
+  # With detection efficiencies in the model, we now have more tributary states,
+  # since we have an upstream and a river mouth state
+  
+  # "Deschutes River", 
+  "Deschutes River Mouth", "Deschutes River Upstream",
+  # "John Day River", 
+  "John Day River Mouth", "John Day River Upstream",
+  # "Hood River",
+  "Hood River Mouth", "Hood River Upstream",
+  # "Fifteenmile Creek", 
+  "Fifteenmile Creek Mouth", "Fifteenmile Creek Upstream",
+  # "Umatilla River",
+  "Umatilla River Mouth", "Umatilla River Upstream",
+  # "Yakima River",
+  "Yakima River Mouth", "Yakima River Upstream",
+  # "Walla Walla River",
+  "Walla Walla River Mouth", "Walla Walla River Upstream",
+  # "Wenatchee River", 
+  "Wenatchee River Mouth", "Wenatchee River Upstream",
+  # "Entiat River", 
+  "Entiat River Mouth", "Entiat River Upstream",
+  # "Okanogan River", 
+  "Okanogan River Mouth", "Okanogan River Upstream",
+  # "Methow River", 
+  "Methow River Mouth", "Methow River Upstream",
+  # "Tucannon River",
+  "Tucannon River Mouth", "Tucannon River Upstream",
+  # "Asotin Creek", 
+  "Asotin Creek Mouth", "Asotin Creek Upstream",
+  "Clearwater River",
+  "Salmon River",
+  "Grande Ronde River",
+  # "Imnaha River",
+  "Imnaha River Mouth", "Imnaha River Upstream",
+  "BON to MCN other tributaries",
+  "Upstream WEL other tributaries",
+  
+  # Loss
+  "loss"
+)
+
+upstream_indices <- grep("Creek Upstream|River Upstream", model_states)
+states_order_for_plot <- gsub(" Mouth", "", model_states[-upstream_indices])
+# Make a couple of changes to make them be in the order from most downstream to most upstream
+states_order_for_plot[10] <- "Hood River"
+states_order_for_plot[11] <- "Fifteenmile Creek"
+states_order_for_plot[12] <- "Deschutes River"
+states_order_for_plot[13] <- "John Day River"
+states_order_for_plot[15] <- "Walla Walla River"
+states_order_for_plot[16] <- "Yakima River"
+states_order_for_plot[19] <- "Methow River"
+states_order_for_plot[20] <- "Okanogan River"
+
+states_order_for_plot[16:29] <- states_order_for_plot[15:28]
+states_order_for_plot[15] <- "BON to MCN other tributaries"
+states_order_for_plot[23:29] <- states_order_for_plot[22:28]
+states_order_for_plot[22] <- "Upstream WEL other tributaries"
+states_order_for_plot[29] <- "loss"
+
+states_order_for_plot[24] <- "Clearwater River"
+states_order_for_plot[25] <- "Asotin Creek"
+states_order_for_plot[26] <- "Grande Ronde River"
+states_order_for_plot[27] <- "Salmon River"
+
+# create a function to generate flextable
+prob_flextable <- function(prob_table, trib_name){
+  # first, drop all of the upstream states (these are not informative) and rename mouth states by dropping mouth from state name
+  prob_table %>% 
+    subset(., !(grepl("Creek Upstream|River Upstream", from))) %>% 
+    mutate(from = gsub(" Mouth", "", from)) %>% 
+    mutate(to = gsub(" Mouth", "", to)) -> prob_table
+    
+  
+  
+  # second, reorder the table by the states
+  prob_table <- prob_table[order(factor(prob_table$from, levels=states_order_for_plot)),]
+  
+  
+  flextable(prob_table) %>% 
+    align(part = "all") %>% # left align
+    set_caption(caption = paste0("Movement probabilities for ", trib_name, " Steelhead.")) %>% 
+    font(fontname = "Times New Roman (Body)", part = "all") %>% 
+    fontsize(size = 10, part = "body") %>% 
+    theme_booktabs() %>% # default theme
+    FitFlextableToPage() -> table
+  
+  return(table)
+}
+```
+
+
 
 # Introduction
 
@@ -45,6 +170,9 @@ Because of the association between overshoot and fallback and decreased migratio
 
 
 # Methods
+
+## Study area
+![The model schematic.](.//figures/CRB_map_pres_dams.pdf){width=100%}
 
 ## Modeling overview
 
@@ -101,6 +229,89 @@ All code is available at https://github.com/markusmin/steelhead.
 # Results
 A total of 662 different movement probabilities, based on the combination of state transition and origin/DPS, were estimated by the model (Tables 1-6). The model schematic in Fig. 1 is necessary to interpret the ecological significance of these movement probabilities, in terms of which movements constitute the probabilities of certain movements, such as overshoot, fallback, homing, or straying. Furthermore, each movement probability represents only the probability of an individual making that movement conditional on it already being in the "from" state. Due to poor detection probabilities in tributaries and in downstream passage routes, only overshoot probabilities (which have near 100% detection probability) are discussed in the Results; see [Current Limitations](#current-limitations) for a discussion of these issues and future directions to address them. Overshoot probabilities, or the probability of ascending the dam upstream of the natal tributary in the model schematic (Fig. 1), varied considerably by natal origin.
 
+## Summary statistics
+
+### Sample sizes
+```{r fish_table, echo = FALSE, message = FALSE, warning = FALSE}
+read.csv(here::here("CBR_report", "CBR_report_final", "tables", "fish_year_origin_table.csv"), row.names = 1) -> fish_year_origin_table
+
+fish_year_origin_table[match(natal_origin_order, fish_year_origin_table$natal_origin),] -> fish_year_origin_table
+
+fish_year_origin_table %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) -> fish_year_origin_table
+
+colnames(fish_year_origin_table) <- c("Natal Origin", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+
+flextable(fish_year_origin_table) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Number of tagged fish in our dataset, by natal origin and run year.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  FitFlextableToPage()
+```
+
+### Out-of-ESU movement
+```{r out_of_ESU, echo = FALSE, message = FALSE, warning = FALSE}
+read.csv(here::here("CBR_report", "CBR_report_final", "tables", "out_of_ESU_counts_table.csv"), row.names = 1) -> out_of_ESU_counts_table
+
+out_of_ESU_counts_table[match(natal_origin_order, out_of_ESU_counts_table$natal_origin),] -> out_of_ESU_counts_table
+
+out_of_ESU_counts_table %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
+  dplyr::rename(Proportion = out_of_ESU, "Natal Origin" = natal_origin) -> out_of_ESU_counts_table
+
+
+flextable(out_of_ESU_counts_table) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Proportion and number of tagged individuals seen in reaches of the Colubmia or Snake outside of the ESU boundaries that are not necessary for homing. For Middle Columbia Steelhead, this is defined as reaches upstream of Priest Rapids Dam on the Upper Columbia River or upstream of Ice Harbor Dam on the Snake River; for Upper Columbia Steelhead, this is deffined as reaches upstream of Ice Harbor Dam on the Snake River, and for Snake River Steelhead, this is defined as reaches upstream of Priest Rapids Dam on the Upper Columbia River.")  %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 9, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  FitFlextableToPage()
+```
+
+### Overshoot by dam
+```{r overshoot_table, echo = FALSE, message = FALSE, warning = FALSE}
+read.csv(here::here("CBR_report", "CBR_report_final", "tables", "overshoot_dam_origin_table.csv"), row.names = 1) -> overshoot_dam_origin_table
+
+overshoot_dam_origin_table[match(natal_origin_order, overshoot_dam_origin_table$natal_origin),] -> overshoot_dam_origin_table
+
+overshoot_dam_origin_table %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
+  dplyr::rename("Natal Origin" = natal_origin) -> overshoot_dam_origin_table
+
+
+flextable(overshoot_dam_origin_table) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Proportion and number of tagged individuals observed overshooting each dam.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  FitFlextableToPage()
+```
+
+### Fallback by dam
+```{r fallback_table, echo = FALSE, message = FALSE, warning = FALSE}
+read.csv(here::here("CBR_report", "CBR_report_final", "tables", "fallback_dam_origin_table.csv"), row.names = 1) -> fallback_dam_origin_table
+
+fallback_dam_origin_table[match(natal_origin_order, fallback_dam_origin_table$natal_origin),] -> fallback_dam_origin_table
+
+fallback_dam_origin_table %>% 
+  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
+  dplyr::rename("Natal Origin" = natal_origin) -> fallback_dam_origin_table
+
+
+flextable(fallback_dam_origin_table) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Proportion and number of tagged individuals observed falling back at each dam.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  FitFlextableToPage()
+```
+
+
 ## Final population distribution probability
 
 ### Middle Columbia River Steelhead
@@ -143,22 +354,30 @@ A total of 662 different movement probabilities, based on the combination of sta
 
 ## Homing probabilities, conditional on overshoot
 ```{r homing_probs, echo = FALSE, warning = FALSE, message = FALSE}
-library(flextable)
-library(tidyverse)
 read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_homing_probabilities.csv"), row.names = 1) %>% 
   dplyr::rename("Natal Origin" = natal_origin, "Non-overshoot" = non_overshoot, "Overshoot" = overshoot) -> overshooting_homing_probs
 
 flextable(overshooting_homing_probs) %>% 
   align(part = "all") %>% # left align
-  set_caption(caption = "Probability of successfully homing, conditional on making it to the section of mainstem into which the home tributary flows, or conditional on overshooting the dam directly upstream of the home tributary.") %>% 
+  set_caption(caption = "A comparison of probability of successfully homing, conditional on either (1) making it to the section of mainstem into which the home tributary flows, or (2) on overshooting the dam directly upstream of the home tributary.") %>% 
   font(fontname = "Times New Roman (Body)", part = "all") %>% 
   fontsize(size = 10, part = "body") %>% 
   theme_booktabs() %>% # default theme
-  autofit()
+  FitFlextableToPage()
 ```
 
+## Fallback probability by dam and origin
+```{r fallback_probs, echo = FALSE, warning = FALSE, message = FALSE}
+read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_fallback_probs.csv"))  -> dam_specific_fallback_probs
 
-
+flextable(dam_specific_fallback_probs) %>% 
+  align(part = "all") %>% # left align
+  set_caption(caption = "Probability of falling back over a dam, conditional on being in the state directly upstream of the dam.") %>% 
+  font(fontname = "Times New Roman (Body)", part = "all") %>% 
+  fontsize(size = 10, part = "body") %>% 
+  theme_booktabs() %>% # default theme
+  FitFlextableToPage()
+```
 
 ## Middle Columbia River Steelhead
 Of the natal tributaries downstream of McNary Dam, John Day River and Umatilla River Steelhead each had a high mean probability of overshooting McNary Dam (46.4% and 33.8%, respectively; Table 2), while Deschutes River and Fifteenmile Creek Steelhead had a low mean probability (0.7% and 9%, respectively; Table 2). Conditional on overshooting McNary Dam, John Day River and Umatilla River Steelhead had an approximately 20% chance of additionally overshooting Ice Harbor Dam on the Snake River, but only a very low probability of overshooting Priest Rapids Dam on the Columbia River (Table 2). For Yakima River and Walla Walla River Steelhead, whose natal tributaries are upstream of McNary Dam, Yakima River Steelhead were more likely to overshoot Priest Rapids Dam (13.8% mean probability) than Ice Harbor Dam (3.5% mean probabiltiy) whereas Wallla Walla River Steelhead were much more likely to overshoot Ice Harbor Dam (57.4% mean probability) than Priest Rapids Dam (2% mean probability) (Table 2).
@@ -193,19 +412,18 @@ The model structure and the use of the multinomial logit to evaluate movement pr
 
 # References
 
-\setlength{\parindent}{-0.375in}
-\setlength{\leftskip}{0.375in}
-\setlength{\parskip}{8pt}
-\noindent
+<div id="refs"></div>
 
-# Appendix 1: Individual movement probabilities
 
-## Appendix 1a. Middle Columbia River Steelhead
+
+# Appendix 1: Detection probabilities
+![Detection probability by tributary and timeframe.](.//figures/DE_plots.pdf){width=100%}
+
+
+# Appendix 2: Individual movement probabilities
+
+## Middle Columbia River Steelhead
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
-library(here)
-library(kableExtra)
-library(tidyverse)
-library(flextable)
 # Upper Columbia
 
 middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"), row.names = 1)
@@ -230,33 +448,80 @@ middle_columbia_origin_probs %>%
 #   kable_styling(latex_options = c("repeat_header"))
 
 # testing:
-flextable(middle_columbia_DPS_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+# flextable(middle_columbia_DPS_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Middle Columbia Steelhead, outside of the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
 
 # 
 # regulartable(middle_columbia_origin_probs)
 ```
 
-<br>
-  <br>
-  <br>
-  
-```{r middle_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-flextable(middle_columbia_origin_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+
+```{r middle_columbia_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
+subset(middle_columbia_origin_probs, origin == "Fifteenmile Creek") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Fifteenmile Creek")
+
+subset(middle_columbia_origin_probs, origin == "Deschutes River") %>% 
+  dplyr::select(-origin) -> deschutes_origin_probs
+deschutes_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> deschutes_probs
+
+prob_flextable(prob_table = deschutes_probs, trib_name = "Deschutes River")
+
+subset(middle_columbia_origin_probs, origin == "John Day River") %>% 
+  dplyr::select(-origin) -> john_day_origin_probs
+john_day_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> john_day_probs
+
+prob_flextable(prob_table = john_day_probs, trib_name = "John Day River")
+
+subset(middle_columbia_origin_probs, origin == "Umatilla River") %>% 
+  dplyr::select(-origin) -> umatilla_origin_probs
+umatilla_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> umatilla_probs
+
+prob_flextable(prob_table = umatilla_probs, trib_name = "Umatilla River")
+
+subset(middle_columbia_origin_probs, origin == "Walla Walla River") %>% 
+  dplyr::select(-origin) -> walla_walla_origin_probs
+walla_walla_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> walla_walla_probs
+
+prob_flextable(prob_table = walla_walla_probs, trib_name = "Walla Walla River")
+
+subset(middle_columbia_origin_probs, origin == "Yakima River") %>% 
+  dplyr::select(-origin) -> yakima_origin_probs
+yakima_origin_probs %>% 
+  bind_rows(., middle_columbia_DPS_probs) -> yakima_probs
+
+prob_flextable(prob_table = yakima_probs, trib_name = "Yakima River")
 ```
 
-## Appendix 1b. Upper Columbia River Steelhead
+
+
+<br>
+<br>  
+<br>
+  
+```{r middle_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
+# flextable(middle_columbia_origin_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
+```
+
+## Upper Columbia River Steelhead
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 # Upper Columbia
 
@@ -282,16 +547,47 @@ upper_columbia_origin_probs %>%
 #   kable_styling(latex_options = c("repeat_header"))
 
 # testing:
-flextable(upper_columbia_DPS_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+# flextable(upper_columbia_DPS_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
 
 # 
 # regulartable(upper_columbia_origin_probs)
+```
+
+
+```{r upper_columbia_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
+subset(upper_columbia_origin_probs, origin == "Wenatchee River") %>% 
+  dplyr::select(-origin) -> wenatchee_origin_probs
+wenatchee_origin_probs %>% 
+  bind_rows(., upper_columbia_DPS_probs) -> wenatchee_probs
+
+prob_flextable(prob_table = wenatchee_probs, trib_name = "Wenatchee River")
+
+subset(upper_columbia_origin_probs, origin == "Entiat River") %>% 
+  dplyr::select(-origin) -> entiat_origin_probs
+entiat_origin_probs %>% 
+  bind_rows(., upper_columbia_DPS_probs) -> entiat_probs
+
+prob_flextable(prob_table = entiat_probs, trib_name = "Entiat River")
+
+subset(upper_columbia_origin_probs, origin == "Methow River") %>% 
+  dplyr::select(-origin) -> methow_origin_probs
+methow_origin_probs %>% 
+  bind_rows(., upper_columbia_DPS_probs) -> methow_probs
+
+prob_flextable(prob_table = methow_probs, trib_name = "Methow River")
+
+subset(upper_columbia_origin_probs, origin == "Okanogan River") %>% 
+  dplyr::select(-origin) -> okanogan_origin_probs
+okanogan_origin_probs %>% 
+  bind_rows(., upper_columbia_DPS_probs) -> okanogan_probs
+
+prob_flextable(prob_table = okanogan_probs, trib_name = "Okanogan River")
 ```
 
 <br>
@@ -299,16 +595,16 @@ flextable(upper_columbia_DPS_probs) %>%
 <br>
 
 ```{r upper_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-flextable(upper_columbia_origin_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+# flextable(upper_columbia_origin_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
 ```
 
-## Appendix 1c. Snake River Basin Steelhead
+## Snake River Basin Steelhead
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 # Snake River
 
@@ -334,16 +630,62 @@ snake_origin_probs %>%
 #   kable_styling(latex_options = c("repeat_header"))
 
 # testing:
-flextable(snake_DPS_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+# flextable(snake_DPS_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
 
 # 
 # regulartable(snake_origin_probs)
+```
+
+```{r snake_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
+subset(snake_origin_probs, origin == "Tucannon River") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Tucannon River")
+
+subset(snake_origin_probs, origin == "Clearwater River") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Clearwater River")
+
+subset(snake_origin_probs, origin == "Asotin Creek") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Asotin Creek")
+
+subset(snake_origin_probs, origin == "Grande Ronde River") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Grande Ronde River")
+
+subset(snake_origin_probs, origin == "Salmon River") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Salmon River")
+
+subset(snake_origin_probs, origin == "Imnaha River") %>% 
+  dplyr::select(-origin) -> fifteenmile_origin_probs
+fifteenmile_origin_probs %>% 
+  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
+
+prob_flextable(prob_table = fifteenmile_probs, trib_name = "Imnaha River")
+
+
 ```
 
 <br>
@@ -351,13 +693,17 @@ flextable(snake_DPS_probs) %>%
   <br>
   
 ```{r snake_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-flextable(snake_origin_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  autofit()
+# flextable(snake_origin_probs) %>% 
+#   align(part = "all") %>% # left align
+#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
+#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
+#   fontsize(size = 10, part = "body") %>% 
+#   theme_booktabs() %>% # default theme
+#   FitFlextableToPage()
 ```
 
 
+\setlength{\parindent}{-0.375in}
+\setlength{\leftskip}{0.375in}
+\setlength{\parskip}{8pt}
+\noindent
