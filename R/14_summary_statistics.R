@@ -437,6 +437,14 @@ fallback_only_movements %>%
 
 write.csv(fallback_table_for_report, here::here("CBR_report", "CBR_report_final", "tables", "fallback_dam_origin_table.csv"))
 
+fallback_only_movements %>% 
+  ungroup() %>% 
+  # Make sure you don't double count - only keep unique combinations of tag code + fallback dam (pathway)
+  filter(!(duplicated(paste0(tag_code_2, fallback_dam)))) %>% 
+  count(natal_origin, fallback_dam) %>% 
+  dplyr::select(-natal_origin) %>% 
+  group_by(fallback_dam) %>% 
+  summarise(total = sum(n)) -> total_fallback_by_dam
 
 
 # 
