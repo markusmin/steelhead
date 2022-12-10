@@ -1711,7 +1711,7 @@ deteff_draws(alpha = "okanogan_alpha1", beta = "okanogan_beta", draws_object = u
 okanogan_DE_plot <- DE_plot_function(df = okanogan_predicted_DE, trib_name = "Okanogan (12/13-21/22)")
 
 deteff_draws(alpha = "wenatchee_alpha1", beta = "wenatchee_beta", draws_object = upper_columbia_draws, niter = 200) -> wenatchee_predicted_DE1
-wenatchee_DE_plot1 <- DE_plot_function(df = wenatchee_predicted_DE1, trib_name = "Wenatchee River (2010-2020)")
+wenatchee_DE_plot1 <- DE_plot_function(df = wenatchee_predicted_DE1, trib_name = "Wenatchee River (10/11-21/22)")
 
 deteff_draws(alpha = "entiat_alpha1", beta = "entiat_beta", draws_object = upper_columbia_draws, niter = 200) -> entiat_predicted_DE1
 entiat_DE_plot1 <- DE_plot_function(df = entiat_predicted_DE1, trib_name = "Entiat River (07/08-21/22)")
