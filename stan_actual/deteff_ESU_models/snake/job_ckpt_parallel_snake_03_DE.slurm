@@ -10,7 +10,7 @@
 #SBATCH -A stf-ckpt
 
 ## Resources
-#SBATCH --nodes=3
+#SBATCH --nodes=1
 #SBATCH --time=4:00:00
 #SBATCH --ntasks=28
 #SBATCH --mem=120G

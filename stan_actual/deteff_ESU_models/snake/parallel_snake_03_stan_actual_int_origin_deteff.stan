@@ -79,17 +79,6 @@ functions{
     // start - end apparently doesn't work because reduce_sum() resets the indices for each slice (confusing) - according to this post: https://discourse.mc-stan.org/t/parallelization-in-cmdstanr-using-reduce-sum-on-a-multinomial-likelihood/24607/7
   // or maybe not, this post seems to contradict this: https://discourse.mc-stan.org/t/help-with-multi-threading-a-simple-ordinal-probit-model-using-reduce-sum/15353
   // i is the number of fish
-  
-  // edits 2022-12-02: vectorize part of this loop
-  // Make a vector with length (end - start + 1), where we can store the lp for each fish individually
-  // get the length of the vector
-  int fish_in_chunk;
-  fish_in_chunk = (end - start + 1);
-  
-  // create the vector with that length to store lp of individual fish
-  vector[fish_in_chunk] fish_in_chunk_lp;
-  // end edits 2022-12-02
-  
   for (i in start:end){
     // for (i in 1:end-start+1){
     // Loop through each of the observations, stopping at the loss column
@@ -101,7 +90,6 @@ functions{
     // Let's initialize this instead as a real value starting at zero
     real lp_fish = 0;
     // j is the index of the observation (i.e., each individual state transition)
-    
     for (j in 1:n_obs[i]){
       // for (j in 1:n_obs[i - start + 1]){
           // print("i = ",i);
@@ -212,6 +200,9 @@ functions{
           // proportion vector, uncorrected for detection efficiency
           p_vec_actual = softmax(logits);
           
+          // FOR TESTING - set p_vec_observed = p_vec_actual
+          p_vec_observed = p_vec_actual;
+          
           // print("p_vec_actual: ", p_vec_actual);
         // print("i = ",i);
         // print("j = ",j);
@@ -307,22 +298,20 @@ functions{
         // inspect the data vs. the vector of probabilities
         // print("data: ", slice_y[i - start + 1,j+1]);
         
+        // 2022-11-29 edits for performance:
+        // We are going to try to vectorize this and sum it outside of the loop, rather than repeatedly updating a variable.
         lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
+        // lp_fish += categorical_lpmf(slice_y[i,j+1] | p_vec);
       
     }
     
     // Now, increment the log density
     // total_lp += sum(lp_fish);
-    // edits 2022-12-02: don't increment, but instead populate vector
-    // total_lp += lp_fish;
-    fish_in_chunk_lp[(i - start + 1)] = lp_fish;
+    total_lp += lp_fish;
+    
     
 } // end looping through fish in this slice
 
-// edits 2022-12-02: sum the lp in the vector
-total_lp = sum(fish_in_chunk_lp);
-
-// return total_lp of the chunk
 return total_lp;
 
 } // end partial_sum_lpmf function

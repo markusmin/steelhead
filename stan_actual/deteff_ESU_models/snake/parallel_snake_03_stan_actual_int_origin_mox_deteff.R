@@ -523,7 +523,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 }
 
 # There are six origins in this model, so we will have five origin parameters.
-# We will only allow an origin effect within the ESU (so after ICH). Before, they will only have an intercept term
+# We will only allow an origin effect within the ESU (so after PRA). Before, they will only have an intercept term
 # print declaration of borigin parameters
 for (i in 1:5){
   for (j in 1:nrow(snake_movements)){
@@ -1679,29 +1679,27 @@ n.ind <- dim(state_data)[3]
   print("model compiled at")
   print(Sys.time())
   
-  options(mc.cores=3)
-  
   # Step 3: Run MCMC (HMC)
   fit <- mod$sample(
     data = data, 
     seed = 123, 
     # seed = 456,
     # chains = 3, 
-    chains = 3,
-    # parallel_chains = 1,
-    parallel_chains = 3,
+    chains = 1,
+    parallel_chains = 1,
+    # parallel_chains = 3,
     refresh = 10, # print update every 10 iter
     # iter_sampling = 1000,
     # iter_warmup = 1000,
-    iter_warmup = 20,
-    iter_sampling = 20,
+    iter_warmup = 200,
+    iter_sampling = 200,
     # adapt_delta = 0.95,
     init = 0,
     threads_per_chain = 28
   )
   
 # saveRDS(fit, "100iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
-fit$save_object(file = "3chains_20iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
+fit$save_object(file = "200iter_parallel_snake_stan_actual_int_origin_stan_fit.rds")
 
 # Troubleshoot our data
 # Check to see if every transition in our model is represented
