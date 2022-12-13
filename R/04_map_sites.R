@@ -216,6 +216,13 @@ ggsave(here("figures", "CRB_map_v3.pdf"), CRB_map, height = 6, width  = 10)
 ##### Plot all sites on top of base map #####
 complete_event_det_counts <- read.csv(here::here("model_files", "complete_event_det_counts.csv"))
 
+# Make a change - add Lower Monumental and Little Goose to list of dams, highlight in grey.
+complete_event_det_counts %>% 
+  mutate(dam = ifelse(event_site_name %in% c("GOA - Little Goose Fish Ladder", "LMA - Lower Monumental Adult Ladders"), "dam", dam)) %>% 
+  mutate(dam_abbr = ifelse(event_site_name == "GOA - Little Goose Fish Ladder", "LGO",
+                           ifelse(event_site_name == "LMA - Lower Monumental Adult Ladders", "LMO", dam_abbr))) -> complete_event_det_counts
+
+
 # JDA correction
 complete_event_det_counts %>% 
   subset(!duplicated(event_site_name)) -> complete_event_det_counts
@@ -328,18 +335,18 @@ ggsave(here("figures", "CRB_map_pres_nodams.pdf"), CRB_map_pres_nodams, height =
 # ggsave(here("figures", "CRB_map_pres_nodams.png"), CRB_map_pres_nodams, height = 7.5, width  = 13.33) 
 
 CRB_map_pres_dams <- CRB_map_pres_nodams +
-  # Add dams - but grey out TDA and JDA, since they're not currently included as state delineators (and therefore we aren't estimating overshoot/fallback at them)
-  geom_point(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA"))), 
+  # Add dams - but grey out TDA, JDA, LMO, and LGO since they're not currently included as state delineators (and therefore we aren't estimating overshoot/fallback at them)
+  geom_point(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA", "LGO", "LMO"))), 
              aes(x = event_site_longitude, y = event_site_latitude), 
              shape = 73, size = 7, inherit.aes = FALSE) +
-  geom_text(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA"))), 
+  geom_text(data = subset(complete_event_det_counts, dam == "dam" & !(dam_abbr %in% c("TDA", "JDA", "LGO", "LMO"))), 
             aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
             size = 6, inherit.aes = FALSE) +
-  # grey out JDA and TDA
-  geom_point(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA")), 
+  # grey out TDA, JDA, LMO, and LGO
+  geom_point(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA", "LGO", "LMO")), 
              aes(x = event_site_longitude, y = event_site_latitude), 
              shape = 73, size = 7, color = "gray50", inherit.aes = FALSE) +
-  geom_text(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA")), 
+  geom_text(data = subset(complete_event_det_counts, dam == "dam" & dam_abbr %in% c("TDA", "JDA", "LGO", "LMO")), 
             aes(x = event_site_longitude, y = event_site_latitude+0.15, label = dam_abbr), 
             size = 6, color = "gray50", inherit.aes = FALSE)
   
