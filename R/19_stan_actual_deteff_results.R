@@ -182,14 +182,24 @@ snake_DE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 snake_DE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  # mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
+  #                             " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+           paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                              " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> snake_DE_DPS_probs
 
 snake_DE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> snake_DE_origin_probs
+
+# Put an asterisk next to all of these, since they're shared across all origins
+snake_DE_DPS_probs %>%
+  mutate(probability= paste0(probability, "*")) -> snake_DE_DPS_probs
 
 write.csv(snake_DE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_DPS_probs.csv"))
 write.csv(snake_DE_origin_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_origin_probs.csv"))
@@ -230,13 +240,17 @@ snake_NDE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 snake_NDE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> snake_NDE_DPS_probs
 
 snake_NDE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> snake_NDE_origin_probs
 
 # export both tables
@@ -275,17 +289,26 @@ middle_columbia_DE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 middle_columbia_DE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> middle_columbia_DE_DPS_probs
 
 middle_columbia_DE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> middle_columbia_DE_origin_probs
 
 
 # export both tables
+# Put an asterisk next to all of these, since they're shared across all origins
+middle_columbia_DE_DPS_probs %>%
+  mutate(probability= paste0(probability, "*")) -> middle_columbia_DE_DPS_probs
+
+
 write.csv(middle_columbia_DE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"))
 write.csv(middle_columbia_DE_origin_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_origin_probs.csv"))
 
@@ -321,13 +344,17 @@ middle_columbia_NDE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 middle_columbia_NDE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> middle_columbia_NDE_DPS_probs
 
 middle_columbia_NDE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> middle_columbia_NDE_origin_probs
 
 # export both tables
@@ -364,15 +391,24 @@ upper_columbia_DE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 upper_columbia_DE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> upper_columbia_DE_DPS_probs
 
 upper_columbia_DE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> upper_columbia_DE_origin_probs
 # export both tables
+
+# Put an asterisk next to all of these, since they're shared across all origins
+upper_columbia_DE_DPS_probs %>%
+  mutate(probability= paste0(probability, "*")) -> upper_columbia_DE_DPS_probs
+
 write.csv(upper_columbia_DE_DPS_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_DPS_probs.csv"))
 write.csv(upper_columbia_DE_origin_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_origin_probs.csv"))
 
@@ -406,13 +442,17 @@ upper_columbia_NDE_prob_table %>%
 
 # Change output to be mean (5% - 95% CI), rather than three separate columns
 upper_columbia_NDE_DPS_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability) -> upper_columbia_NDE_DPS_probs
 
 upper_columbia_NDE_origin_probs %>% 
-  mutate(probability = paste0(formatC(mean, digits = 2, format = "fg"), " (", formatC(q5, digits = 2, format = "fg"), 
-                              " - ", formatC(q95, digits = 2, format = "fg"), ")")) %>% 
+  mutate(probability = ifelse(mean == 0, "0",                               
+                              ifelse(mean <= 0.005 & mean > 0, "<0.01",
+                              paste0(formatC(mean, digits = 2, format = "f"), " (", formatC(q5, digits = 2, format = "f"), 
+                                     " - ", formatC(q95, digits = 2, format = "f"), ")")))) %>% 
   dplyr::select(from, to, probability, origin) -> upper_columbia_NDE_origin_probs
 
 # export both tables
@@ -597,7 +637,8 @@ final_fates_uncertainty <- function(transition_matrix_list, niter, start_state =
     # dplyr::select(-prob) %>% 
     pivot_wider(names_from = q, values_from = prob) -> final_fates_quantiles
   
-  return(final_fates_quantiles)
+  # Edit - return raw values for each of the 200 as well as the summaries. This will allow us to get those ratios and the quantiles.
+  return(list(final_fates_quantiles, final_fates_summary))
 }
 
 ### Function to reformat data for plot
@@ -633,8 +674,12 @@ final_fate_plot_data_reformat <- function(final_fates_quantiles){
     mutate(state = fct_rev(factor(state, levels = states_order_for_plot))) %>% 
     arrange(desc(state)) %>% # reorder by factor levels
     # mutate(label = paste0(`0.5`, "% (", `0.025`, "% - ", `0.975`, "%)")) %>% 
-    mutate(label = paste0(format(`0.5`, digits = 2, scientific = FALSE), " (", format(`0.025`, digits = 2, scientific = FALSE), 
-                          " - ", format(`0.975`, digits = 2, scientific = FALSE), ")")) %>% 
+    # mutate(label = paste0(format(`0.5`, digits = 2, scientific = FALSE), " (", format(`0.025`, digits = 2, scientific = FALSE), 
+    #                       " - ", format(`0.975`, digits = 2, scientific = FALSE), ")")) %>% 
+    mutate(label = ifelse(`0.5` == 0, "0",
+      ifelse(`0.5` <= 0.005 & `0.5` > 0, "<0.01",
+                                paste0(formatC(`0.5`, digits = 2, format = "f"), " (", formatC(`0.025`, digits = 2, format = "f"), 
+                                       " - ", formatC(`0.975`, digits = 2, format = "f"), ")")))) %>% 
     mutate(label.pos = 0) -> final_fates_quantiles_forplot
   
   return(final_fates_quantiles_forplot)
@@ -653,12 +698,14 @@ final_fates_plot <- function(final_fates_quantiles_forplot, homing_state, downst
   
   # Create the quantiles plot
   quantiles_plot <- ggplot(final_fates_quantiles_forplot, aes(x = state, y = `0.5`, ymin = `0.025`, ymax = `0.975`)) +
-    geom_point() +
+    geom_point(size = 3.5, shape = 18) +
     geom_linerange() +
     coord_flip() +
     ylab("Final Distribution Probability") +
     xlab("Model State") +
     # ggtitle(" ") +
+    # Create a scale common to all
+    scale_y_continuous(lim = c(0, 0.85), breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8)) +
     theme(plot.title = element_text(size = 12),
           axis.text.y = element_text(color = rev(state_significance_colors)),
           axis.title = element_text(size = 14),
@@ -723,89 +770,90 @@ as.data.frame(upper_columbia_fit$draws()) -> upper_columbia_draws
 
 ##### MIDDLE COLUMBIA, UPPER COLUMBIA, AND SNAKE - prepare data for plotting ####
 print(Sys.time())
+set.seed(123)
 ### Middle Columbia
 # deschutes River
 deschutes_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin1_probs_DE", niter = 200)
-deschutes_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200)
+deschutes_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200)[[1]]
 deschutes_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = deschutes_final_fates_quantiles)
 
 # john_day River
 john_day_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin3_probs_DE", niter = 200)
-john_day_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200)
+john_day_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200)[[1]]
 john_day_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = john_day_final_fates_quantiles)
 
 # fifteenmile creek
 fifteenmile_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin2_probs_DE", niter = 200)
-fifteenmile_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200)
+fifteenmile_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200)[[1]]
 fifteenmile_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = fifteenmile_final_fates_quantiles)
 
 # umatilla River
 umatilla_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin4_probs_DE", niter = 200)
-umatilla_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200)
+umatilla_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200)[[1]]
 umatilla_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = umatilla_final_fates_quantiles)
 
 # yakima River
 yakima_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin5_probs_DE", niter = 200)
-yakima_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200)
+yakima_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200)[[1]]
 yakima_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = yakima_final_fates_quantiles)
 
 # walla_walla River
 walla_walla_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = middle_columbia_draws, variable_prefix = "origin6_probs_DE", niter = 200)
-walla_walla_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200)
+walla_walla_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200)[[1]]
 walla_walla_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = walla_walla_final_fates_quantiles)
 
 ### Upper Columbia
 
 # wenatchee River
 wenatchee_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = upper_columbia_draws, variable_prefix = "origin1_probs_DE", niter = 200)
-wenatchee_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200)
+wenatchee_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200)[[1]]
 wenatchee_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = wenatchee_final_fates_quantiles)
 
 # entiat River
 entiat_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = upper_columbia_draws, variable_prefix = "origin2_probs_DE", niter = 200)
-entiat_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200)
+entiat_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200)[[1]]
 entiat_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = entiat_final_fates_quantiles)
 
 # okanogan River
 okanogan_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = upper_columbia_draws, variable_prefix = "origin3_probs_DE", niter = 200)
-okanogan_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = okanogan_DE_transition_matrix_list, niter = 200)
+okanogan_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = okanogan_DE_transition_matrix_list, niter = 200)[[1]]
 okanogan_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = okanogan_final_fates_quantiles)
 
 # methow River
 methow_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = upper_columbia_draws, variable_prefix = "origin4_probs_DE", niter = 200)
-methow_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = methow_DE_transition_matrix_list, niter = 200)
+methow_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = methow_DE_transition_matrix_list, niter = 200)[[1]]
 methow_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = methow_final_fates_quantiles)
 
 
 ### Snake River
 # Tucannon River
 tucannon_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin1_probs_DE", niter = 200)
-tucannon_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200)
+tucannon_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200)[[1]]
 tucannon_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = tucannon_final_fates_quantiles)
 
 # asotin Creek
 asotin_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin2_probs_DE", niter = 200)
-asotin_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = asotin_DE_transition_matrix_list, niter = 200)
+asotin_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = asotin_DE_transition_matrix_list, niter = 200)[[1]]
 asotin_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = asotin_final_fates_quantiles)
 
 # clearwater River
 clearwater_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin3_probs_DE", niter = 200)
-clearwater_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = clearwater_DE_transition_matrix_list, niter = 200)
+clearwater_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = clearwater_DE_transition_matrix_list, niter = 200)[[1]]
 clearwater_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = clearwater_final_fates_quantiles)
 
 # imnaha River
 imnaha_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin6_probs_DE", niter = 200)
-imnaha_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = imnaha_DE_transition_matrix_list, niter = 200)
+imnaha_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = imnaha_DE_transition_matrix_list, niter = 200)[[1]]
 imnaha_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = imnaha_final_fates_quantiles)
 
 # salmon River
 salmon_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin4_probs_DE", niter = 200)
-salmon_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = salmon_DE_transition_matrix_list, niter = 200)
+salmon_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = salmon_DE_transition_matrix_list, niter = 200)[[1]]
 salmon_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = salmon_final_fates_quantiles)
 
 # grande_ronde River
 grande_ronde_DE_transition_matrix_list <- transition_matrix_reformat_draws(draws_object = snake_draws, variable_prefix = "origin5_probs_DE", niter = 200)
-grande_ronde_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = grande_ronde_DE_transition_matrix_list, niter = 200)
+grande_ronde_final_fates_quantiles <- final_fates_uncertainty(transition_matrix_list = grande_ronde_DE_transition_matrix_list, niter = 200)[[1]]
 grande_ronde_final_fates_quantiles_forplot <- final_fate_plot_data_reformat(final_fates_quantiles = grande_ronde_final_fates_quantiles)
 
 print(Sys.time())
@@ -824,7 +872,7 @@ deschutes_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = de
                                                                       "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "deschutes_fates_plot.pdf"), deschutes_plot_for_report, height = 8, width = 10)
-ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "deschutes_fates_plot.pdf"), deschutes_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "deschutes_fates_plot.pdf"), deschutes_plot_for_report, height = 8, width = 10)
 
 john_day_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = john_day_final_fates_quantiles_forplot, homing_state = "John Day River", 
                                              downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River"),
@@ -834,6 +882,7 @@ john_day_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = joh
                                                                       "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "john_day_fates_plot.pdf"), john_day_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "john_day_fates_plot.pdf"), john_day_plot_for_report, height = 8, width = 10)
 
 fifteenmile_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = fifteenmile_final_fates_quantiles_forplot, homing_state = "Fifteenmile Creek", 
                                                 downstream_tributaries = c("Hood River"),
@@ -843,6 +892,7 @@ fifteenmile_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = 
                                                                          "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "fifteenmile_fates_plot.pdf"), fifteenmile_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "fifteenmile_fates_plot.pdf"), fifteenmile_plot_for_report, height = 8, width = 10)
 
 umatilla_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = umatilla_final_fates_quantiles_forplot, homing_state = "Umatilla River", 
                                              downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River"),
@@ -852,6 +902,7 @@ umatilla_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = uma
                                                                       "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "umatilla_fates_plot.pdf"), umatilla_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "umatilla_fates_plot.pdf"), umatilla_plot_for_report, height = 8, width = 10)
 
 walla_walla_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = walla_walla_final_fates_quantiles_forplot, homing_state = "Walla Walla River", 
                                                 downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "BON to MCN other tributaries"),
@@ -860,6 +911,7 @@ walla_walla_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = 
                                                                          "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "walla_walla_fates_plot.pdf"), walla_walla_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "walla_walla_fates_plot.pdf"), walla_walla_plot_for_report, height = 8, width = 10)
 
 yakima_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = yakima_final_fates_quantiles_forplot, homing_state = "Yakima River", 
                                            downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "BON to MCN other tributaries", "Walla Walla River"),
@@ -867,7 +919,7 @@ yakima_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = yakim
                                                                     "Tucannon River", "Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "yakima_fates_plot.pdf"), yakima_plot_for_report, height = 8, width = 10)
-
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "yakima_fates_plot.pdf"), yakima_plot_for_report, height = 8, width = 10)
 
 
 
@@ -878,6 +930,7 @@ wenatchee_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = we
                                              upstream_tributaries = c("Entiat River", "Methow River", "Okanogan River", "Upstream WEL other tributaries"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "wenatchee_fates_plot.pdf"), wenatchee_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "wenatchee_fates_plot.pdf"), wenatchee_plot_for_report, height = 8, width = 10)
 
 entiat_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = entiat_final_fates_quantiles_forplot, homing_state = "Entiat River", 
                                            downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -886,6 +939,7 @@ entiat_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = entia
                                            upstream_tributaries = c("Methow River", "Okanogan River", "Upstream WEL other tributaries"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "entiat_fates_plot.pdf"), entiat_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "entiat_fates_plot.pdf"), entiat_plot_for_report, height = 8, width = 10)
 
 methow_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = methow_final_fates_quantiles_forplot, homing_state = "Methow River", 
                                            downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -894,6 +948,7 @@ methow_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = metho
                                            upstream_tributaries = c("Okanogan River", "Upstream WEL other tributaries"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "methow_fates_plot.pdf"), methow_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "methow_fates_plot.pdf"), methow_plot_for_report, height = 8, width = 10)
 
 okanogan_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = okanogan_final_fates_quantiles_forplot, homing_state = "Okanogan River", 
                                              downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -902,6 +957,7 @@ okanogan_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = oka
                                              upstream_tributaries = c("Upstream WEL other tributaries"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "okanogan_fates_plot.pdf"), okanogan_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "okanogan_fates_plot.pdf"), okanogan_plot_for_report, height = 8, width = 10)
 
 
 ### Snake
@@ -911,6 +967,7 @@ tucannon_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = tuc
                                              upstream_tributaries = c("Asotin Creek", "Clearwater River", "Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "tucannon_fates_plot.pdf"), tucannon_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "tucannon_fates_plot.pdf"), tucannon_plot_for_report, height = 8, width = 10)
 
 asotin_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = asotin_final_fates_quantiles_forplot, homing_state = "Asotin Creek", 
                                              downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -919,6 +976,7 @@ asotin_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = asoti
                                              upstream_tributaries = c("Imnaha River", "Grande Ronde River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "asotin_fates_plot.pdf"), asotin_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "asotin_fates_plot.pdf"), asotin_plot_for_report, height = 8, width = 10)
 
 clearwater_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = clearwater_final_fates_quantiles_forplot, homing_state = "Clearwater River", 
                                              downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -926,6 +984,7 @@ clearwater_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = c
                                              upstream_tributaries = c("Imnaha River", "Grande Ronde River", "Salmon River", "Asotin Creek"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "clearwater_fates_plot.pdf"), clearwater_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "clearwater_fates_plot.pdf"), clearwater_plot_for_report, height = 8, width = 10)
 
 salmon_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = salmon_final_fates_quantiles_forplot, homing_state = "Salmon River", 
                                            downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -934,6 +993,7 @@ salmon_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = salmo
                                            upstream_tributaries = c("Imnaha River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "salmon_fates_plot.pdf"), salmon_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "salmon_fates_plot.pdf"), salmon_plot_for_report, height = 8, width = 10)
 
 grande_ronde_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = grande_ronde_final_fates_quantiles_forplot, homing_state = "Grande Ronde River", 
                                                  downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -942,6 +1002,7 @@ grande_ronde_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot =
                                                  upstream_tributaries = c("Imnaha River", "Salmon River"))
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "grande_ronde_fates_plot.pdf"), grande_ronde_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "grande_ronde_fates_plot.pdf"), grande_ronde_plot_for_report, height = 8, width = 10)
 
 imnaha_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = imnaha_final_fates_quantiles_forplot, homing_state = "Imnaha River", 
                                            downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -950,6 +1011,7 @@ imnaha_plot_for_report <- final_fates_plot(final_fates_quantiles_forplot = imnah
                                            upstream_tributaries = NA)
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "final_fates_plots", "imnaha_fates_plot.pdf"), imnaha_plot_for_report, height = 8, width = 10)
+ggsave(here::here("CBR_report", "CBR_report_final", "figures", "final_fates_plots", "imnaha_fates_plot.pdf"), imnaha_plot_for_report, height = 8, width = 10)
 
 transition_matrix_reformat <- function(movement_probs, variable_prefix){
     movement_probs %>% 
@@ -1149,6 +1211,49 @@ write.csv(all_origins_final_distribution, here::here("stan_actual", "deteff_ESU_
 
 ##### Get final fates of fish - conditional on overshoot #####
 
+
+# First - write a function that can get us the ratios as well as the confidence intervals around them, using the draws
+overshoot_ratio <- function(correct_mainstem_draws, overshoot_draws, niter){
+  # ratio_df <- data.frame(correct_mainstem = rep(NA, niter),
+  #                        overshoot = rep(NA, niter),
+  #                        overshoot_ratio = rep(NA, niter))
+  
+  ratio_df <- matrix(nrow = 200, ncol = 28)
+  colnames(ratio_df) <- correct_mainstem_draws[,1]
+  
+  for (i in 1:niter){
+    ratio_df[i, ] = overshoot_draws[,i+1]/correct_mainstem_draws[,i+1]
+  }
+  
+  # Now, get the ratio with the quantiles
+  ratio_df_summary <- matrix(ncol = 28, nrow = 3)
+  colnames(ratio_df_summary) <- colnames(ratio_df)
+  
+  # Loop through all of the states
+  for (i in 1:28){
+    # ignore all of the not seen transitions, which have NAs
+    if (!(any(is.na(ratio_df[,i]) == TRUE))){
+      ratio_df_summary[,i] <- quantile(ratio_df[,i], c(0.025, 0.5, 0.975))
+    }
+  }
+  
+  # now make the final data frame for export
+  overshoot_ratio_table <- data.frame(state = correct_mainstem_draws[,1],
+                                      label = NA)
+  
+  # populate the table
+  for (i in 1:28){
+    overshoot_ratio_table$label[i] <- paste0(formatC(ratio_df_summary[2,i], digits = 2, format = "f"), " (", formatC(ratio_df_summary[1,i], digits = 2, format = "f"), 
+                                             " - ", formatC(ratio_df_summary[3,i], digits = 2, format = "f"), ")")
+    
+  }
+  
+  overshoot_ratio_table %>% 
+    mutate(state = gsub(" Mouth", "", state)) -> overshoot_ratio_table
+  
+  return(overshoot_ratio_table)
+}
+
 # Populations that we can measure overshoot for: 
 # 1) AT MCN: Deschutes River, John Day River, Hood River, Fifteenmile Creek, Umatilla River
 # 2) At PRA or ICH: Yakima River and Walla Walla River
@@ -1165,7 +1270,8 @@ write.csv(all_origins_final_distribution, here::here("stan_actual", "deteff_ESU_
 
 ### Middle Columbia
 
-deschutes_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 3)
+deschutes_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+deschutes_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 deschutes_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = deschutes_final_fates_quantiles_overshoot)
 deschutes_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = deschutes_final_fates_quantiles_forplot_overshoot, homing_state = "Deschutes River", 
                                               downstream_tributaries = c("Hood River", "Fifteenmile Creek"),
@@ -1176,7 +1282,8 @@ deschutes_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = de
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "deschutes_overshoot_fates.pdf"), deschutes_overshoot_fates, height = 8, width = 10)
 
-fifteenmile_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 3)
+fifteenmile_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+fifteenmile_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 fifteenmile_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = fifteenmile_final_fates_quantiles_overshoot)
 fifteenmile_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = fifteenmile_final_fates_quantiles_forplot_overshoot, homing_state = "Fifteenmile Creek", 
                                               downstream_tributaries = c("Hood River"),
@@ -1187,7 +1294,8 @@ fifteenmile_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = 
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "fifteenmile_overshoot_fates.pdf"), fifteenmile_overshoot_fates, height = 8, width = 10)
 
-john_day_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 3)
+john_day_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+john_day_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 john_day_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = john_day_final_fates_quantiles_overshoot)
 john_day_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = john_day_final_fates_quantiles_forplot_overshoot, homing_state = "John Day River", 
                                               downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River"),
@@ -1198,7 +1306,8 @@ john_day_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = joh
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "john_day_overshoot_fates.pdf"), john_day_overshoot_fates, height = 8, width = 10)
 
-umatilla_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 3)
+umatilla_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+umatilla_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 umatilla_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = umatilla_final_fates_quantiles_overshoot)
 umatilla_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = umatilla_final_fates_quantiles_forplot_overshoot, homing_state = "Umatilla River", 
                                               downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River"),
@@ -1210,7 +1319,8 @@ umatilla_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = uma
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "umatilla_overshoot_fates.pdf"), umatilla_overshoot_fates, height = 8, width = 10)
 
 # Note - Walla Walla can overshoot at two places (PRA and ICH). Create two plots for each
-walla_walla_final_fates_quantiles_overshoot_PRA <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 4)
+walla_walla_final_fates_quantiles_overshoot_PRA <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 4)[[1]]
+walla_walla_final_fates_quantiles_overshoot_PRA_draws <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 4)[[2]]
 walla_walla_final_fates_quantiles_forplot_overshoot_PRA <- final_fate_plot_data_reformat(final_fates_quantiles = walla_walla_final_fates_quantiles_overshoot_PRA)
 walla_walla_overshoot_PRA_fates <- final_fates_plot(final_fates_quantiles_forplot = walla_walla_final_fates_quantiles_forplot_overshoot_PRA, homing_state = "Walla Walla River", 
                                               downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River"),
@@ -1221,7 +1331,8 @@ walla_walla_overshoot_PRA_fates <- final_fates_plot(final_fates_quantiles_forplo
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "walla_walla_overshoot_PRA_fates.pdf"), walla_walla_overshoot_PRA_fates, height = 8, width = 10)
 
-walla_walla_final_fates_quantiles_overshoot_ICH <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 8)
+walla_walla_final_fates_quantiles_overshoot_ICH <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 8)[[1]]
+walla_walla_final_fates_quantiles_overshoot_ICH_draws <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 8)[[2]]
 walla_walla_final_fates_quantiles_forplot_overshoot_ICH <- final_fate_plot_data_reformat(final_fates_quantiles = walla_walla_final_fates_quantiles_overshoot_ICH)
 walla_walla_overshoot_ICH_fates <- final_fates_plot(final_fates_quantiles_forplot = walla_walla_final_fates_quantiles_forplot_overshoot_ICH, homing_state = "Walla Walla River", 
                                                     downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River"),
@@ -1232,7 +1343,8 @@ walla_walla_overshoot_ICH_fates <- final_fates_plot(final_fates_quantiles_forplo
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "walla_walla_overshoot_ICH_fates.pdf"), walla_walla_overshoot_ICH_fates, height = 8, width = 10)
 
-yakima_final_fates_quantiles_overshoot_PRA <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 4)
+yakima_final_fates_quantiles_overshoot_PRA <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 4)[[1]]
+yakima_final_fates_quantiles_overshoot_PRA_draws <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 4)[[2]]
 yakima_final_fates_quantiles_forplot_overshoot_PRA <- final_fate_plot_data_reformat(final_fates_quantiles = yakima_final_fates_quantiles_overshoot_PRA)
 yakima_overshoot_PRA_fates <- final_fates_plot(final_fates_quantiles_forplot = yakima_final_fates_quantiles_forplot_overshoot_PRA, homing_state = "Yakima River", 
                                            downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Wala River"),
@@ -1242,7 +1354,8 @@ yakima_overshoot_PRA_fates <- final_fates_plot(final_fates_quantiles_forplot = y
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "yakima_overshoot_PRA_fates.pdf"), yakima_overshoot_PRA_fates, height = 8, width = 10)
 
-yakima_final_fates_quantiles_overshoot_ICH <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 8)
+yakima_final_fates_quantiles_overshoot_ICH <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 8)[[1]]
+yakima_final_fates_quantiles_overshoot_ICH_draws <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 8)[[2]]
 yakima_final_fates_quantiles_forplot_overshoot_ICH <- final_fate_plot_data_reformat(final_fates_quantiles = yakima_final_fates_quantiles_overshoot_ICH)
 yakima_overshoot_ICH_fates <- final_fates_plot(final_fates_quantiles_forplot = yakima_final_fates_quantiles_forplot_overshoot_ICH, homing_state = "Yakima River", 
                                                downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Wala River"),
@@ -1253,7 +1366,8 @@ yakima_overshoot_ICH_fates <- final_fates_plot(final_fates_quantiles_forplot = y
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "yakima_overshoot_ICH_fates.pdf"), yakima_overshoot_ICH_fates, height = 8, width = 10)
 
 ### Upper Columbia
-wenatchee_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 6)
+wenatchee_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 6)[[1]]
+wenatchee_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 6)[[2]]
 wenatchee_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = wenatchee_final_fates_quantiles_overshoot)
 wenatchee_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = wenatchee_final_fates_quantiles_forplot_overshoot, homing_state = "Deschutes River", 
                                               downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1262,7 +1376,8 @@ wenatchee_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = we
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_fates_plots", "wenatchee_overshoot_fates_plot.pdf"), wenatchee_overshoot_fates, height = 8, width = 10)
 
-entiat_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 7)
+entiat_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 7)[[1]]
+entiat_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 7)[[2]]
 entiat_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = entiat_final_fates_quantiles_overshoot)
 entiat_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = entiat_final_fates_quantiles_forplot_overshoot, homing_state = "Deschutes River", 
                                            downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1274,7 +1389,8 @@ ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoo
 
 ### Snake
 
-tucannon_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 9)
+tucannon_final_fates_quantiles_overshoot <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 9)[[1]]
+tucannon_final_fates_quantiles_overshoot_draws <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 9)[[2]]
 tucannon_final_fates_quantiles_forplot_overshoot <- final_fate_plot_data_reformat(final_fates_quantiles = tucannon_final_fates_quantiles_overshoot)
 tucannon_overshoot_fates <- final_fates_plot(final_fates_quantiles_forplot = tucannon_final_fates_quantiles_forplot_overshoot, homing_state = "Deschutes River", 
                                              downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1285,11 +1401,13 @@ ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoo
 
 ##### Get final fates of fish - conditional on being in the correct mainstem state #####
 
+
 # These values will be compared to fish in the overshoot state
 
 ### Middle Columbia
 
-deschutes_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 2)
+deschutes_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 2)[[1]]
+deschutes_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = deschutes_DE_transition_matrix_list, niter = 200, start_state = 2)[[2]]
 deschutes_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = deschutes_final_fates_quantiles_correct_mainstem)
 deschutes_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = deschutes_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Deschutes River", 
                                                      downstream_tributaries = c("Hood River", "Fifteenmile Creek"),
@@ -1300,7 +1418,8 @@ deschutes_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forpl
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "deschutes_correct_mainstem_fates.pdf"), deschutes_correct_mainstem_fates, height = 8, width = 10)
 
-fifteenmile_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 2)
+fifteenmile_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 2)[[1]]
+fifteenmile_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = fifteenmile_DE_transition_matrix_list, niter = 200, start_state = 2)[[2]]
 fifteenmile_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = fifteenmile_final_fates_quantiles_correct_mainstem)
 fifteenmile_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = fifteenmile_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Fifteenmile Creek", 
                                                        downstream_tributaries = c("Hood River"),
@@ -1311,7 +1430,8 @@ fifteenmile_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_for
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "fifteenmile_correct_mainstem_fates.pdf"), fifteenmile_correct_mainstem_fates, height = 8, width = 10)
 
-john_day_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 2)
+john_day_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 2)[[1]]
+john_day_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = john_day_DE_transition_matrix_list, niter = 200, start_state = 2)[[2]]
 john_day_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = john_day_final_fates_quantiles_correct_mainstem)
 john_day_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = john_day_final_fates_quantiles_forplot_correct_mainstem, homing_state = "John Day River", 
                                                     downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River"),
@@ -1322,7 +1442,8 @@ john_day_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplo
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "john_day_correct_mainstem_fates.pdf"), john_day_correct_mainstem_fates, height = 8, width = 10)
 
-umatilla_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 2)
+umatilla_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 2)[[1]]
+umatilla_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = umatilla_DE_transition_matrix_list, niter = 200, start_state = 2)[[2]]
 umatilla_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = umatilla_final_fates_quantiles_correct_mainstem)
 umatilla_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = umatilla_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Umatilla River", 
                                                     downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River"),
@@ -1333,7 +1454,8 @@ umatilla_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplo
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "umatilla_correct_mainstem_fates.pdf"), umatilla_correct_mainstem_fates, height = 8, width = 10)
 
-walla_walla_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 3)
+walla_walla_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+walla_walla_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = walla_walla_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 walla_walla_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = walla_walla_final_fates_quantiles_correct_mainstem)
 walla_walla_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = walla_walla_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Walla Walla River", 
                                                        downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River"),
@@ -1345,7 +1467,8 @@ walla_walla_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_for
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "walla_walla_correct_mainstem_fates.pdf"), walla_walla_correct_mainstem_fates, height = 8, width = 10)
 
 
-yakima_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 3)
+yakima_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 3)[[1]]
+yakima_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = yakima_DE_transition_matrix_list, niter = 200, start_state = 3)[[2]]
 yakima_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = yakima_final_fates_quantiles_correct_mainstem)
 yakima_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = yakima_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Yakima River", 
                                                   downstream_tributaries = c("Hood River", "Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Wala River"),
@@ -1357,7 +1480,8 @@ ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_
 
 
 ### Upper Columbia
-wenatchee_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 5)
+wenatchee_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 5)[[1]]
+wenatchee_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = wenatchee_DE_transition_matrix_list, niter = 200, start_state = 5)[[2]]
 wenatchee_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = wenatchee_final_fates_quantiles_correct_mainstem)
 wenatchee_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = wenatchee_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Deschutes River", 
                                                      downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1366,7 +1490,8 @@ wenatchee_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forpl
 
 ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_mainstem_fates_plots", "wenatchee_correct_mainstem_fates_plot.pdf"), entiat_correct_mainstem_fates, height = 8, width = 10)
 
-entiat_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 6)
+entiat_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 6)[[1]]
+entiat_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = entiat_DE_transition_matrix_list, niter = 200, start_state = 6)[[2]]
 entiat_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = entiat_final_fates_quantiles_correct_mainstem)
 entiat_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = entiat_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Deschutes River", 
                                                   downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1378,7 +1503,8 @@ ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_
 
 ### Snake
 
-tucannon_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 8)
+tucannon_final_fates_quantiles_correct_mainstem <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 8)[[1]]
+tucannon_final_fates_quantiles_correct_mainstem_draws <- final_fates_uncertainty(transition_matrix_list = tucannon_DE_transition_matrix_list, niter = 200, start_state = 8)[[2]]
 tucannon_final_fates_quantiles_forplot_correct_mainstem <- final_fate_plot_data_reformat(final_fates_quantiles = tucannon_final_fates_quantiles_correct_mainstem)
 tucannon_correct_mainstem_fates <- final_fates_plot(final_fates_quantiles_forplot = tucannon_final_fates_quantiles_forplot_correct_mainstem, homing_state = "Deschutes River", 
                                                     downstream_tributaries = c("Deschutes River", "John Day River", "BON to MCN other tributaries", "Umatilla River",
@@ -1390,14 +1516,44 @@ ggsave(here::here("stan_actual", "deteff_ESU_models", "output_tables", "correct_
 
 ##### Compare final fates of fish, overshoot vs. being in the correct mainstem #####
 
+# Get ratio tables for each
+fifteenmile_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = fifteenmile_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = fifteenmile_final_fates_quantiles_overshoot_draws, niter = 200)
+deschutes_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = deschutes_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = deschutes_final_fates_quantiles_overshoot_draws, niter = 200)
+john_day_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = john_day_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = john_day_final_fates_quantiles_overshoot_draws, niter = 200)
+umatilla_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = umatilla_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = umatilla_final_fates_quantiles_overshoot_draws, niter = 200)
+walla_walla_overshoot_PRA_ratios <- overshoot_ratio(correct_mainstem_draws = walla_walla_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = walla_walla_final_fates_quantiles_overshoot_PRA_draws, niter = 200)
+walla_walla_overshoot_ICH_ratios <- overshoot_ratio(correct_mainstem_draws = walla_walla_final_fates_quantiles_correct_mainstem_draws, 
+                                                    overshoot_draws = walla_walla_final_fates_quantiles_overshoot_ICH_draws, niter = 200)
+yakima_overshoot_PRA_ratios <- overshoot_ratio(correct_mainstem_draws = yakima_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = yakima_final_fates_quantiles_overshoot_PRA_draws, niter = 200)
+yakima_overshoot_ICH_ratios <- overshoot_ratio(correct_mainstem_draws = yakima_final_fates_quantiles_correct_mainstem_draws, 
+                                           overshoot_draws = yakima_final_fates_quantiles_overshoot_ICH_draws, niter = 200)
+wenatchee_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = wenatchee_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = wenatchee_final_fates_quantiles_overshoot_draws, niter = 200)
+entiat_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = entiat_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = entiat_final_fates_quantiles_overshoot_draws, niter = 200)
+tucannon_overshoot_ratios <- overshoot_ratio(correct_mainstem_draws = tucannon_final_fates_quantiles_correct_mainstem_draws, 
+                                                      overshoot_draws = tucannon_final_fates_quantiles_overshoot_draws, niter = 200)
+
+
+
+
 overshoot_homing_probabilities <- data.frame(natal_origin = c("Fifteenmile Creek", "Deschutes River", "John Day River",
-                                                              "Umatilla River", "Walla Walla River", "Yakima River",
+                                                              "Umatilla River", "Walla Walla River at PRA", "Walla Walla River at ICH",
+                                                              "Yakima River at PRA", "Yakima River at ICH",
                                                               "Wenatchee River", "Entiat River", "Tucannon River"),
                                              non_overshoot = c(subset(fifteenmile_final_fates_quantiles_forplot_correct_mainstem, state == "Fifteenmile Creek")$label,
                                                                subset(deschutes_final_fates_quantiles_forplot_correct_mainstem, state == "Deschutes River")$label,
                                                                subset(john_day_final_fates_quantiles_forplot_correct_mainstem, state == "John Day River")$label,
                                                                subset(umatilla_final_fates_quantiles_forplot_correct_mainstem, state == "Umatilla River")$label,
                                                                subset(walla_walla_final_fates_quantiles_forplot_correct_mainstem, state == "Walla Walla River")$label,
+                                                               subset(walla_walla_final_fates_quantiles_forplot_correct_mainstem, state == "Walla Walla River")$label,
+                                                               subset(yakima_final_fates_quantiles_forplot_correct_mainstem, state == "Yakima River")$label,
                                                                subset(yakima_final_fates_quantiles_forplot_correct_mainstem, state == "Yakima River")$label,
                                                                subset(wenatchee_final_fates_quantiles_forplot_correct_mainstem, state == "Wenatchee River")$label,
                                                                subset(entiat_final_fates_quantiles_forplot_correct_mainstem, state == "Entiat River")$label,
@@ -1406,13 +1562,32 @@ overshoot_homing_probabilities <- data.frame(natal_origin = c("Fifteenmile Creek
                                                                subset(deschutes_final_fates_quantiles_forplot_overshoot, state == "Deschutes River")$label,
                                                                subset(john_day_final_fates_quantiles_forplot_overshoot, state == "John Day River")$label,
                                                                subset(umatilla_final_fates_quantiles_forplot_overshoot, state == "Umatilla River")$label,
-                                                               paste0("PRA: ", subset(walla_walla_final_fates_quantiles_forplot_overshoot_PRA, state == "Walla Walla River")$label,
-                                                                      " / ICH: ", subset(walla_walla_final_fates_quantiles_forplot_overshoot_ICH, state == "Walla Walla River")$label),
-                                                           paste0("PRA: ", subset(yakima_final_fates_quantiles_forplot_overshoot_PRA, state == "Yakima River")$label,
-                                                                  " / ICH: ", subset(yakima_final_fates_quantiles_forplot_overshoot_ICH, state == "Yakima River")$label),
+                                                           subset(walla_walla_final_fates_quantiles_forplot_overshoot_PRA, state == "Walla Walla River")$label,
+                                                           subset(walla_walla_final_fates_quantiles_forplot_overshoot_ICH, state == "Walla Walla River")$label,
+                                                           subset(yakima_final_fates_quantiles_forplot_overshoot_PRA, state == "Yakima River")$label,
+                                                           subset(yakima_final_fates_quantiles_forplot_overshoot_ICH, state == "Yakima River")$label,
+                                                           #     paste0("PRA: ", subset(walla_walla_final_fates_quantiles_forplot_overshoot_PRA, state == "Walla Walla River")$label,
+                                                           #            " / ICH: ", subset(walla_walla_final_fates_quantiles_forplot_overshoot_ICH, state == "Walla Walla River")$label),
+                                                           # paste0("PRA: ", subset(yakima_final_fates_quantiles_forplot_overshoot_PRA, state == "Yakima River")$label,
+                                                           #        " / ICH: ", subset(yakima_final_fates_quantiles_forplot_overshoot_ICH, state == "Yakima River")$label),
                                                                subset(wenatchee_final_fates_quantiles_forplot_overshoot, state == "Wenatchee River")$label,
                                                                subset(entiat_final_fates_quantiles_forplot_overshoot, state == "Entiat River")$label,
-                                                               subset(tucannon_final_fates_quantiles_forplot_overshoot, state == "Tucannon River")$label))
+                                                               subset(tucannon_final_fates_quantiles_forplot_overshoot, state == "Tucannon River")$label),
+                                             overshoot_ratio = c(subset(fifteenmile_overshoot_ratios, state == "Fifteenmile Creek")$label,
+                                                                 subset(deschutes_overshoot_ratios, state == "Deschutes River")$label,
+                                                                 subset(john_day_overshoot_ratios, state == "John Day River")$label,
+                                                                 subset(umatilla_overshoot_ratios, state == "Umatilla River")$label,
+                                                                 # paste0("PRA: ", subset(walla_walla_overshoot_PRA_ratios, state == "Walla Walla River")$label,
+                                                                 #        " / ICH: ", subset(walla_walla_overshoot_ICH_ratios, state == "Walla Walla River")$label),
+                                                                 # paste0("PRA: ", subset(yakima_overshoot_PRA_ratios, state == "Yakima River")$label,
+                                                                 #        " / ICH: ", subset(yakima_overshoot_ICH_ratios, state == "Yakima River")$label),
+                                                                 subset(walla_walla_overshoot_PRA_ratios, state == "Walla Walla River")$label,
+                                                                 subset(walla_walla_overshoot_ICH_ratios, state == "Walla Walla River")$label,
+                                                                 subset(yakima_overshoot_PRA_ratios, state == "Yakima River")$label,
+                                                                 subset(yakima_overshoot_ICH_ratios, state == "Yakima River")$label,
+                                                                 subset(wenatchee_overshoot_ratios, state == "Wenatchee River")$label,
+                                                                 subset(entiat_overshoot_ratios, state == "Entiat River")$label,
+                                                                 subset(tucannon_overshoot_ratios, state == "Tucannon River")$label))
 
 write.csv(overshoot_homing_probabilities, here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_homing_probabilities.csv"))
 
@@ -1587,6 +1762,201 @@ dplyr::rename(BON_fallback_prob, BON = probability) %>%
 write.csv(dam_specific_fallback_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_fallback_probs.csv"), row.names = FALSE)
 
 
+##### overshoot probabilities - dam + origin specific #####
+middle_columbia_origins <- c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River")
+upper_columbia_origins <- c("Wenatchee River", "Entiat River",    "Okanogan River",  "Methow River")
+snake_origins <- c("Tucannon River",   "Asotin Creek", "Clearwater River", "Salmon River",  "Grande Ronde", "Imnaha River")
+
+
+### McNary Dam
+# to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN"
+# overshoot at MCN only unique for middle columbia
+
+MCN_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Fifteenmile_Creek")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Deschutes_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "John_Day_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Umatilla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Walla_Walla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Yakima_River")$probability,
+                                                 # subset(upper_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Wenatchee_River")$probability,
+                                                 # subset(upper_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Entiat_River")$probability,
+                                                 # subset(upper_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Okanogan_River")$probability,
+                                                 # subset(upper_columbia_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Methow_River")$probability,
+                                                 rep(subset(upper_columbia_DE_DPS_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN")$probability, length(upper_columbia_origins)),
+                                                 rep(subset(snake_DE_DPS_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN")$probability, length(snake_origins))))
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Tucannon_River")$probability,
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Asotin_Creek")$probability,
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Clearwater_River")$probability,
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Salmon_River")$probability,
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Grande_Ronde")$probability,
+                                                 # subset(snake_DE_origin_probs, to == "mainstem, MCN to ICH or PRA" & from == "mainstem, BON to MCN" & origin == "Imnaha_River")$probability))
+
+
+
+### Priest Rapids Dam
+# to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA"
+# Specific for all three DPSs, since the from state is the branch state
+PRA_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Fifteenmile_Creek")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Deschutes_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "John_Day_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Umatilla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Walla_Walla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Yakima_River")$probability,
+                                                 # rep(subset(upper_columbia_DE_DPS_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA")$probability, length(upper_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Methow_River")$probability,
+                                                 # rep(subset(snake_DE_DPS_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA")$probability, length(snake_origins))))
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Tucannon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Asotin_Creek")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Clearwater_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Salmon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Grande_Ronde")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, PRA to RIS" & from == "mainstem, MCN to ICH or PRA" & origin == "Imnaha_River")$probability))
+
+
+
+### Rock Island Dam
+# Specific for Upper and middle Columbia, since the from state touches a to state in the middle Columbia DPS
+# to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS"
+RIS_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Fifteenmile_Creek")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Deschutes_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "John_Day_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Umatilla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Walla_Walla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Yakima_River")$probability,
+                                                 # rep(subset(middle_columbia_DE_DPS_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS")$probability, length(middle_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS" & origin == "Methow_River")$probability,
+                                                 rep(subset(snake_DE_DPS_probs, to == "mainstem, RIS to RRE" & from == "mainstem, PRA to RIS")$probability, length(snake_origins))))
+
+
+
+### Rocky Reach Dam
+# Specific for Upper columbia only
+# to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE"
+RRE_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(rep(subset(middle_columbia_DE_DPS_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE")$probability, length(middle_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE" & origin == "Methow_River")$probability,
+                                                 rep(subset(snake_DE_DPS_probs, to == "mainstem, RRE to WEL" & from == "mainstem, RIS to RRE")$probability, length(snake_origins))))
+
+
+
+### Wells Dam
+# Specific for Upper columbia only
+# to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL"
+WEL_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(rep(subset(middle_columbia_DE_DPS_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL")$probability, length(middle_columbia_origins)),
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL" & origin == "Methow_River")$probability,
+                                                 rep(subset(snake_DE_DPS_probs, to == "mainstem, upstream of WEL" & from == "mainstem, RRE to WEL")$probability, length(snake_origins))))
+
+
+
+### Ice Harbor Dam
+# Specific for all three, since it's from a branching state
+# to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA"
+ICH_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Fifteenmile_Creek")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Deschutes_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "John_Day_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Umatilla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Walla_Walla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Yakima_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Wenatchee_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Entiat_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Okanogan_River")$probability,
+                                                 subset(upper_columbia_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Methow_River")$probability,
+                                                 # rep(subset(upper_columbia_DE_DPS_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA")$probability, length(upper_columbia_origins)),
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Tucannon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Asotin_Creek")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Clearwater_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Salmon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Grande_Ronde")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, ICH to LGR" & from == "mainstem, MCN to ICH or PRA" & origin == "Imnaha_River")$probability))
+
+
+### Lower Granite Dam
+# Specific for Snake and Middle Columbia
+# to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR"
+LGR_overshoot_prob <- data.frame(population = c(middle_columbia_origins,
+                                                upper_columbia_origins,
+                                                snake_origins),
+                                 probability = c(subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Fifteenmile_Creek")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Deschutes_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "John_Day_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Umatilla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Walla_Walla_River")$probability,
+                                                 subset(middle_columbia_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Yakima_River")$probability,
+                                                 # rep(subset(middle_columbia_DE_DPS_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR")$probability, length(middle_columbia_origins)),
+                                                 rep(subset(upper_columbia_DE_DPS_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR")$probability, length(upper_columbia_origins)),
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Tucannon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Asotin_Creek")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Clearwater_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Salmon_River")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Grande_Ronde")$probability,
+                                                 subset(snake_DE_origin_probs, to == "mainstem, upstream of LGR" & from == "mainstem, ICH to LGR" & origin == "Imnaha_River")$probability))
+
+### Join all together
+dplyr::rename(MCN_overshoot_prob, MCN = probability) %>% 
+  # left_join(., dplyr::rename(MCN_overshoot_prob, MCN = probability), by = "population") %>% 
+  left_join(., dplyr::rename(PRA_overshoot_prob, PRA = probability), by = "population") %>% 
+  left_join(., dplyr::rename(RIS_overshoot_prob, RIS = probability), by = "population") %>% 
+  left_join(., dplyr::rename(RRE_overshoot_prob, RRE = probability), by = "population") %>% 
+  left_join(., dplyr::rename(WEL_overshoot_prob, WEL = probability), by = "population") %>% 
+  left_join(., dplyr::rename(ICH_overshoot_prob, ICH = probability), by = "population") %>% 
+  left_join(., dplyr::rename(LGR_overshoot_prob, LGR = probability), by = "population") %>% 
+  dplyr::rename(origin = population) -> dam_specific_overshoot_probs
+
+dam_specific_overshoot_probs %>% 
+  arrange(origin) -> dam_specific_overshoot_probs
+
+dam_specific_overshoot_probs[1,c('MCN', 'ICH', 'LGR')] <- "NA" # Asotin Creek
+dam_specific_overshoot_probs[2,c('MCN', 'ICH', 'LGR')] <- "NA" # Clearwater River
+# dam_specific_overshoot_probs[3,c('MCN', 'ICH', 'LGR')] <- "NA" # Deschutes River
+dam_specific_overshoot_probs[4,c('MCN', 'PRA', 'RIS', 'RRE')] <- "NA" # Entiat River
+# dam_specific_overshoot_probs[5,c('MCN', 'ICH', 'LGR')] <- "NA" # Fifteenmile Creek
+dam_specific_overshoot_probs[6,c('MCN', 'ICH', 'LGR')] <- "NA" # Grande Ronde River
+dam_specific_overshoot_probs[7,c('MCN', 'ICH', 'LGR')] <- "NA" # Imnaha River
+# dam_specific_overshoot_probs[8,c('MCN', 'ICH', 'LGR')] <- "NA" # John Day River
+dam_specific_overshoot_probs[9,c('MCN', 'PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Methow River
+dam_specific_overshoot_probs[10,c('MCN', 'PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Okanogan River
+dam_specific_overshoot_probs[11,c('MCN', 'ICH', 'LGR')] <- "NA" # Salmon River
+dam_specific_overshoot_probs[12,c('MCN', 'ICH')] <- "NA" # Tucannon River
+# dam_specific_overshoot_probs[13,c('MCN', 'ICH', 'LGR')] <- "NA" # Umatilla River
+dam_specific_overshoot_probs[14,c('MCN')] <- "NA" # Walla Walla River
+dam_specific_overshoot_probs[15,c('MCN', 'PRA', 'RIS')] <- "NA" # Wenatchee River
+dam_specific_overshoot_probs[16,c('MCN')] <- "NA" # Yakima River
+
+# Now, put NAs as well for all movements that are overshoot movements, but that we never saw for that natal origin
+# dam_specific_overshoot_probs
+
+
+
+write.csv(dam_specific_overshoot_probs, here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_overshoot_probs.csv"), row.names = FALSE)
 
 
 
