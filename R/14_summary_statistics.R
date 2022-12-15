@@ -9,6 +9,11 @@ library(tidyverse)
 library(lubridate)
 library(janitor)
 
+
+middle_columbia_origins <- c("Fifteenmile Creek", "Deschutes River", "John Day River", "Umatilla River", "Walla Walla River", "Yakima River")
+upper_columbia_origins <- c("Wenatchee River", "Entiat River",    "Okanogan River",  "Methow River")
+snake_origins <- c("Tucannon River",   "Asotin Creek", "Clearwater River", "Salmon River",  "Grande Ronde River", "Imnaha River")
+
 # Import data
 # temporarily load old data to test script
 # states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
@@ -292,12 +297,33 @@ overshooting_fish %>%
   count(natal_origin, pathway) %>% 
   # add the total fish per origin, so we can calculate proportions
   left_join(natal_origin_fish_counts, by = "natal_origin") %>% 
-  mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  # mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  mutate(value = paste0(formatC(n/total * 100, digits = 2, format = "f"), "% (", n, "/", total, ")")) %>% 
   dplyr::select(-c(n, total)) %>% 
   pivot_wider(names_from = pathway, values_from = value) %>% 
   replace(is.na(.), "0") %>% 
   # reorder the dams
   relocate(MCN, .before = PRA)-> overshoot_table_for_report
+
+# Replace 0 with NA for dams that are between the natal tributary and the ocean (since you can't overshoot those)
+overshoot_table_for_report[1,c('MCN', 'ICH', 'LGR')] <- "NA" # Asotin Creek
+overshoot_table_for_report[2,c('MCN', 'ICH', 'LGR')] <- "NA" # Clearwater River
+# overshoot_table_for_report[3,c('MCN', 'ICH', 'LGR')] <- "NA" # Deschutes River
+overshoot_table_for_report[4,c('MCN', 'PRA', 'RIS', 'RRE')] <- "NA" # Entiat River
+# overshoot_table_for_report[5,c('MCN', 'ICH', 'LGR')] <- "NA" # Fifteenmile Creek
+overshoot_table_for_report[6,c('MCN', 'ICH', 'LGR')] <- "NA" # Grande Ronde River
+# overshoot_table_for_report[7,c('MCN', 'ICH', 'LGR')] <- "NA" # Hood River
+overshoot_table_for_report[8,c('MCN', 'ICH', 'LGR')] <- "NA" # Imnaha River
+# overshoot_table_for_report[9,c('MCN', 'ICH', 'LGR')] <- "NA" # John Day River
+overshoot_table_for_report[10,c('MCN', 'PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Methow River
+overshoot_table_for_report[11,c('MCN', 'PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Okanogan River
+overshoot_table_for_report[12,c('MCN', 'ICH', 'LGR')] <- "NA" # Salmon River
+overshoot_table_for_report[13,c('MCN', 'ICH')] <- "NA" # Tucannon River
+# overshoot_table_for_report[14,c('MCN', 'ICH', 'LGR')] <- "NA" # Umatilla River
+overshoot_table_for_report[15,c('MCN')] <- "NA" # Walla Walla River
+overshoot_table_for_report[16,c('MCN', 'PRA', 'RIS')] <- "NA" # Wenatchee River
+overshoot_table_for_report[17,c('MCN')] <- "NA" # Yakima River
+
 
 write.csv(overshoot_table_for_report, here::here("CBR_report", "CBR_report_final", "tables", "overshoot_dam_origin_table.csv"))
 
@@ -355,17 +381,22 @@ natal_origin_fish_counts %>%
   group_by(natal_origin) %>% 
   summarise(total = sum(total)) -> natal_origin_total_fish_counts
 
+
 out_of_ESU_counts %>% 
   left_join(., natal_origin_total_fish_counts, by = "natal_origin") %>% 
-  mutate(proportion = formatC(n/total, digits = 2, format = "fg")) %>% 
-  mutate(out_of_ESU = paste0(proportion, " (N = ", n, ")")) %>% 
-  dplyr::select(natal_origin, out_of_ESU) -> out_of_ESU_counts_table
+  mutate(percent = paste0(formatC(n/total * 100, digits = 2, format = "f"),"%")) %>% 
+  relocate(total, .before = n) %>% 
+  mutate(DPS = ifelse(natal_origin %in% gsub(" ", "_", middle_columbia_origins), "Middle Columbia",
+                      ifelse(natal_origin %in% gsub(" ", "_", upper_columbia_origins), "Upper Columbia",
+                             ifelse(natal_origin %in% gsub(" ", "_", snake_origins), "Snake River Basin", "ERROR")))) %>% 
+  relocate(DPS, .before = total) -> out_of_ESU_counts_table
 
 ## Add in the missing ones
-no_out_of_ESU <- data.frame(natal_origin = c("Hood_River", "Entiat_River"), out_of_ESU = c("0","0"))
+# no_out_of_ESU <- data.frame(natal_origin = c("Hood_River", "Entiat_River"), DPS = c("Lower Columbia", "Upper Columbia"), total = c(0,0), n = c(0,0), percent = c("0%","0%"))
 
 out_of_ESU_counts_table %>% 
-  bind_rows(., no_out_of_ESU) -> out_of_ESU_counts_table
+  add_row(natal_origin = c("Hood_River"), DPS = c("Lower Columbia"), total = c(subset(natal_origin_total_fish_counts, natal_origin == "Hood_River")$total), n = c(0), percent = c("0%"), .before = 1) %>% 
+  add_row(natal_origin = c("Entiat_River"), DPS = c("Upper Columbia"), total = c(subset(natal_origin_total_fish_counts, natal_origin == "Entiat_River")$total), n = c(0), percent = c("0%"), .before = 8) -> out_of_ESU_counts_table
 
 write.csv(out_of_ESU_counts_table, here::here("CBR_report", "CBR_report_final", "tables", "out_of_ESU_counts_table.csv"))
 
@@ -427,13 +458,21 @@ fallback_only_movements %>%
   count(natal_origin, fallback_dam) %>% 
   # add the total fish per origin, so we can calculate proportions
   left_join(natal_origin_fish_counts, by = "natal_origin") %>% 
-  mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  # mutate(value = paste0(formatC(n/total, digits = 2, format = "fg"), " (N = ", n, ")")) %>% 
+  mutate(value = paste0(formatC(n/total * 100, digits = 2, format = "f"), "% (", n, "/", total, ")")) %>% 
   dplyr::select(-c(n, total)) %>% 
   pivot_wider(names_from = fallback_dam, values_from = value) %>% 
   replace(is.na(.), "0") %>% 
   # reorder the dams
   relocate(ICH, .after = WEL) %>% 
   relocate(LGR, .after = ICH)-> fallback_table_for_report
+
+# Change 0 to NA if there is no opportunity for FB (i.e., no fish passed the dam in the first place)
+fallback_table_for_report[3,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Deschutes River
+fallback_table_for_report[4,c('ICH', 'LGR')] <- "NA" # Entiat River
+fallback_table_for_report[5,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Fifteenmile Creek
+fallback_table_for_report[7,c('PRA', 'RIS', 'RRE', 'WEL', 'ICH', 'LGR')] <- "NA" # Hood River
+
 
 write.csv(fallback_table_for_report, here::here("CBR_report", "CBR_report_final", "tables", "fallback_dam_origin_table.csv"))
 
