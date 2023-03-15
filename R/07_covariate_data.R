@@ -1,6 +1,7 @@
 ### 07 - covariates
 
 # This script will reformat covariate data for inclusion in the multistate model
+# It will also investigate the degree of multicollinearity through variance inflation factors
 
 
 # Load libraries
@@ -40,18 +41,16 @@ data_filter <- function(data, limit, var){
     mutate(drop = ifelse(is.na(eval(parse(text = var))), FALSE,
                          ifelse(abs(eval(parse(text = var)) - lag(eval(parse(text = var)))) > limit, TRUE, FALSE))) -> data
   
-  clean_data <- list(clean = subset(data, drop == FALSE), dropped = subset(data, drop == TRUE))
+  data_filtered <- list(clean = subset(data, drop == FALSE), dropped = subset(data, drop == TRUE))
+  
+  clean_data <- data_filtered$clean
   
   return(clean_data)
 }
 
-subset(data, drop == TRUE)
-
-# this isn't quite working right and we don't need it, so we will just manually subset
-
-
-# Store clean data
-MCN_t_tailrace_long_clean <- subset(MCN_t_tailrace_long, temp < 28)
+# Clean and store data
+# note: here we are using a 3 degree change limit. Three degrees of change for daily data would be extreme
+MCN_t_tailrace_long_clean <- data_filter(data = MCN_t_tailrace_long, limit = 3, var = "temp")
 
 ggplot(MCN_t_tailrace_long_clean, aes(x = day, y = temp, color = year)) +
   geom_line()
