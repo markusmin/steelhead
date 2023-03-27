@@ -1,0 +1,726 @@
+---
+title: "steelhead_cov_data"
+author: "Markus Min"
+date: '2023-03-27'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# load libraries
+library(here)
+library(janitor)
+library(tidyverse)
+library(lubridate)
+library(car)
+
+```
+
+## Overview
+
+For each dam, we will:
+
+1. Assess concerns over data availability.
+2. Investigate multicollinearity between our three continuous covariates: flow, spill, and temperature.
+3. Look at passage timing, to determine when covariate data will be most useful.
+4. Decide how covariate data will be matched to state occupancy (e.g., a window approach)
+
+
+```{r functions}
+
+# Function 1: reformat covariate data
+cov_reformat <- function(input_data, variable_name){
+  
+  # need to deal with leap years
+  leap_years <- seq(1960, 2024, by = 4)
+  
+  input_data %>% 
+    pivot_longer(., cols = colnames(.)[2:ncol(.)]) %>% 
+    dplyr::rename(year = name,
+                  !!quo_name(variable_name) := value) %>% 
+    mutate(year = gsub("X","",year)) %>% 
+    mutate(year = as.numeric(year), day = as.numeric(day)) %>% 
+    # drop day 366 in non-leap years
+    dplyr::filter(!(day == 366 & !(year %in% leap_years))) %>%
+    # Add a new column for date (combine year and day)
+    mutate(date = format(as.Date(day, origin = paste0(year-1, "-12-31")))) %>% 
+    arrange(year, day) -> output_data
+  
+  return(output_data)
+}
+
+# Function 2: combine covariate data into df with date, spill, flow, and temp columns
+cov_combine <- function(flow_data, spill_data, temp_data){
+  flow_data %>% 
+  left_join(., dplyr::select(spill_data, spill, date), by = "date") %>% 
+  left_join(., dplyr::select(temp_data, temp, date), by = "date") %>% 
+  mutate(date = ymd(date)) %>% 
+  # keep only 2004 onwards (years that have data for all cov)
+  subset(date >= ymd("2004-01-01")) -> cont_cov
+  
+  return(cont_cov)
+  
+}
+
+
+# Function 3: quantify data availability
+cov_data_availability <- function(cont_cov){
+  cont_cov %>% 
+  mutate(data_available = ifelse(is.na(flow) & !(is.na(spill)) & !(is.na(temp)), "spill + temp",
+                                 ifelse(is.na(flow) & is.na(spill) & !(is.na(temp)), "temp",
+                                        ifelse(is.na(flow) & (is.na(spill)) & (is.na(temp)), "none",
+                                               ifelse(!(is.na(flow)) & !(is.na(spill)) & !(is.na(temp)), "spill + temp + flow",
+                                                      ifelse(!(is.na(flow)) & !(is.na(spill)) & (is.na(temp)), "spill + flow",
+                                                             ifelse(!(is.na(flow)) & (is.na(spill)) & (is.na(temp)), "flow",
+                                                                    ifelse((is.na(flow)) & !(is.na(spill)) & (is.na(temp)), "spill",
+                                                                           ifelse(!(is.na(flow)) & (is.na(spill)) & !(is.na(temp)), "temp + flow",
+                                                                                  "ERROR"))))))))) %>% 
+  # make them factors for plotting
+  mutate(data_available = fct_rev(factor(data_available, levels = c("spill + temp + flow", "spill + flow", 
+                                                            "temp + flow", "spill + temp",
+                                                            "temp", "flow", "spill", "none")))) -> cont_cov
+  
+  return(cont_cov)
+}
+
+# Function 3.5 - a different function to quantify just missing data
+cov_data_availability_2 <- function(cont_cov) {
+  cont_cov %>% 
+    # Make a different column where it just shows missing data (this should be simpler) 
+  mutate(temp_avail = ifelse(is.na(temp), NA, "temp")) %>% 
+  mutate(flow_avail = ifelse(is.na(flow), NA, "flow")) %>% 
+  mutate(spill_avail = ifelse(is.na(spill), NA, "spill")) %>% 
+  dplyr::select(date, temp_avail, flow_avail, spill_avail) %>% 
+  pivot_longer(cols = c(temp_avail, flow_avail, spill_avail))-> data_avail_df
+
+  data_avail_plot <- ggplot(subset(data_avail_df, !(is.na(value))), aes(x = date, y = value)) +
+    geom_point() +
+    ylab("Data Availability")
+  
+  return(data_avail_plot)
+}
+
+
+
+# Function 4: Data availabilty visualization
+cov_data_viz <- function(cont_cov) {
+  
+  
+# okay, is there a pattern seasonally?
+# data_avail_plot <- ggplot(cont_cov, aes(x = date, y = data_available)) +
+#   geom_point() +
+#   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+#   theme(panel.grid.minor = element_blank(),
+#         axis.text = element_text(size = 7))
+# 
+# # v2 - missing data only
+# data_avail_plot <- ggplot(cont_cov, aes(x = date, y = missing_data)) +
+#   geom_point() +
+#   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+#   theme(panel.grid.minor = element_blank(),
+#         axis.text = element_text(size = 7))
+
+temp_plot <- ggplot(cont_cov, aes(x = day, y = temp)) +
+  geom_point() +
+  scale_x_continuous(breaks = c(0,50,100,150,200,250,300,365))
+
+flow_plot <- ggplot(cont_cov, aes(x = day, y = flow)) +
+  geom_point() +
+  scale_x_continuous(breaks = c(0,50,100,150,200,250,300,365))
+
+spill_plot <- ggplot(cont_cov, aes(x = day, y = spill)) +
+  geom_point() +
+  scale_x_continuous(breaks = c(0,50,100,150,200,250,300,365))
+
+# plot_list <- list(data_avail_plot, temp_plot, flow_plot, spill_plot)
+plot_list <- list(temp_plot, flow_plot, spill_plot)
+
+return(plot_list)
+
+}
+
+# Function 5: Plot regressions, return VIF and R^2
+cov_regressions <- function(cont_cov){
+  
+# plot
+flow_v_spill <- ggplot(cont_cov, aes(x = flow, y = spill)) +
+  geom_point()
+
+flow_v_temp <- ggplot(cont_cov, aes(x = flow, y = temp)) +
+  geom_point()
+
+temp_v_spill <- ggplot(cont_cov, aes(x = temp, y = spill)) +
+  geom_point()
+
+# reg_plots <- list(flow_v_spill, flow_v_temp, temp_v_spill)
+
+# run regressions
+spill_flow_lm <- lm(spill~flow, data = cont_cov)
+spill_flow_lm_sum <- summary(spill_flow_lm)
+
+temp_flow_lm <- lm(temp~flow, data = cont_cov)
+temp_flow_lm_sum <- summary(temp_flow_lm)
+
+spill_temp_lm <- lm(spill~temp, data = cont_cov)
+spill_temp_lm_sum <-summary(spill_temp_lm)
+
+return(list(flow_v_spill, spill_flow_lm_sum,
+            flow_v_temp, temp_flow_lm_sum,
+            temp_v_spill, spill_temp_lm_sum))
+}
+
+# Function 6: Variance inflation factors
+cov_vif <- function(cont_cov){
+  # run multiple linear regressions and calculate VIF
+  spill_mlm <- lm(spill ~ flow + temp, data = cont_cov)
+  spill_vif <- vif(spill_mlm)
+
+  temp_mlm <- lm(temp ~ flow + spill, data = cont_cov)
+  temp_vif <- vif(temp_mlm)
+
+  flow_mlm <- lm(flow ~ spill + temp, data = cont_cov)
+  flow_vif <- vif(flow_mlm)
+  
+  return(list(spill_vif, temp_vif, flow_vif))
+} 
+
+  
+
+```
+
+
+
+```{r load_data}
+# BON
+BON_flow <- read.csv(here::here("covariate_data", "BON", "basin_outflow_BON_allyears.csv"))[1:366,]
+BON_flow_long <- cov_reformat(input_data = BON_flow, variable_name = "flow")
+BON_spill <- read.csv(here::here("covariate_data", "BON", "basin_spill_BON_allyears.csv"))[1:366,]
+BON_spill_long <- cov_reformat(input_data = BON_spill, variable_name = "spill")
+BON_temp <- read.csv(here::here("covariate_data", "BON", "basin_tempc_tailrace_BON_allyears.csv"))[1:366,]
+BON_temp_long <- cov_reformat(input_data = BON_temp, variable_name = "temp")
+
+
+# ICH
+ICH_flow <- read.csv(here::here("covariate_data", "ICH", "basin_outflow_IHR_allyears.csv"))[1:366,]
+ICH_flow_long <- cov_reformat(input_data = ICH_flow, variable_name = "flow")
+ICH_spill <- read.csv(here::here("covariate_data", "ICH", "basin_spill_IHR_allyears.csv"))[1:366,]
+ICH_spill_long <- cov_reformat(input_data = ICH_spill, variable_name = "spill")
+ICH_temp <- read.csv(here::here("covariate_data", "ICH", "basin_tempc_tailrace_IHR_allyears.csv"))[1:366,]
+ICH_temp_long <- cov_reformat(input_data = ICH_temp, variable_name = "temp")
+
+
+# JDA
+JDA_flow <- read.csv(here::here("covariate_data", "JDA", "basin_outflow_JDA_allyears.csv"))[1:366,]
+JDA_flow_long <- cov_reformat(input_data = JDA_flow, variable_name = "flow")
+JDA_spill <- read.csv(here::here("covariate_data", "JDA", "basin_spill_JDA_allyears.csv"))[1:366,]
+JDA_spill_long <- cov_reformat(input_data = JDA_spill, variable_name = "spill")
+JDA_temp <- read.csv(here::here("covariate_data", "JDA", "basin_tempc_tailrace_JDA_allyears.csv"))[1:366,]
+JDA_temp_long <- cov_reformat(input_data = JDA_temp, variable_name = "temp")
+
+
+# TDA
+TDA_flow <- read.csv(here::here("covariate_data", "TDA", "basin_outflow_TDA_allyears.csv"))[1:366,]
+TDA_flow_long <- cov_reformat(input_data = TDA_flow, variable_name = "flow")
+TDA_spill <- read.csv(here::here("covariate_data", "TDA", "basin_spill_TDA_allyears.csv"))[1:366,]
+TDA_spill_long <- cov_reformat(input_data = TDA_spill, variable_name = "spill")
+TDA_temp <- read.csv(here::here("covariate_data", "TDA", "basin_tempc_tailrace_TDA_allyears.csv"))[1:366,]
+TDA_temp_long <- cov_reformat(input_data = TDA_temp, variable_name = "temp")
+
+# LGR
+LGR_flow <- read.csv(here::here("covariate_data", "LGR", "basin_outflow_LWG_allyears.csv"))[1:366,]
+LGR_flow_long <- cov_reformat(input_data = LGR_flow, variable_name = "flow")
+LGR_spill <- read.csv(here::here("covariate_data", "LGR", "basin_spill_LWG_allyears.csv"))[1:366,]
+LGR_spill_long <- cov_reformat(input_data = LGR_spill, variable_name = "spill")
+LGR_temp <- read.csv(here::here("covariate_data", "LGR", "basin_tempc_tailrace_LWG_allyears.csv"))[1:366,]
+LGR_temp_long <- cov_reformat(input_data = LGR_temp, variable_name = "temp")
+
+# LMO
+LMO_flow <- read.csv(here::here("covariate_data", "LMO", "basin_outflow_LMN_allyears.csv"))[1:366,]
+LMO_flow_long <- cov_reformat(input_data = LMO_flow, variable_name = "flow")
+LMO_spill <- read.csv(here::here("covariate_data", "LMO", "basin_spill_LMN_allyears.csv"))[1:366,]
+LMO_spill_long <- cov_reformat(input_data = LMO_spill, variable_name = "spill")
+LMO_temp <- read.csv(here::here("covariate_data", "LMO", "basin_tempc_tailrace_LMN_allyears.csv"))[1:366,]
+LMO_temp_long <- cov_reformat(input_data = LMO_temp, variable_name = "temp")
+
+# LGO
+LGO_flow <- read.csv(here::here("covariate_data", "LGO", "basin_outflow_LGS_allyears.csv"))[1:366,]
+LGO_flow_long <- cov_reformat(input_data = LGO_flow, variable_name = "flow")
+LGO_spill <- read.csv(here::here("covariate_data", "LGO", "basin_spill_LGS_allyears.csv"))[1:366,]
+LGO_spill_long <- cov_reformat(input_data = LGO_spill, variable_name = "spill")
+LGO_temp <- read.csv(here::here("covariate_data", "LGO", "basin_tempc_tailrace_LGS_allyears.csv"))[1:366,]
+LGO_temp_long <- cov_reformat(input_data = LGO_temp, variable_name = "temp")
+
+
+# MCN
+MCN_flow <- read.csv(here::here("covariate_data", "MCN", "basin_outflow_MCN_allyears.csv"))[1:366,]
+MCN_flow_long <- cov_reformat(input_data = MCN_flow, variable_name = "flow")
+MCN_spill <- read.csv(here::here("covariate_data", "MCN", "basin_spill_MCN_allyears.csv"))[1:366,]
+MCN_spill_long <- cov_reformat(input_data = MCN_spill, variable_name = "spill")
+MCN_temp <- read.csv(here::here("covariate_data", "MCN", "basin_tempc_tailrace_MCN_allyears.csv"))[1:366,]
+MCN_temp_long <- cov_reformat(input_data = MCN_temp, variable_name = "temp")
+
+
+# PRA
+PRA_flow <- read.csv(here::here("covariate_data", "PRA", "basin_outflow_PRD_allyears.csv"))[1:366,]
+PRA_flow_long <- cov_reformat(input_data = PRA_flow, variable_name = "flow")
+PRA_spill <- read.csv(here::here("covariate_data", "PRA", "basin_spill_PRD_allyears.csv"))[1:366,]
+PRA_spill_long <- cov_reformat(input_data = PRA_spill, variable_name = "spill")
+PRA_temp <- read.csv(here::here("covariate_data", "PRA", "basin_tempc_tailrace_PRD_allyears.csv"))[1:366,]
+PRA_temp_long <- cov_reformat(input_data = PRA_temp, variable_name = "temp")
+
+
+# RIS
+RIS_flow <- read.csv(here::here("covariate_data", "RIS", "basin_outflow_RIS_allyears.csv"))[1:366,]
+RIS_flow_long <- cov_reformat(input_data = RIS_flow, variable_name = "flow")
+RIS_spill <- read.csv(here::here("covariate_data", "RIS", "basin_spill_RIS_allyears.csv"))[1:366,]
+RIS_spill_long <- cov_reformat(input_data = RIS_spill, variable_name = "spill")
+RIS_temp <- read.csv(here::here("covariate_data", "RIS", "basin_tempc_tailrace_RIS_allyears.csv"))[1:366,]
+RIS_temp_long <- cov_reformat(input_data = RIS_temp, variable_name = "temp")
+
+
+# RRE
+RRE_flow <- read.csv(here::here("covariate_data", "RRE", "basin_outflow_RRH_allyears.csv"))[1:366,]
+RRE_flow_long <- cov_reformat(input_data = RRE_flow, variable_name = "flow")
+RRE_spill <- read.csv(here::here("covariate_data", "RRE", "basin_spill_RRH_allyears.csv"))[1:366,]
+RRE_spill_long <- cov_reformat(input_data = RRE_spill, variable_name = "spill")
+RRE_temp <- read.csv(here::here("covariate_data", "RRE", "basin_tempc_tailrace_RRH_allyears.csv"))[1:366,]
+RRE_temp_long <- cov_reformat(input_data = RRE_temp, variable_name = "temp")
+
+
+# WEL
+WEL_flow <- read.csv(here::here("covariate_data", "WEL", "basin_outflow_WEL_allyears.csv"))[1:366,]
+WEL_flow_long <- cov_reformat(input_data = WEL_flow, variable_name = "flow")
+WEL_spill <- read.csv(here::here("covariate_data", "WEL", "basin_spill_WEL_allyears.csv"))[1:366,]
+WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
+WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_WEL_allyears.csv"))[1:366,]
+WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
+
+```
+
+
+### Bonneville Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r BON}
+BON_cont_cov <- cov_combine(flow_data = BON_flow_long,
+                            spill_data = BON_spill_long,
+                            temp_data = BON_temp_long)
+
+BON_cont_cov <- cov_data_availability(BON_cont_cov)
+
+# data availability as a table
+table(BON_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = BON_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = BON_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = BON_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+
+```{r BON_vif}
+cov_vif(cont_cov = BON_cont_cov)
+```
+
+
+
+### John Day Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r JDA}
+JDA_cont_cov <- cov_combine(flow_data = JDA_flow_long,
+                            spill_data = JDA_spill_long,
+                            temp_data = JDA_temp_long)
+
+JDA_cont_cov <- cov_data_availability(JDA_cont_cov)
+
+# data availability as a table
+table(JDA_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = JDA_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = JDA_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = JDA_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r JDA_vif}
+cov_vif(cont_cov = JDA_cont_cov)
+```
+
+
+
+### The Dalles Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r TDA}
+TDA_cont_cov <- cov_combine(flow_data = TDA_flow_long,
+                            spill_data = TDA_spill_long,
+                            temp_data = TDA_temp_long)
+
+TDA_cont_cov <- cov_data_availability(TDA_cont_cov)
+
+# data availability as a table
+table(TDA_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = TDA_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = TDA_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = TDA_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r TDA_vif}
+cov_vif(cont_cov = TDA_cont_cov)
+```
+
+
+### McNary Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r MCN}
+MCN_cont_cov <- cov_combine(flow_data = MCN_flow_long,
+                            spill_data = MCN_spill_long,
+                            temp_data = MCN_temp_long)
+
+MCN_cont_cov <- cov_data_availability(MCN_cont_cov)
+
+# data availability as a table
+table(MCN_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = MCN_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = MCN_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = MCN_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r MCN_vif}
+cov_vif(cont_cov = MCN_cont_cov)
+```
+
+
+
+### Priest Rapids Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r PRA}
+PRA_cont_cov <- cov_combine(flow_data = PRA_flow_long,
+                            spill_data = PRA_spill_long,
+                            temp_data = PRA_temp_long)
+
+PRA_cont_cov <- cov_data_availability(PRA_cont_cov)
+
+# data availability as a table
+table(PRA_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = PRA_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = PRA_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = PRA_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r PRA_vif}
+cov_vif(cont_cov = PRA_cont_cov)
+```
+
+
+
+### Rock Island Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r RIS}
+RIS_cont_cov <- cov_combine(flow_data = RIS_flow_long,
+                            spill_data = RIS_spill_long,
+                            temp_data = RIS_temp_long)
+
+RIS_cont_cov <- cov_data_availability(RIS_cont_cov)
+
+# data availability as a table
+table(RIS_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = RIS_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = RIS_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = RIS_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r RIS_vif}
+cov_vif(cont_cov = RIS_cont_cov)
+```
+
+
+### Rocky Reach Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r RRE}
+RRE_cont_cov <- cov_combine(flow_data = RRE_flow_long,
+                            spill_data = RRE_spill_long,
+                            temp_data = RRE_temp_long)
+
+RRE_cont_cov <- cov_data_availability(RRE_cont_cov)
+
+# data availability as a table
+table(RRE_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = RRE_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = RRE_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = RRE_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r RRE_vif}
+cov_vif(cont_cov = RRE_cont_cov)
+```
+
+
+### Wells Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r WEL}
+WEL_cont_cov <- cov_combine(flow_data = WEL_flow_long,
+                            spill_data = WEL_spill_long,
+                            temp_data = WEL_temp_long)
+
+WEL_cont_cov <- cov_data_availability(WEL_cont_cov)
+
+# data availability as a table
+table(WEL_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = WEL_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = WEL_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = WEL_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r WEL_vif}
+cov_vif(cont_cov = WEL_cont_cov)
+```
+
+
+### Ice Harbor Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r ICH}
+ICH_cont_cov <- cov_combine(flow_data = ICH_flow_long,
+                            spill_data = ICH_spill_long,
+                            temp_data = ICH_temp_long)
+
+ICH_cont_cov <- cov_data_availability(ICH_cont_cov)
+
+# data availability as a table
+table(ICH_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = ICH_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = ICH_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = ICH_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r ICH_vif}
+cov_vif(cont_cov = ICH_cont_cov)
+```
+
+
+
+### Lower Monumental Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r LMO}
+LMO_cont_cov <- cov_combine(flow_data = LMO_flow_long,
+                            spill_data = LMO_spill_long,
+                            temp_data = LMO_temp_long)
+
+LMO_cont_cov <- cov_data_availability(LMO_cont_cov)
+
+# data availability as a table
+table(LMO_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = LMO_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = LMO_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = LMO_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r LMO_vif}
+cov_vif(cont_cov = LMO_cont_cov)
+```
+
+
+### Little Goose Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r LGO}
+LGO_cont_cov <- cov_combine(flow_data = LGO_flow_long,
+                            spill_data = LGO_spill_long,
+                            temp_data = LGO_temp_long)
+
+LGO_cont_cov <- cov_data_availability(LGO_cont_cov)
+
+# data availability as a table
+table(LGO_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = LGO_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = LGO_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = LGO_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r LGO_vif}
+cov_vif(cont_cov = LGO_cont_cov)
+```
+
+
+
+### Lower Granite Dam
+
+#### Data availability
+Availability of spill/temperature/flow data, by number of days (2004-present):
+```{r LGR}
+LGR_cont_cov <- cov_combine(flow_data = LGR_flow_long,
+                            spill_data = LGR_spill_long,
+                            temp_data = LGR_temp_long)
+
+LGR_cont_cov <- cov_data_availability(LGR_cont_cov)
+
+# data availability as a table
+table(LGR_cont_cov$data_available)
+```
+
+#### Data by day of year
+```{r}
+cov_data_availability_2(cont_cov = LGR_cont_cov)
+# visualize data as plots
+cov_data_viz(cont_cov = LGR_cont_cov)
+```
+
+
+#### Regressions and VIF
+``` {r}
+# regressions and vif
+cov_regressions(cont_cov = LGR_cont_cov)
+```
+Variance inflation factors (Spill, Temperature, and Flow):
+  
+```{r LGR_vif}
+cov_vif(cont_cov = LGR_cont_cov)
+```
+
