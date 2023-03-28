@@ -1,5 +1,5 @@
 ---
-title: "steelhead_cov_data"
+title: "Covariate Data and Movement Timing"
 author: "Markus Min"
 date: '2023-03-27'
 output: html_document
@@ -14,12 +14,11 @@ library(janitor)
 library(tidyverse)
 library(lubridate)
 library(car)
+library(ggthemes)
 
 ```
 
-## Overview
-
-For each dam, we will:
+## Objectives
 
 1. Assess concerns over data availability.
 2. Investigate multicollinearity between our three continuous covariates: flow, spill, and temperature.
@@ -297,6 +296,73 @@ WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_W
 WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
 
 ```
+
+
+```{r load_states_data}
+# so, I think that the most up to date files are in the same folders as the model runs
+snake_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "snake", "snake_adults_states_complete.csv"), row.names = 1)
+lowcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"), row.names = 1)
+midcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "middle_columbia", "middle_columbia_adults_states_complete.csv"), row.names = 1)
+uppcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "upper_columbia", "upper_columbia_adults_states_complete.csv"), row.names = 1)
+
+# combine them all
+snake_adults_states_complete %>% 
+  bind_rows(., midcol_adults_states_complete) %>% 
+  bind_rows(., uppcol_adults_states_complete) %>% 
+  bind_rows(., lowcol_adults_states_complete) -> ASC
+
+# now add tag code metadata, for natal origins
+origin_numeric <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John_Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+                             natal_origin_numeric = seq(1,17,1))
+
+origin_rear_actual <- read.csv(here::here("stan_actual", "origin_rear_actual.csv"), row.names = 1)
+origin_rear_actual %>% 
+  dplyr::rename(natal_origin_numeric = natal_origin) %>% 
+  left_join(origin_numeric, by = "natal_origin_numeric") %>% 
+  dplyr::select(tag_code_2, natal_origin) -> tag_code_origins
+
+ASC %>% 
+  left_join(., tag_code_origins, by = "tag_code_2") -> ASC
+
+```
+
+## Matching covariate data to state occupancy
+
+Example of movements for one fish:
+```{r}
+# subset(ASC, tag_code %in% c("384.3B2395F9F6", "3DD.0077D43358", "3DD.0077D3F3CB", "3DD.0077996B66", "3DD.00777260CF", "3DD.00776DF38F", "3DD.0077645B38", "3DD.0077437BC1", "3DD.00774166EC", "3D9.1C2DF4F5E2", "3D9.1C2DE0F9A7"))
+## Matching covariate data to state occupancy
+dplyr::select(subset(ASC, tag_code %in% c("384.3B2395F9F6")), state, date_time, pathway)
+```
+
+
+
+## Covariate Data
+
+### Summary
+- The following dams lack winter (November - Feburary) temperature data: Bonneville, Rock Island (until 2012), Rocky Reach (until 2012), Wells Dam (until 2013) 
+- Spill data can be a bit patchy - are missing spill values zeros?
+- Spill and flow are strongly correlated; VIF vary, but are between 2 and 8. R^2 values range 0.55 - 0.9
+- In some years, spill appears to follow the relationship *spill = flow - X*, but the value of *X* changes from year to year. This appears to be especially true for the four Snake River Dams
+
+
+
 
 
 ### Bonneville Dam
@@ -723,4 +789,171 @@ Variance inflation factors (Spill, Temperature, and Flow):
 ```{r LGR_vif}
 cov_vif(cont_cov = LGR_cont_cov)
 ```
+
+
+
+## State timing
+
+```{r state_timing}
+# reformat data to add columns for month/day/day of year
+ASC %>% 
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  mutate(day = yday(date_time)) %>% 
+  mutate(month = month(date_time)) %>% 
+  mutate(year = year(date_time)) -> ASC
+
+dam_pathways <- c("BON (adult)", "MCN (adult)", "PRA (adult)", "RIS (adult)",
+                                      "RRE (adult)", "WEL (adult)", "ICH (adult)", "LGR (adult)")
+
+trib_pathways <- unique(ASC$pathway)[grep("upstream|sites|RM", unique(ASC$pathway))]
+
+# sort by tributary
+ASO_pathways <- trib_pathways[grep("ASO", trib_pathways)]
+CLE_pathways <- trib_pathways[grep("CLE", trib_pathways)]
+DES_pathways <- trib_pathways[grep("DES", trib_pathways)]
+ENT_pathways <- trib_pathways[grep("ENT", trib_pathways)]
+FIF_pathways <- trib_pathways[grep("FIF", trib_pathways)]
+GRRO_pathways <- trib_pathways[grep("GRRO", trib_pathways)]
+HOOD_pathways <- trib_pathways[grep("HOOD", trib_pathways)]
+IMN_pathways <- trib_pathways[grep("IMN", trib_pathways)]
+JDR_pathways <- trib_pathways[grep("JDR", trib_pathways)]
+MET_pathways <- trib_pathways[grep("MET", trib_pathways)]
+OKA_pathways <- trib_pathways[grep("OKA", trib_pathways)]
+SAL_pathways <- trib_pathways[grep("SAL", trib_pathways)]
+TUC_pathways <- trib_pathways[grep("TUC", trib_pathways)]
+UMA_pathways <- trib_pathways[grep("UMA", trib_pathways)]
+WAWA_pathways <- trib_pathways[grep("WAWA", trib_pathways)]
+WEN_pathways <- trib_pathways[grep("WEN", trib_pathways)]
+YAK_pathways <- trib_pathways[grep("YAK", trib_pathways)]
+
+known_fallback_pathways <- unique(ASC$pathway)[grep("fallback", unique(ASC$pathway))]
+
+# setdiff(unique(ASC$pathway), c(trib_pathways, dam_pathways))
+```
+
+### Dam ascents
+```{r dam_ascent_timing}
+# BON
+ggplot(subset(ASC, pathway == "BON (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("BON (adult)")
+
+# MCN
+ggplot(subset(ASC, pathway == "MCN (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("MCN (adult)")
+
+# PRA
+ggplot(subset(ASC, pathway == "PRA (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("PRA (adult)")
+
+# RIS
+ggplot(subset(ASC, pathway == "RIS (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("RIS (adult)")
+
+# RRE
+ggplot(subset(ASC, pathway == "RRE (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("WEL (adult)")
+
+# WEL
+ggplot(subset(ASC, pathway == "WEL (adult)"), aes(x = day)) +
+  geom_histogram() + 
+  ggtitle("WEL (adult)")
+
+# ICH
+ggplot(subset(ASC, pathway == "ICH (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("ICH (adult)")
+
+# LGR
+ggplot(subset(ASC, pathway == "LGR (adult)"), aes(x = day)) +
+  geom_histogram() +
+  ggtitle("LGR (adult)")
+```
+
+### Tributary entries
+```{r trib_entry_timing}
+# for this - let's look at entries to tributaries, not movement within
+ASC %>% 
+  group_by(tag_code) %>% 
+  filter(!(pathway %in% trib_pathways & lag(pathway %in% trib_pathways))) -> ASC
+
+# plot them all!
+ggplot(subset(ASC, pathway %in% ASO_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() +
+  scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Asotin Creek")
+
+ggplot(subset(ASC, pathway %in% CLE_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Clearwater River")
+
+ggplot(subset(ASC, pathway %in% DES_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Deschutes River")
+
+ggplot(subset(ASC, pathway %in% ENT_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Entiat River")
+
+ggplot(subset(ASC, pathway %in% FIF_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Fifteenmile Creek")
+
+ggplot(subset(ASC, pathway %in% GRRO_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Grande Ronde River")
+
+ggplot(subset(ASC, pathway %in% HOOD_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Hood River")
+
+ggplot(subset(ASC, pathway %in% IMN_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Imnaha River")
+
+ggplot(subset(ASC, pathway %in% JDR_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("John Day River")
+
+ggplot(subset(ASC, pathway %in% MET_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Methow River")
+
+ggplot(subset(ASC, pathway %in% OKA_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Okanogan River")
+
+ggplot(subset(ASC, pathway %in% SAL_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Salmon River")
+
+ggplot(subset(ASC, pathway %in% TUC_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Tucannon River")
+
+ggplot(subset(ASC, pathway %in% UMA_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Umatilla River")
+
+ggplot(subset(ASC, pathway %in% WAWA_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Walla Walla River")
+
+ggplot(subset(ASC, pathway %in% WEN_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Wenatchee River")
+
+ggplot(subset(ASC, pathway %in% YAK_pathways), aes(x = day, fill = natal_origin)) +
+  geom_histogram() + scale_fill_tableau(palette = "Tableau 20")+
+  ggtitle("Yakima River")
+```
+
+
+### Dam fallback (timing estimated)
+
+
 
