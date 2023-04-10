@@ -72,6 +72,8 @@ tag_codes_1 %>%
   bind_rows(., tag_codes_13) %>% 
   bind_rows(., tag_codes_14) -> tag_code_file_finder
 
+write.table(tag_code_file_finder, here::here("PTAGIS_queries", "tag_code_file_finder.txt"), row.names = FALSE)
+
 # Read in states complete
 # read.csv(here::here("from_hyak_transfer", "2022-05-25-complete_det_hist", "states_complete.csv")) %>%
 # read.csv(here::here("from_hyak_transfer", "2022-07-16-complete_det_hist", "states_complete.csv")) %>%
