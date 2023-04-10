@@ -1,0 +1,177 @@
+---
+title: "21_reach_residence"
+author: "Markus Min"
+date: '2023-04-09'
+output: html_document
+---
+
+### Description
+This Rmd file investigates residence time of individual fish in different reaches to determine a time at which a "decision" is made on movement (similar to Siegel et al. 2021).
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# load libraries
+library(here)
+library(janitor)
+library(tidyverse)
+library(lubridate)
+library(car)
+library(ggthemes)
+
+# load data
+
+
+```
+
+```{r load_states_data}
+# so, I think that the most up to date files are in the same folders as the model runs
+snake_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "snake", "snake_adults_states_complete.csv"), row.names = 1)
+lowcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"), row.names = 1)
+midcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "middle_columbia", "middle_columbia_adults_states_complete.csv"), row.names = 1)
+uppcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "upper_columbia", "upper_columbia_adults_states_complete.csv"), row.names = 1)
+
+# combine them all
+snake_adults_states_complete %>% 
+  bind_rows(., midcol_adults_states_complete) %>% 
+  bind_rows(., uppcol_adults_states_complete) %>% 
+  bind_rows(., lowcol_adults_states_complete) -> ASC
+
+# now add tag code metadata, for natal origins
+origin_numeric <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John_Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+                             natal_origin_numeric = seq(1,17,1))
+
+origin_rear_actual <- read.csv(here::here("stan_actual", "origin_rear_actual.csv"), row.names = 1)
+origin_rear_actual %>% 
+  dplyr::rename(natal_origin_numeric = natal_origin) %>% 
+  left_join(origin_numeric, by = "natal_origin_numeric") %>% 
+  dplyr::select(tag_code_2, natal_origin) -> tag_code_origins
+
+ASC %>% 
+  left_join(., tag_code_origins, by = "tag_code_2") -> ASC
+```
+
+```{r functions}
+# a function that takes two states, and finds the average amount of time between those states
+# notably, if a fish doesn't go straight, it won't keep it in this function
+# so, if a fish attempts BON ascent on day 1, gives up, and does it again on day 7, then is seen at MCN on day 17,
+# passage time will be 10 days, not 16 days
+# also, if a fish ascends BON, then goes to Deschutes, then goes to MCN, it will not be kept in this function
+
+passage_time <- function(pathway_1, pathway_2){
+  
+  # first, subset only those that have those two states
+  # don't keep any with implicit time interpolated
+  ASC %>% 
+    filter(pathway == pathway_1 & lead(pathway == pathway_2) & tag_code_2 == lead(tag_code_2) & pathway != "implicit" & lead(pathway) != "implicit" |
+             pathway == pathway_2 & lag(pathway == pathway_1) & tag_code_2 == lag(tag_code_2) & pathway != "implicit" & lag(pathway) != "implicit") %>% 
+    mutate(date_time = ymd_hms(date_time)) -> two_pathway_df
+  
+  # make a data frame to record all of the transitions
+  n_transitions <- nrow(two_pathway_df)/2
+  passage_df <- data.frame(tag_code_2 = two_pathway_df$tag_code_2[seq(1,(nrow(two_pathway_df)-1),2)],
+                           passage_time = NA)
+  
+  
+  for (i in 1:nrow(passage_df)){
+    passage_df$passage_time[i] <- two_pathway_df$date_time[(i*2)] - two_pathway_df$date_time[(i*2-1)]
+    
+  }
+  
+  return(passage_df)
+  
+}
+
+# a function to plot passage time
+passage_time_plot <- function(passage_df, reach){
+  passage_plot <- ggplot(passage_df, aes(x = passage_time)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Days") +
+    ggtitle(reach)
+ 
+  return(passage_plot) 
+}
+
+passage_time_plot_logdays <- function(passage_df, reach){
+  passage_plot <- ggplot(passage_df, aes(x = log(passage_time))) +
+    geom_histogram(binwidth = 0.1) +
+    xlab("Days") +
+    ggtitle(reach)
+  
+  return(passage_plot) 
+}
+
+
+# a function that takes just one state, and finds the average amount of time to move out of that state
+
+residence_time <- function(residence_state){
+  
+  # don't keep any with implicit time interpolated
+  ASC %>% 
+    filter(state == residence_state & tag_code_2 == lead(tag_code_2) & pathway != "implicit" & lead(pathway) != "implicit" |
+             lag(state) == residence_state & tag_code_2 == lag(tag_code_2) & pathway != "implicit" & lag(pathway) != "implicit") %>% 
+    mutate(date_time = ymd_hms(date_time)) -> one_state_df
+  
+  # make a data frame to record all of the transitions
+  n_transitions <- nrow(one_state_df)/2
+  passage_df <- data.frame(tag_code_2 = one_state_df$tag_code_2[seq(1,(nrow(one_state_df)-1),2)],
+                           passage_time = NA)
+  
+  
+  for (i in 1:nrow(passage_df)){
+    passage_df$passage_time[i] <- one_state_df$date_time[(i*2)] - one_state_df$date_time[(i*2-1)]
+    
+  }
+  
+  return(passage_df)
+  
+}
+
+```
+
+```{r BON_to_MCN}
+
+BON_MCN_passage <- passage_time(pathway_1 = "BON (adult)", pathway_2 = "MCN (adult)")
+BON_to_MCN <- passage_time_plot(passage_df = BON_MCN_passage, reach = "Bonneville Adult Ladder to McNary Adult Ladder")
+BON_to_MCN
+
+BON_to_MCN_log <- passage_time_plot_logdays(passage_df = BON_MCN_passage, reach = "Bonneville Adult Ladder to McNary Adult Ladder")
+BON_to_MCN_log
+
+# give summary of passage time
+
+summary(BON_MCN_passage$passage_time)
+```
+
+```{r mainstem_BON_MCN}
+BON_MCN_residence <- residence_time(residence_state = "mainstem, BON to MCN")
+
+BON_to_MCN <- passage_time_plot(passage_df = BON_MCN_residence, reach = "mainstem, BON to MCN")
+BON_to_MCN
+
+BON_to_MCN_log <- passage_time_plot_logdays(passage_df = BON_MCN_residence, reach = "mainstem, BON to MCN")
+BON_to_MCN_log
+
+# give summary of passage time
+
+summary(BON_MCN_residence$passage_time)
+```
+
+
+
