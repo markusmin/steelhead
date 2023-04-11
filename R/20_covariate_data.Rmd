@@ -295,6 +295,11 @@ WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
 WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_WEL_allyears.csv"))[1:366,]
 WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
 
+# Export this data for modeling
+write.csv(MCN_temp_long, here::here("covariate_data", "for_model", "MCN_temp.csv"), row.names = FALSE)
+write.csv(ICH_temp_long, here::here("covariate_data", "for_model", "ICH_temp.csv"), row.names = FALSE)
+
+
 ```
 
 
@@ -476,8 +481,7 @@ cov_vif(cont_cov = TDA_cont_cov)
 
 #### Data availability
 Availability of spill/temperature/flow data, by number of days (2004-present):
-```{r MCN}
-MCN_cont_cov <- cov_combine(flow_data = MCN_flow_long,
+```{r MCNcont_cov <- cov_combine(flow_data = MCN_flow_long,
                             spill_data = MCN_spill_long,
                             temp_data = MCN_temp_long)
 
