@@ -6,35 +6,44 @@ output: html_document
 ---
 
 ### Description
-This Rmd file investigates residence time of individual fish in different reaches to determine a time at which a "decision" is made on movement (similar to Siegel et al. 2021).
+This Rmd file investigates residence time of individual fish in different reaches. This will help us determine in what time window covariates are most influential to fish movement decisions.
+
+#### Covariate inclusion in Siegel et al. 2021: "Environmentally triggered shifts in steelhead migration behavior and consequences for survival in the mid-Columbia River"
+![](../figures/Siegel_2021_Fig2.png){width=100%}
+
+"For each population group, we fit a 3-component mixture model [32] to log-transformed travel times using the package mixtools [33] to assign a probability of migration behavior to each fish that was detected at both dams (n = 32,740)."
+
+"We considered the following environmental variables in models for the probability of delay: river temperature (T), river flow (F), dam spill volume (S), and the date of first detection at Bonneville Dam (D). The environmental variables (T, F, and S), which were accessed from the Columbia River Data Access in Real Time database [36], were averaged over the median fast fish travel time period (8 days) starting on the day of first detection at Bonneville Dam. These 8 days represent the period of exposure during which a fish makes the “decision” to delay or to continue upstream."
 
 
 ### Proposed covariate structure
 
-
-
 ##### Continuous
 1. Temperature
-  a. In mainstem sites, use the temperature value at the median residence time of "fast" fish - the fish that move straight through
-  b. Use temperature as a covariate for every movement out of the mainstem (upstream, downstream, or into tributaries)
+  + In mainstem sites, use the temperature value at the median residence time of "fast" fish - the fish that move straight through. Or pick a window of time based on residence time, and add that many days to the day that we see them enter the state and then average across those days.
+  + Taking values right after fish enter a state would ensure that we are measuring conditions that we know they had to have experienced
+  + Use temperature as a covariate for movements upstream and into tributaries, but not downstream.
 2. Spill
-  a. March days of spill
-  b. Use this as a covariate for fallback only; might need to do some clever indexing with origins to make this happen
+  + March days of spill; this would be both "useful to fish" and "useful to BPA"
+  + Richins and Skalski (2018): no relationship was found between fallback rates to natal tributaries and spill during January or February.
+  + One option is to use this as a covariate for overshoot fallback only; might need to do some indexing with origins to make this happen
+  + Does this get at the "useful to BPA" level of spill? If we want to do a deep dive on spill, we can slice spill different ways (perhaps at a level finer than by month) and try inclduing it in different forms
 3. Flow - DROP. Flow is highly correlated with spill, and spill has been found to be more informative than flow for downstream movements (fallback) and not a good predictor of upstream movements
-  a. Richins and Skalski (2018) investigated how fallback rates were related to flow, and found no relationship between fallback rates to natal tributaries and late-winter flow
-  b. Siegel et al. (2021) looked at upstream migration of Steelhead (between Bonneville and McNary) and found that flow was not a good predictor for upstream migratory delays
+  + Richins and Skalski (2018) investigated how fallback rates were related to flow, and found no relationship between fallback rates to natal tributaries and late-winter flow
+  + Siegel et al. (2021) looked at upstream migration of Steelhead (between Bonneville and McNary) and found that flow was not a good predictor for upstream migratory delays
+
+Inevitably we are going to have fish where we are using covariates where we know they didn't experience those conditions, especially in the case of spill. Temperature shouldn't be as big of a deal, since the window that we average over will probably be quite small and temperature is generally very autocorrelated.
 
 ##### Categorical
 1. Natal origin - all movements within ESU boundaries
 2. Hatchery vs. wild - all movements
-3. Barged vs. not barged - all movements
-  a. Note that Richins and Skalski (2018) found that barging led to lower migration success (but also lower overshooting), but only had enough data for Tucannon River Hatchery Steelhead
+3. Barged vs. not barged - all movements, but would not affect most individuals
+  + Richins and Skalski (2018) found that barging led to lower migration success (but also lower overshooting)
+  + Only had enough data for Tucannon River Hatchery Steelhead
 4. Acclimated vs. not acclimated - all movements
+  + Strong effect, but again limited to one population (Wenatchee River Hatchery Steelhead)
 5. Ocean age - all movements
-
-
-
-Inevitably we are going to have fish where we are using covariates where we know they didn't experience those conditions. If its only off by a few days it shouldn't be a big deal because conditions are generally very autocorrelated, especially in the case of things like temperature. 
+  + Richins and Skalski (2018): "Compared to barging and rearing practices, ocean residence time was associated with smaller effects on migration success. Using meta-analysis, we found that increased ocean residence time was associated with reduced homing success during early migration, decreased movement directly to the natal tributary, increased overshooting, and decreased over-all success. Spending 2 years rather than 1 year in the ocean had estimated effects on overshooting ranging from a 4-percentage-point decrease (SE = 0.5 percentage point) for Wenatchee River steel- head to a 12-percentage-point increase (SE = 1 percentage point) for Entiat River steelhead."
 
 
 ```{r setup, include=FALSE}
@@ -159,6 +168,26 @@ passage_time_plot_logdays <- function(passage_df, reach){
   return(passage_plot) 
 }
 
+passage_time_plot_origin <- function(passage_df, reach){
+  passage_plot <- ggplot(passage_df, aes(x = passage_time, fill = natal_origin)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Days") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 20")
+ 
+  return(passage_plot) 
+}
+
+passage_time_plot_logdays_origin <- function(passage_df, reach){
+  passage_plot <- ggplot(passage_df, aes(x = log(passage_time), fill = natal_origin)) +
+    geom_histogram(binwidth = 0.1) +
+    xlab("log(Days)") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 20")
+  
+  return(passage_plot) 
+}
+
 
 # a function that takes just one state, and finds the average amount of time to move out of that state
 
@@ -174,6 +203,7 @@ residence_time <- function(residence_state){
   n_transitions <- nrow(one_state_df)/2
   passage_df <- data.frame(tag_code_2 = one_state_df$tag_code_2[seq(1,(nrow(one_state_df)-1),2)],
                            ESU = one_state_df$ESU[seq(1,(nrow(one_state_df)-1),2)],
+                           natal_origin = one_state_df$natal_origin[seq(1,(nrow(one_state_df)-1),2)],
                            passage_time = NA)
   
   
@@ -223,14 +253,23 @@ mainstem_states <- c("mainstem, mouth to BON",
 
 plots_days <- list()
 plots_logdays <- list()
+plots_days_origin <- list()
+plots_logdays_origin <- list()
+
 for (i in 1:length(mainstem_states)) {
   residence_df <- residence_time(residence_state = mainstem_states[i])
   
   passage_plot <- passage_time_plot(passage_df = residence_df, reach = mainstem_states[i])
   plots_days[[i]] <- passage_plot
   
+  passage_plot_origin <- passage_time_plot_origin(passage_df = residence_df, reach = mainstem_states[i])
+  plots_days_origin[[i]] <- passage_plot_origin
+  
   passage_plot_log <- passage_time_plot_logdays(passage_df = residence_df, reach = mainstem_states[i])
   plots_logdays[[i]] <- passage_plot_log
+  
+  passage_plot_log_origin <- passage_time_plot_logdays_origin(passage_df = residence_df, reach = mainstem_states[i])
+  plots_logdays_origin[[i]] <- passage_plot_log_origin
 
   # give summary of passage time
   summary(residence_df$passage_time)
@@ -238,39 +277,61 @@ for (i in 1:length(mainstem_states)) {
 }
 ```
 
-### Lower/Middle Columbia
+## Residence time by mainstem reach
+
+#### Lower/Middle Columbia
 ```{r}
 plots_days[[1]]
 plots_logdays[[1]]
+# plots_days_origin[[1]]
+# plots_logdays_origin[[1]]
 plots_days[[2]]
 plots_logdays[[2]]
+# plots_days_origin[[2]]
+plots_logdays_origin[[2]]
 plots_days[[3]]
 plots_logdays[[3]]
+# plots_days_origin[[3]]
+plots_logdays_origin[[3]]
 ```
 
-### Upper Columbia
+#### Upper Columbia
 ```{r}
 plots_days[[4]]
 plots_logdays[[4]]
+# plots_days_origin[[4]]
+plots_logdays_origin[[4]]
 plots_days[[5]]
 plots_logdays[[5]]
+# plots_days_origin[[5]]
+plots_logdays_origin[[5]]
 plots_days[[6]]
 plots_logdays[[6]]
+# plots_days_origin[[6]]
+plots_logdays_origin[[6]]
 plots_days[[7]]
 plots_logdays[[7]]
+# plots_days_origin[[7]]
+plots_logdays_origin[[7]]
 ```
 
-### Snake
+#### Snake
 ```{r}
 plots_days[[8]]
 plots_logdays[[8]]
+# plots_days_origin[[8]]
+plots_logdays_origin[[8]]
 plots_days[[9]]
 plots_logdays[[9]]
+# plots_days_origin[[9]]
+plots_logdays_origin[[9]]
 ```
 
 ## Covariate data exploratory analysis
 
 What is the relationship between water temperature at Ice Harbor and the probability of overshooting (and other movements) for Walla Walla River Steelhead?
+
+From Richins and Skalski (2018): for natural-origin Walla Walla River steelhead, the probability of moving directly to home decreased from over 90% to less than 25% as water temperatures increased from 10°C to 20°C.
 
 ```{r WAWA_temp_analysis}
 ICH_temp <- read.csv(here::here("covariate_data", "for_model", "ICH_temp.csv"))
@@ -398,7 +459,7 @@ The temperatures for fish going *upstream* are as follows:
 summary(subset(mainstem_fish, pathway == "MCN (adult)")$temp)
 ```
 
-The temperatures for fish going *downstream* are as follows: `r summary(subset(mainstem_fish, pathway != "MCN (adult)")$temp)`.
+The temperatures for fish going *downstream* are as follows:
 ```{r}
 summary(subset(mainstem_fish, pathway != "MCN (adult)")$temp)
 ```
