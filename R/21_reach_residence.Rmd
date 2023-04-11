@@ -270,7 +270,7 @@ plots_logdays[[9]]
 
 ## Covariate data exploratory analysis
 
-What is the relationship between water temperature at McNary and the probability of overshooting for Walla Walla River Steelhead?
+What is the relationship between water temperature at Ice Harbor and the probability of overshooting (and other movements) for Walla Walla River Steelhead?
 
 ```{r WAWA_temp_analysis}
 ICH_temp <- read.csv(here::here("covariate_data", "for_model", "ICH_temp.csv"))
@@ -287,28 +287,229 @@ WAWA_ASC %>%
 WAWA_ASC_subset %>% 
   mutate(state = ifelse(state %in% c("Walla Walla River Mouth", "Walla Walla River Upstream"), "Walla Walla River",
                         ifelse(state == "Yakima River Mouth", "Yakima River", state))) %>% 
-  mutate(date_time = ymd_hms(date_time))-> WAWA_ASC_subset
+  mutate(date_time = ymd_hms(date_time)) %>% 
+  # create an empty field for temp
+  mutate(temp = NA)-> WAWA_ASC_subset
 
 # match temperature
-for (i in 1:seq(1, nrow(WAWA_ASC_subset)/2-1, by = 2)){
+for (i in seq(1, nrow(WAWA_ASC_subset)-1, by = 2)){
   # get the average temperature over eight days from detection at McNary
   # extract the date range
-  date_range <- seq(date(WAWA_ASC_subset$date_time[i]), date(WAWA_ASC_subset$date_time[i]) + days(7), by = "days")
+  date_range <- as.character(seq(date(WAWA_ASC_subset$date_time[i]), date(WAWA_ASC_subset$date_time[i]) + days(7), by = "days"))
   
   # match those dates to the temp data
-  
+  temp_range <- subset(ICH_temp, date %in% date_range)
   
   # get the average temperature
+  mean_temp <- mean(temp_range$temp, na.rm = TRUE)
+  
+  WAWA_ASC_subset$temp[i:(i+1)] <- mean_temp
+}
+
+# make these into two vectors: state numeric and temp numeric
+states <- as.numeric(factor(WAWA_ASC_subset[seq(2,nrow(WAWA_ASC_subset),2),]$state, levels = 
+                                 c("Walla Walla River", "mainstem, ICH to LGR", 
+                                   "mainstem, PRA to RIS","mainstem, BON to MCN","Yakima River")))
+
+temps <- WAWA_ASC_subset[seq(2,nrow(WAWA_ASC_subset),2),]$temp
+data <- list(states, temps)
+
+# 5 options: "Walla Walla River"           "mainstem, ICH to LGR"        "mainstem, PRA to RIS"        "mainstem, BON to MCN"        "Yakima River"
+# p vector of length 5 - intercept + temperature
+negLL <- function(params, data){
+  # start negLL at zero
+  negLL <- 0
+  
+  alpha <- params[1:5]
+  beta <- params[6:10]
+  
+  p_vec <- vector(length = 5)
+    
+  states <- data[[1]]
+  
+  # turn this into a series of vectors
+  states_matrix <- matrix(data = 0, nrow = length(states), ncol = 5)
+  
+  temps <- data[[2]]
+  
+  for (i in 1:length(states)){
+    states_matrix[i,states[i]] <- 1
+    
+    p_vec <- exp(alpha + beta*temps[i])/(1 + sum(exp(alpha + beta * temps[i])))
+    negLL <- negLL + -1* dmultinom(x = states_matrix[i,], prob = p_vec, log = TRUE)
+  }
+  
+  return(negLL)
 }
 
 
-# run multinomial logit
-dmultinom()
+# run multinomial logit optim
+optim_inits <- c(rep(0, 5), rep(0, 5))
+# optim_inits <- c(rep(0, 5), rep(-1,5))
+set.seed(123)
+optim_results <- optim(par = optim_inits, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, control = list(maxit = 2000))
 
+# probability of overshooting by temperature
+temp_predict <- seq(min(temps), max(temps), by = 0.1)
 
+movement_probs <- data.frame(temp = temp_predict,
+                             PRA_to_RIS = NA,
+                             ICH_to_LGR = NA,
+                             Yakima_River = NA,
+                             Walla_Walla_River = NA,
+                             BON_to_MCN = NA)
 
+for (i in 1:length(temp_predict)){
+  movement_probs$PRA_to_RIS[i] <- exp(optim_results$par[3] + optim_results$par[8]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$ICH_to_LGR[i] <- exp(optim_results$par[2] + optim_results$par[7]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Yakima_River[i] <- exp(optim_results$par[5] + optim_results$par[10]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Walla_Walla_River[i] <- exp(optim_results$par[1] + optim_results$par[6]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$BON_to_MCN[i] <- exp(optim_results$par[4] + optim_results$par[9]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+}
+
+movement_probs %>% 
+  pivot_longer(., cols = colnames(movement_probs)[2:6]) %>% 
+  dplyr::rename(next_state = name) -> movement_probs_long
+
+next_movement = data.frame(next_movement = c("Overshoot PRA", "Overshoot ICH", 
+                                             "Yakima River (Stray)",
+                                             "Walla Walla River (Home)",
+                                             "Fallback MCN"),
+                           next_state = unique(movement_probs_long$next_state))
+  
+
+movement_probs_long %>% 
+  left_join(., next_movement, by = "next_state") -> movement_probs_long
+
+ggplot(movement_probs_long, aes(x = temp, y = value, color = next_movement)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10") + 
+  scale_y_continuous(limits = c(0,1))
 ```
 
 
+##### Okay, but how is temperature correlated with direction of movement?
+```{r temp_v_movement_direction}
+subset(WAWA_ASC_subset, state == "mainstem, MCN to ICH or PRA") -> mainstem_fish
+```
+
+The temperatures for fish going *upstream* are as follows:
+```{r}
+summary(subset(mainstem_fish, pathway == "MCN (adult)")$temp)
+```
+
+The temperatures for fish going *downstream* are as follows: `r summary(subset(mainstem_fish, pathway != "MCN (adult)")$temp)`.
+```{r}
+summary(subset(mainstem_fish, pathway != "MCN (adult)")$temp)
+```
+
+#### run the multinomial logit again with fish, but now only those going upstream
+```{r}
+states <- as.numeric(factor(subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")),2),]$state, levels = 
+                                 c("Walla Walla River", "mainstem, ICH to LGR", 
+                                   "mainstem, PRA to RIS","mainstem, BON to MCN","Yakima River")))
+
+temps <- subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")),2),]$temp
+data <- list(states, temps)
+
+# run multinomial logit optim
+optim_inits <- c(rep(0, 5), rep(0, 5))
+# optim_inits <- c(rep(0, 5), rep(-1,5))
+set.seed(123)
+optim_results <- optim(par = optim_inits, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, control = list(maxit = 2000))
+
+# optim_results
+
+# probability of overshooting by temperature
+temp_predict <- seq(min(temps), max(temps), by = 0.1)
+
+movement_probs <- data.frame(temp = temp_predict,
+                             PRA_to_RIS = NA,
+                             ICH_to_LGR = NA,
+                             Yakima_River = NA,
+                             Walla_Walla_River = NA,
+                             BON_to_MCN = NA)
+
+for (i in 1:length(temp_predict)){
+  movement_probs$PRA_to_RIS[i] <- exp(optim_results$par[3] + optim_results$par[8]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$ICH_to_LGR[i] <- exp(optim_results$par[2] + optim_results$par[7]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Yakima_River[i] <- exp(optim_results$par[5] + optim_results$par[10]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Walla_Walla_River[i] <- exp(optim_results$par[1] + optim_results$par[6]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$BON_to_MCN[i] <- exp(optim_results$par[4] + optim_results$par[9]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+}
+
+movement_probs %>% 
+  pivot_longer(., cols = colnames(movement_probs)[2:6]) %>% 
+  dplyr::rename(next_state = name) -> movement_probs_long
+
+next_movement = data.frame(next_movement = c("Overshoot PRA", "Overshoot ICH", 
+                                             "Yakima River (Stray)",
+                                             "Walla Walla River (Home)",
+                                             "Fallback MCN"),
+                           next_state = unique(movement_probs_long$next_state))
+  
+
+movement_probs_long %>% 
+  left_join(., next_movement, by = "next_state") -> movement_probs_long
+
+ggplot(movement_probs_long, aes(x = temp, y = value, color = next_movement)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10") + 
+  scale_y_continuous(limits = c(0,1))
+```
 
 
+#### run the multinomial logit again with fish, but now only those going downstream
+```{r}
+states <- as.numeric(factor(subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")),2),]$state, levels = 
+                                 c("Walla Walla River", "mainstem, ICH to LGR", 
+                                   "mainstem, PRA to RIS","mainstem, BON to MCN","Yakima River")))
+
+temps <- subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")),2),]$temp
+data <- list(states, temps)
+
+# run multinomial logit optim
+optim_inits <- c(rep(0, 5), rep(0, 5))
+# optim_inits <- c(rep(0, 5), rep(-1,5))
+set.seed(123)
+optim_results <- optim(par = optim_inits, data = data, fn = negLL, method = 'L-BFGS-B', hessian = FALSE, control = list(maxit = 2000))
+
+# optim_results
+
+# probability of overshooting by temperature
+temp_predict <- seq(min(temps), max(temps), by = 0.1)
+
+movement_probs <- data.frame(temp = temp_predict,
+                             PRA_to_RIS = NA,
+                             ICH_to_LGR = NA,
+                             Yakima_River = NA,
+                             Walla_Walla_River = NA,
+                             BON_to_MCN = NA)
+
+for (i in 1:length(temp_predict)){
+  movement_probs$PRA_to_RIS[i] <- exp(optim_results$par[3] + optim_results$par[8]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$ICH_to_LGR[i] <- exp(optim_results$par[2] + optim_results$par[7]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Yakima_River[i] <- exp(optim_results$par[5] + optim_results$par[10]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$Walla_Walla_River[i] <- exp(optim_results$par[1] + optim_results$par[6]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+  movement_probs$BON_to_MCN[i] <- exp(optim_results$par[4] + optim_results$par[9]*temp_predict[i])/(1 + sum(exp(optim_results$par[1:5] + optim_results$par[6:10] * temp_predict[i])))
+}
+
+movement_probs %>% 
+  pivot_longer(., cols = colnames(movement_probs)[2:6]) %>% 
+  dplyr::rename(next_state = name) -> movement_probs_long
+
+next_movement = data.frame(next_movement = c("Overshoot PRA", "Overshoot ICH", 
+                                             "Yakima River (Stray)",
+                                             "Walla Walla River (Home)",
+                                             "Fallback MCN"),
+                           next_state = unique(movement_probs_long$next_state))
+  
+
+movement_probs_long %>% 
+  left_join(., next_movement, by = "next_state") -> movement_probs_long
+
+ggplot(movement_probs_long, aes(x = temp, y = value, color = next_movement)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10") + 
+  scale_y_continuous(limits = c(0,1))
+```
