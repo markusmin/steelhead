@@ -8,6 +8,35 @@ output: html_document
 ### Description
 This Rmd file investigates residence time of individual fish in different reaches to determine a time at which a "decision" is made on movement (similar to Siegel et al. 2021).
 
+
+### Proposed covariate structure
+
+
+
+##### Continuous
+1. Temperature
+  a. In mainstem sites, use the temperature value at the median residence time of "fast" fish - the fish that move straight through
+  b. Use temperature as a covariate for every movement out of the mainstem (upstream, downstream, or into tributaries)
+2. Spill
+  a. March days of spill
+  b. Use this as a covariate for fallback only; might need to do some clever indexing with origins to make this happen
+3. Flow - DROP. Flow is highly correlated with spill, and spill has been found to be more informative than flow for downstream movements (fallback) and not a good predictor of upstream movements
+  a. Richins and Skalski (2018) investigated how fallback rates were related to flow, and found no relationship between fallback rates to natal tributaries and late-winter flow
+  b. Siegel et al. (2021) looked at upstream migration of Steelhead (between Bonneville and McNary) and found that flow was not a good predictor for upstream migratory delays
+
+##### Categorical
+1. Natal origin - all movements within ESU boundaries
+2. Hatchery vs. wild - all movements
+3. Barged vs. not barged - all movements
+  a. Note that Richins and Skalski (2018) found that barging led to lower migration success (but also lower overshooting), but only had enough data for Tucannon River Hatchery Steelhead
+4. Acclimated vs. not acclimated - all movements
+5. Ocean age - all movements
+
+
+
+Inevitably we are going to have fish where we are using covariates where we know they didn't experience those conditions. If its only off by a few days it shouldn't be a big deal because conditions are generally very autocorrelated, especially in the case of things like temperature. 
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
@@ -65,6 +94,16 @@ origin_rear_actual %>%
 
 ASC %>% 
   left_join(., tag_code_origins, by = "tag_code_2") -> ASC
+
+# also note which ESU they're from, for plotting
+ESU_origins <- data.frame(natal_origin = unique(ASC$natal_origin),
+                          ESU = c(rep("Snake", 6),
+                                  rep("Middle Columbia", 6),
+                                  rep("Upper Columbia", 4),
+                                  "Lower Columbia"))
+
+ASC %>% 
+  left_join(., ESU_origins, by = "natal_origin") -> ASC
 ```
 
 ```{r functions}
@@ -86,6 +125,7 @@ passage_time <- function(pathway_1, pathway_2){
   # make a data frame to record all of the transitions
   n_transitions <- nrow(two_pathway_df)/2
   passage_df <- data.frame(tag_code_2 = two_pathway_df$tag_code_2[seq(1,(nrow(two_pathway_df)-1),2)],
+                           ESU = two_pathway_df$ESU[seq(1,(nrow(two_pathway_df)-1),2)],
                            passage_time = NA)
   
   
@@ -100,19 +140,21 @@ passage_time <- function(pathway_1, pathway_2){
 
 # a function to plot passage time
 passage_time_plot <- function(passage_df, reach){
-  passage_plot <- ggplot(passage_df, aes(x = passage_time)) +
+  passage_plot <- ggplot(passage_df, aes(x = passage_time, fill = ESU)) +
     geom_histogram(binwidth = 1) +
     xlab("Days") +
-    ggtitle(reach)
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 10")
  
   return(passage_plot) 
 }
 
 passage_time_plot_logdays <- function(passage_df, reach){
-  passage_plot <- ggplot(passage_df, aes(x = log(passage_time))) +
+  passage_plot <- ggplot(passage_df, aes(x = log(passage_time), fill = ESU)) +
     geom_histogram(binwidth = 0.1) +
-    xlab("Days") +
-    ggtitle(reach)
+    xlab("log(Days)") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 10")
   
   return(passage_plot) 
 }
@@ -131,6 +173,7 @@ residence_time <- function(residence_state){
   # make a data frame to record all of the transitions
   n_transitions <- nrow(one_state_df)/2
   passage_df <- data.frame(tag_code_2 = one_state_df$tag_code_2[seq(1,(nrow(one_state_df)-1),2)],
+                           ESU = one_state_df$ESU[seq(1,(nrow(one_state_df)-1),2)],
                            passage_time = NA)
   
   
@@ -142,10 +185,9 @@ residence_time <- function(residence_state){
   return(passage_df)
   
 }
-
 ```
 
-```{r BON_to_MCN}
+```{r BON_to_MCN, eval = FALSE}
 
 BON_MCN_passage <- passage_time(pathway_1 = "BON (adult)", pathway_2 = "MCN (adult)")
 BON_to_MCN <- passage_time_plot(passage_df = BON_MCN_passage, reach = "Bonneville Adult Ladder to McNary Adult Ladder")
@@ -159,19 +201,114 @@ BON_to_MCN_log
 summary(BON_MCN_passage$passage_time)
 ```
 
-```{r mainstem_BON_MCN}
-BON_MCN_residence <- residence_time(residence_state = "mainstem, BON to MCN")
+```{r all_states_residence_time}
+unique_states <- unique(ASC$state)
+# okay, so some of these are terminal states, where literally no fish that go in come out
+# Salmon river
+unique_states <- unique_states[!(unique_states == "Salmon River")]
+unique_states <- unique_states[!(unique_states == "Clearwater River")]
+unique_states <- unique_states[!(unique_states == "loss")]
+unique_states <- unique_states[!(unique_states == "Upstream WEL other tributaries")]
 
-BON_to_MCN <- passage_time_plot(passage_df = BON_MCN_residence, reach = "mainstem, BON to MCN")
-BON_to_MCN
+# we might be interested in just mainstem sites, but for now we'll keep in tribs
+mainstem_states <- c("mainstem, mouth to BON",
+  "mainstem, BON to MCN",
+  "mainstem, MCN to ICH or PRA",
+  "mainstem, PRA to RIS",
+  "mainstem, RIS to RRE",
+  "mainstem, RRE to WEL",
+  "mainstem, upstream of WEL",
+  "mainstem, ICH to LGR",
+  "mainstem, upstream of LGR")
 
-BON_to_MCN_log <- passage_time_plot_logdays(passage_df = BON_MCN_residence, reach = "mainstem, BON to MCN")
-BON_to_MCN_log
+plots_days <- list()
+plots_logdays <- list()
+for (i in 1:length(mainstem_states)) {
+  residence_df <- residence_time(residence_state = mainstem_states[i])
+  
+  passage_plot <- passage_time_plot(passage_df = residence_df, reach = mainstem_states[i])
+  plots_days[[i]] <- passage_plot
+  
+  passage_plot_log <- passage_time_plot_logdays(passage_df = residence_df, reach = mainstem_states[i])
+  plots_logdays[[i]] <- passage_plot_log
 
-# give summary of passage time
-
-summary(BON_MCN_residence$passage_time)
+  # give summary of passage time
+  summary(residence_df$passage_time)
+  
+}
 ```
+
+### Lower/Middle Columbia
+```{r}
+plots_days[[1]]
+plots_logdays[[1]]
+plots_days[[2]]
+plots_logdays[[2]]
+plots_days[[3]]
+plots_logdays[[3]]
+```
+
+### Upper Columbia
+```{r}
+plots_days[[4]]
+plots_logdays[[4]]
+plots_days[[5]]
+plots_logdays[[5]]
+plots_days[[6]]
+plots_logdays[[6]]
+plots_days[[7]]
+plots_logdays[[7]]
+```
+
+### Snake
+```{r}
+plots_days[[8]]
+plots_logdays[[8]]
+plots_days[[9]]
+plots_logdays[[9]]
+```
+
+## Covariate data exploratory analysis
+
+What is the relationship between water temperature at McNary and the probability of overshooting for Walla Walla River Steelhead?
+
+```{r WAWA_temp_analysis}
+ICH_temp <- read.csv(here::here("covariate_data", "for_model", "ICH_temp.csv"))
+
+subset(ASC, natal_origin == "Walla_Walla_River") -> WAWA_ASC
+
+# Keep only those fish in MCN to ICH or PRA state
+WAWA_ASC %>% 
+  filter(state == "mainstem, MCN to ICH or PRA" & tag_code_2 == lead(tag_code_2)  |
+             lag(state) == "mainstem, MCN to ICH or PRA" & tag_code_2 == lag(tag_code_2)) -> WAWA_ASC_subset
+
+
+# combine both WAWA states into one
+WAWA_ASC_subset %>% 
+  mutate(state = ifelse(state %in% c("Walla Walla River Mouth", "Walla Walla River Upstream"), "Walla Walla River",
+                        ifelse(state == "Yakima River Mouth", "Yakima River", state))) %>% 
+  mutate(date_time = ymd_hms(date_time))-> WAWA_ASC_subset
+
+# match temperature
+for (i in 1:seq(1, nrow(WAWA_ASC_subset)/2-1, by = 2)){
+  # get the average temperature over eight days from detection at McNary
+  # extract the date range
+  date_range <- seq(date(WAWA_ASC_subset$date_time[i]), date(WAWA_ASC_subset$date_time[i]) + days(7), by = "days")
+  
+  # match those dates to the temp data
+  
+  
+  # get the average temperature
+}
+
+
+# run multinomial logit
+dmultinom()
+
+
+
+```
+
 
 
 
