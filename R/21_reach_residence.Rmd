@@ -158,12 +158,34 @@ passage_time_plot <- function(passage_df, reach){
   return(passage_plot) 
 }
 
+passage_time_plot_quantiles <- function(passage_df, reach, quantiles){
+  passage_plot <- ggplot(passage_df, aes(x = passage_time, fill = ESU)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Days") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 10") +
+    geom_vline(xintercept = quantiles, lty = 2)
+ 
+  return(passage_plot) 
+}
+
 passage_time_plot_logdays <- function(passage_df, reach){
   passage_plot <- ggplot(passage_df, aes(x = log(passage_time), fill = ESU)) +
     geom_histogram(binwidth = 0.1) +
     xlab("log(Days)") +
     ggtitle(reach) +
     scale_fill_tableau(palette = "Tableau 10")
+  
+  return(passage_plot) 
+}
+
+passage_time_plot_logdays_quantiles <- function(passage_df, reach, quantiles){
+  passage_plot <- ggplot(passage_df, aes(x = log(passage_time), fill = ESU)) +
+    geom_histogram(binwidth = 0.1) +
+    xlab("log(Days)") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 10") +
+    geom_vline(xintercept = quantiles, lty = 2)
   
   return(passage_plot) 
 }
@@ -275,13 +297,66 @@ for (i in 1:length(mainstem_states)) {
   summary(residence_df$passage_time)
   
 }
+
 ```
+
+
+```{r all_states_residence_time_window_exploration}
+main_mainstem_states <- c(
+  "mainstem, BON to MCN",
+  "mainstem, MCN to ICH or PRA",
+  "mainstem, PRA to RIS",
+  "mainstem, RIS to RRE",
+  "mainstem, RRE to WEL",
+  "mainstem, ICH to LGR")
+
+plots_days_windows <- list()
+plots_logdays_windows <- list()
+plots_days_origin_windows <- list()
+plots_logdays_origin_windows <- list()
+
+for (i in 1:length(main_mainstem_states)) {
+  residence_df <- residence_time(residence_state = main_mainstem_states[i])
+  
+  # Look into windows - show: 1) median of the whole distribution, 
+  # and what cutoff you'd need to capture 50%, 80%, and 95% of fish residence time
+  quantiles <- quantile(residence_df$passage_time, probs = c(0.5, 0.8, 0.95))
+  log(quantiles)
+  
+  
+  passage_plot_quantiles <- passage_time_plot_quantiles(passage_df = residence_df, reach = mainstem_states[i], quantiles = quantiles)
+  plots_days_windows[[i]] <- passage_plot_quantiles
+  
+  passage_plot_log_quantiles <- passage_time_plot_logdays_quantiles(passage_df = residence_df, reach = mainstem_states[i], quantiles = log(quantiles))
+  plots_logdays_windows[[i]] <- passage_plot_log_quantiles
+  
+}
+
+```
+
+## Residence time by main mainstem reaches
+```{r}
+plots_days_windows[[1]]
+plots_logdays_windows[[1]]
+plots_days_windows[[2]]
+plots_logdays_windows[[2]]
+plots_days_windows[[3]]
+plots_logdays_windows[[3]]
+plots_days_windows[[4]]
+plots_logdays_windows[[4]]
+plots_days_windows[[5]]
+plots_logdays_windows[[5]]
+plots_days_windows[[6]]
+plots_logdays_windows[[6]]
+```
+
+
 
 ## Residence time by mainstem reach
 
 #### Lower/Middle Columbia
 ```{r}
-plots_days[[1]]
+plots_days_windows[[1]]
 plots_logdays[[1]]
 # plots_days_origin[[1]]
 # plots_logdays_origin[[1]]
@@ -325,6 +400,185 @@ plots_days[[9]]
 plots_logdays[[9]]
 # plots_days_origin[[9]]
 plots_logdays_origin[[9]]
+```
+
+### Passage time only for overshooting
+
+
+```{r}
+# reduce only to fish that we know have overshot
+overshoot_states <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John_Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+overshoot_state = c(NA, # Asotin Creek
+                                                           NA, # Clearwater
+                                                           "mainstem, MCN to ICH or PRA", # Deschutes River
+                                                           "mainstem, upstream of WEL", #Entiat
+                                                           "mainstem, MCN to ICH or PRA", # Fifteenmile Creek
+                                                           NA, # Grande Ronde River
+                                                           "mainstem, MCN to ICH or PRA", # Hood River
+                                                           NA, # Imnaha River
+                                                           "mainstem, MCN to ICH or PRA", # John Day River
+                                                           NA, # Methow River
+                                                           NA,  # Okanogan River
+                                                           NA, # Salmon River
+                                                           "mainstem, upstream of LGR", # Tucannon River
+                                                           "mainstem, MCN to ICH or PRA", # Umatilla River
+                                                           "mainstem, PRA to RIS", # Walla Walla River
+                                                           "mainstem, RRE to WEL", # Wenatchee River
+                                                           "mainstem, PRA to RIS" # Yakima River
+                                       ),
+mainstem_state = c(NA, # Asotin Creek
+                                                           NA, # Clearwater
+                                                           "mainstem, BON to MCN", # Deschutes River
+                                                           "mainstem, RRE to WEL", #Entiat
+                                                           "mainstem, BON to MCN", # Fifteenmile Creek
+                                                           NA, # Grande Ronde River
+                                                           "mainstem, BON to MCN", # Hood River
+                                                           NA, # Imnaha River
+                                                           "mainstem, BON to MCN", # John Day River
+                                                           NA, # Methow River
+                                                           NA,  # Okanogan River
+                                                           NA, # Salmon River
+                                                           "mainstem, ICH to LGR", # Tucannon River
+                                                           "mainstem, BON to MCN", # Umatilla River
+                                                           "mainstem, MCN to ICH or PRA", # Walla Walla River
+                                                           "mainstem, RRE to WEL", # Wenatchee River
+                                                           "mainstem, MCN to ICH or PRA" # Yakima River
+                   ))
+
+
+ASC %>% 
+  left_join(., overshoot_states, by = "natal_origin") %>% 
+  filter(state == overshoot_state | lead(state) == overshoot_state & tag_code_2 == lead(tag_code_2)) %>% 
+  mutate(date_time = ymd_hms(date_time)) -> overshoot_ASC
+  
+  # make a data frame to record all of the transitions
+  n_transitions <- nrow(overshoot_ASC)/2
+  overshoot_passage_df <- data.frame(tag_code_2 = overshoot_ASC$tag_code_2[seq(1,(nrow(overshoot_ASC)-1),2)],
+                           ESU = overshoot_ASC$ESU[seq(1,(nrow(overshoot_ASC)-1),2)],
+                           natal_origin = overshoot_ASC$natal_origin[seq(1,(nrow(overshoot_ASC)-1),2)],
+                           passage_time = NA)
+  
+  
+  for (i in 1:nrow(overshoot_passage_df)){
+    overshoot_passage_df$passage_time[i] <- overshoot_ASC$date_time[(i*2)] - overshoot_ASC$date_time[(i*2-1)]
+    
+  }
+
+## plot time to overshoot, by origin
+overshoot_time_plot <- ggplot(overshoot_passage_df, aes(x = passage_time, fill = natal_origin)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Days") +
+    ggtitle("Time before overshoot at first upstream dam") +
+    scale_fill_tableau(palette = "Tableau 10")
+
+
+  overshoot_time_plot_logdays <- ggplot(overshoot_passage_df, aes(x = log(passage_time), fill = natal_origin)) +
+    geom_histogram(binwidth = 0.1) +
+    xlab("log(Days)") +
+    ggtitle("Time before overshoot at first upstream dam") +
+    scale_fill_tableau(palette = "Tableau 10")
+
+  overshoot_time_plot  
+overshoot_time_plot_logdays
+
+
+# Day of fallback
+data.frame(day = yday(overshoot_ASC[seq(2, nrow(overshoot_ASC), 2),]$date_time),
+           tag_code = overshoot_ASC[seq(2, nrow(overshoot_ASC), 2),]$tag_code_2,
+           natal_origin = overshoot_ASC[seq(2, nrow(overshoot_ASC), 2),]$natal_origin) -> overshoot_dates
+
+# gonna remove hood fish because there's so few of them and they're messing up my color consistency
+ggplot(subset(overshoot_dates, natal_origin != "Hood_River"), aes(x = day, fill = natal_origin)) +
+  geom_histogram() +
+  ggtitle("Estimated day of overshoot") +
+  scale_fill_tableau(palette = "Tableau 10")
+# subset(overshoot_ASC, natal_origin == "Tucannon_River")
+```
+
+### Passage time only for fallback (if known)
+
+```{r}
+ASC %>% 
+  left_join(., overshoot_states, by = "natal_origin") %>% 
+  filter(lag(state) == overshoot_state & state == mainstem_state & tag_code_2 == lag(tag_code_2) |
+  state == overshoot_state & lead(state) == mainstem_state  & tag_code_2 == lead(tag_code_2)) %>% 
+  mutate(date_time = ymd_hms(date_time)) -> fallback_ASC
+  
+  # make a data frame to record all of the transitions
+  n_transitions <- nrow(fallback_ASC)/2
+  fallback_passage_df <- data.frame(tag_code_2 = fallback_ASC$tag_code_2[seq(1,(nrow(fallback_ASC)-1),2)],
+                           ESU = fallback_ASC$ESU[seq(1,(nrow(fallback_ASC)-1),2)],
+                           natal_origin = fallback_ASC$natal_origin[seq(1,(nrow(fallback_ASC)-1),2)],
+                           passage_time = NA)
+  
+  
+  for (i in 1:nrow(fallback_passage_df)){
+    fallback_passage_df$passage_time[i] <- fallback_ASC$date_time[(i*2)] - fallback_ASC$date_time[(i*2-1)]
+    
+  }
+
+## plot time to fallback, by origin
+fallback_time_plot <- ggplot(fallback_passage_df, aes(x = passage_time, fill = natal_origin)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Days") +
+    ggtitle("Time before fallback at first upstream dam") +
+    scale_fill_tableau(palette = "Tableau 10")
+
+
+  fallback_time_plot_logdays <- ggplot(fallback_passage_df, aes(x = log(passage_time), fill = natal_origin)) +
+    geom_histogram(binwidth = 0.1) +
+    xlab("log(Days)") +
+    ggtitle("Time before fallback at first upstream dam") +
+    scale_fill_tableau(palette = "Tableau 10")
+
+  fallback_time_plot  
+fallback_time_plot_logdays
+
+# what about time of any fallback?
+
+data.frame(day = yday(fallback_ASC[seq(2, nrow(fallback_ASC), 2),]$date_time),
+           tag_code = fallback_ASC[seq(2, nrow(fallback_ASC), 2),]$tag_code_2,
+           natal_origin = fallback_ASC[seq(2, nrow(fallback_ASC), 2),]$natal_origin) -> fallback_dates
+
+# gonna remove hood fish because there's so few of them and they're messing up my color consistency
+ggplot(subset(fallback_dates, natal_origin != "Hood_River"), aes(x = day, fill = natal_origin)) +
+  geom_histogram() +
+  ggtitle("Estimated day of fallback") +
+  scale_fill_tableau(palette = "Tableau 10")
+
+
+
+
+subset(fallback_passage_df, passage_time <= 10)$tag_code_2 -> fast_fallback_tag_codes
+
+# time of year when fast fallback is happening
+
+subset(fallback_ASC, tag_code_2 %in% fast_fallback_tag_codes) -> fast_fallback
+
+data.frame(day = yday(fast_fallback[seq(2, nrow(fast_fallback), 2),]$date_time),
+           tag_code = fast_fallback[seq(2, nrow(fast_fallback), 2),]$tag_code_2,
+           natal_origin = fast_fallback[seq(2, nrow(fast_fallback), 2),]$natal_origin) -> fast_fallback_dates
+
+ggplot(fast_fallback_dates, aes(x = day, fill = natal_origin)) +
+  geom_histogram() +
+  ggtitle("Day of fallback, when fallback occurs within 10 days of ascent") +
+  scale_fill_tableau(palette = "Tableau 10")
 ```
 
 ## Covariate data exploratory analysis
