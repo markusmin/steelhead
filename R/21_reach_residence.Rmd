@@ -314,6 +314,7 @@ plots_days_windows <- list()
 plots_logdays_windows <- list()
 plots_days_origin_windows <- list()
 plots_logdays_origin_windows <- list()
+list_quantiles <- list()
 
 for (i in 1:length(main_mainstem_states)) {
   residence_df <- residence_time(residence_state = main_mainstem_states[i])
@@ -322,12 +323,12 @@ for (i in 1:length(main_mainstem_states)) {
   # and what cutoff you'd need to capture 50%, 80%, and 95% of fish residence time
   quantiles <- quantile(residence_df$passage_time, probs = c(0.5, 0.8, 0.95))
   log(quantiles)
+  list_quantiles[[i]] <- quantiles
   
-  
-  passage_plot_quantiles <- passage_time_plot_quantiles(passage_df = residence_df, reach = mainstem_states[i], quantiles = quantiles)
+  passage_plot_quantiles <- passage_time_plot_quantiles(passage_df = residence_df, reach = main_mainstem_states[i], quantiles = quantiles)
   plots_days_windows[[i]] <- passage_plot_quantiles
   
-  passage_plot_log_quantiles <- passage_time_plot_logdays_quantiles(passage_df = residence_df, reach = mainstem_states[i], quantiles = log(quantiles))
+  passage_plot_log_quantiles <- passage_time_plot_logdays_quantiles(passage_df = residence_df, reach = main_mainstem_states[i], quantiles = log(quantiles))
   plots_logdays_windows[[i]] <- passage_plot_log_quantiles
   
 }
@@ -336,18 +337,49 @@ for (i in 1:length(main_mainstem_states)) {
 
 ## Residence time by main mainstem reaches
 ```{r}
+
+# make an actual table
+quantiles_table <- data.frame(reach = main_mainstem_states,
+                              t50 = c(list_quantiles[[1]][1],
+                                       list_quantiles[[2]][1],
+                                       list_quantiles[[3]][1],
+                                       list_quantiles[[4]][1],
+                                       list_quantiles[[5]][1],
+                                       list_quantiles[[6]][1]),
+                              t80 = c(list_quantiles[[1]][2],
+                                       list_quantiles[[2]][2],
+                                       list_quantiles[[3]][2],
+                                       list_quantiles[[4]][2],
+                                       list_quantiles[[5]][2],
+                                       list_quantiles[[6]][2]),
+                              t95 = c(list_quantiles[[1]][3],
+                                       list_quantiles[[2]][3],
+                                       list_quantiles[[3]][3],
+                                       list_quantiles[[4]][3],
+                                       list_quantiles[[5]][3],
+                                       list_quantiles[[6]][3]))
+
+quantiles_table
+
 plots_days_windows[[1]]
+# list_quantiles[[1]]
 plots_logdays_windows[[1]]
 plots_days_windows[[2]]
+# list_quantiles[[2]]
 plots_logdays_windows[[2]]
 plots_days_windows[[3]]
+# list_quantiles[[3]]
 plots_logdays_windows[[3]]
 plots_days_windows[[4]]
+# list_quantiles[[4]]
 plots_logdays_windows[[4]]
 plots_days_windows[[5]]
+# list_quantiles[[5]]
 plots_logdays_windows[[5]]
 plots_days_windows[[6]]
+# list_quantiles[[6]]
 plots_logdays_windows[[6]]
+
 ```
 
 
