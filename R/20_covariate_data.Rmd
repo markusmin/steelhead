@@ -198,7 +198,8 @@ BON_spill <- read.csv(here::here("covariate_data", "BON", "basin_spill_BON_allye
 BON_spill_long <- cov_reformat(input_data = BON_spill, variable_name = "spill")
 BON_temp <- read.csv(here::here("covariate_data", "BON", "basin_tempc_tailrace_BON_allyears.csv"))[1:366,]
 BON_temp_long <- cov_reformat(input_data = BON_temp, variable_name = "temp")
-
+BON_temp_2 <- read.csv(here::here("covariate_data", "BON", "basin_tempc_BON_allyears.csv"))[1:366,]
+BON_temp_2_long <- cov_reformat(input_data = BON_temp_2, variable_name = "temp")
 
 # ICH
 ICH_flow <- read.csv(here::here("covariate_data", "ICH", "basin_outflow_IHR_allyears.csv"))[1:366,]
@@ -296,10 +297,68 @@ WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_W
 WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
 
 # Export this data for modeling
+write.csv(BON_temp_long, here::here("covariate_data", "for_model", "BON_temp.csv"), row.names = FALSE)
+write.csv(JDA_temp_long, here::here("covariate_data", "for_model", "JDA_temp.csv"), row.names = FALSE)
+write.csv(TDA_temp_long, here::here("covariate_data", "for_model", "TDA_temp.csv"), row.names = FALSE)
 write.csv(MCN_temp_long, here::here("covariate_data", "for_model", "MCN_temp.csv"), row.names = FALSE)
+write.csv(PRA_temp_long, here::here("covariate_data", "for_model", "PRA_temp.csv"), row.names = FALSE)
+write.csv(RIS_temp_long, here::here("covariate_data", "for_model", "RIS_temp.csv"), row.names = FALSE)
+write.csv(RRE_temp_long, here::here("covariate_data", "for_model", "RRE_temp.csv"), row.names = FALSE)
+write.csv(WEL_temp_long, here::here("covariate_data", "for_model", "WEL_temp.csv"), row.names = FALSE)
 write.csv(ICH_temp_long, here::here("covariate_data", "for_model", "ICH_temp.csv"), row.names = FALSE)
+write.csv(LMO_temp_long, here::here("covariate_data", "for_model", "LMO_temp.csv"), row.names = FALSE)
+write.csv(LGO_temp_long, here::here("covariate_data", "for_model", "LGO_temp.csv"), row.names = FALSE)
+write.csv(LGR_temp_long, here::here("covariate_data", "for_model", "LGR_temp.csv"), row.names = FALSE)
 
 
+# Re-export, using reach-specific residence time windows
+quantiles <- read.csv(here::here("covariate_data", "reach_quantiles.csv"), row.names = 1)
+
+# round the median to nearest whole day
+quantiles %>% 
+  mutate(median = round(t50)) -> quantiles
+
+# match them using outflow
+
+# use a function
+window_temp <- function(temp_data, median_time){
+  temp_data %>% 
+  filter(!is.na(temp)) %>% 
+  mutate(date = date(date)) %>% 
+  mutate(window_temp = NA) %>% # let's start in 2005, since that's when our data starts
+  subset(year >= 2005) -> temp_data
+
+# loop to get all windows
+for (i in 1:nrow(subset(temp_data, year <= 2022))){
+  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] & date <= temp_data$date[i] + days(x = median_time))$temp)
+}
+  
+  return(temp_data)
+}
+
+
+BON_window_temp <- window_temp(temp_data = BON_temp_long, median_tim = subset(quantiles, reach == "mainstem, BON to MCN")$median)
+
+# lets compare tailrace and non-tailrace temps at BON
+dplyr::select(BON_temp_2_long, c(temp, date)) %>% 
+  dplyr::rename(main_temp = temp) -> BON_temp_2_long_forjoin
+
+BON_temp_long %>% 
+  dplyr::rename(tailrace_temp = temp) %>% 
+  dplyr::select(tailrace_temp, date) %>% 
+  left_join(., BON_temp_2_long_forjoin, by = "date") -> BON_temp_comparison
+
+ggplot(subset(BON_temp_comparison, !is.na(tailrace_temp) & !(is.na(main_temp))), aes(x = main_temp, y = tailrace_temp)) +
+  geom_point()
+
+# what's up with the weird observations?
+BON_temp_comparison %>% 
+  filter(abs(tailrace_temp - main_temp) > 3) -> BON_weird_temps
+BON_weird_temps
+# tailrace temps all look fishy to me here
+
+# okay, this tailrace temp is definitely wrong
+subset(BON_temp_comparison, date %in% c("2014-03-11", "2014-03-12", "2014-03-13", "2014-03-14", "2014-03-15"))
 ```
 
 
