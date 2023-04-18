@@ -50,3 +50,6 @@ PTAGIS_queries/intermediate_files/all_adult_returns.csv
 
 # Ignore the diagnostics runs
 /stan_actual/deteff_ESU_models/diagnostics/
+
+# Ignore the word documents for the BPA report
+/CBR_report/
