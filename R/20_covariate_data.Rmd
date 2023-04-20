@@ -296,8 +296,20 @@ WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
 WEL_temp <- read.csv(here::here("covariate_data", "WEL", "basin_tempc_tailrace_WEL_allyears.csv"))[1:366,]
 WEL_temp_long <- cov_reformat(input_data = WEL_temp, variable_name = "temp")
 
+# Some quick filtering to remove obviously incorrect values
+
+# A lot of issues with fall/winter temperature at RRE
+RRE_temp_long %>% 
+  # drop any rows where they're the same value as the next three or the previous three
+  filter(!(temp == lag(temp) & temp == lag(temp, 2) & temp == lag(temp, 3) |
+             temp == lead(temp) & temp == lead(temp, 2) & temp == lead(temp, 3))) -> RRE_temp_long
+
+
+
+
 # Export this data for modeling
 write.csv(BON_temp_long, here::here("covariate_data", "for_model", "BON_temp.csv"), row.names = FALSE)
+write.csv(BON_temp_2_long, here::here("covariate_data", "for_model", "BON_forebay_temp.csv"), row.names = FALSE)
 write.csv(JDA_temp_long, here::here("covariate_data", "for_model", "JDA_temp.csv"), row.names = FALSE)
 write.csv(TDA_temp_long, here::here("covariate_data", "for_model", "TDA_temp.csv"), row.names = FALSE)
 write.csv(MCN_temp_long, here::here("covariate_data", "for_model", "MCN_temp.csv"), row.names = FALSE)
@@ -310,34 +322,6 @@ write.csv(LMO_temp_long, here::here("covariate_data", "for_model", "LMO_temp.csv
 write.csv(LGO_temp_long, here::here("covariate_data", "for_model", "LGO_temp.csv"), row.names = FALSE)
 write.csv(LGR_temp_long, here::here("covariate_data", "for_model", "LGR_temp.csv"), row.names = FALSE)
 
-
-# Re-export, using reach-specific residence time windows
-quantiles <- read.csv(here::here("covariate_data", "reach_quantiles.csv"), row.names = 1)
-
-# round the median to nearest whole day
-quantiles %>% 
-  mutate(median = round(t50)) -> quantiles
-
-# match them using outflow
-
-# use a function
-window_temp <- function(temp_data, median_time){
-  temp_data %>% 
-  filter(!is.na(temp)) %>% 
-  mutate(date = date(date)) %>% 
-  mutate(window_temp = NA) %>% # let's start in 2005, since that's when our data starts
-  subset(year >= 2005) -> temp_data
-
-# loop to get all windows
-for (i in 1:nrow(subset(temp_data, year <= 2022))){
-  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] & date <= temp_data$date[i] + days(x = median_time))$temp)
-}
-  
-  return(temp_data)
-}
-
-
-BON_window_temp <- window_temp(temp_data = BON_temp_long, median_tim = subset(quantiles, reach == "mainstem, BON to MCN")$median)
 
 # lets compare tailrace and non-tailrace temps at BON
 dplyr::select(BON_temp_2_long, c(temp, date)) %>% 
@@ -359,6 +343,197 @@ BON_weird_temps
 
 # okay, this tailrace temp is definitely wrong
 subset(BON_temp_comparison, date %in% c("2014-03-11", "2014-03-12", "2014-03-13", "2014-03-14", "2014-03-15"))
+
+BON_temp_2_long %>% 
+  group_by(year) %>% 
+  summarise(annual_daily_average = mean(temp, na.rm = TRUE))
+# CONFIRMED - this is forebay temperature
+```
+
+#### calculate windows
+```{r}
+# so, I think that the most up to date files are in the same folders as the model runs
+snake_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "snake", "snake_adults_states_complete.csv"), row.names = 1)
+lowcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"), row.names = 1)
+midcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "middle_columbia", "middle_columbia_adults_states_complete.csv"), row.names = 1)
+uppcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "upper_columbia", "upper_columbia_adults_states_complete.csv"), row.names = 1)
+
+# combine them all
+snake_adults_states_complete %>% 
+  bind_rows(., midcol_adults_states_complete) %>% 
+  bind_rows(., uppcol_adults_states_complete) %>% 
+  bind_rows(., lowcol_adults_states_complete) -> ASC
+
+# now add tag code metadata, for natal origins
+origin_numeric <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John_Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+                             natal_origin_numeric = seq(1,17,1))
+
+origin_rear_actual <- read.csv(here::here("stan_actual", "origin_rear_actual.csv"), row.names = 1)
+origin_rear_actual %>% 
+  dplyr::rename(natal_origin_numeric = natal_origin) %>% 
+  left_join(origin_numeric, by = "natal_origin_numeric") %>% 
+  dplyr::select(tag_code_2, natal_origin) -> tag_code_origins
+
+ASC %>% 
+  left_join(., tag_code_origins, by = "tag_code_2") -> ASC
+
+# also note which ESU they're from, for plotting
+ESU_origins <- data.frame(natal_origin = unique(ASC$natal_origin),
+                          ESU = c(rep("Snake", 6),
+                                  rep("Middle Columbia", 6),
+                                  rep("Upper Columbia", 4),
+                                  "Lower Columbia"))
+
+ASC %>% 
+  left_join(., ESU_origins, by = "natal_origin") -> ASC
+
+# a function that takes just one state, and finds the average amount of time to move out of that state
+
+residence_time <- function(residence_state){
+  
+  # don't keep any with implicit time interpolated
+  ASC %>% 
+    filter(state == residence_state & tag_code_2 == lead(tag_code_2) & pathway != "implicit" & lead(pathway) != "implicit" |
+             lag(state) == residence_state & tag_code_2 == lag(tag_code_2) & pathway != "implicit" & lag(pathway) != "implicit") %>% 
+    mutate(date_time = ymd_hms(date_time)) -> one_state_df
+  
+  # make a data frame to record all of the transitions
+  n_transitions <- nrow(one_state_df)/2
+  passage_df <- data.frame(tag_code_2 = one_state_df$tag_code_2[seq(1,(nrow(one_state_df)-1),2)],
+                           ESU = one_state_df$ESU[seq(1,(nrow(one_state_df)-1),2)],
+                           natal_origin = one_state_df$natal_origin[seq(1,(nrow(one_state_df)-1),2)],
+                           passage_time = NA)
+  
+  
+  for (i in 1:nrow(passage_df)){
+    passage_df$passage_time[i] <- one_state_df$date_time[(i*2)] - one_state_df$date_time[(i*2-1)]
+    
+  }
+  
+  return(passage_df)
+  
+}
+
+main_mainstem_states <- c(
+  "mainstem, BON to MCN",
+  "mainstem, MCN to ICH or PRA",
+  "mainstem, PRA to RIS",
+  "mainstem, RIS to RRE",
+  "mainstem, RRE to WEL",
+  "mainstem, ICH to LGR")
+
+list_quantiles <- list()
+
+for (i in 1:length(main_mainstem_states)) {
+  residence_df <- residence_time(residence_state = main_mainstem_states[i])
+  
+  # Look into windows - show: 1) median of the whole distribution, 
+  # and what cutoff you'd need to capture 50%, 80%, and 95% of fish residence time
+  quantiles <- quantile(residence_df$passage_time, probs = c(0.5, 0.8, 0.95))
+  list_quantiles[[i]] <- quantiles
+
+  
+}
+
+# make an actual table
+quantiles_table <- data.frame(reach = main_mainstem_states,
+                              t50 = c(list_quantiles[[1]][1],
+                                       list_quantiles[[2]][1],
+                                       list_quantiles[[3]][1],
+                                       list_quantiles[[4]][1],
+                                       list_quantiles[[5]][1],
+                                       list_quantiles[[6]][1]),
+                              t80 = c(list_quantiles[[1]][2],
+                                       list_quantiles[[2]][2],
+                                       list_quantiles[[3]][2],
+                                       list_quantiles[[4]][2],
+                                       list_quantiles[[5]][2],
+                                       list_quantiles[[6]][2]),
+                              t95 = c(list_quantiles[[1]][3],
+                                       list_quantiles[[2]][3],
+                                       list_quantiles[[3]][3],
+                                       list_quantiles[[4]][3],
+                                       list_quantiles[[5]][3],
+                                       list_quantiles[[6]][3]))
+
+# write.csv(quantiles_table, here::here("covariate_data", "reach_quantiles.csv"))
+```
+
+
+### export using window approach
+```{r}
+# Re-export, using reach-specific residence time windows
+# quantiles <- read.csv(here::here("covariate_data", "reach_quantiles.csv"), row.names = 1)
+
+# round the median to nearest whole day
+quantiles_table %>% 
+  mutate(median = round(t50)) -> quantiles_table
+
+# match them using outflow
+
+# use a function
+window_temp <- function(temp_data, median_time){
+  temp_data %>% 
+  filter(!is.na(temp)) %>% 
+  mutate(date = date(date)) %>% 
+  mutate(window_temp = NA) %>% # let's start in 2005, since that's when our data starts
+  subset(year >= 2005) -> temp_data
+
+# loop to get all windows
+for (i in 1:nrow(subset(temp_data, year <= 2022))){
+  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] & date <= temp_data$date[i] + days(x = median_time))$temp)
+}
+  
+  # now, add back in NAs for all values that we don't have
+  temp_data %>% 
+    complete(date = seq(ymd("2005-01-01"), ymd("2022-12-31"), by = "days")) %>% 
+    mutate(year = year(date), day = day(date)) -> temp_data
+  
+  return(temp_data)
+}
+
+# Bonneville Dam, for mainstem, BON to MCN reach
+BON_window_temp <- window_temp(temp_data = BON_temp_2_long, median_time = subset(quantiles_table, reach == "mainstem, BON to MCN")$median)
+
+# McNary Dam, for mainstem, MCN to ICH or PRA reach
+MCN_window_temp <- window_temp(temp_data = MCN_temp_long, median_time = subset(quantiles_table, reach == "mainstem, MCN to ICH or PRA")$median)
+
+# PRA Dam, for PRA to RIS reach
+PRA_window_temp <- window_temp(temp_data = PRA_temp_long, median_time = subset(quantiles_table, reach == "mainstem, PRA to RIS")$median)
+
+# RIS Dam, for RIS to RRE reach
+RIS_window_temp <- window_temp(temp_data = RIS_temp_long, median_time = subset(quantiles_table, reach == "mainstem, RIS to RRE")$median)
+
+# RRE Dam, for RRE to WEL reach
+RRE_window_temp <- window_temp(temp_data = RRE_temp_long, median_time = subset(quantiles_table, reach == "mainstem, RRE to WEL")$median)
+
+# Ice Harbor Dam, for ICH to LGR reach
+ICH_window_temp <- window_temp(temp_data = ICH_temp_long, median_time = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
+
+# export all of these
+write.csv(BON_window_temp, here::here("covariate_data", "for_model", "BON_window_temp.csv"), row.names = FALSE)
+write.csv(MCN_window_temp, here::here("covariate_data", "for_model", "MCN_window_temp.csv"), row.names = FALSE)
+write.csv(PRA_window_temp, here::here("covariate_data", "for_model", "PRA_window_temp.csv"), row.names = FALSE)
+write.csv(RIS_window_temp, here::here("covariate_data", "for_model", "RIS_window_temp.csv"), row.names = FALSE)
+write.csv(RRE_window_temp, here::here("covariate_data", "for_model", "RRE_window_temp.csv"), row.names = FALSE)
+write.csv(ICH_window_temp, here::here("covariate_data", "for_model", "ICH_window_temp.csv"), row.names = FALSE)
+
 ```
 
 
