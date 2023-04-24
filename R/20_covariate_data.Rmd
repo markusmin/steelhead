@@ -476,7 +476,7 @@ quantiles_table <- data.frame(reach = main_mainstem_states,
 ```
 
 
-### export using window approach
+### export temperature data using window approach
 ```{r}
 # Re-export, using reach-specific residence time windows
 # quantiles <- read.csv(here::here("covariate_data", "reach_quantiles.csv"), row.names = 1)
@@ -527,14 +527,57 @@ RRE_window_temp <- window_temp(temp_data = RRE_temp_long, median_time = subset(q
 ICH_window_temp <- window_temp(temp_data = ICH_temp_long, median_time = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
 
 # export all of these
-write.csv(BON_window_temp, here::here("covariate_data", "for_model", "BON_window_temp.csv"), row.names = FALSE)
-write.csv(MCN_window_temp, here::here("covariate_data", "for_model", "MCN_window_temp.csv"), row.names = FALSE)
-write.csv(PRA_window_temp, here::here("covariate_data", "for_model", "PRA_window_temp.csv"), row.names = FALSE)
-write.csv(RIS_window_temp, here::here("covariate_data", "for_model", "RIS_window_temp.csv"), row.names = FALSE)
-write.csv(RRE_window_temp, here::here("covariate_data", "for_model", "RRE_window_temp.csv"), row.names = FALSE)
-write.csv(ICH_window_temp, here::here("covariate_data", "for_model", "ICH_window_temp.csv"), row.names = FALSE)
+write.csv(BON_window_temp, here::here("covariate_data", "for_model", "temp", "BON_window_temp.csv"), row.names = FALSE)
+write.csv(MCN_window_temp, here::here("covariate_data", "for_model", "temp", "MCN_window_temp.csv"), row.names = FALSE)
+write.csv(PRA_window_temp, here::here("covariate_data", "for_model", "temp", "PRA_window_temp.csv"), row.names = FALSE)
+write.csv(RIS_window_temp, here::here("covariate_data", "for_model", "temp", "RIS_window_temp.csv"), row.names = FALSE)
+write.csv(RRE_window_temp, here::here("covariate_data", "for_model", "temp", "RRE_window_temp.csv"), row.names = FALSE)
+write.csv(ICH_window_temp, here::here("covariate_data", "for_model", "temp", "ICH_window_temp.csv"), row.names = FALSE)
 
 ```
+
+### Export March days of spill as covariate
+```{r}
+march_spill_days <- function(spill_data){
+  spill_data %>% 
+    # keep only 2005 onwards
+    subset(year >= 2005) %>% 
+    mutate(date = ymd(date)) %>% 
+    mutate(month = month(date)) %>% 
+    mutate(any_spill = ifelse(spill > 0, "yes", "no")) %>% 
+    group_by(year, month) %>% 
+    count(any_spill == "yes") %>% 
+    dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
+    subset(positive_spill == TRUE & month == 3) %>% 
+    dplyr::rename(march_spill_days = n) %>% 
+    ungroup() %>% 
+    complete(year = seq(2005,2022,1), fill = list(march_spill_days = 0)) %>% 
+    dplyr::select(year, march_spill_days) -> march_spill_days
+    # summarise(monthly_spill_days = count(any_spill == "yes"))
+  
+  return(march_spill_days)
+}
+
+BON_march_spill <- march_spill_days(spill_data = BON_spill_long)
+MCN_march_spill <- march_spill_days(spill_data = MCN_spill_long)
+PRA_march_spill <- march_spill_days(spill_data = PRA_spill_long)
+RIS_march_spill <- march_spill_days(spill_data = RIS_spill_long)
+RRE_march_spill <- march_spill_days(spill_data = RRE_spill_long)
+WEL_march_spill <- march_spill_days(spill_data = WEL_spill_long)
+ICH_march_spill <- march_spill_days(spill_data = ICH_spill_long)
+LGR_march_spill <- march_spill_days(spill_data = LGR_spill_long)
+
+write.csv(BON_march_spill, here::here("covariate_data", "for_model", "spill", "BON_march_spill.csv"), row.names = FALSE)
+write.csv(MCN_march_spill, here::here("covariate_data", "for_model", "spill", "MCN_march_spill.csv"), row.names = FALSE)
+write.csv(PRA_march_spill, here::here("covariate_data", "for_model", "spill", "PRA_march_spill.csv"), row.names = FALSE)
+write.csv(RIS_march_spill, here::here("covariate_data", "for_model", "spill", "RIS_march_spill.csv"), row.names = FALSE)
+write.csv(RRE_march_spill, here::here("covariate_data", "for_model", "spill", "RRE_march_spill.csv"), row.names = FALSE)
+write.csv(WEL_march_spill, here::here("covariate_data", "for_model", "spill", "WEL_march_spill.csv"), row.names = FALSE)
+write.csv(ICH_march_spill, here::here("covariate_data", "for_model", "spill", "ICH_march_spill.csv"), row.names = FALSE)
+write.csv(LGR_march_spill, here::here("covariate_data", "for_model", "spill", "LGR_march_spill.csv"), row.names = FALSE)
+```
+
+
 
 
 ```{r load_states_data}
