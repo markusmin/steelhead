@@ -575,6 +575,38 @@ write.csv(RRE_march_spill, here::here("covariate_data", "for_model", "spill", "R
 write.csv(WEL_march_spill, here::here("covariate_data", "for_model", "spill", "WEL_march_spill.csv"), row.names = FALSE)
 write.csv(ICH_march_spill, here::here("covariate_data", "for_model", "spill", "ICH_march_spill.csv"), row.names = FALSE)
 write.csv(LGR_march_spill, here::here("covariate_data", "for_model", "spill", "LGR_march_spill.csv"), row.names = FALSE)
+
+# make a quick plot for these
+ggplot(MCN_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("McNary Dam")
+
+ggplot(PRA_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Priest Rapids Dam")
+
+ggplot(RIS_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Rock Island Dam")
+
+ggplot(RRE_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Rocky Reach Dam")
+
+ggplot(WEL_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Wells Dam")
+
+ggplot(ICH_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Ice Harbor Dam")
+
+ggplot(LGR_march_spill, aes(x = year, y = march_spill_days)) +
+  geom_point() +
+  ggtitle("Lower Granite Dam")
+
+
+
 ```
 
 
