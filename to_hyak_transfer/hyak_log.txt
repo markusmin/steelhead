@@ -2311,6 +2311,19 @@ Run 20 iter of snake vectorized_1, on ckpt, with 3 chains - to see if it even wo
 scp -r ./snake/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/deteff_ESU_models/snake_vectorized_200iter/
 
 
+### 2023-04-25 ###
+
+We're back! Time to run the last model, but now with rear type (hatchery vs. wild) as a covariate
+
+### 2023-05-01 ###
+
+So I think cmdstan is working, but we're getting a ton of deprecated warnings from a program called by stan.
+To turn these off, I went to this file: /Users/markusmin/.cmdstan/cmdstan-2.32.0/make
+# and added: CXXFLAGS += -Wno-deprecated-declarations
+
+Based on advice from here: https://discourse.mc-stan.org/t/running-cmdstan-on-ventura/30948/11
+
+
 
 
 
