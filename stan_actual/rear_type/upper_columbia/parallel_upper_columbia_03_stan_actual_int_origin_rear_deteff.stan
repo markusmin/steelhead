@@ -342,7 +342,7 @@ data {
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
   array[n_ind, 5] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin and run year)
   
-  matrix[34,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
+  matrix[35,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   
   // array that contains design matrices for each tributary
   array[18,34,42] int tributary_design_matrices_array;
@@ -727,6 +727,7 @@ real umatilla_alpha2;
 real walla_walla_alpha1;
 real walla_walla_alpha2;
 real walla_walla_alpha3;
+real walla_walla_alpha4;
 real wenatchee_alpha1;
 real yakima_alpha1;
 
@@ -1560,7 +1561,7 @@ borigin_rear_matrices_array_DE[2,4,42,7] = b_met_H_matrix_42_7;
 borigin_rear_matrices_array_NDE[2,4,42,7] = b_met_H_matrix_42_7;
 
 // detection efficiency - create a vector that stores all parameters
-vector[34] det_eff_param_vector; // this is length 34 because that's how many det eff params we have
+vector[35] det_eff_param_vector; // this is length 35 because that's how many det eff params we have
 
 // populate the vector
 det_eff_param_vector[1] = asotin_alpha1;
@@ -1581,8 +1582,9 @@ det_eff_param_vector[15] = umatilla_alpha2;
 det_eff_param_vector[16] = walla_walla_alpha1;
 det_eff_param_vector[17] = walla_walla_alpha2;
 det_eff_param_vector[18] = walla_walla_alpha3;
-det_eff_param_vector[19] = wenatchee_alpha1;
-det_eff_param_vector[20] = yakima_alpha1;
+det_eff_param_vector[19] = walla_walla_alpha4;
+det_eff_param_vector[20] = wenatchee_alpha1;
+det_eff_param_vector[21] = yakima_alpha1;
 
 // det_eff_param_vector[1] = det_eff_param_posteriors[1,1];
 // det_eff_param_vector[2] = det_eff_param_posteriors[2,1];
@@ -1606,34 +1608,35 @@ det_eff_param_vector[20] = yakima_alpha1;
 // det_eff_param_vector[20] = det_eff_param_posteriors[20,1];
 
 // 14 terms for discharge relationship, one for each tributary
-det_eff_param_vector[21] = asotin_beta;
-det_eff_param_vector[22] = deschutes_beta;
-det_eff_param_vector[23] = entiat_beta;
-// det_eff_param_vector[24] = fifteenmile_beta;
+det_eff_param_vector[22] = asotin_beta;
+det_eff_param_vector[23] = deschutes_beta;
+det_eff_param_vector[24] = entiat_beta;
+// det_eff_param_vector[25] = fifteenmile_beta;
 // // fix these to zero
-det_eff_param_vector[24] = 0;
-det_eff_param_vector[25] = hood_beta;
-// det_eff_param_vector[26] = imnaha_beta;
-det_eff_param_vector[26] = 0;
-det_eff_param_vector[27] = john_day_beta;
-det_eff_param_vector[28] = methow_beta;
-det_eff_param_vector[29] = okanogan_beta;
-det_eff_param_vector[30] = tucannon_beta;
-det_eff_param_vector[31] = umatilla_beta;
-det_eff_param_vector[32] = walla_walla_beta;
-det_eff_param_vector[33] = wenatchee_beta;
-det_eff_param_vector[34] = yakima_beta;
+det_eff_param_vector[25] = 0;
+det_eff_param_vector[26] = hood_beta;
+// det_eff_param_vector[27] = imnaha_beta;
+det_eff_param_vector[27] = 0;
+det_eff_param_vector[28] = john_day_beta;
+det_eff_param_vector[29] = methow_beta;
+det_eff_param_vector[30] = okanogan_beta;
+det_eff_param_vector[31] = tucannon_beta;
+det_eff_param_vector[32] = umatilla_beta;
+det_eff_param_vector[33] = walla_walla_beta;
+det_eff_param_vector[34] = wenatchee_beta;
+det_eff_param_vector[35] = yakima_beta;
 
-
-det_eff_param_vector[21] = 0;
+// what's the deal with this block? it looks like I turned off the discharge
+// turns out that I did this for troubleshooting reasons - need to turn this back 
+// on when running the actual model
 det_eff_param_vector[22] = 0;
 det_eff_param_vector[23] = 0;
-// det_eff_param_vector[24] = fifteenmile_beta;
-// fix these to zero
 det_eff_param_vector[24] = 0;
+// det_eff_param_vector[25] = fifteenmile_beta;
+// fix these to zero
 det_eff_param_vector[25] = 0;
-// det_eff_param_vector[26] = imnaha_beta;
 det_eff_param_vector[26] = 0;
+// det_eff_param_vector[27] = imnaha_beta;
 det_eff_param_vector[27] = 0;
 det_eff_param_vector[28] = 0;
 det_eff_param_vector[29] = 0;
@@ -1642,6 +1645,7 @@ det_eff_param_vector[31] = 0;
 det_eff_param_vector[32] = 0;
 det_eff_param_vector[33] = 0;
 det_eff_param_vector[34] = 0;
+det_eff_param_vector[35] = 0;
 
 
 
@@ -2076,28 +2080,29 @@ umatilla_alpha1 ~ normal(det_eff_param_posteriors[14,1], det_eff_param_posterior
 umatilla_alpha2 ~ normal(det_eff_param_posteriors[15,1], det_eff_param_posteriors[15,2]);
 walla_walla_alpha1 ~ normal(det_eff_param_posteriors[16,1], det_eff_param_posteriors[16,2]);
 walla_walla_alpha2 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
-walla_walla_alpha3 ~ normal(det_eff_param_posteriors[18,1], det_eff_param_posteriors[18,2]);
-wenatchee_alpha1 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
-yakima_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
+walla_walla_alpha3 ~ normal(det_eff_param_posteriors[17,1], det_eff_param_posteriors[17,2]);
+walla_walla_alpha4 ~ normal(det_eff_param_posteriors[19,1], det_eff_param_posteriors[19,2]);
+wenatchee_alpha1 ~ normal(det_eff_param_posteriors[20,1], det_eff_param_posteriors[20,2]);
+yakima_alpha1 ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
 
 // 14 terms for discharge relationship, one for each tributary
-asotin_beta ~ normal(det_eff_param_posteriors[21,1], det_eff_param_posteriors[21,2]);
-deschutes_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
-entiat_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
-// // fifteenmile_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+asotin_beta ~ normal(det_eff_param_posteriors[22,1], det_eff_param_posteriors[22,2]);
+deschutes_beta ~ normal(det_eff_param_posteriors[23,1], det_eff_param_posteriors[23,2]);
+entiat_beta ~ normal(det_eff_param_posteriors[24,1], det_eff_param_posteriors[24,2]);
+// // fifteenmile_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
 // // note that fifteenmile and imnaha don't have any discharge data, so they just get intercepts and the beta term is fixed to zero
 // // fifteenmile_beta ~ normal(0,0.000001);
-hood_beta ~ normal(det_eff_param_posteriors[25,1], det_eff_param_posteriors[25,2]);
-// // imnaha_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+hood_beta ~ normal(det_eff_param_posteriors[26,1], det_eff_param_posteriors[26,2]);
+// // imnaha_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
 // // imnaha_beta ~ normal(0,0.000001);
-john_day_beta ~ normal(det_eff_param_posteriors[27,1], det_eff_param_posteriors[27,2]);
-methow_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
-okanogan_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
-tucannon_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
-umatilla_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
-walla_walla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
-wenatchee_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
-yakima_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
+john_day_beta ~ normal(det_eff_param_posteriors[28,1], det_eff_param_posteriors[28,2]);
+methow_beta ~ normal(det_eff_param_posteriors[29,1], det_eff_param_posteriors[29,2]);
+okanogan_beta ~ normal(det_eff_param_posteriors[30,1], det_eff_param_posteriors[30,2]);
+tucannon_beta ~ normal(det_eff_param_posteriors[31,1], det_eff_param_posteriors[31,2]);
+umatilla_beta ~ normal(det_eff_param_posteriors[32,1], det_eff_param_posteriors[32,2]);
+walla_walla_beta ~ normal(det_eff_param_posteriors[33,1], det_eff_param_posteriors[33,2]);
+wenatchee_beta ~ normal(det_eff_param_posteriors[34,1], det_eff_param_posteriors[34,2]);
+yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35,2]);
 
 
 
