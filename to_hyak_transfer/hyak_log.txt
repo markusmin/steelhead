@@ -2323,7 +2323,14 @@ To turn these off, I went to this file: /Users/markusmin/.cmdstan/cmdstan-2.32.0
 
 Based on advice from here: https://discourse.mc-stan.org/t/running-cmdstan-on-ventura/30948/11
 
+### 2023-05-08 ###
+Stan is working.
 
+Noticed some weird stuff in the model, where it looks like I turned the discharge effect off without fully realizing it?
+- confirmed this to be the case, I used an intercept-only model for detection efficiency last time.
+Evidence: if you look at the posteriors for the alpha and beta parameters for DE, the alpha posteriors are different
+from the priors (due to data), but the beta posteriors are the same as the priors (because they don't interact with the data)
+- It looks like I turned it off when troubleshooting a different problem, but forgot to turn it back on for the actual model
 
 
 
