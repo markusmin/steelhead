@@ -532,9 +532,9 @@ deteff_stan_fit_summary[1:10,]
 
 ##### EXPORT PARAMETER ESTIMATES TO USE AS PRIORS IN PRIMARY MODEL #####
 # create matrix to store values
-det_eff_param_posteriors <- matrix(nrow = 34, ncol = 2)
-det_eff_param_posteriors[,1] <- deteff_stan_fit_summary$mean[2:35]
-det_eff_param_posteriors[,2] <- deteff_stan_fit_summary$sd[2:35]
+det_eff_param_posteriors <- matrix(nrow = 35, ncol = 2)
+det_eff_param_posteriors[,1] <- deteff_stan_fit_summary$mean[2:36]
+det_eff_param_posteriors[,2] <- deteff_stan_fit_summary$sd[2:36]
 
 write.csv(det_eff_param_posteriors, here::here("stan_actual", "detection_efficiency_model", "det_eff_param_posteriors_new.csv"))
 
