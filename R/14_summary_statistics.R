@@ -48,21 +48,24 @@ states_complete %>%
   dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) -> states_complete
 print(Sys.time())
 
+
+# edit to show by rear type as well as natal origin and run year
 states_complete %>% 
-  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin), by = "tag_code") %>% 
+  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin, rear_type_code), by = "tag_code") %>% 
+  mutate(rear_type = ifelse(!(rear_type_code %in% c("H", "U")), "W", "H")) %>% 
   distinct(tag_code_2, .keep_all = TRUE) %>% 
   ungroup() %>% 
-  count(natal_origin, run_year) %>% 
+  count(natal_origin, run_year, rear_type) %>% 
   as.data.frame() %>% 
-  dplyr::rename(total = n) -> natal_origin_fish_counts
+  dplyr::rename(total = n) -> natal_origin_rear_fish_counts
 
 ### CREATE THE TABLE FOR REPORT - rows = natal origins, columns = natal origins, values = number of fish
-natal_origin_fish_counts %>% 
+natal_origin_rear_fish_counts %>% 
   pivot_wider(., values_from = total, names_from = run_year) %>% 
   relocate("05/06", .before = "06/07") %>% 
-  replace(is.na(.), 0) -> fish_year_origin_table
+  replace(is.na(.), 0) -> fish_year_rear_origin_table
 
-write.csv(fish_year_origin_table, here::here("CBR_report", "CBR_report_final", "tables", "fish_year_origin_table.csv"))
+write.csv(fish_year_rear_origin_table, here::here("CBR_report", "CBR_report_final", "tables", "fish_year_rear_origin_table.csv"))
   
 
 ##### Overshoot summary statistics #####
