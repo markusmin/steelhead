@@ -2333,4 +2333,36 @@ from the priors (due to data), but the beta posteriors are the same as the prior
 - It looks like I turned it off when troubleshooting a different problem, but forgot to turn it back on for the actual model
 
 
+### 2023-05-09 ###
+Hatchery vs wild:
+- Split wild and hatchery datasets per ESU
+	- Based on sample sizes, there are some origin + rear combinations we have to drop
+	- Drop:
+		- Asotin Creek H
+		- Deschutes River H
+		- Entiat River H
+		- Fifteenmile Creek H
+		- John Day H
+		- Okanogan W
+		- Yakima H
+	- I wrote this based on threshold value - of 350 (these are all below 66 though)
+
+- Run the origin model for each of those six datasets
+
+### 2023-05-10 ###
+- running the upper columbia, wild model on mox to test
+# first move the folder to mox
+# from within the directory /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_models/
+
+# then from within the folder on mox:
+sbatch job_ckpt_UC_W.slurm
+# it worked! And it didn't take too long to run 100 iter (50 warmup and 50 sampling)
+Chain 1 finished in 6737.2 seconds.
+Warning: 42 of 50 (84.0%) transitions hit the maximum treedepth limit of 10.
+
+
+
+
+
 
