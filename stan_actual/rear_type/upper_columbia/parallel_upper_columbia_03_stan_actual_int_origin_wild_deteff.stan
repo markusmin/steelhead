@@ -1,6 +1,7 @@
-// 03_parallel_snake_stan_actual_int_origin_rear_deteff
-// This model includes a detection efficiency calculation for the tributaries, and rear type as a covariate.
-// rear type will be included as a covariate for every movement
+// 03_parallel_snake_stan_actual_int_origin_wild_deteff
+// wild, upper Columbia Steelhead
+// This model includes a detection efficiency calculation for the tributaries
+// the only covariate in this model is origin
 
 functions{
     real partial_sum_lpmf( // int[] slice_n_fish, // I don't think that we need this, given that we are using start and end to index the detection histories
@@ -11,10 +12,6 @@ functions{
                         int max_visits,
                         // array[n_ind, 7] int cat_X_mat,
                         array[,] int cat_X_mat,
-                        
-                        // new - for interaction (rear x origin) terms
-                        array[] int rear_indices,
-                        array[] int trib_indices,
                         
                         // array[n_ind, max_visits-1] int states_mat,
                         array[,] int states_mat,
@@ -40,20 +37,15 @@ functions{
                         // will be shared between the two, but transitions into tributaries won't.
                         // DE = detection efficiency, NDE = no detection efficiency
                         array[,] real b0_matrix_DE,
-                        array[,] real brear_matrix_DE,
                         array[,] real borigin1_matrix_DE,
                         array[,] real borigin2_matrix_DE,
                         array[,] real borigin3_matrix_DE,
                         
                         array[,] real b0_matrix_NDE,
-                        array[,] real brear_matrix_NDE,
                         array[,] real borigin1_matrix_NDE,
                         array[,] real borigin2_matrix_NDE,
                         array[,] real borigin3_matrix_NDE,
                         
-                        // for interaction terms - going to be 2x4x43x43
-                        array[,,,] real borigin_rear_matrices_array_DE,
-                        array[,,,] real borigin_rear_matrices_array_NDE,
                         
                         // below is new data for detection efficiency
                         // declare an array that you can detection probabilities in, 
@@ -167,11 +159,9 @@ functions{
                       // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
                   if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
-                    cat_X_mat[i,2] * brear_matrix_DE[current,k] + // rear type
-                    cat_X_mat[i,3] * borigin1_matrix_DE[current,k] +
-                    cat_X_mat[i,4] * borigin2_matrix_DE[current,k] +
-                    cat_X_mat[i,5] * borigin3_matrix_DE[current,k] +
-                    borigin_rear_matrices_array_DE[rear_indices[i], trib_indices[i], current,k]; // interaction term
+                    cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
+                    cat_X_mat[i,3] * borigin2_matrix_DE[current,k] +
+                    cat_X_mat[i,4] * borigin3_matrix_DE[current,k];
                     
                     // store in the vector that it's DE
                     DE_correction[k] = 1;
@@ -179,11 +169,9 @@ functions{
                     // Else, use the NDE matrix, and don't correct for detection efficiency
                   } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
-                    cat_X_mat[i,2] * brear_matrix_NDE[current,k] + // rear type
-                    cat_X_mat[i,3] * borigin1_matrix_NDE[current,k] +
-                    cat_X_mat[i,4] * borigin2_matrix_NDE[current,k] +
-                    cat_X_mat[i,5] * borigin3_matrix_NDE[current,k] +
-                    borigin_rear_matrices_array_NDE[rear_indices[i], trib_indices[i], current,k]; // interaction term;
+                    cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
+                    cat_X_mat[i,3] * borigin2_matrix_NDE[current,k] +
+                    cat_X_mat[i,4] * borigin3_matrix_NDE[current,k]; 
                     
                     // otherwise, store in the vector that it's not DE
                     DE_correction[k] = 0;
@@ -327,8 +315,6 @@ data {
   int max_visits;
   int n_ind; // number of individuals (this is nfish)
   array[n_ind,max_visits] int y; // array with dimensions nfish (number of fish), 41 (maximum number of site visits)
-  array[n_ind] int rear_indices;// rear_indices is a vector that contains for each fish, whether it was wild (1) or hatchery (2)
-  array[n_ind] int trib_indices;// trib_indices is a vector that contains for each fish, which tributary it came from: 1 = Wenatchee, 2 = Entiat, 3 = Okanogan, 4 = Methow
   array[n_ind] int n_obs; // n_obs is a vector that contains the number of site visits for each individual - but needs to be declared as array to take integer values
   vector[43] possible_movements; // a vector containing the number of possible transitions out of each state
   array[n_ind, max_visits-1] int states_mat; // a matrix (array to take integer values) with rows = each fish and columns = the site visits
@@ -340,12 +326,12 @@ data {
   array[n_notmovements,2] int not_movements; // a matrix containing all non-allowed state transitions
   // array[n_ind, 48] int dates; // a matrix containing dates (as integers) where rows = number of fish and columns = site visits
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
-  array[n_ind, 5] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (rear and origin and run year)
+  array[n_ind, 4] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (origin)
   
   matrix[35,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   
   // array that contains design matrices for each tributary
-  array[18,34,42] int tributary_design_matrices_array;
+  array[18,35,42] int tributary_design_matrices_array;
   
   // vector that contains the run years in which each individual transition occurred
   int ntransitions;
@@ -434,29 +420,6 @@ real b0_matrix_39_9;
 real b0_matrix_41_2;
 real b0_matrix_42_7;
 
-real brear_matrix_3_4;
-real brear_matrix_4_3;
-real brear_matrix_4_5;
-real brear_matrix_5_4;
-real brear_matrix_5_6;
-real brear_matrix_5_24_DE;
-real brear_matrix_5_24_NDE;
-real brear_matrix_6_5;
-real brear_matrix_6_7;
-real brear_matrix_6_26_DE;
-real brear_matrix_6_26_NDE;
-real brear_matrix_7_6;
-real brear_matrix_7_28_DE;
-real brear_matrix_7_28_NDE;
-real brear_matrix_7_30_DE;
-real brear_matrix_7_30_NDE;
-real brear_matrix_7_42;
-real brear_matrix_24_5;
-real brear_matrix_26_6;
-real brear_matrix_28_7;
-real brear_matrix_30_7;
-real brear_matrix_42_7;
-
 real borigin1_matrix_3_4;
 real borigin1_matrix_4_3;
 real borigin1_matrix_4_5;
@@ -526,187 +489,6 @@ real borigin3_matrix_28_7;
 real borigin3_matrix_30_7;
 real borigin3_matrix_42_7;
 
-// interaction terms
-real b_wen_W_matrix_3_4;
-real b_wen_W_matrix_4_3;
-real b_wen_W_matrix_4_5;
-real b_wen_W_matrix_5_4;
-real b_wen_W_matrix_5_6;
-real b_wen_W_matrix_5_24_DE;
-real b_wen_W_matrix_5_24_NDE;
-real b_wen_W_matrix_6_5;
-real b_wen_W_matrix_6_7;
-real b_wen_W_matrix_6_26_DE;
-real b_wen_W_matrix_6_26_NDE;
-real b_wen_W_matrix_7_6;
-real b_wen_W_matrix_7_28_DE;
-real b_wen_W_matrix_7_28_NDE;
-real b_wen_W_matrix_7_30_DE;
-real b_wen_W_matrix_7_30_NDE;
-real b_wen_W_matrix_7_42;
-real b_wen_W_matrix_24_5;
-real b_wen_W_matrix_26_6;
-real b_wen_W_matrix_28_7;
-real b_wen_W_matrix_30_7;
-real b_wen_W_matrix_42_7;
-real b_wen_H_matrix_3_4;
-real b_wen_H_matrix_4_3;
-real b_wen_H_matrix_4_5;
-real b_wen_H_matrix_5_4;
-real b_wen_H_matrix_5_6;
-real b_wen_H_matrix_5_24_DE;
-real b_wen_H_matrix_5_24_NDE;
-real b_wen_H_matrix_6_5;
-real b_wen_H_matrix_6_7;
-real b_wen_H_matrix_6_26_DE;
-real b_wen_H_matrix_6_26_NDE;
-real b_wen_H_matrix_7_6;
-real b_wen_H_matrix_7_28_DE;
-real b_wen_H_matrix_7_28_NDE;
-real b_wen_H_matrix_7_30_DE;
-real b_wen_H_matrix_7_30_NDE;
-real b_wen_H_matrix_7_42;
-real b_wen_H_matrix_24_5;
-real b_wen_H_matrix_26_6;
-real b_wen_H_matrix_28_7;
-real b_wen_H_matrix_30_7;
-real b_wen_H_matrix_42_7;
-
-real b_ent_W_matrix_3_4;
-real b_ent_W_matrix_4_3;
-real b_ent_W_matrix_4_5;
-real b_ent_W_matrix_5_4;
-real b_ent_W_matrix_5_6;
-real b_ent_W_matrix_5_24_DE;
-real b_ent_W_matrix_5_24_NDE;
-real b_ent_W_matrix_6_5;
-real b_ent_W_matrix_6_7;
-real b_ent_W_matrix_6_26_DE;
-real b_ent_W_matrix_6_26_NDE;
-real b_ent_W_matrix_7_6;
-real b_ent_W_matrix_7_28_DE;
-real b_ent_W_matrix_7_28_NDE;
-real b_ent_W_matrix_7_30_DE;
-real b_ent_W_matrix_7_30_NDE;
-real b_ent_W_matrix_7_42;
-real b_ent_W_matrix_24_5;
-real b_ent_W_matrix_26_6;
-real b_ent_W_matrix_28_7;
-real b_ent_W_matrix_30_7;
-real b_ent_W_matrix_42_7;
-real b_ent_H_matrix_3_4;
-real b_ent_H_matrix_4_3;
-real b_ent_H_matrix_4_5;
-real b_ent_H_matrix_5_4;
-real b_ent_H_matrix_5_6;
-real b_ent_H_matrix_5_24_DE;
-real b_ent_H_matrix_5_24_NDE;
-real b_ent_H_matrix_6_5;
-real b_ent_H_matrix_6_7;
-real b_ent_H_matrix_6_26_DE;
-real b_ent_H_matrix_6_26_NDE;
-real b_ent_H_matrix_7_6;
-real b_ent_H_matrix_7_28_DE;
-real b_ent_H_matrix_7_28_NDE;
-real b_ent_H_matrix_7_30_DE;
-real b_ent_H_matrix_7_30_NDE;
-real b_ent_H_matrix_7_42;
-real b_ent_H_matrix_24_5;
-real b_ent_H_matrix_26_6;
-real b_ent_H_matrix_28_7;
-real b_ent_H_matrix_30_7;
-real b_ent_H_matrix_42_7;
-
-real b_oka_W_matrix_3_4;
-real b_oka_W_matrix_4_3;
-real b_oka_W_matrix_4_5;
-real b_oka_W_matrix_5_4;
-real b_oka_W_matrix_5_6;
-real b_oka_W_matrix_5_24_DE;
-real b_oka_W_matrix_5_24_NDE;
-real b_oka_W_matrix_6_5;
-real b_oka_W_matrix_6_7;
-real b_oka_W_matrix_6_26_DE;
-real b_oka_W_matrix_6_26_NDE;
-real b_oka_W_matrix_7_6;
-real b_oka_W_matrix_7_28_DE;
-real b_oka_W_matrix_7_28_NDE;
-real b_oka_W_matrix_7_30_DE;
-real b_oka_W_matrix_7_30_NDE;
-real b_oka_W_matrix_7_42;
-real b_oka_W_matrix_24_5;
-real b_oka_W_matrix_26_6;
-real b_oka_W_matrix_28_7;
-real b_oka_W_matrix_30_7;
-real b_oka_W_matrix_42_7;
-real b_oka_H_matrix_3_4;
-real b_oka_H_matrix_4_3;
-real b_oka_H_matrix_4_5;
-real b_oka_H_matrix_5_4;
-real b_oka_H_matrix_5_6;
-real b_oka_H_matrix_5_24_DE;
-real b_oka_H_matrix_5_24_NDE;
-real b_oka_H_matrix_6_5;
-real b_oka_H_matrix_6_7;
-real b_oka_H_matrix_6_26_DE;
-real b_oka_H_matrix_6_26_NDE;
-real b_oka_H_matrix_7_6;
-real b_oka_H_matrix_7_28_DE;
-real b_oka_H_matrix_7_28_NDE;
-real b_oka_H_matrix_7_30_DE;
-real b_oka_H_matrix_7_30_NDE;
-real b_oka_H_matrix_7_42;
-real b_oka_H_matrix_24_5;
-real b_oka_H_matrix_26_6;
-real b_oka_H_matrix_28_7;
-real b_oka_H_matrix_30_7;
-real b_oka_H_matrix_42_7;
-
-real b_met_W_matrix_3_4;
-real b_met_W_matrix_4_3;
-real b_met_W_matrix_4_5;
-real b_met_W_matrix_5_4;
-real b_met_W_matrix_5_6;
-real b_met_W_matrix_5_24_DE;
-real b_met_W_matrix_5_24_NDE;
-real b_met_W_matrix_6_5;
-real b_met_W_matrix_6_7;
-real b_met_W_matrix_6_26_DE;
-real b_met_W_matrix_6_26_NDE;
-real b_met_W_matrix_7_6;
-real b_met_W_matrix_7_28_DE;
-real b_met_W_matrix_7_28_NDE;
-real b_met_W_matrix_7_30_DE;
-real b_met_W_matrix_7_30_NDE;
-real b_met_W_matrix_7_42;
-real b_met_W_matrix_24_5;
-real b_met_W_matrix_26_6;
-real b_met_W_matrix_28_7;
-real b_met_W_matrix_30_7;
-real b_met_W_matrix_42_7;
-real b_met_H_matrix_3_4;
-real b_met_H_matrix_4_3;
-real b_met_H_matrix_4_5;
-real b_met_H_matrix_5_4;
-real b_met_H_matrix_5_6;
-real b_met_H_matrix_5_24_DE;
-real b_met_H_matrix_5_24_NDE;
-real b_met_H_matrix_6_5;
-real b_met_H_matrix_6_7;
-real b_met_H_matrix_6_26_DE;
-real b_met_H_matrix_6_26_NDE;
-real b_met_H_matrix_7_6;
-real b_met_H_matrix_7_28_DE;
-real b_met_H_matrix_7_28_NDE;
-real b_met_H_matrix_7_30_DE;
-real b_met_H_matrix_7_30_NDE;
-real b_met_H_matrix_7_42;
-real b_met_H_matrix_24_5;
-real b_met_H_matrix_26_6;
-real b_met_H_matrix_28_7;
-real b_met_H_matrix_30_7;
-real b_met_H_matrix_42_7;
-
 // here, write out all of the parameters for detection efficiency
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
 real asotin_alpha1;
@@ -767,14 +549,6 @@ transformed parameters {
   // Non-zero elements will be overwritten
   // b0_matrix = rep_matrix(-100000, 43, 43);
   b0_matrix_NDE = rep_array(-100000, 43, 43);
-
-  // Declare a matrix to store brear params
-  array[43,43] real brear_matrix_DE;
-  brear_matrix_DE = rep_array(0, 43, 43);
-  
-  array[43,43] real brear_matrix_NDE;
-  brear_matrix_NDE = rep_array(0, 43, 43);
-
   
   // Declare a matrix to store borigin1 params
   // matrix[43,43] borigin1_matrix;
@@ -825,18 +599,7 @@ transformed parameters {
   // borigin3_matrix = rep_matrix(-100000, 43, 43);
   // borigin3_matrix = rep_matrix(0, 43, 43);
   borigin3_matrix_NDE = rep_array(0, 43, 43);
-  
-  // Declare a matrix to store the interaction terms
-  array[2,4,43,43] real borigin_rear_matrices_array_DE;
-  // make an intermediate, 2x4 array to copy
-  array[2,4] real interactions_matrix;
-  interactions_matrix = rep_array(0, 2, 4);
-  // borigin_rear_matrices_array_DE = rep_array(0, 2, 4, 43, 43);
-  borigin_rear_matrices_array_DE = rep_array(interactions_matrix, 43, 43);
-  
-  array[2,4,43,43] real borigin_rear_matrices_array_NDE;
-  // borigin_rear_matrices_array_NDE = rep_array(0, 2, 4, 43, 43);
-  borigin_rear_matrices_array_NDE = rep_array(interactions_matrix, 43, 43);
+
   
   // Populate this matrix with betas
   // Fill in all of the non-zero elements into the b0_matrix
@@ -987,55 +750,6 @@ b0_matrix_NDE[41,2] = b0_matrix_41_2;
 b0_matrix_DE[42,7] = b0_matrix_42_7;
 b0_matrix_NDE[42,7] = b0_matrix_42_7;
 
-brear_matrix_DE[3,4] = brear_matrix_3_4;
-brear_matrix_NDE[3,4] = brear_matrix_3_4;
-brear_matrix_DE[4,3] = brear_matrix_4_3;
-brear_matrix_NDE[4,3] = brear_matrix_4_3;
-brear_matrix_DE[4,5] = brear_matrix_4_5;
-brear_matrix_NDE[4,5] = brear_matrix_4_5;
-brear_matrix_DE[5,4] = brear_matrix_5_4;
-brear_matrix_NDE[5,4] = brear_matrix_5_4;
-brear_matrix_DE[5,6] = brear_matrix_5_6;
-brear_matrix_NDE[5,6] = brear_matrix_5_6;
-brear_matrix_DE[5,24] = brear_matrix_5_24_DE;
-brear_matrix_NDE[5,24] = brear_matrix_5_24_NDE;
-brear_matrix_NDE[5,25] = brear_matrix_5_24_NDE;
-brear_matrix_DE[6,5] = brear_matrix_6_5;
-brear_matrix_NDE[6,5] = brear_matrix_6_5;
-brear_matrix_DE[6,7] = brear_matrix_6_7;
-brear_matrix_NDE[6,7] = brear_matrix_6_7;
-brear_matrix_DE[6,26] = brear_matrix_6_26_DE;
-brear_matrix_NDE[6,26] = brear_matrix_6_26_NDE;
-brear_matrix_NDE[6,27] = brear_matrix_6_26_NDE;
-brear_matrix_DE[7,6] = brear_matrix_7_6;
-brear_matrix_NDE[7,6] = brear_matrix_7_6;
-brear_matrix_DE[7,28] = brear_matrix_7_28_DE;
-brear_matrix_NDE[7,28] = brear_matrix_7_28_NDE;
-brear_matrix_NDE[7,29] = brear_matrix_7_28_NDE;
-brear_matrix_DE[7,30] = brear_matrix_7_30_DE;
-brear_matrix_NDE[7,30] = brear_matrix_7_30_NDE;
-brear_matrix_NDE[7,31] = brear_matrix_7_30_NDE;
-brear_matrix_DE[7,42] = brear_matrix_7_42;
-brear_matrix_NDE[7,42] = brear_matrix_7_42;
-brear_matrix_DE[24,5] = brear_matrix_24_5;
-brear_matrix_NDE[24,5] = brear_matrix_24_5;
-brear_matrix_DE[25,5] = brear_matrix_24_5;
-brear_matrix_NDE[25,5] = brear_matrix_24_5;
-brear_matrix_DE[26,6] = brear_matrix_26_6;
-brear_matrix_NDE[26,6] = brear_matrix_26_6;
-brear_matrix_DE[27,6] = brear_matrix_26_6;
-brear_matrix_NDE[27,6] = brear_matrix_26_6;
-brear_matrix_DE[28,7] = brear_matrix_28_7;
-brear_matrix_NDE[28,7] = brear_matrix_28_7;
-brear_matrix_DE[29,7] = brear_matrix_28_7;
-brear_matrix_NDE[29,7] = brear_matrix_28_7;
-brear_matrix_DE[30,7] = brear_matrix_30_7;
-brear_matrix_NDE[30,7] = brear_matrix_30_7;
-brear_matrix_DE[31,7] = brear_matrix_30_7;
-brear_matrix_NDE[31,7] = brear_matrix_30_7;
-brear_matrix_DE[42,7] = brear_matrix_42_7;
-brear_matrix_NDE[42,7] = brear_matrix_42_7;
-
 borigin1_matrix_DE[3,4] = borigin1_matrix_3_4;
 borigin1_matrix_NDE[3,4] = borigin1_matrix_3_4;
 borigin1_matrix_DE[4,3] = borigin1_matrix_4_3;
@@ -1170,395 +884,6 @@ borigin3_matrix_DE[31,7] = borigin3_matrix_30_7;
 borigin3_matrix_NDE[31,7] = borigin3_matrix_30_7;
 borigin3_matrix_DE[42,7] = borigin3_matrix_42_7;
 borigin3_matrix_NDE[42,7] = borigin3_matrix_42_7;
-
-// interaction terms
-borigin_rear_matrices_array_DE[1,1,3,4] = b_wen_W_matrix_3_4;
-borigin_rear_matrices_array_NDE[1,1,3,4] = b_wen_W_matrix_3_4;
-borigin_rear_matrices_array_DE[1,1,4,3] = b_wen_W_matrix_4_3;
-borigin_rear_matrices_array_NDE[1,1,4,3] = b_wen_W_matrix_4_3;
-borigin_rear_matrices_array_DE[1,1,4,5] = b_wen_W_matrix_4_5;
-borigin_rear_matrices_array_NDE[1,1,4,5] = b_wen_W_matrix_4_5;
-borigin_rear_matrices_array_DE[1,1,5,4] = b_wen_W_matrix_5_4;
-borigin_rear_matrices_array_NDE[1,1,5,4] = b_wen_W_matrix_5_4;
-borigin_rear_matrices_array_DE[1,1,5,6] = b_wen_W_matrix_5_6;
-borigin_rear_matrices_array_NDE[1,1,5,6] = b_wen_W_matrix_5_6;
-borigin_rear_matrices_array_DE[1,1,5,24] = b_wen_W_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[1,1,5,24] = b_wen_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[1,1,5,25] = b_wen_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[1,1,6,5] = b_wen_W_matrix_6_5;
-borigin_rear_matrices_array_NDE[1,1,6,5] = b_wen_W_matrix_6_5;
-borigin_rear_matrices_array_DE[1,1,6,7] = b_wen_W_matrix_6_7;
-borigin_rear_matrices_array_NDE[1,1,6,7] = b_wen_W_matrix_6_7;
-borigin_rear_matrices_array_DE[1,1,6,26] = b_wen_W_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[1,1,6,26] = b_wen_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[1,1,6,27] = b_wen_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[1,1,7,6] = b_wen_W_matrix_7_6;
-borigin_rear_matrices_array_NDE[1,1,7,6] = b_wen_W_matrix_7_6;
-borigin_rear_matrices_array_DE[1,1,7,28] = b_wen_W_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[1,1,7,28] = b_wen_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[1,1,7,29] = b_wen_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[1,1,7,30] = b_wen_W_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[1,1,7,30] = b_wen_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[1,1,7,31] = b_wen_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[1,1,7,42] = b_wen_W_matrix_7_42;
-borigin_rear_matrices_array_NDE[1,1,7,42] = b_wen_W_matrix_7_42;
-borigin_rear_matrices_array_DE[1,1,24,5] = b_wen_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,1,24,5] = b_wen_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,1,25,5] = b_wen_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,1,25,5] = b_wen_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,1,26,6] = b_wen_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,1,26,6] = b_wen_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,1,27,6] = b_wen_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,1,27,6] = b_wen_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,1,28,7] = b_wen_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,1,28,7] = b_wen_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,1,29,7] = b_wen_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,1,29,7] = b_wen_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,1,30,7] = b_wen_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,1,30,7] = b_wen_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,1,31,7] = b_wen_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,1,31,7] = b_wen_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,1,42,7] = b_wen_W_matrix_42_7;
-borigin_rear_matrices_array_NDE[1,1,42,7] = b_wen_W_matrix_42_7;
-borigin_rear_matrices_array_DE[2,1,3,4] = b_wen_H_matrix_3_4;
-borigin_rear_matrices_array_NDE[2,1,3,4] = b_wen_H_matrix_3_4;
-borigin_rear_matrices_array_DE[2,1,4,3] = b_wen_H_matrix_4_3;
-borigin_rear_matrices_array_NDE[2,1,4,3] = b_wen_H_matrix_4_3;
-borigin_rear_matrices_array_DE[2,1,4,5] = b_wen_H_matrix_4_5;
-borigin_rear_matrices_array_NDE[2,1,4,5] = b_wen_H_matrix_4_5;
-borigin_rear_matrices_array_DE[2,1,5,4] = b_wen_H_matrix_5_4;
-borigin_rear_matrices_array_NDE[2,1,5,4] = b_wen_H_matrix_5_4;
-borigin_rear_matrices_array_DE[2,1,5,6] = b_wen_H_matrix_5_6;
-borigin_rear_matrices_array_NDE[2,1,5,6] = b_wen_H_matrix_5_6;
-borigin_rear_matrices_array_DE[2,1,5,24] = b_wen_H_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[2,1,5,24] = b_wen_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[2,1,5,25] = b_wen_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[2,1,6,5] = b_wen_H_matrix_6_5;
-borigin_rear_matrices_array_NDE[2,1,6,5] = b_wen_H_matrix_6_5;
-borigin_rear_matrices_array_DE[2,1,6,7] = b_wen_H_matrix_6_7;
-borigin_rear_matrices_array_NDE[2,1,6,7] = b_wen_H_matrix_6_7;
-borigin_rear_matrices_array_DE[2,1,6,26] = b_wen_H_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[2,1,6,26] = b_wen_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[2,1,6,27] = b_wen_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[2,1,7,6] = b_wen_H_matrix_7_6;
-borigin_rear_matrices_array_NDE[2,1,7,6] = b_wen_H_matrix_7_6;
-borigin_rear_matrices_array_DE[2,1,7,28] = b_wen_H_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[2,1,7,28] = b_wen_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[2,1,7,29] = b_wen_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[2,1,7,30] = b_wen_H_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[2,1,7,30] = b_wen_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[2,1,7,31] = b_wen_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[2,1,7,42] = b_wen_H_matrix_7_42;
-borigin_rear_matrices_array_NDE[2,1,7,42] = b_wen_H_matrix_7_42;
-borigin_rear_matrices_array_DE[2,1,24,5] = b_wen_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,1,24,5] = b_wen_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,1,25,5] = b_wen_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,1,25,5] = b_wen_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,1,26,6] = b_wen_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,1,26,6] = b_wen_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,1,27,6] = b_wen_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,1,27,6] = b_wen_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,1,28,7] = b_wen_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,1,28,7] = b_wen_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,1,29,7] = b_wen_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,1,29,7] = b_wen_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,1,30,7] = b_wen_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,1,30,7] = b_wen_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,1,31,7] = b_wen_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,1,31,7] = b_wen_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,1,42,7] = b_wen_H_matrix_42_7;
-borigin_rear_matrices_array_NDE[2,1,42,7] = b_wen_H_matrix_42_7;
-
-borigin_rear_matrices_array_DE[1,2,3,4] = b_ent_W_matrix_3_4;
-borigin_rear_matrices_array_NDE[1,2,3,4] = b_ent_W_matrix_3_4;
-borigin_rear_matrices_array_DE[1,2,4,3] = b_ent_W_matrix_4_3;
-borigin_rear_matrices_array_NDE[1,2,4,3] = b_ent_W_matrix_4_3;
-borigin_rear_matrices_array_DE[1,2,4,5] = b_ent_W_matrix_4_5;
-borigin_rear_matrices_array_NDE[1,2,4,5] = b_ent_W_matrix_4_5;
-borigin_rear_matrices_array_DE[1,2,5,4] = b_ent_W_matrix_5_4;
-borigin_rear_matrices_array_NDE[1,2,5,4] = b_ent_W_matrix_5_4;
-borigin_rear_matrices_array_DE[1,2,5,6] = b_ent_W_matrix_5_6;
-borigin_rear_matrices_array_NDE[1,2,5,6] = b_ent_W_matrix_5_6;
-borigin_rear_matrices_array_DE[1,2,5,24] = b_ent_W_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[1,2,5,24] = b_ent_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[1,2,5,25] = b_ent_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[1,2,6,5] = b_ent_W_matrix_6_5;
-borigin_rear_matrices_array_NDE[1,2,6,5] = b_ent_W_matrix_6_5;
-borigin_rear_matrices_array_DE[1,2,6,7] = b_ent_W_matrix_6_7;
-borigin_rear_matrices_array_NDE[1,2,6,7] = b_ent_W_matrix_6_7;
-borigin_rear_matrices_array_DE[1,2,6,26] = b_ent_W_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[1,2,6,26] = b_ent_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[1,2,6,27] = b_ent_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[1,2,7,6] = b_ent_W_matrix_7_6;
-borigin_rear_matrices_array_NDE[1,2,7,6] = b_ent_W_matrix_7_6;
-borigin_rear_matrices_array_DE[1,2,7,28] = b_ent_W_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[1,2,7,28] = b_ent_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[1,2,7,29] = b_ent_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[1,2,7,30] = b_ent_W_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[1,2,7,30] = b_ent_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[1,2,7,31] = b_ent_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[1,2,7,42] = b_ent_W_matrix_7_42;
-borigin_rear_matrices_array_NDE[1,2,7,42] = b_ent_W_matrix_7_42;
-borigin_rear_matrices_array_DE[1,2,24,5] = b_ent_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,2,24,5] = b_ent_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,2,25,5] = b_ent_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,2,25,5] = b_ent_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,2,26,6] = b_ent_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,2,26,6] = b_ent_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,2,27,6] = b_ent_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,2,27,6] = b_ent_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,2,28,7] = b_ent_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,2,28,7] = b_ent_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,2,29,7] = b_ent_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,2,29,7] = b_ent_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,2,30,7] = b_ent_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,2,30,7] = b_ent_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,2,31,7] = b_ent_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,2,31,7] = b_ent_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,2,42,7] = b_ent_W_matrix_42_7;
-borigin_rear_matrices_array_NDE[1,2,42,7] = b_ent_W_matrix_42_7;
-borigin_rear_matrices_array_DE[2,2,3,4] = b_ent_H_matrix_3_4;
-borigin_rear_matrices_array_NDE[2,2,3,4] = b_ent_H_matrix_3_4;
-borigin_rear_matrices_array_DE[2,2,4,3] = b_ent_H_matrix_4_3;
-borigin_rear_matrices_array_NDE[2,2,4,3] = b_ent_H_matrix_4_3;
-borigin_rear_matrices_array_DE[2,2,4,5] = b_ent_H_matrix_4_5;
-borigin_rear_matrices_array_NDE[2,2,4,5] = b_ent_H_matrix_4_5;
-borigin_rear_matrices_array_DE[2,2,5,4] = b_ent_H_matrix_5_4;
-borigin_rear_matrices_array_NDE[2,2,5,4] = b_ent_H_matrix_5_4;
-borigin_rear_matrices_array_DE[2,2,5,6] = b_ent_H_matrix_5_6;
-borigin_rear_matrices_array_NDE[2,2,5,6] = b_ent_H_matrix_5_6;
-borigin_rear_matrices_array_DE[2,2,5,24] = b_ent_H_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[2,2,5,24] = b_ent_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[2,2,5,25] = b_ent_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[2,2,6,5] = b_ent_H_matrix_6_5;
-borigin_rear_matrices_array_NDE[2,2,6,5] = b_ent_H_matrix_6_5;
-borigin_rear_matrices_array_DE[2,2,6,7] = b_ent_H_matrix_6_7;
-borigin_rear_matrices_array_NDE[2,2,6,7] = b_ent_H_matrix_6_7;
-borigin_rear_matrices_array_DE[2,2,6,26] = b_ent_H_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[2,2,6,26] = b_ent_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[2,2,6,27] = b_ent_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[2,2,7,6] = b_ent_H_matrix_7_6;
-borigin_rear_matrices_array_NDE[2,2,7,6] = b_ent_H_matrix_7_6;
-borigin_rear_matrices_array_DE[2,2,7,28] = b_ent_H_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[2,2,7,28] = b_ent_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[2,2,7,29] = b_ent_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[2,2,7,30] = b_ent_H_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[2,2,7,30] = b_ent_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[2,2,7,31] = b_ent_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[2,2,7,42] = b_ent_H_matrix_7_42;
-borigin_rear_matrices_array_NDE[2,2,7,42] = b_ent_H_matrix_7_42;
-borigin_rear_matrices_array_DE[2,2,24,5] = b_ent_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,2,24,5] = b_ent_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,2,25,5] = b_ent_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,2,25,5] = b_ent_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,2,26,6] = b_ent_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,2,26,6] = b_ent_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,2,27,6] = b_ent_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,2,27,6] = b_ent_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,2,28,7] = b_ent_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,2,28,7] = b_ent_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,2,29,7] = b_ent_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,2,29,7] = b_ent_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,2,30,7] = b_ent_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,2,30,7] = b_ent_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,2,31,7] = b_ent_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,2,31,7] = b_ent_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,2,42,7] = b_ent_H_matrix_42_7;
-borigin_rear_matrices_array_NDE[2,2,42,7] = b_ent_H_matrix_42_7;
-
-borigin_rear_matrices_array_DE[1,3,3,4] = b_oka_W_matrix_3_4;
-borigin_rear_matrices_array_NDE[1,3,3,4] = b_oka_W_matrix_3_4;
-borigin_rear_matrices_array_DE[1,3,4,3] = b_oka_W_matrix_4_3;
-borigin_rear_matrices_array_NDE[1,3,4,3] = b_oka_W_matrix_4_3;
-borigin_rear_matrices_array_DE[1,3,4,5] = b_oka_W_matrix_4_5;
-borigin_rear_matrices_array_NDE[1,3,4,5] = b_oka_W_matrix_4_5;
-borigin_rear_matrices_array_DE[1,3,5,4] = b_oka_W_matrix_5_4;
-borigin_rear_matrices_array_NDE[1,3,5,4] = b_oka_W_matrix_5_4;
-borigin_rear_matrices_array_DE[1,3,5,6] = b_oka_W_matrix_5_6;
-borigin_rear_matrices_array_NDE[1,3,5,6] = b_oka_W_matrix_5_6;
-borigin_rear_matrices_array_DE[1,3,5,24] = b_oka_W_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[1,3,5,24] = b_oka_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[1,3,5,25] = b_oka_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[1,3,6,5] = b_oka_W_matrix_6_5;
-borigin_rear_matrices_array_NDE[1,3,6,5] = b_oka_W_matrix_6_5;
-borigin_rear_matrices_array_DE[1,3,6,7] = b_oka_W_matrix_6_7;
-borigin_rear_matrices_array_NDE[1,3,6,7] = b_oka_W_matrix_6_7;
-borigin_rear_matrices_array_DE[1,3,6,26] = b_oka_W_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[1,3,6,26] = b_oka_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[1,3,6,27] = b_oka_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[1,3,7,6] = b_oka_W_matrix_7_6;
-borigin_rear_matrices_array_NDE[1,3,7,6] = b_oka_W_matrix_7_6;
-borigin_rear_matrices_array_DE[1,3,7,28] = b_oka_W_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[1,3,7,28] = b_oka_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[1,3,7,29] = b_oka_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[1,3,7,30] = b_oka_W_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[1,3,7,30] = b_oka_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[1,3,7,31] = b_oka_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[1,3,7,42] = b_oka_W_matrix_7_42;
-borigin_rear_matrices_array_NDE[1,3,7,42] = b_oka_W_matrix_7_42;
-borigin_rear_matrices_array_DE[1,3,24,5] = b_oka_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,3,24,5] = b_oka_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,3,25,5] = b_oka_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,3,25,5] = b_oka_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,3,26,6] = b_oka_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,3,26,6] = b_oka_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,3,27,6] = b_oka_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,3,27,6] = b_oka_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,3,28,7] = b_oka_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,3,28,7] = b_oka_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,3,29,7] = b_oka_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,3,29,7] = b_oka_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,3,30,7] = b_oka_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,3,30,7] = b_oka_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,3,31,7] = b_oka_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,3,31,7] = b_oka_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,3,42,7] = b_oka_W_matrix_42_7;
-borigin_rear_matrices_array_NDE[1,3,42,7] = b_oka_W_matrix_42_7;
-borigin_rear_matrices_array_DE[2,3,3,4] = b_oka_H_matrix_3_4;
-borigin_rear_matrices_array_NDE[2,3,3,4] = b_oka_H_matrix_3_4;
-borigin_rear_matrices_array_DE[2,3,4,3] = b_oka_H_matrix_4_3;
-borigin_rear_matrices_array_NDE[2,3,4,3] = b_oka_H_matrix_4_3;
-borigin_rear_matrices_array_DE[2,3,4,5] = b_oka_H_matrix_4_5;
-borigin_rear_matrices_array_NDE[2,3,4,5] = b_oka_H_matrix_4_5;
-borigin_rear_matrices_array_DE[2,3,5,4] = b_oka_H_matrix_5_4;
-borigin_rear_matrices_array_NDE[2,3,5,4] = b_oka_H_matrix_5_4;
-borigin_rear_matrices_array_DE[2,3,5,6] = b_oka_H_matrix_5_6;
-borigin_rear_matrices_array_NDE[2,3,5,6] = b_oka_H_matrix_5_6;
-borigin_rear_matrices_array_DE[2,3,5,24] = b_oka_H_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[2,3,5,24] = b_oka_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[2,3,5,25] = b_oka_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[2,3,6,5] = b_oka_H_matrix_6_5;
-borigin_rear_matrices_array_NDE[2,3,6,5] = b_oka_H_matrix_6_5;
-borigin_rear_matrices_array_DE[2,3,6,7] = b_oka_H_matrix_6_7;
-borigin_rear_matrices_array_NDE[2,3,6,7] = b_oka_H_matrix_6_7;
-borigin_rear_matrices_array_DE[2,3,6,26] = b_oka_H_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[2,3,6,26] = b_oka_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[2,3,6,27] = b_oka_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[2,3,7,6] = b_oka_H_matrix_7_6;
-borigin_rear_matrices_array_NDE[2,3,7,6] = b_oka_H_matrix_7_6;
-borigin_rear_matrices_array_DE[2,3,7,28] = b_oka_H_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[2,3,7,28] = b_oka_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[2,3,7,29] = b_oka_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[2,3,7,30] = b_oka_H_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[2,3,7,30] = b_oka_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[2,3,7,31] = b_oka_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[2,3,7,42] = b_oka_H_matrix_7_42;
-borigin_rear_matrices_array_NDE[2,3,7,42] = b_oka_H_matrix_7_42;
-borigin_rear_matrices_array_DE[2,3,24,5] = b_oka_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,3,24,5] = b_oka_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,3,25,5] = b_oka_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,3,25,5] = b_oka_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,3,26,6] = b_oka_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,3,26,6] = b_oka_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,3,27,6] = b_oka_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,3,27,6] = b_oka_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,3,28,7] = b_oka_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,3,28,7] = b_oka_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,3,29,7] = b_oka_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,3,29,7] = b_oka_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,3,30,7] = b_oka_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,3,30,7] = b_oka_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,3,31,7] = b_oka_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,3,31,7] = b_oka_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,3,42,7] = b_oka_H_matrix_42_7;
-borigin_rear_matrices_array_NDE[2,3,42,7] = b_oka_H_matrix_42_7;
-
-borigin_rear_matrices_array_DE[1,4,3,4] = b_met_W_matrix_3_4;
-borigin_rear_matrices_array_NDE[1,4,3,4] = b_met_W_matrix_3_4;
-borigin_rear_matrices_array_DE[1,4,4,3] = b_met_W_matrix_4_3;
-borigin_rear_matrices_array_NDE[1,4,4,3] = b_met_W_matrix_4_3;
-borigin_rear_matrices_array_DE[1,4,4,5] = b_met_W_matrix_4_5;
-borigin_rear_matrices_array_NDE[1,4,4,5] = b_met_W_matrix_4_5;
-borigin_rear_matrices_array_DE[1,4,5,4] = b_met_W_matrix_5_4;
-borigin_rear_matrices_array_NDE[1,4,5,4] = b_met_W_matrix_5_4;
-borigin_rear_matrices_array_DE[1,4,5,6] = b_met_W_matrix_5_6;
-borigin_rear_matrices_array_NDE[1,4,5,6] = b_met_W_matrix_5_6;
-borigin_rear_matrices_array_DE[1,4,5,24] = b_met_W_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[1,4,5,24] = b_met_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[1,4,5,25] = b_met_W_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[1,4,6,5] = b_met_W_matrix_6_5;
-borigin_rear_matrices_array_NDE[1,4,6,5] = b_met_W_matrix_6_5;
-borigin_rear_matrices_array_DE[1,4,6,7] = b_met_W_matrix_6_7;
-borigin_rear_matrices_array_NDE[1,4,6,7] = b_met_W_matrix_6_7;
-borigin_rear_matrices_array_DE[1,4,6,26] = b_met_W_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[1,4,6,26] = b_met_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[1,4,6,27] = b_met_W_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[1,4,7,6] = b_met_W_matrix_7_6;
-borigin_rear_matrices_array_NDE[1,4,7,6] = b_met_W_matrix_7_6;
-borigin_rear_matrices_array_DE[1,4,7,28] = b_met_W_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[1,4,7,28] = b_met_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[1,4,7,29] = b_met_W_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[1,4,7,30] = b_met_W_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[1,4,7,30] = b_met_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[1,4,7,31] = b_met_W_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[1,4,7,42] = b_met_W_matrix_7_42;
-borigin_rear_matrices_array_NDE[1,4,7,42] = b_met_W_matrix_7_42;
-borigin_rear_matrices_array_DE[1,4,24,5] = b_met_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,4,24,5] = b_met_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,4,25,5] = b_met_W_matrix_24_5;
-borigin_rear_matrices_array_NDE[1,4,25,5] = b_met_W_matrix_24_5;
-borigin_rear_matrices_array_DE[1,4,26,6] = b_met_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,4,26,6] = b_met_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,4,27,6] = b_met_W_matrix_26_6;
-borigin_rear_matrices_array_NDE[1,4,27,6] = b_met_W_matrix_26_6;
-borigin_rear_matrices_array_DE[1,4,28,7] = b_met_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,4,28,7] = b_met_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,4,29,7] = b_met_W_matrix_28_7;
-borigin_rear_matrices_array_NDE[1,4,29,7] = b_met_W_matrix_28_7;
-borigin_rear_matrices_array_DE[1,4,30,7] = b_met_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,4,30,7] = b_met_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,4,31,7] = b_met_W_matrix_30_7;
-borigin_rear_matrices_array_NDE[1,4,31,7] = b_met_W_matrix_30_7;
-borigin_rear_matrices_array_DE[1,4,42,7] = b_met_W_matrix_42_7;
-borigin_rear_matrices_array_NDE[1,4,42,7] = b_met_W_matrix_42_7;
-borigin_rear_matrices_array_DE[2,4,3,4] = b_met_H_matrix_3_4;
-borigin_rear_matrices_array_NDE[2,4,3,4] = b_met_H_matrix_3_4;
-borigin_rear_matrices_array_DE[2,4,4,3] = b_met_H_matrix_4_3;
-borigin_rear_matrices_array_NDE[2,4,4,3] = b_met_H_matrix_4_3;
-borigin_rear_matrices_array_DE[2,4,4,5] = b_met_H_matrix_4_5;
-borigin_rear_matrices_array_NDE[2,4,4,5] = b_met_H_matrix_4_5;
-borigin_rear_matrices_array_DE[2,4,5,4] = b_met_H_matrix_5_4;
-borigin_rear_matrices_array_NDE[2,4,5,4] = b_met_H_matrix_5_4;
-borigin_rear_matrices_array_DE[2,4,5,6] = b_met_H_matrix_5_6;
-borigin_rear_matrices_array_NDE[2,4,5,6] = b_met_H_matrix_5_6;
-borigin_rear_matrices_array_DE[2,4,5,24] = b_met_H_matrix_5_24_DE;
-borigin_rear_matrices_array_NDE[2,4,5,24] = b_met_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_NDE[2,4,5,25] = b_met_H_matrix_5_24_NDE;
-borigin_rear_matrices_array_DE[2,4,6,5] = b_met_H_matrix_6_5;
-borigin_rear_matrices_array_NDE[2,4,6,5] = b_met_H_matrix_6_5;
-borigin_rear_matrices_array_DE[2,4,6,7] = b_met_H_matrix_6_7;
-borigin_rear_matrices_array_NDE[2,4,6,7] = b_met_H_matrix_6_7;
-borigin_rear_matrices_array_DE[2,4,6,26] = b_met_H_matrix_6_26_DE;
-borigin_rear_matrices_array_NDE[2,4,6,26] = b_met_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_NDE[2,4,6,27] = b_met_H_matrix_6_26_NDE;
-borigin_rear_matrices_array_DE[2,4,7,6] = b_met_H_matrix_7_6;
-borigin_rear_matrices_array_NDE[2,4,7,6] = b_met_H_matrix_7_6;
-borigin_rear_matrices_array_DE[2,4,7,28] = b_met_H_matrix_7_28_DE;
-borigin_rear_matrices_array_NDE[2,4,7,28] = b_met_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_NDE[2,4,7,29] = b_met_H_matrix_7_28_NDE;
-borigin_rear_matrices_array_DE[2,4,7,30] = b_met_H_matrix_7_30_DE;
-borigin_rear_matrices_array_NDE[2,4,7,30] = b_met_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_NDE[2,4,7,31] = b_met_H_matrix_7_30_NDE;
-borigin_rear_matrices_array_DE[2,4,7,42] = b_met_H_matrix_7_42;
-borigin_rear_matrices_array_NDE[2,4,7,42] = b_met_H_matrix_7_42;
-borigin_rear_matrices_array_DE[2,4,24,5] = b_met_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,4,24,5] = b_met_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,4,25,5] = b_met_H_matrix_24_5;
-borigin_rear_matrices_array_NDE[2,4,25,5] = b_met_H_matrix_24_5;
-borigin_rear_matrices_array_DE[2,4,26,6] = b_met_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,4,26,6] = b_met_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,4,27,6] = b_met_H_matrix_26_6;
-borigin_rear_matrices_array_NDE[2,4,27,6] = b_met_H_matrix_26_6;
-borigin_rear_matrices_array_DE[2,4,28,7] = b_met_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,4,28,7] = b_met_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,4,29,7] = b_met_H_matrix_28_7;
-borigin_rear_matrices_array_NDE[2,4,29,7] = b_met_H_matrix_28_7;
-borigin_rear_matrices_array_DE[2,4,30,7] = b_met_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,4,30,7] = b_met_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,4,31,7] = b_met_H_matrix_30_7;
-borigin_rear_matrices_array_NDE[2,4,31,7] = b_met_H_matrix_30_7;
-borigin_rear_matrices_array_DE[2,4,42,7] = b_met_H_matrix_42_7;
-borigin_rear_matrices_array_NDE[2,4,42,7] = b_met_H_matrix_42_7;
 
 // detection efficiency - create a vector that stores all parameters
 vector[35] det_eff_param_vector; // this is length 35 because that's how many det eff params we have
@@ -1783,29 +1108,6 @@ b0_matrix_39_9 ~ normal(0,10);
 b0_matrix_41_2 ~ normal(0,10);
 b0_matrix_42_7 ~ normal(0,10);
 
-brear_matrix_3_4 ~ normal(0,10);
-brear_matrix_4_3 ~ normal(0,10);
-brear_matrix_4_5 ~ normal(0,10);
-brear_matrix_5_4 ~ normal(0,10);
-brear_matrix_5_6 ~ normal(0,10);
-brear_matrix_5_24_DE ~ normal(0,10);
-brear_matrix_5_24_NDE ~ normal(0,10);
-brear_matrix_6_5 ~ normal(0,10);
-brear_matrix_6_7 ~ normal(0,10);
-brear_matrix_6_26_DE ~ normal(0,10);
-brear_matrix_6_26_NDE ~ normal(0,10);
-brear_matrix_7_6 ~ normal(0,10);
-brear_matrix_7_28_DE ~ normal(0,10);
-brear_matrix_7_28_NDE ~ normal(0,10);
-brear_matrix_7_30_DE ~ normal(0,10);
-brear_matrix_7_30_NDE ~ normal(0,10);
-brear_matrix_7_42 ~ normal(0,10);
-brear_matrix_24_5 ~ normal(0,10);
-brear_matrix_26_6 ~ normal(0,10);
-brear_matrix_28_7 ~ normal(0,10);
-brear_matrix_30_7 ~ normal(0,10);
-brear_matrix_42_7 ~ normal(0,10);
-
 borigin1_matrix_3_4 ~ normal(0,10);
 borigin1_matrix_4_3 ~ normal(0,10);
 borigin1_matrix_4_5 ~ normal(0,10);
@@ -1875,188 +1177,6 @@ borigin3_matrix_28_7 ~ normal(0,10);
 borigin3_matrix_30_7 ~ normal(0,10);
 borigin3_matrix_42_7 ~ normal(0,10);
 
-// interaction term priors
-b_wen_W_matrix_3_4 ~ normal(0,10);
-b_wen_W_matrix_4_3 ~ normal(0,10);
-b_wen_W_matrix_4_5 ~ normal(0,10);
-b_wen_W_matrix_5_4 ~ normal(0,10);
-b_wen_W_matrix_5_6 ~ normal(0,10);
-b_wen_W_matrix_5_24_DE ~ normal(0,10);
-b_wen_W_matrix_5_24_NDE ~ normal(0,10);
-b_wen_W_matrix_6_5 ~ normal(0,10);
-b_wen_W_matrix_6_7 ~ normal(0,10);
-b_wen_W_matrix_6_26_DE ~ normal(0,10);
-b_wen_W_matrix_6_26_NDE ~ normal(0,10);
-b_wen_W_matrix_7_6 ~ normal(0,10);
-b_wen_W_matrix_7_28_DE ~ normal(0,10);
-b_wen_W_matrix_7_28_NDE ~ normal(0,10);
-b_wen_W_matrix_7_30_DE ~ normal(0,10);
-b_wen_W_matrix_7_30_NDE ~ normal(0,10);
-b_wen_W_matrix_7_42 ~ normal(0,10);
-b_wen_W_matrix_24_5 ~ normal(0,10);
-b_wen_W_matrix_26_6 ~ normal(0,10);
-b_wen_W_matrix_28_7 ~ normal(0,10);
-b_wen_W_matrix_30_7 ~ normal(0,10);
-b_wen_W_matrix_42_7 ~ normal(0,10);
-b_wen_H_matrix_3_4 ~ normal(0,10);
-b_wen_H_matrix_4_3 ~ normal(0,10);
-b_wen_H_matrix_4_5 ~ normal(0,10);
-b_wen_H_matrix_5_4 ~ normal(0,10);
-b_wen_H_matrix_5_6 ~ normal(0,10);
-b_wen_H_matrix_5_24_DE ~ normal(0,10);
-b_wen_H_matrix_5_24_NDE ~ normal(0,10);
-b_wen_H_matrix_6_5 ~ normal(0,10);
-b_wen_H_matrix_6_7 ~ normal(0,10);
-b_wen_H_matrix_6_26_DE ~ normal(0,10);
-b_wen_H_matrix_6_26_NDE ~ normal(0,10);
-b_wen_H_matrix_7_6 ~ normal(0,10);
-b_wen_H_matrix_7_28_DE ~ normal(0,10);
-b_wen_H_matrix_7_28_NDE ~ normal(0,10);
-b_wen_H_matrix_7_30_DE ~ normal(0,10);
-b_wen_H_matrix_7_30_NDE ~ normal(0,10);
-b_wen_H_matrix_7_42 ~ normal(0,10);
-b_wen_H_matrix_24_5 ~ normal(0,10);
-b_wen_H_matrix_26_6 ~ normal(0,10);
-b_wen_H_matrix_28_7 ~ normal(0,10);
-b_wen_H_matrix_30_7 ~ normal(0,10);
-b_wen_H_matrix_42_7 ~ normal(0,10);
-
-b_ent_W_matrix_3_4 ~ normal(0,10);
-b_ent_W_matrix_4_3 ~ normal(0,10);
-b_ent_W_matrix_4_5 ~ normal(0,10);
-b_ent_W_matrix_5_4 ~ normal(0,10);
-b_ent_W_matrix_5_6 ~ normal(0,10);
-b_ent_W_matrix_5_24_DE ~ normal(0,10);
-b_ent_W_matrix_5_24_NDE ~ normal(0,10);
-b_ent_W_matrix_6_5 ~ normal(0,10);
-b_ent_W_matrix_6_7 ~ normal(0,10);
-b_ent_W_matrix_6_26_DE ~ normal(0,10);
-b_ent_W_matrix_6_26_NDE ~ normal(0,10);
-b_ent_W_matrix_7_6 ~ normal(0,10);
-b_ent_W_matrix_7_28_DE ~ normal(0,10);
-b_ent_W_matrix_7_28_NDE ~ normal(0,10);
-b_ent_W_matrix_7_30_DE ~ normal(0,10);
-b_ent_W_matrix_7_30_NDE ~ normal(0,10);
-b_ent_W_matrix_7_42 ~ normal(0,10);
-b_ent_W_matrix_24_5 ~ normal(0,10);
-b_ent_W_matrix_26_6 ~ normal(0,10);
-b_ent_W_matrix_28_7 ~ normal(0,10);
-b_ent_W_matrix_30_7 ~ normal(0,10);
-b_ent_W_matrix_42_7 ~ normal(0,10);
-b_ent_H_matrix_3_4 ~ normal(0,10);
-b_ent_H_matrix_4_3 ~ normal(0,10);
-b_ent_H_matrix_4_5 ~ normal(0,10);
-b_ent_H_matrix_5_4 ~ normal(0,10);
-b_ent_H_matrix_5_6 ~ normal(0,10);
-b_ent_H_matrix_5_24_DE ~ normal(0,10);
-b_ent_H_matrix_5_24_NDE ~ normal(0,10);
-b_ent_H_matrix_6_5 ~ normal(0,10);
-b_ent_H_matrix_6_7 ~ normal(0,10);
-b_ent_H_matrix_6_26_DE ~ normal(0,10);
-b_ent_H_matrix_6_26_NDE ~ normal(0,10);
-b_ent_H_matrix_7_6 ~ normal(0,10);
-b_ent_H_matrix_7_28_DE ~ normal(0,10);
-b_ent_H_matrix_7_28_NDE ~ normal(0,10);
-b_ent_H_matrix_7_30_DE ~ normal(0,10);
-b_ent_H_matrix_7_30_NDE ~ normal(0,10);
-b_ent_H_matrix_7_42 ~ normal(0,10);
-b_ent_H_matrix_24_5 ~ normal(0,10);
-b_ent_H_matrix_26_6 ~ normal(0,10);
-b_ent_H_matrix_28_7 ~ normal(0,10);
-b_ent_H_matrix_30_7 ~ normal(0,10);
-b_ent_H_matrix_42_7 ~ normal(0,10);
-
-b_oka_W_matrix_3_4 ~ normal(0,10);
-b_oka_W_matrix_4_3 ~ normal(0,10);
-b_oka_W_matrix_4_5 ~ normal(0,10);
-b_oka_W_matrix_5_4 ~ normal(0,10);
-b_oka_W_matrix_5_6 ~ normal(0,10);
-b_oka_W_matrix_5_24_DE ~ normal(0,10);
-b_oka_W_matrix_5_24_NDE ~ normal(0,10);
-b_oka_W_matrix_6_5 ~ normal(0,10);
-b_oka_W_matrix_6_7 ~ normal(0,10);
-b_oka_W_matrix_6_26_DE ~ normal(0,10);
-b_oka_W_matrix_6_26_NDE ~ normal(0,10);
-b_oka_W_matrix_7_6 ~ normal(0,10);
-b_oka_W_matrix_7_28_DE ~ normal(0,10);
-b_oka_W_matrix_7_28_NDE ~ normal(0,10);
-b_oka_W_matrix_7_30_DE ~ normal(0,10);
-b_oka_W_matrix_7_30_NDE ~ normal(0,10);
-b_oka_W_matrix_7_42 ~ normal(0,10);
-b_oka_W_matrix_24_5 ~ normal(0,10);
-b_oka_W_matrix_26_6 ~ normal(0,10);
-b_oka_W_matrix_28_7 ~ normal(0,10);
-b_oka_W_matrix_30_7 ~ normal(0,10);
-b_oka_W_matrix_42_7 ~ normal(0,10);
-b_oka_H_matrix_3_4 ~ normal(0,10);
-b_oka_H_matrix_4_3 ~ normal(0,10);
-b_oka_H_matrix_4_5 ~ normal(0,10);
-b_oka_H_matrix_5_4 ~ normal(0,10);
-b_oka_H_matrix_5_6 ~ normal(0,10);
-b_oka_H_matrix_5_24_DE ~ normal(0,10);
-b_oka_H_matrix_5_24_NDE ~ normal(0,10);
-b_oka_H_matrix_6_5 ~ normal(0,10);
-b_oka_H_matrix_6_7 ~ normal(0,10);
-b_oka_H_matrix_6_26_DE ~ normal(0,10);
-b_oka_H_matrix_6_26_NDE ~ normal(0,10);
-b_oka_H_matrix_7_6 ~ normal(0,10);
-b_oka_H_matrix_7_28_DE ~ normal(0,10);
-b_oka_H_matrix_7_28_NDE ~ normal(0,10);
-b_oka_H_matrix_7_30_DE ~ normal(0,10);
-b_oka_H_matrix_7_30_NDE ~ normal(0,10);
-b_oka_H_matrix_7_42 ~ normal(0,10);
-b_oka_H_matrix_24_5 ~ normal(0,10);
-b_oka_H_matrix_26_6 ~ normal(0,10);
-b_oka_H_matrix_28_7 ~ normal(0,10);
-b_oka_H_matrix_30_7 ~ normal(0,10);
-b_oka_H_matrix_42_7 ~ normal(0,10);
-
-b_met_W_matrix_3_4 ~ normal(0,10);
-b_met_W_matrix_4_3 ~ normal(0,10);
-b_met_W_matrix_4_5 ~ normal(0,10);
-b_met_W_matrix_5_4 ~ normal(0,10);
-b_met_W_matrix_5_6 ~ normal(0,10);
-b_met_W_matrix_5_24_DE ~ normal(0,10);
-b_met_W_matrix_5_24_NDE ~ normal(0,10);
-b_met_W_matrix_6_5 ~ normal(0,10);
-b_met_W_matrix_6_7 ~ normal(0,10);
-b_met_W_matrix_6_26_DE ~ normal(0,10);
-b_met_W_matrix_6_26_NDE ~ normal(0,10);
-b_met_W_matrix_7_6 ~ normal(0,10);
-b_met_W_matrix_7_28_DE ~ normal(0,10);
-b_met_W_matrix_7_28_NDE ~ normal(0,10);
-b_met_W_matrix_7_30_DE ~ normal(0,10);
-b_met_W_matrix_7_30_NDE ~ normal(0,10);
-b_met_W_matrix_7_42 ~ normal(0,10);
-b_met_W_matrix_24_5 ~ normal(0,10);
-b_met_W_matrix_26_6 ~ normal(0,10);
-b_met_W_matrix_28_7 ~ normal(0,10);
-b_met_W_matrix_30_7 ~ normal(0,10);
-b_met_W_matrix_42_7 ~ normal(0,10);
-b_met_H_matrix_3_4 ~ normal(0,10);
-b_met_H_matrix_4_3 ~ normal(0,10);
-b_met_H_matrix_4_5 ~ normal(0,10);
-b_met_H_matrix_5_4 ~ normal(0,10);
-b_met_H_matrix_5_6 ~ normal(0,10);
-b_met_H_matrix_5_24_DE ~ normal(0,10);
-b_met_H_matrix_5_24_NDE ~ normal(0,10);
-b_met_H_matrix_6_5 ~ normal(0,10);
-b_met_H_matrix_6_7 ~ normal(0,10);
-b_met_H_matrix_6_26_DE ~ normal(0,10);
-b_met_H_matrix_6_26_NDE ~ normal(0,10);
-b_met_H_matrix_7_6 ~ normal(0,10);
-b_met_H_matrix_7_28_DE ~ normal(0,10);
-b_met_H_matrix_7_28_NDE ~ normal(0,10);
-b_met_H_matrix_7_30_DE ~ normal(0,10);
-b_met_H_matrix_7_30_NDE ~ normal(0,10);
-b_met_H_matrix_7_42 ~ normal(0,10);
-b_met_H_matrix_24_5 ~ normal(0,10);
-b_met_H_matrix_26_6 ~ normal(0,10);
-b_met_H_matrix_28_7 ~ normal(0,10);
-b_met_H_matrix_30_7 ~ normal(0,10);
-b_met_H_matrix_42_7 ~ normal(0,10);
-
-
 
 // Prior on detection efficiency parameters - from the other stan script for detection efficiency
 // here, write out all of the parameters for detection efficiency
@@ -2111,11 +1231,10 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
 // This should allow us to increment log density across fish, rather than observations within a fish, allowing us to 
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, cat_X_mat, rear_indices, trib_indices, states_mat, n_obs, // arguments 1-10
-  b0_matrix_DE, brear_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE, borigin3_matrix_DE, // arguments 11-15
-  b0_matrix_NDE, brear_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE, borigin3_matrix_NDE, // arguments 16-20
-  borigin_rear_matrices_array_DE, borigin_rear_matrices_array_NDE, // arguments 21-22
-  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 23-26
+  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, cat_X_mat, states_mat, n_obs, // arguments 1-8
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE, borigin3_matrix_DE, // arguments 9-12
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE, borigin3_matrix_NDE, // arguments 13-16
+  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 17-20
 
 }
 

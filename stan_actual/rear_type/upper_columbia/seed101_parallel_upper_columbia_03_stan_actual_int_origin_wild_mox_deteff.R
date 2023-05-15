@@ -6,10 +6,10 @@
 # "Wenatchee_River", "Entiat_River", "Okanogan_River","Methow_River"
 
 
-# This script will fit an intercept + origin + rear model using stan to the actual dataset
+# This script will fit an intercept + origin model using stan to wild fish from the Upper Columbia
 
 # FOR TESTING: setwd
-# setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type_2023-04-25/upper_columbia/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type/upper_columbia/")
 
 # library("rstan")
 library(cmdstanr)
@@ -547,42 +547,6 @@ for (i in 1:(nrow(b0_matrix_names))){
   
 }
 
-# write out a rear type covariate for stan
-# we are going to have the same number of rear type parameters as intercepts, so we can keep most of the above block the same
-b0_matrix_names %>% 
-  mutate(brear_matrix_name = gsub("b0", "brear", b0_matrix_name)) %>% 
-  dplyr::select(-b0_matrix_name) -> brear_matrix_names
-
-
-for (j in 1:nrow(upper_columbia_movements)){
-  
-  # Movements from mainstem to river mouth: print two versions
-  if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-    cat("real ", "brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", ";", "\n", sep = "")
-    cat("real ", "brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", ";", "\n", sep = "")
-  }
-  
-  # If it's a within tributary movement - we don't want it
-  else if (upper_columbia_movements$within_trib_movement[j] == 1){
-    # do nothing!
-  }
-  # If it's a movement from mainstem to upstream - we also don't want it
-  else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-    # do nothing!
-  } 
-  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
-  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
-  # these transitions will get the same parameters as the river mouth to mainstem
-  else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-    # do nothing!
-  } else {
-    # Finally - if it's any other movement, just treat it like normal!
-    # If it's not, print just the one version
-    cat("real ", "brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-  }
-  
-}
-
 
 # In this ESU, there are four origins, so we will have three origin parameters
 # We will only allow an origin effect within the ESU (so after PRA). Before, they will only have an intercept term
@@ -613,45 +577,6 @@ for (i in 1:3){
       # Finally - if it's any other movement, just treat it like normal!
       # If it's not, print just the one version
       cat("real ", "borigin", i, "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-    }
-    
-  }
-  cat ("\n")
-}
-
-# write out rear x interaction terms - 4 origins x 2 rear types = 8 interaction terms
-origins_written <- c("wen", "ent", "oka", "met")
-rear_type_written <- c("W", "H")
-for (i in 1:4){ # for four origins
-  for (k in 1:2){ # for two rear types
-
-  for (j in 1:nrow(upper_columbia_movements)){
-    
-    # Movements from mainstem to river mouth: print two versions
-    if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-      cat("real ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", ";", "\n", sep = "")
-      cat("real ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", ";", "\n", sep = "")
-    }
-    
-    # If it's a within tributary movement - we don't want it
-    else if (upper_columbia_movements$within_trib_movement[j] == 1){
-      # do nothing!
-    }
-    # If it's a movement from mainstem to upstream - we also don't want it
-    else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-      # do nothing!
-    } 
-    # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
-    # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
-    # these transitions will get the same parameters as the river mouth to mainstem
-    else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-      # do nothing!
-    } else {
-      # Finally - if it's any other movement, just treat it like normal!
-      # If it's not, print just the one version
-      cat("real ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-      
-    }
     }
     
   }
@@ -698,40 +623,6 @@ for (i in 1:(nrow(b0_matrix_names))){
 } 
 
 
-# brear - same structure as origin
-for (j in 1:nrow(upper_columbia_movements)){
-  # Movements from mainstem to river mouth: store the two different versions
-  if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-    cat("brear",  "_matrix_DE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", ";", "\n", sep = "")
-    cat("brear",  "_matrix_NDE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", ";", "\n", sep = "")
-    
-  }
-  
-  # If it's a within tributary movement - we don't want it
-  else if (upper_columbia_movements$within_trib_movement[j] == 1){
-    # do nothing!
-  }
-  # If it's a movement from mainstem to upstream:
-  # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
-  # For DE - we don't care about this, because we're removing the upstream states
-  else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-    # cat("brear",  "_matrix_DE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j-1], "_DE", ";", "\n", sep = "")
-    cat("brear",  "_matrix_NDE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j-1], "_NDE", ";", "\n", sep = "")
-    
-  }
-  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
-  # And note - that these are not DE or NDE parameters
-  else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-    cat("brear",  "_matrix_DE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j],  ";", "\n", sep = "")
-    cat("brear",  "_matrix_NDE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-    # If it's not, store the same parameter in both matrices
-  } else {
-    cat("brear",  "_matrix_DE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-    cat("brear",  "_matrix_NDE[", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "brear",  "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j],  ";", "\n", sep = "")
-  }
-  
-}
-
 # There are four origins, so we need three parameters (origins - 1)
 for (i in 1:3){
   for (j in 1:nrow(upper_columbia_movements)){
@@ -770,46 +661,7 @@ for (i in 1:3){
   cat ("\n")
 }
   
-# write out rear x interaction terms - 4 origins x 2 rear types = 8 interaction terms
-origins_written <- c("wen", "ent", "oka", "met")
-rear_type_written <- c("W", "H")
-for (i in 1:4){ # for four origins
-  for (k in 1:2){ # for two rear types
-    for (j in 1:nrow(upper_columbia_movements)){
-      # Movements from mainstem to river mouth: store the two different versions
-      if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-        cat("borigin_rear_matrices_array_DE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", ";", "\n", sep = "")
-        cat("borigin_rear_matrices_array_NDE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", ";", "\n", sep = "")
-        
-      }
-      
-      # If it's a within tributary movement - we don't want it
-      else if (upper_columbia_movements$within_trib_movement[j] == 1){
-        # do nothing!
-      }
-      # If it's a movement from mainstem to upstream:
-      # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
-      # For DE - we don't care about this, because we're removing the upstream states
-      else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-        cat("borigin_rear_matrices_array_NDE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j-1], "_NDE", ";", "\n", sep = "")
-        
-      }
-      # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
-      # And note - that these are not DE or NDE parameters
-      else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-        cat("borigin_rear_matrices_array_DE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j],  ";", "\n", sep = "")
-        cat("borigin_rear_matrices_array_NDE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j-1], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-        # If it's not, store the same parameter in both matrices
-      } else {
-        cat("borigin_rear_matrices_array_DE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], ";", "\n", sep = "")
-        cat("borigin_rear_matrices_array_NDE[", k, ",", i, ",", upper_columbia_movements$row[j], ",", upper_columbia_movements$col[j], "]", " = ", "b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j],  ";", "\n", sep = "")
-      }
-      
-    }
-  }
-    
-    cat ("\n")
-  }
+
 # write out the priors
 # print b0 matrix priors
 for (i in 1:(nrow(b0_matrix_names))){
@@ -851,35 +703,6 @@ for (i in 1:(nrow(b0_matrix_names))){
 }
 
 
-# print brear matrix priors
-for (j in 1:nrow(upper_columbia_movements)){
-  
-  # Movements from mainstem to river mouth: print two versions
-  if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-    cat("brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
-    cat("brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
-  }
-  
-  # If it's a within tributary movement - we don't want it
-  else if (upper_columbia_movements$within_trib_movement[j] == 1){
-    # do nothing!
-  }
-  # If it's a movement from mainstem to upstream - we also don't want it
-  else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-    # do nothing!
-  } 
-  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
-  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
-  # these transitions will get the same parameters as the river mouth to mainstem
-  else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-    # do nothing!
-  } else {
-    # Finally - if it's any other movement, just treat it like normal!
-    # If it's not, print just the one version
-    cat("brear", "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], " ~ normal(0,10);", "\n", sep = "")
-  }
-  
-}
 
 # There are four origins in this model, so we will have three origin parameters.
 for (i in 1:3){
@@ -914,48 +737,37 @@ for (i in 1:3){
   cat ("\n")
 }
 
-# print interaction term priors
-for (i in 1:4){ # for four origins
-  for (k in 1:2){ # for two rear types
-    
-    for (j in 1:nrow(upper_columbia_movements)){
-      
-      # Movements from mainstem to river mouth: print two versions
-      if (upper_columbia_movements$mainstem_river_mouth_movement[j] == 1){
-        cat("b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
-        cat("b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
-      }
-      
-      # If it's a within tributary movement - we don't want it
-      else if (upper_columbia_movements$within_trib_movement[j] == 1){
-        # do nothing!
-      }
-      # If it's a movement from mainstem to upstream - we also don't want it
-      else if (upper_columbia_movements$mainstem_upstream_movement[j] == 1){
-        # do nothing!
-      } 
-      # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
-      # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
-      # these transitions will get the same parameters as the river mouth to mainstem
-      else if (upper_columbia_movements$upstream_mainstem_movement[j] == 1){
-        # do nothing!
-      } else {
-        # Finally - if it's any other movement, just treat it like normal!
-        # If it's not, print just the one version
-        cat("b_", origins_written[i], "_", rear_type_written[k], "_matrix_", upper_columbia_movements$row[j], "_", upper_columbia_movements$col[j], " ~ normal(0,10);", "\n", sep = "")
-        
-      }
-    }
-    
-  }
-  cat ("\n")
-}
-
 ##### LOAD and REFORMAT STATES DATA #####
 
 # Load states complete
 # states_complete <- read.csv(here::here("from_hyak_transfer", "2022-07-21-complete_det_hist", "states_complete.csv"), row.names = 1)
 states_complete <- read.csv("upper_columbia_adults_states_complete.csv", row.names = 1)
+
+### Edit 2023-05-09 - keep only the wild origin fish
+tag_code_metadata <- read.csv("tag_code_metadata.csv")
+# keep only the fish that are in the dataset
+tag_code_metadata <- subset(tag_code_metadata, tag_code %in% states_complete$tag_code)
+natal_origin_table <- read.csv("natal_origin_table.csv")
+tag_code_metadata %>% 
+  left_join(., natal_origin_table, by = "release_site_name") -> tag_code_metadata
+
+
+states_complete %>% 
+  left_join(., dplyr::select(tag_code_metadata, tag_code, rear_type_code, natal_origin), by = "tag_code") %>% 
+  subset(!(rear_type_code %in% c("U", "H")) ) -> states_complete
+
+# Count how many we have by origin, and drop small sample sizes
+states_complete %>% 
+  filter(!duplicated(tag_code_2)) %>% 
+  count(natal_origin) -> uppcol_wild_origin_table
+
+origins_to_drop <- subset(uppcol_wild_origin_table, n < 350)$natal_origin
+# Dropping wild, Okanogan fish
+subset(tag_code_metadata, natal_origin %in% origins_to_drop)$tag_code -> drop_tag_codes
+
+states_complete %>% 
+  subset(!(tag_code %in% drop_tag_codes)) -> states_complete
+
 
 ##### FIRST STEP - EDIT STATES DATA - REMOVE UPSTREAM DETECTIONS IN DE YEARS #####
 
@@ -1310,7 +1122,7 @@ tributary_discharge_data <- read.csv("tributary_discharge_data_zscore.csv")
 
 # Our parameter vector will also be a column vector of length 34
 
-tributary_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+tributary_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 
 # This is to make it easier to tell indexing
 rownames(tributary_design_matrix) <- paste0(run_year_df$run_year[1:(nrow(run_year_df)-1)], "-", seq(1,18,1))
@@ -1363,55 +1175,58 @@ tributary_design_matrix[3:10,14] <- 1
 # (15) Umatilla River 2: 14/15 - 21/22 (see email from Stacy Remple for info on this - not in tributary detection efficiency RMD or on PTAGIS, but there was an antenna installation in 2014)
 tributary_design_matrix[11:18,15] <- 1
 
-# (16) Walla Walla River 1 (ORB): 05/06 - 11/12 (this site continues to 14/15, but in 12/13 the PRV site comes online which is closer to the river mouth and also seems to have better detection efficiency)
+# (16) Walla Walla River 1 (ORB solo): 05/06 - 11/12
 tributary_design_matrix[2:8,16] <- 1
 
-# (17) Walla Walla River 2 (PRV): 12/13 - 18/19
+# (17) Walla Walla River 2 (PRV and ORB simultaneously): 12/13 - 14/15
 tributary_design_matrix[9:15,17] <- 1
 
-# (18) Walla Walla River 3 (WWB): 19/20 - 21/22
-tributary_design_matrix[16:18,18] <- 1
+# (17) Walla Walla River 3 (PRV solo): 15/16-18/19
+tributary_design_matrix[9:15,18] <- 1
+
+# (18) Walla Walla River 4 (WWB): 19/20 - 21/22
+tributary_design_matrix[16:18,19] <- 1
 
 # (19) Wenatchee River 1: 10/11 (starts January 2011) - 21/22
-tributary_design_matrix[7:18,19] <- 1
+tributary_design_matrix[7:18,20] <- 1
 
 # (20) Yakima River 1: 04/05 - 21/22
 # tributary_design_matrix[1:18,20] <- 1
 # for now - remove 04/05 run year
-tributary_design_matrix[2:18,20] <- 1
+tributary_design_matrix[2:18,21] <- 1
 
 
 # Now, add discharge values in the remaining columns
-tributary_design_matrix[2:18,21] <-subset(tributary_discharge_data, tributary == "Asotin Creek")$mean_discharge_zscore
+tributary_design_matrix[2:18,22] <-subset(tributary_discharge_data, tributary == "Asotin Creek")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,22] <-subset(tributary_discharge_data, tributary == "Deschutes River")$mean_discharge_zscore
+tributary_design_matrix[2:18,23] <-subset(tributary_discharge_data, tributary == "Deschutes River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,23] <-subset(tributary_discharge_data, tributary == "Entiat River")$mean_discharge_zscore
+tributary_design_matrix[2:18,24] <-subset(tributary_discharge_data, tributary == "Entiat River")$mean_discharge_zscore
 
-# tributary_design_matrix[2:18,24] <-subset(tributary_discharge_data, tributary == "Fifteenmile Creek")$mean_discharge_zscore
+# tributary_design_matrix[2:18,25] <-subset(tributary_discharge_data, tributary == "Fifteenmile Creek")$mean_discharge_zscore
 # No discharge data for Fifteenmile Creek - keep as zeros, since we don't have a complete time series
 
-tributary_design_matrix[2:18,25] <-subset(tributary_discharge_data, tributary == "Hood River")$mean_discharge_zscore
+tributary_design_matrix[2:18,26] <-subset(tributary_discharge_data, tributary == "Hood River")$mean_discharge_zscore
 
-# tributary_design_matrix[2:10,26] <-subset(tributary_discharge_data, tributary == "Imnaha River")$mean_discharge_zscore
+# tributary_design_matrix[2:10,27] <-subset(tributary_discharge_data, tributary == "Imnaha River")$mean_discharge_zscore
 # Indexing is different for the Imnaha because we only have discharge data through 12/13 (13/14 data is not from the complete run year)
 # Keep Imnaha as all zeros - we only have one year (12/13) with overlap between discharge data and detection capability
 
-tributary_design_matrix[2:18,27] <-subset(tributary_discharge_data, tributary == "John Day River")$mean_discharge_zscore
+tributary_design_matrix[2:18,28] <-subset(tributary_discharge_data, tributary == "John Day River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,28] <-subset(tributary_discharge_data, tributary == "Methow River")$mean_discharge_zscore
+tributary_design_matrix[2:18,29] <-subset(tributary_discharge_data, tributary == "Methow River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,29] <-subset(tributary_discharge_data, tributary == "Okanogan River")$mean_discharge_zscore
+tributary_design_matrix[2:18,30] <-subset(tributary_discharge_data, tributary == "Okanogan River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,30] <-subset(tributary_discharge_data, tributary == "Tucannon River")$mean_discharge_zscore
+tributary_design_matrix[2:18,31] <-subset(tributary_discharge_data, tributary == "Tucannon River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,31] <-subset(tributary_discharge_data, tributary == "Umatilla River")$mean_discharge_zscore
+tributary_design_matrix[2:18,32] <-subset(tributary_discharge_data, tributary == "Umatilla River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,32] <-subset(tributary_discharge_data, tributary == "Walla Walla River")$mean_discharge_zscore
+tributary_design_matrix[2:18,33] <-subset(tributary_discharge_data, tributary == "Walla Walla River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,33] <-subset(tributary_discharge_data, tributary == "Wenatchee River")$mean_discharge_zscore
+tributary_design_matrix[2:18,34] <-subset(tributary_discharge_data, tributary == "Wenatchee River")$mean_discharge_zscore
 
-tributary_design_matrix[2:18,34] <-subset(tributary_discharge_data, tributary == "Yakima River")$mean_discharge_zscore
+tributary_design_matrix[2:18,35] <-subset(tributary_discharge_data, tributary == "Yakima River")$mean_discharge_zscore
 
 
 
@@ -1424,78 +1239,78 @@ rownames(tributary_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1
 # Don't do this - just leave it in for indexing purposes
 
 # Take the master tributary design matrix, and create design matrices for each of the tributaries individually
-asotin_creek_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+asotin_creek_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(asotin_creek_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 asotin_creek_design_matrix[,1] <- tributary_design_matrix[,1]
 asotin_creek_design_matrix[,2] <- tributary_design_matrix[,2]
 asotin_creek_design_matrix[,21] <- tributary_design_matrix[,21]
 
-deschutes_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+deschutes_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(deschutes_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 deschutes_river_design_matrix[,3] <- tributary_design_matrix[,3]
 deschutes_river_design_matrix[,22] <- tributary_design_matrix[,22]
 
-entiat_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+entiat_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(entiat_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 entiat_river_design_matrix[,4] <- tributary_design_matrix[,4]
 entiat_river_design_matrix[,23] <- tributary_design_matrix[,23]
 
-fifteenmile_creek_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+fifteenmile_creek_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(fifteenmile_creek_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 fifteenmile_creek_design_matrix[,5] <- tributary_design_matrix[,5]
 fifteenmile_creek_design_matrix[,24] <- tributary_design_matrix[,24]
 
-hood_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+hood_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(hood_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 hood_river_design_matrix[,6] <- tributary_design_matrix[,6]
 hood_river_design_matrix[,25] <- tributary_design_matrix[,25]
 
-imnaha_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+imnaha_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(imnaha_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 imnaha_river_design_matrix[,7] <- tributary_design_matrix[,7]
 imnaha_river_design_matrix[,26] <- tributary_design_matrix[,26]
 
-john_day_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+john_day_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(john_day_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 john_day_river_design_matrix[,8] <- tributary_design_matrix[,8]
 john_day_river_design_matrix[,27] <- tributary_design_matrix[,27]
 
-methow_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+methow_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(methow_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 methow_river_design_matrix[,9] <- tributary_design_matrix[,9]
 methow_river_design_matrix[,10] <- tributary_design_matrix[,10]
 methow_river_design_matrix[,28] <- tributary_design_matrix[,28]
 
-okanogan_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+okanogan_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(okanogan_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 okanogan_river_design_matrix[,11] <- tributary_design_matrix[,11]
 okanogan_river_design_matrix[,29] <- tributary_design_matrix[,29]
 
-tucannon_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+tucannon_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(tucannon_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 tucannon_river_design_matrix[,12] <- tributary_design_matrix[,12]
 tucannon_river_design_matrix[,13] <- tributary_design_matrix[,13]
 tucannon_river_design_matrix[,30] <- tributary_design_matrix[,30]
 
-umatilla_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+umatilla_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(umatilla_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 umatilla_river_design_matrix[,14] <- tributary_design_matrix[,14]
 umatilla_river_design_matrix[,15] <- tributary_design_matrix[,15]
 umatilla_river_design_matrix[,31] <- tributary_design_matrix[,31]
 
-walla_walla_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+walla_walla_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(walla_walla_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 walla_walla_river_design_matrix[,16] <- tributary_design_matrix[,16]
 walla_walla_river_design_matrix[,17] <- tributary_design_matrix[,17]
 walla_walla_river_design_matrix[,18] <- tributary_design_matrix[,18]
 walla_walla_river_design_matrix[,32] <- tributary_design_matrix[,32]
 
-wenatchee_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+wenatchee_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(wenatchee_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 wenatchee_river_design_matrix[,19] <- tributary_design_matrix[,19]
 wenatchee_river_design_matrix[,33] <- tributary_design_matrix[,33]
 
-yakima_river_design_matrix <- matrix(0, nrow = 18, ncol = 34)
+yakima_river_design_matrix <- matrix(0, nrow = 18, ncol = 35)
 rownames(yakima_river_design_matrix) <- run_year_df$run_year[1:(nrow(run_year_df)-1)]
 yakima_river_design_matrix[,20] <- tributary_design_matrix[,20]
 yakima_river_design_matrix[,34] <- tributary_design_matrix[,34]
@@ -1505,7 +1320,7 @@ yakima_river_design_matrix[,34] <- tributary_design_matrix[,34]
 # Note: this will have the same number of slices as possible state transitions (42 - which is all transitions minus loss).
 # But only 14 of these slices (corresponding to the 14 tributaries that have detection efficiency capability)
 # will have any non-zero values.
-tributary_design_matrices_array <- array(0, dim = c(18,34,42))
+tributary_design_matrices_array <- array(0, dim = c(18,35,42))
 
 # Note that these are indices of only the mouth states (since these are the states that we are calculating detection efficiency at)
 tributary_design_matrices_array[,,34] <- asotin_creek_design_matrix
@@ -1613,7 +1428,7 @@ trib_det_eff_order <- c("Asotin_Creek",
 #   mutate_all(date_numeric) -> transition_date_numeric
 
 
-##### Reformat origin and rear information #####
+##### Reformat origin information #####
 tag_code_metadata <- read.csv("tag_code_metadata.csv")
 # keep only the fish that are in the dataset
 tag_code_metadata <- subset(tag_code_metadata, tag_code %in% states_complete$tag_code)
@@ -1642,24 +1457,23 @@ origin_numeric <- data.frame(natal_origin = c("Asotin_Creek",
 natal_origin_table <- read.csv("natal_origin_table.csv")
 tag_code_metadata %>% 
   left_join(., natal_origin_table, by = "release_site_name") %>% 
-  left_join(., origin_numeric, by = "natal_origin") %>% 
-  mutate(rear_type_numeric = ifelse(rear_type_code %in% c("H", "U"), 2, 1))-> tag_code_metadata
+  left_join(., origin_numeric, by = "natal_origin") -> tag_code_metadata
 
 # At this point, we need to recreate tag_code_metadata but with the tag_code_2 field
 states_complete %>% 
   distinct(tag_code_2, .keep_all = TRUE) %>% 
   dplyr::select(tag_code, tag_code_2) -> tag_codes_2
 
-# reformat this into origin_rear info
+# reformat this into origin_wild info
 tag_codes_2 %>%
-  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin_numeric, rear_type_numeric), by = "tag_code") %>% 
-  dplyr::rename(natal_origin = natal_origin_numeric, rear_type = rear_type_numeric) %>% 
-  dplyr::select(-tag_code) -> origin_rear_actual
+  left_join(dplyr::select(tag_code_metadata, tag_code, natal_origin_numeric), by = "tag_code") %>% 
+  dplyr::rename(natal_origin = natal_origin_numeric) %>% 
+  dplyr::select(-tag_code) -> origin_wild_actual
 
-write.csv(origin_rear_actual,"upper_columbia_origin_rear_actual.csv")
+write.csv(origin_wild_actual,"upper_columbia_origin_wild_actual.csv")
   
 
-fish_sim_cat_data_actual <- origin_rear_actual
+fish_sim_cat_data_actual <- origin_wild_actual
   
   
 # Store quantities for loop
@@ -1705,41 +1519,25 @@ n.ind <- dim(state_data)[3]
   # Create the design matrix for categorical variables
   # new for detection efficiency: add a run year field to allow for glm calculation
   # of detection efficiency, as well as to note when certain movements are not possible
-  # new for rear type: need to generate the interaction term indexing
-  rear_indices <- vector(length = n.ind)
-  trib_indices <- vector(length = n.ind)
-  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 5)
+  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 4)
   # Start it so that they're all 0s
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_actual[,1] <- 1
   
-  # This is for origin + rear + run year
+  # This is for origin + run year
   for (i in 1:n.ind){
-    # Rear type
-    if (fish_sim_cat_data_actual$rear_type[i] == 1){
-      cat_X_mat_actual[i,2] <- 1
-      rear_indices[i] <- 1
-    }
-    else {
-      cat_X_mat_actual[i,2] <- -1
-      rear_indices[i] <- 2
-    }
     # Natal origin
     if (fish_sim_cat_data_actual$natal_origin[i] == 16){ # Wenatchee River
-      cat_X_mat_actual[i,3] <- 1
-      trib_indices[i] <- 1
+      cat_X_mat_actual[i,2] <- 1
     }
     else if (fish_sim_cat_data_actual$natal_origin[i] == 4){ # Entiat River
-      cat_X_mat_actual[i,4] <- 1
-      trib_indices[i] <- 2
+      cat_X_mat_actual[i,3] <- 1
     }
     else if (fish_sim_cat_data_actual$natal_origin[i] == 11){ # Okanogan River
-      cat_X_mat_actual[i,5] <- 1
-      trib_indices[i] <- 3
+      cat_X_mat_actual[i,4] <- 1
     }
     else { # for Methow River
-      cat_X_mat_actual[i,3:5] <- -1
-      trib_indices[i] <- 4
+      cat_X_mat_actual[i,2:4] <- -1
     }
   }
   # "Tucannon_River", "Asotin_Creek", "Clearwater_River", "Salmon_River", "Grande_Ronde_River", "Imnaha_River"
@@ -1880,7 +1678,7 @@ n.ind <- dim(state_data)[3]
   
   
   # Load the data from the detection efficiency model to use as priors in this model
-  det_eff_param_posteriors <- as.matrix(read.csv("det_eff_param_posteriors.csv", row.names = 1))
+  det_eff_param_posteriors <- as.matrix(read.csv("det_eff_param_posteriors_new.csv", row.names = 1))
   
   
   # get a vector of run years that transitions occurred within - need to do this at the end, once you've made all changes to states_complete
@@ -1897,7 +1695,6 @@ n.ind <- dim(state_data)[3]
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, # dates = dates,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual,
-               trib_indices = trib_indices, rear_indices = rear_indices,
                grainsize = 1, N = dim(state_data_2)[1],
                # New data for detection efficiency
                tributary_design_matrices_array = tributary_design_matrices_array,
@@ -1915,7 +1712,6 @@ n.ind <- dim(state_data)[3]
   
   # Fit stan model using cmdstan
   # Step 1: load the model
-  # mod <- cmdstan_model("01_stan_sim_int_only.stan", compile = FALSE)
   
   # to run this model with interaction terms, you need to increase the fbracket depth:
   # cpp_options <- list(
@@ -1923,10 +1719,8 @@ n.ind <- dim(state_data)[3]
   # )
   # cmdstan_make_local(cpp_options = cpp_options)
   
-  # mod <- cmdstan_model("parallel_upper_columbia_03_stan_actual_int_origin_rear_deteff.stan", compile = FALSE)
+  mod <- cmdstan_model("parallel_upper_columbia_03_stan_actual_int_origin_wild_deteff.stan", compile = FALSE)
   
-  # try a different, simpler model
-  mod <- cmdstan_model("/Users/markusmin/Documents/CBR/steelhead/stan_simulation/01_int_only/01_stan_sim_int_only_v2.stan", compile = FALSE)
   
   print("Compiling model")
   # Step 2: Compile the model, set up to run in parallel
