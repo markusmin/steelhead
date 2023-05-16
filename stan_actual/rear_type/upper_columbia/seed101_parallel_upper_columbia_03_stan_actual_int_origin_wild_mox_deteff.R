@@ -551,7 +551,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 # In this ESU, there are four origins, so we will have three origin parameters
 # We will only allow an origin effect within the ESU (so after PRA). Before, they will only have an intercept term
 # print declaration of borigin parameters
-for (i in 1:3){
+for (i in 1:3){ # since we only have three origins for wild, don't need to copy origin3
   for (j in 1:nrow(upper_columbia_movements)){
     
     # Movements from mainstem to river mouth: print two versions
@@ -624,6 +624,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 
 
 # There are four origins, so we need three parameters (origins - 1)
+# again with three wild origins, don't copy the last line
 for (i in 1:3){
   for (j in 1:nrow(upper_columbia_movements)){
     # Movements from mainstem to river mouth: store the two different versions
@@ -705,6 +706,7 @@ for (i in 1:(nrow(b0_matrix_names))){
 
 
 # There are four origins in this model, so we will have three origin parameters.
+# false, three origins
 for (i in 1:3){
   for (j in 1:nrow(upper_columbia_movements)){
     
@@ -1519,7 +1521,8 @@ n.ind <- dim(state_data)[3]
   # Create the design matrix for categorical variables
   # new for detection efficiency: add a run year field to allow for glm calculation
   # of detection efficiency, as well as to note when certain movements are not possible
-  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 4)
+  # cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 4)
+  cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 3)
   # Start it so that they're all 0s
   # The first column everyone gets a 1 (this is beta 0/grand mean mu)
   cat_X_mat_actual[,1] <- 1
@@ -1533,11 +1536,11 @@ n.ind <- dim(state_data)[3]
     else if (fish_sim_cat_data_actual$natal_origin[i] == 4){ # Entiat River
       cat_X_mat_actual[i,3] <- 1
     }
-    else if (fish_sim_cat_data_actual$natal_origin[i] == 11){ # Okanogan River
-      cat_X_mat_actual[i,4] <- 1
-    }
+    # else if (fish_sim_cat_data_actual$natal_origin[i] == 11){ # Okanogan River
+    #   cat_X_mat_actual[i,4] <- 1
+    # }
     else { # for Methow River
-      cat_X_mat_actual[i,2:4] <- -1
+      cat_X_mat_actual[i,2:3] <- -1
     }
   }
   # "Tucannon_River", "Asotin_Creek", "Clearwater_River", "Salmon_River", "Grande_Ronde_River", "Imnaha_River"
