@@ -917,7 +917,7 @@ for (i in 1:42){
     
     origin1_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin1_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin1_matrix_NDE[i,]))));
     origin2_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin2_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin2_matrix_NDE[i,]))));
-    origin4_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]- borigin1_matrix_NDE[i,j] - borigin2_matrix_NDE[i,j])/
+    origin3_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]- borigin1_matrix_NDE[i,j] - borigin2_matrix_NDE[i,j])/
     (1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) - to_row_vector(borigin1_matrix_NDE[i,]) - to_row_vector(borigin2_matrix_NDE[i,]))));
     
   }

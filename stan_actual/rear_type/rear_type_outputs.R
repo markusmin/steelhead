@@ -97,8 +97,8 @@ upper_columbia_summary %>%
   mutate(origin = sub("_.*", "", variable)) %>% 
   mutate(origin = ifelse(origin == "origin1", "Wenatchee_River",
                          ifelse(origin == "origin2", "Entiat_River",
-                                ifelse(origin == "origin3",  "Okanogan_River",
-                                       ifelse(origin == "origin4", "Methow_River", "error"))))) -> upper_columbia_derived_probabilities 
+                                # ifelse(origin == "origin3",  "Okanogan_River",
+                                       ifelse(origin == "origin3", "Methow_River", "error")))) -> upper_columbia_derived_probabilities 
 
 upper_columbia_derived_probabilities %>% 
   filter(.,grepl("_NDE", variable)) -> upper_columbia_NDE_derived_probabilities

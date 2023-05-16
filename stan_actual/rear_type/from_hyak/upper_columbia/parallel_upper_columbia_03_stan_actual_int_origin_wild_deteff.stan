@@ -39,12 +39,10 @@ functions{
                         array[,] real b0_matrix_DE,
                         array[,] real borigin1_matrix_DE,
                         array[,] real borigin2_matrix_DE,
-                        array[,] real borigin3_matrix_DE,
                         
                         array[,] real b0_matrix_NDE,
                         array[,] real borigin1_matrix_NDE,
                         array[,] real borigin2_matrix_NDE,
-                        array[,] real borigin3_matrix_NDE,
                         
                         
                         // below is new data for detection efficiency
@@ -160,8 +158,7 @@ functions{
                   if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
-                    cat_X_mat[i,3] * borigin2_matrix_DE[current,k] +
-                    cat_X_mat[i,4] * borigin3_matrix_DE[current,k];
+                    cat_X_mat[i,3] * borigin2_matrix_DE[current,k];
                     
                     // store in the vector that it's DE
                     DE_correction[k] = 1;
@@ -170,8 +167,7 @@ functions{
                   } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
-                    cat_X_mat[i,3] * borigin2_matrix_NDE[current,k] +
-                    cat_X_mat[i,4] * borigin3_matrix_NDE[current,k]; 
+                    cat_X_mat[i,3] * borigin2_matrix_NDE[current,k]; 
                     
                     // otherwise, store in the vector that it's not DE
                     DE_correction[k] = 0;
@@ -326,7 +322,7 @@ data {
   array[n_notmovements,2] int not_movements; // a matrix containing all non-allowed state transitions
   // array[n_ind, 48] int dates; // a matrix containing dates (as integers) where rows = number of fish and columns = site visits
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
-  array[n_ind, 4] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (origin)
+  array[n_ind, 3] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (origin)
   
   matrix[35,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   
@@ -466,28 +462,6 @@ real borigin2_matrix_28_7;
 real borigin2_matrix_30_7;
 real borigin2_matrix_42_7;
 
-real borigin3_matrix_3_4;
-real borigin3_matrix_4_3;
-real borigin3_matrix_4_5;
-real borigin3_matrix_5_4;
-real borigin3_matrix_5_6;
-real borigin3_matrix_5_24_DE;
-real borigin3_matrix_5_24_NDE;
-real borigin3_matrix_6_5;
-real borigin3_matrix_6_7;
-real borigin3_matrix_6_26_DE;
-real borigin3_matrix_6_26_NDE;
-real borigin3_matrix_7_6;
-real borigin3_matrix_7_28_DE;
-real borigin3_matrix_7_28_NDE;
-real borigin3_matrix_7_30_DE;
-real borigin3_matrix_7_30_NDE;
-real borigin3_matrix_7_42;
-real borigin3_matrix_24_5;
-real borigin3_matrix_26_6;
-real borigin3_matrix_28_7;
-real borigin3_matrix_30_7;
-real borigin3_matrix_42_7;
 
 // here, write out all of the parameters for detection efficiency
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
@@ -583,22 +557,6 @@ transformed parameters {
   // borigin2_matrix = rep_matrix(-100000, 43, 43);
   // borigin2_matrix = rep_matrix(0, 43, 43);
   borigin2_matrix_NDE = rep_array(0, 43, 43);
-  
-  // Declare a matrix to store borigin3 params
-  // matrix[43,43] borigin3_matrix;
-  array[43,43] real borigin3_matrix_DE;
-  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
-  // Non-zero elements will be overwritten
-  // borigin3_matrix = rep_matrix(-100000, 43, 43);
-  // borigin3_matrix = rep_matrix(0, 43, 43);
-  borigin3_matrix_DE = rep_array(0, 43, 43);
-  
-  array[43,43] real borigin3_matrix_NDE;
-  // Set all of the elements of the b0 matrix to -100000 (effectively a 0 in logit space);
-  // Non-zero elements will be overwritten
-  // borigin3_matrix = rep_matrix(-100000, 43, 43);
-  // borigin3_matrix = rep_matrix(0, 43, 43);
-  borigin3_matrix_NDE = rep_array(0, 43, 43);
 
   
   // Populate this matrix with betas
@@ -840,51 +798,6 @@ borigin2_matrix_NDE[31,7] = borigin2_matrix_30_7;
 borigin2_matrix_DE[42,7] = borigin2_matrix_42_7;
 borigin2_matrix_NDE[42,7] = borigin2_matrix_42_7;
 
-borigin3_matrix_DE[3,4] = borigin3_matrix_3_4;
-borigin3_matrix_NDE[3,4] = borigin3_matrix_3_4;
-borigin3_matrix_DE[4,3] = borigin3_matrix_4_3;
-borigin3_matrix_NDE[4,3] = borigin3_matrix_4_3;
-borigin3_matrix_DE[4,5] = borigin3_matrix_4_5;
-borigin3_matrix_NDE[4,5] = borigin3_matrix_4_5;
-borigin3_matrix_DE[5,4] = borigin3_matrix_5_4;
-borigin3_matrix_NDE[5,4] = borigin3_matrix_5_4;
-borigin3_matrix_DE[5,6] = borigin3_matrix_5_6;
-borigin3_matrix_NDE[5,6] = borigin3_matrix_5_6;
-borigin3_matrix_DE[5,24] = borigin3_matrix_5_24_DE;
-borigin3_matrix_NDE[5,24] = borigin3_matrix_5_24_NDE;
-borigin3_matrix_NDE[5,25] = borigin3_matrix_5_24_NDE;
-borigin3_matrix_DE[6,5] = borigin3_matrix_6_5;
-borigin3_matrix_NDE[6,5] = borigin3_matrix_6_5;
-borigin3_matrix_DE[6,7] = borigin3_matrix_6_7;
-borigin3_matrix_NDE[6,7] = borigin3_matrix_6_7;
-borigin3_matrix_DE[6,26] = borigin3_matrix_6_26_DE;
-borigin3_matrix_NDE[6,26] = borigin3_matrix_6_26_NDE;
-borigin3_matrix_NDE[6,27] = borigin3_matrix_6_26_NDE;
-borigin3_matrix_DE[7,6] = borigin3_matrix_7_6;
-borigin3_matrix_NDE[7,6] = borigin3_matrix_7_6;
-borigin3_matrix_DE[7,28] = borigin3_matrix_7_28_DE;
-borigin3_matrix_NDE[7,28] = borigin3_matrix_7_28_NDE;
-borigin3_matrix_NDE[7,29] = borigin3_matrix_7_28_NDE;
-borigin3_matrix_DE[7,30] = borigin3_matrix_7_30_DE;
-borigin3_matrix_NDE[7,30] = borigin3_matrix_7_30_NDE;
-borigin3_matrix_NDE[7,31] = borigin3_matrix_7_30_NDE;
-borigin3_matrix_DE[7,42] = borigin3_matrix_7_42;
-borigin3_matrix_NDE[7,42] = borigin3_matrix_7_42;
-borigin3_matrix_DE[24,5] = borigin3_matrix_24_5;
-borigin3_matrix_NDE[24,5] = borigin3_matrix_24_5;
-borigin3_matrix_DE[26,6] = borigin3_matrix_26_6;
-borigin3_matrix_NDE[26,6] = borigin3_matrix_26_6;
-borigin3_matrix_DE[28,7] = borigin3_matrix_28_7;
-borigin3_matrix_NDE[28,7] = borigin3_matrix_28_7;
-borigin3_matrix_DE[29,7] = borigin3_matrix_28_7;
-borigin3_matrix_NDE[29,7] = borigin3_matrix_28_7;
-borigin3_matrix_DE[30,7] = borigin3_matrix_30_7;
-borigin3_matrix_NDE[30,7] = borigin3_matrix_30_7;
-borigin3_matrix_DE[31,7] = borigin3_matrix_30_7;
-borigin3_matrix_NDE[31,7] = borigin3_matrix_30_7;
-borigin3_matrix_DE[42,7] = borigin3_matrix_42_7;
-borigin3_matrix_NDE[42,7] = borigin3_matrix_42_7;
-
 // detection efficiency - create a vector that stores all parameters
 vector[35] det_eff_param_vector; // this is length 35 because that's how many det eff params we have
 
@@ -982,8 +895,6 @@ matrix[43,43] origin2_probs_DE;
 origin2_probs_DE = rep_matrix(0, 43, 43);
 matrix[43,43] origin3_probs_DE;
 origin3_probs_DE = rep_matrix(0, 43, 43);
-matrix[43,43] origin4_probs_DE;
-origin4_probs_DE = rep_matrix(0, 43, 43);
 
 matrix[43,43] origin1_probs_NDE;
 origin1_probs_NDE = rep_matrix(0, 43, 43);
@@ -991,8 +902,6 @@ matrix[43,43] origin2_probs_NDE;
 origin2_probs_NDE = rep_matrix(0, 43, 43);
 matrix[43,43] origin3_probs_NDE;
 origin3_probs_NDE = rep_matrix(0, 43, 43);
-matrix[43,43] origin4_probs_NDE;
-origin4_probs_NDE = rep_matrix(0, 43, 43);
 
 // for each of the non-loss states:
 for (i in 1:42){
@@ -1001,17 +910,15 @@ for (i in 1:42){
     
     origin1_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin1_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin1_matrix_DE[i,]))));
     origin2_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin2_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin2_matrix_DE[i,]))));
-    origin3_probs_DE[i,j] = exp(b0_matrix_DE[i,j]+ borigin3_matrix_DE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) + to_row_vector(borigin3_matrix_DE[i,]))));
-    origin4_probs_DE[i,j] = exp(b0_matrix_DE[i,j]- borigin1_matrix_DE[i,j] - borigin2_matrix_DE[i,j] - borigin3_matrix_DE[i,j])/
-    (1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) - to_row_vector(borigin1_matrix_DE[i,]) - to_row_vector(borigin2_matrix_DE[i,]) - to_row_vector(borigin3_matrix_DE[i,]))));
+    origin3_probs_DE[i,j] = exp(b0_matrix_DE[i,j]- borigin1_matrix_DE[i,j] - borigin2_matrix_DE[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix_DE[i,]) - to_row_vector(borigin1_matrix_DE[i,]) - to_row_vector(borigin2_matrix_DE[i,]))));
     
     // then for NDE
     
     origin1_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin1_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin1_matrix_NDE[i,]))));
     origin2_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin2_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin2_matrix_NDE[i,]))));
-    origin3_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]+ borigin3_matrix_NDE[i,j])/(1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) + to_row_vector(borigin3_matrix_NDE[i,]))));
-    origin4_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]- borigin1_matrix_NDE[i,j] - borigin2_matrix_NDE[i,j] - borigin3_matrix_NDE[i,j])/
-    (1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) - to_row_vector(borigin1_matrix_NDE[i,]) - to_row_vector(borigin2_matrix_NDE[i,]) - to_row_vector(borigin3_matrix_NDE[i,]))));
+    origin3_probs_NDE[i,j] = exp(b0_matrix_NDE[i,j]- borigin1_matrix_NDE[i,j] - borigin2_matrix_NDE[i,j])/
+    (1 + sum(exp(to_row_vector(b0_matrix_NDE[i,]) - to_row_vector(borigin1_matrix_NDE[i,]) - to_row_vector(borigin2_matrix_NDE[i,]))));
     
   }
 }
@@ -1021,12 +928,10 @@ for (i in 1:42){
   origin1_probs_DE[i,43] = 1 - sum(origin1_probs_DE[i,1:42]);
   origin2_probs_DE[i,43] = 1 - sum(origin2_probs_DE[i,1:42]);
   origin3_probs_DE[i,43] = 1 - sum(origin3_probs_DE[i,1:42]);
-  origin4_probs_DE[i,43] = 1 - sum(origin4_probs_DE[i,1:42]);
   
   origin1_probs_NDE[i,43] = 1 - sum(origin1_probs_NDE[i,1:42]);
   origin2_probs_NDE[i,43] = 1 - sum(origin2_probs_NDE[i,1:42]);
   origin3_probs_NDE[i,43] = 1 - sum(origin3_probs_NDE[i,1:42]);
-  origin4_probs_NDE[i,43] = 1 - sum(origin4_probs_NDE[i,1:42]);
   
 }
 
@@ -1154,28 +1059,6 @@ borigin2_matrix_28_7 ~ normal(0,10);
 borigin2_matrix_30_7 ~ normal(0,10);
 borigin2_matrix_42_7 ~ normal(0,10);
 
-borigin3_matrix_3_4 ~ normal(0,10);
-borigin3_matrix_4_3 ~ normal(0,10);
-borigin3_matrix_4_5 ~ normal(0,10);
-borigin3_matrix_5_4 ~ normal(0,10);
-borigin3_matrix_5_6 ~ normal(0,10);
-borigin3_matrix_5_24_DE ~ normal(0,10);
-borigin3_matrix_5_24_NDE ~ normal(0,10);
-borigin3_matrix_6_5 ~ normal(0,10);
-borigin3_matrix_6_7 ~ normal(0,10);
-borigin3_matrix_6_26_DE ~ normal(0,10);
-borigin3_matrix_6_26_NDE ~ normal(0,10);
-borigin3_matrix_7_6 ~ normal(0,10);
-borigin3_matrix_7_28_DE ~ normal(0,10);
-borigin3_matrix_7_28_NDE ~ normal(0,10);
-borigin3_matrix_7_30_DE ~ normal(0,10);
-borigin3_matrix_7_30_NDE ~ normal(0,10);
-borigin3_matrix_7_42 ~ normal(0,10);
-borigin3_matrix_24_5 ~ normal(0,10);
-borigin3_matrix_26_6 ~ normal(0,10);
-borigin3_matrix_28_7 ~ normal(0,10);
-borigin3_matrix_30_7 ~ normal(0,10);
-borigin3_matrix_42_7 ~ normal(0,10);
 
 
 // Prior on detection efficiency parameters - from the other stan script for detection efficiency
@@ -1232,9 +1115,9 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
   target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, cat_X_mat, states_mat, n_obs, // arguments 1-8
-  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE, borigin3_matrix_DE, // arguments 9-12
-  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE, borigin3_matrix_NDE, // arguments 13-16
-  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 17-20
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 9-11
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 12-14
+  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 15-18
 
 }
 
