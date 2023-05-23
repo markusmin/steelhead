@@ -16,6 +16,7 @@ library(lubridate)
 library(car)
 library(ggthemes)
 library(zoo)
+library(ggpubr)
 ```
 
 ## Description
@@ -24,11 +25,11 @@ This Rmd will prepare temperature data for inclusion in the model. Much of the c
 
 There is a considerable amount of missing temperature data. To interpolate missing values, we will use the following protocol to determine where temperature data is drawn from:
 
-1. If tailrace temperature data is available, use tailrace temperature data
-2. If tailrace temperature data is not available but forebay temperature is, use the forebay temperature
-3. If the gap of temperatures is less than one week, linearly interpolate between those two points
-3. If neither is available, use the relationship between temperature at the current dam and temperature at a nearby dam to interpolate (we will determine what that relationship is in this script)
-4. If no dam has available temperature data for the date in question, use a linear interpolation between the last two temperature data points.
+1.  If tailrace temperature data is available, use tailrace temperature data
+2.  If tailrace temperature data is not available but forebay temperature is, use the forebay temperature
+3.  If the gap of temperatures is less than one week, linearly interpolate between those two points
+4.  If neither is available, use the relationship between temperature at the current dam and temperature at a nearby dam to interpolate (we will determine what that relationship is in this script)
+5.  If no dam has available temperature data for the date in question, use a linear interpolation between the last two temperature data points.
 
 Throughout all of this, we will make sure to record how each temperature data point was generated for QA/QC purposes.
 
@@ -315,8 +316,8 @@ filter_outliers_temp <- function(forebay_t, tailrace_t, dam){
 }
 ```
 
-
 Here, we will distinguish between forebay ("f") and tailrace ("t") temperature at each dam
+
 ```{r load_data}
 # BON
 BON_temp_t <- read.csv(here::here("covariate_data", "BON", "basin_tempc_tailrace_BON_allyears.csv"))[1:366,]
@@ -411,6 +412,7 @@ WAN_temp_f_long <- cov_reformat(input_data = WAN_temp_f, variable_name = "temp")
 ```
 
 ### plot forebay vs. tailrace temperature
+
 ```{r}
 forebay_v_tailrace(forebay_t = BON_temp_f_long, tailrace_t = BON_temp_t_long, dam = "BON")
 forebay_v_tailrace(forebay_t = ICH_temp_f_long, tailrace_t = ICH_temp_t_long, dam = "ICH")
@@ -427,9 +429,10 @@ forebay_v_tailrace(forebay_t = WAN_temp_f_long, tailrace_t = WAN_temp_t_long, da
 forebay_v_tailrace(forebay_t = WEL_temp_f_long, tailrace_t = WEL_temp_t_long, dam = "WEL")
 ```
 
-
 ### data filtering
+
 there are some complete nonsense values that it looks like we will have to filter. Worst offenders are RIS, RRE, and WEL. Is it the forebay or tailrace temperatures that are bad? Turns out both
+
 ```{r}
 plot_temp_ts(forebay_t = BON_temp_f_long, tailrace_t = BON_temp_t_long, dam = "BON")
 plot_temp_ts(forebay_t = ICH_temp_f_long, tailrace_t = ICH_temp_t_long, dam = "ICH")
@@ -447,9 +450,9 @@ plot_temp_ts(forebay_t = WEL_temp_f_long, tailrace_t = WEL_temp_t_long, dam = "W
 ```
 
 ### filtering function
-Two steps:
-1. For total nonsense runs of values (RIS, RRE, and WEL) - manually select and drop those days
-2. Drop outliers - see chunk below
+
+Two steps: 1. For total nonsense runs of values (RIS, RRE, and WEL) - manually select and drop those days 2. Drop outliers - see chunk below
+
 ```{r filter_Wells}
 # WEL, forebay
 WEL_temp_f_long %>% 
@@ -607,9 +610,8 @@ ggplot(RRE_temp_t_long_clean, aes(x = day, y = temp, color = as.factor(year))) +
   ggtitle("RRE Tailrace T, Clean")
 ```
 
-
-
 For outliers: Any values that are +/- 4 degrees away from the long-term mean for that day will be dropped
+
 ```{r}
 BON_temps_clean <- filter_outliers_temp(forebay_t = BON_temp_f_long, tailrace_t = BON_temp_t_long, dam = "BON")
 ICH_temps_clean <- filter_outliers_temp(forebay_t = ICH_temp_f_long, tailrace_t = ICH_temp_t_long, dam = "ICH")
@@ -627,8 +629,8 @@ WEL_temps_clean <- filter_outliers_temp(forebay_t = WEL_temp_f_long_clean, tailr
   
 ```
 
-
 #### get the upper columbia dam temperature relationships with Wanapum
+
 ```{r upper_columbia_dam_t_relationships}
 dplyr::rename(WAN_temps_clean[[2]], WAN_tailrace_temp = tailrace_temp) %>% 
   left_join(.,dplyr::rename(WEL_temps_clean[[2]], WEL_tailrace_temp = tailrace_temp), by = "date") %>% 
@@ -664,8 +666,6 @@ PRA_WAN_coef <- PRA_WAN_lm$coefficients
 
 
 ```
-
-
 
 ### Generate the full temperature time series from which to generate windows
 
@@ -775,10 +775,8 @@ LGR_temp_ts <- full_temp_ts(tailrace_temp = LGR_temps_clean[[2]], forebay_temp =
 
 ```
 
-
-
-
 ### calculate windows
+
 ```{r}
 # so, I think that the most up to date files are in the same folders as the model runs
 snake_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "snake", "snake_adults_states_complete.csv"), row.names = 1)
@@ -864,7 +862,9 @@ main_mainstem_states <- c(
   "mainstem, PRA to RIS",
   "mainstem, RIS to RRE",
   "mainstem, RRE to WEL",
-  "mainstem, ICH to LGR")
+  "mainstem, ICH to LGR",
+  "mainstem, upstream of WEL",
+  "mainstem, upstream of LGR")
 
 list_quantiles <- list()
 
@@ -886,25 +886,31 @@ quantiles_table <- data.frame(reach = main_mainstem_states,
                                        list_quantiles[[3]][1],
                                        list_quantiles[[4]][1],
                                        list_quantiles[[5]][1],
-                                       list_quantiles[[6]][1]),
+                                       list_quantiles[[6]][1],
+                                      list_quantiles[[7]][1],
+                                      list_quantiles[[8]][1]),
                               t80 = c(list_quantiles[[1]][2],
                                        list_quantiles[[2]][2],
                                        list_quantiles[[3]][2],
                                        list_quantiles[[4]][2],
                                        list_quantiles[[5]][2],
-                                       list_quantiles[[6]][2]),
+                                       list_quantiles[[6]][2],
+                                      list_quantiles[[7]][2],
+                                      list_quantiles[[8]][2]),
                               t95 = c(list_quantiles[[1]][3],
                                        list_quantiles[[2]][3],
                                        list_quantiles[[3]][3],
                                        list_quantiles[[4]][3],
                                        list_quantiles[[5]][3],
-                                       list_quantiles[[6]][3]))
+                                       list_quantiles[[6]][3],
+                                      list_quantiles[[7]][3],
+                                      list_quantiles[[8]][3]))
 
 # write.csv(quantiles_table, here::here("covariate_data", "reach_quantiles.csv"))
 ```
 
-
 ### export temperature data using window approach
+
 ```{r}
 # Re-export, using reach-specific residence time windows
 # quantiles <- read.csv(here::here("covariate_data", "reach_quantiles.csv"), row.names = 1)
@@ -946,6 +952,12 @@ RRE_window_temp <- window_temp(temp_data = RRE_temp_ts, median_time = subset(qua
 # Ice Harbor Dam, for ICH to LGR reach
 ICH_window_temp <- window_temp(temp_data = ICH_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
 
+# Wells Dam, for upstream of WEL reach
+WEL_window_temp <- window_temp(temp_data = WEL_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, upstream of WEL")$median)
+
+# Lower Granite Dam, for upstream of LGR reach
+LGR_window_temp <- window_temp(temp_data = LGR_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, upstream of LGR")$median)
+
 # export all of these
 write.csv(BON_window_temp, here::here("covariate_data", "for_model", "temp", "BON_window_temp.csv"), row.names = FALSE)
 write.csv(MCN_window_temp, here::here("covariate_data", "for_model", "temp", "MCN_window_temp.csv"), row.names = FALSE)
@@ -953,5 +965,43 @@ write.csv(PRA_window_temp, here::here("covariate_data", "for_model", "temp", "PR
 write.csv(RIS_window_temp, here::here("covariate_data", "for_model", "temp", "RIS_window_temp.csv"), row.names = FALSE)
 write.csv(RRE_window_temp, here::here("covariate_data", "for_model", "temp", "RRE_window_temp.csv"), row.names = FALSE)
 write.csv(ICH_window_temp, here::here("covariate_data", "for_model", "temp", "ICH_window_temp.csv"), row.names = FALSE)
+write.csv(WEL_window_temp, here::here("covariate_data", "for_model", "temp", "WEL_window_temp.csv"), row.names = FALSE)
+write.csv(LGR_window_temp, here::here("covariate_data", "for_model", "temp", "LGR_window_temp.csv"), row.names = FALSE)
 
 ```
+
+#### export in the format needed for stan
+```{r}
+dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_temp) %>% 
+  left_join(dplyr::rename(dplyr::select(MCN_window_temp, date, window_temp), MCN = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(PRA_window_temp, date, window_temp), PRA = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(RIS_window_temp, date, window_temp), RIS = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(RRE_window_temp, date, window_temp), RRE = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(WEL_window_temp, date, window_temp), WEL = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(ICH_window_temp, date, window_temp), ICH = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(LGR_window_temp, date, window_temp), LGR = window_temp), by = "date") %>% 
+  mutate(index = row_number()) %>% 
+  relocate(index) %>% 
+  dplyr::select(-date) %>% 
+  column_to_rownames("index") -> window_temps
+
+# now, z-score every column
+window_temps %>% 
+  mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
+  mutate(MCN = (MCN - mean(MCN))/sd(MCN)) %>% 
+  mutate(PRA = (PRA - mean(PRA))/sd(PRA)) %>% 
+  mutate(RIS = (RIS - mean(RIS))/sd(RIS)) %>% 
+  mutate(RRE = (RRE - mean(RRE))/sd(RRE)) %>% 
+  mutate(WEL = (WEL - mean(WEL))/sd(WEL)) %>% 
+  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
+  mutate(LGR = (LGR - mean(LGR))/sd(LGR)) -> window_temps
+  
+
+write.csv(window_temps, here::here("covariate_data", "for_model", "window_temps_for_stan.csv"))
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp/upper_columbia/window_temps_for_stan.csv")
+
+```
+
+
+
+
