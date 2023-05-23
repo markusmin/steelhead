@@ -867,23 +867,23 @@ det_eff_param_vector[35] = yakima_beta;
 // what's the deal with this block? it looks like I turned off the discharge
 // turns out that I did this for troubleshooting reasons - need to turn this back 
 // on when running the actual model
-det_eff_param_vector[22] = 0;
-det_eff_param_vector[23] = 0;
-det_eff_param_vector[24] = 0;
-// det_eff_param_vector[25] = fifteenmile_beta;
-// fix these to zero
-det_eff_param_vector[25] = 0;
-det_eff_param_vector[26] = 0;
-// det_eff_param_vector[27] = imnaha_beta;
-det_eff_param_vector[27] = 0;
-det_eff_param_vector[28] = 0;
-det_eff_param_vector[29] = 0;
-det_eff_param_vector[30] = 0;
-det_eff_param_vector[31] = 0;
-det_eff_param_vector[32] = 0;
-det_eff_param_vector[33] = 0;
-det_eff_param_vector[34] = 0;
-det_eff_param_vector[35] = 0;
+// det_eff_param_vector[22] = 0;
+// det_eff_param_vector[23] = 0;
+// det_eff_param_vector[24] = 0;
+// // det_eff_param_vector[25] = fifteenmile_beta;
+// // fix these to zero
+// det_eff_param_vector[25] = 0;
+// det_eff_param_vector[26] = 0;
+// // det_eff_param_vector[27] = imnaha_beta;
+// det_eff_param_vector[27] = 0;
+// det_eff_param_vector[28] = 0;
+// det_eff_param_vector[29] = 0;
+// det_eff_param_vector[30] = 0;
+// det_eff_param_vector[31] = 0;
+// det_eff_param_vector[32] = 0;
+// det_eff_param_vector[33] = 0;
+// det_eff_param_vector[34] = 0;
+// det_eff_param_vector[35] = 0;
 
 
 
