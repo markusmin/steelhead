@@ -995,6 +995,13 @@ window_temps %>%
   mutate(WEL = (WEL - mean(WEL))/sd(WEL)) %>% 
   mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
   mutate(LGR = (LGR - mean(LGR))/sd(LGR)) -> window_temps
+
+# add an empty column for the first state (that doesn't get a temperature effect)
+# make sure that the order is the same is the order of states
+window_temps %>% 
+  mutate(MOUTH = 0) %>% 
+  relocate(MOUTH) -> window_temps
+  
   
 
 write.csv(window_temps, here::here("covariate_data", "for_model", "window_temps_for_stan.csv"))
