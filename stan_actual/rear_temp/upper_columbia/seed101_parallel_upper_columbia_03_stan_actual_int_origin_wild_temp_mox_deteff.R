@@ -1723,6 +1723,9 @@ transition_date_matrix %>%
   mutate_all(date_numeric) %>% 
   as.matrix() -> transition_date_numeric
 
+# replace all NAs with 0s - they won't be used for anything (and a 0 in this case 
+# is nonsensical), but this keep Stan from freaking out
+transition_date_numeric[is.na(transition_date_numeric)] <- 0
 
 ##### Reformat origin information #####
 tag_code_metadata <- read.csv("tag_code_metadata.csv")

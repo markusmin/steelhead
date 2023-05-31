@@ -115,9 +115,17 @@ functions{
         int date;
         date = transition_dates[i,j];
         
-        // Get the current temperature, based on the state x date
+        // Get the temperature in the current state at the current time, based on the state x date
+        // temperature only for eight mainstem sites
         real temp;
-        temp = temperature_data[date, current];
+        if (current >= 2 && current <= 9){
+            temp = temperature_data[date, current];
+        } else {
+          temp = 0; // this just makes it so that there's no effect of temperature,
+          // but also the parameter that's multiplied by this will be zero
+        }
+        
+
         
         // here: create a vector with the length of the states, where we will store whether or not they are affected by DE
         vector[42] DE_correction;
@@ -174,9 +182,9 @@ functions{
                       // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
                   if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
-                    temp * btemp_matrix_DE[current,k] +
-                    cat_X_mat[i,2] * btempxorigin1_matrix_DE[current,k] +
-                    cat_X_mat[i,3] * btempxorigin2_matrix_DE[current,k] +
+                    btemp_matrix_DE[current,k] * temp +
+                    cat_X_mat[i,2] * btempxorigin1_matrix_DE[current,k] * temp +
+                    cat_X_mat[i,3] * btempxorigin2_matrix_DE[current,k] * temp +
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_DE[current,k];
                     
@@ -186,9 +194,9 @@ functions{
                     // Else, use the NDE matrix, and don't correct for detection efficiency
                   } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
-                    temp * btemp_matrix_NDE[current,k] +
-                    cat_X_mat[i,2] * btempxorigin1_matrix_NDE[current,k] +
-                    cat_X_mat[i,3] * btempxorigin2_matrix_NDE[current,k] +
+                    btemp_matrix_NDE[current,k] * temp +
+                    cat_X_mat[i,2] * btempxorigin1_matrix_NDE[current,k] * temp +
+                    cat_X_mat[i,3] * btempxorigin2_matrix_NDE[current,k] * temp +
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_NDE[current,k];
                     
@@ -336,8 +344,8 @@ data {
   array[n_ind,max_visits] int y; // array with dimensions nfish (number of fish), 41 (maximum number of site visits)
   array[n_ind] int n_obs; // n_obs is a vector that contains the number of site visits for each individual - but needs to be declared as array to take integer values
   vector[43] possible_movements; // a vector containing the number of possible transitions out of each state
-  array[n_ind, max_visits-1] int transition_dates; // a matrix of the dates (as numeric string with 2005-06-01 as 1) that each transition took place
-  array[6423,8] real temperature_data; // a matrix of the temperature data for each of eight statess
+  array[n_ind, max_visits] int transition_dates; // a matrix of the dates (as numeric string with 2005-06-01 as 1) that each transition took place
+  array[6423,9] real temperature_data; // a matrix of the temperature data for each of eight statess
   array[n_ind, max_visits-1] int states_mat; // a matrix (array to take integer values) with rows = each fish and columns = the site visits
   // array[54, 2] int movements; // a matrix that contains the possible transitions out of each state
   int nmovements; // an integer value containing the number of possible transitions (same as rows in movements data)
@@ -636,16 +644,14 @@ transformed parameters {
   // Declare a matrix to store btemp params
   // matrix[43,43] btemp_matrix;
   array[43,43] real btemp_matrix_DE;
-  // Set all of the elements of the btemp matrix to -100000 (effectively a 0 in logit space);
-  // Non-zero elements will be overwritten
-  // btemp_matrix = rep_matrix(-100000, 43, 43);
-  btemp_matrix_DE = rep_array(-100000, 43, 43);
+  // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
+  // esepcially important for covariates like temperature to have a zero because
+  // they don't apply to all states
+  btemp_matrix_DE = rep_array(0, 43, 43);
   
   array[43,43] real btemp_matrix_NDE;
-  // Set all of the elements of the btemp matrix to -100000 (effectively a 0 in logit space);
-  // Non-zero elements will be overwritten
-  // btemp_matrix = rep_matrix(-100000, 43, 43);
-  btemp_matrix_NDE = rep_array(-100000, 43, 43);
+  // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
+  btemp_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare matrices to store origin x temperature interactions (DE and NDE)
   // Origin 1 x temp
