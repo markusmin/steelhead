@@ -775,6 +775,22 @@ LGR_temp_ts <- full_temp_ts(tailrace_temp = LGR_temps_clean[[2]], forebay_temp =
 
 ```
 
+### export forebay and tailrace temperatures
+```{r}
+
+write.csv(BON_temp_ts, here::here("covariate_data", "temp_processed", "BON_temp_processed.csv"), row.names = FALSE)
+write.csv(MCN_temp_ts, here::here("covariate_data", "temp_processed", "MCN_temp_processed.csv"), row.names = FALSE)
+write.csv(PRA_temp_ts, here::here("covariate_data", "temp_processed", "PRA_temp_processed.csv"), row.names = FALSE)
+write.csv(RIS_temp_ts, here::here("covariate_data", "temp_processed", "RIS_temp_processed.csv"), row.names = FALSE)
+write.csv(RRE_temp_ts, here::here("covariate_data", "temp_processed", "RRE_temp_processed.csv"), row.names = FALSE)
+write.csv(ICH_temp_ts, here::here("covariate_data", "temp_processed", "ICH_temp_processed.csv"), row.names = FALSE)
+write.csv(WEL_temp_ts, here::here("covariate_data", "temp_processed", "WEL_temp_processed.csv"), row.names = FALSE)
+write.csv(LGR_temp_ts, here::here("covariate_data", "temp_processed", "LGR_temp_processed.csv"), row.names = FALSE)
+
+```
+
+
+
 ### calculate windows
 
 ```{r}
