@@ -238,6 +238,7 @@ quantiles_table %>%
 
 # use a function
 # optional argument if you want to start window at a different time
+# also update to make it flexible at the end of the time series to shorten window at the end of the time series (but this shouldn't really matter, we're not really seeing any movements in December 2022); but it'll just take the temp at that day
 window_temp <- function(temp_data, start_window_days = 0, end_window_days){
   colnames(temp_data) <- c("date", "temp")
   
@@ -246,7 +247,15 @@ window_temp <- function(temp_data, start_window_days = 0, end_window_days){
 
 # loop to get all windows
 for (i in 1:nrow(temp_data)){
-  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] + days(x = start_window_days) & date <= temp_data$date[i] + days(x = end_window_days))$temp)
+  if (i > nrow(temp_data)-start_window_days) {
+    temp_data$window_temp[i] <- temp_data$temp[i]
+    
+  } else {
+    temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] + days(x = start_window_days) & date <= temp_data$date[i] + days(x = end_window_days))$temp)    
+    
+  }
+  
+
 }
   
   return(temp_data)
@@ -331,7 +340,7 @@ window_temps %>%
   mutate(WEL_quick = (WEL_quick - mean(WEL_quick))/sd(WEL_quick)) %>% 
   mutate(WEL_slow = (WEL_slow - mean(WEL_slow))/sd(WEL_slow)) %>% 
   mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
-    mutate(LGR_quick = (LGR_quick - mean(LGR_quick))/sd(LGR_quick)) %>% 
+  mutate(LGR_quick = (LGR_quick - mean(LGR_quick))/sd(LGR_quick)) %>% 
   mutate(LGR_slow = (LGR_slow - mean(LGR_slow))/sd(LGR_slow)) -> window_temps
 
 # add an empty column for the first state (that doesn't get a temperature effect)
