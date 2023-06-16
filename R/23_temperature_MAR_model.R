@@ -16,14 +16,14 @@ library(MARSS)
 # note that these data files were produced by script 22, which filtered out bad data
 # in addition to some other steps. The only columns that we need from these
 # files are date, tailrace_temp, and forebay_temp
-BON_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "BON_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-MCN_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "MCN_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-PRA_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "PRA_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-RIS_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "RIS_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-RRE_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "RRE_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-ICH_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "ICH_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-WEL_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "WEL_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
-LGR_temp <- read.csv(here::here("covariate_data", "for_model", "temp", "LGR_window_temp.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+BON_temp <- read.csv(here::here("covariate_data", "temp_processed", "BON_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+MCN_temp <- read.csv(here::here("covariate_data", "temp_processed", "MCN_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+PRA_temp <- read.csv(here::here("covariate_data", "temp_processed", "PRA_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+RIS_temp <- read.csv(here::here("covariate_data", "temp_processed", "RIS_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+RRE_temp <- read.csv(here::here("covariate_data", "temp_processed", "RRE_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+ICH_temp <- read.csv(here::here("covariate_data", "temp_processed", "ICH_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+WEL_temp <- read.csv(here::here("covariate_data", "temp_processed", "WEL_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
+LGR_temp <- read.csv(here::here("covariate_data", "temp_processed", "LGR_temp_processed.csv")) %>% dplyr::select(date, tailrace_temp, forebay_temp)
 
 # make the column data names more informative by including dam
 colnames(BON_temp) <- paste0("BON_", colnames(BON_temp))
@@ -55,9 +55,10 @@ dat = temp_for_MAR
 # a <- matrix(data = c("a_BON", "a_BON", "a_MCN", "a_MCN", "a_PRA", "a_PRA", "a_RIS", "a_RIS",
 #        "a_RRE", "a_RRE", "a_ICH", "a_ICH", "a_WEL", "a_WEL", "a_LGR", "a_LGR"),
 #        nrow = 16, ncol = 1)
-a <- matrix(data = c(0, 0, "a_MCN", "a_MCN", "a_PRA", "a_PRA", "a_RIS", "a_RIS",
-       "a_RRE", "a_RRE", "a_ICH", "a_ICH", "a_WEL", "a_WEL", "a_LGR", "a_LGR"),
-       nrow = 16, ncol = 1)
+a <- matrix(data = as.list(rep(0, 16)),
+            nrow = 16, ncol = 1)
+a[3:16] <- c("a_MCN", "a_MCN", "a_PRA", "a_PRA", "a_RIS", "a_RIS",
+       "a_RRE", "a_RRE", "a_ICH", "a_ICH", "a_WEL", "a_WEL", "a_LGR", "a_LGR")
 A <- a
 
 # no bias term for Columbia river temp
@@ -74,7 +75,9 @@ Z <- matrix(1, 16, 1)
 r <- matrix(data = as.list(rep(0, 256)), nrow = 16, ncol = 16)
 diag(r) <- c("r_BON", "r_BON", "r_MCN", "r_MCN", "r_PRA", "r_PRA", "r_RIS", "r_RIS",
              "r_RRE", "r_RRE", "r_ICH", "r_ICH", "r_WEL", "r_WEL", "r_LGR", "r_LGR")
-R <- r
+# R <- r
+# variance among dams is probably the same, given all the same equipment
+R <- "diagonal and equal"
 Q <- matrix("q") # this matrix is a 1x1 matrix, because there's only one trend we're estimating
 model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R)
 kem <- MARSS(dat, model = model.list)
@@ -83,8 +86,6 @@ kem <- MARSS(dat, model = model.list)
 fit_df <- data.frame(date = seq(ymd('2005-06-01'),ymd('2022-12-31'), by = 'days'),
                      fit = kem$states)
 
-# look at parameter estimates
-kem
 
 # some have considerably larger r (variance) values. Why?
 # is it because of the difference between forebay and tailrace temperatures?
@@ -124,7 +125,7 @@ hat_yt <- MARSShatyt(kem)
 # plot the yhat for each dam
 # add points for actual data
 
-par(mfrow = c(4, 4))
+par(mfrow = c(2,2))
 for (i in 1:16) {
   plot(dates, kem$ytT[i, ], ylab = "Temperature", 
        xlab = "", type = "l")
@@ -137,7 +138,7 @@ for (i in 1:16) {
 }
 
 # plot just the data
-par(mfrow = c(4, 4))
+par(mfrow = c(1,1))
 for (i in 1:16) {
   plot(dates, dat[i, ], cex = 0.4)
   title(rownames(dat)[i])
@@ -154,7 +155,43 @@ temp_yhat <- data.frame(date = dates,
                         WEL = kem$ytT[13,],
                         LGR = kem$ytT[15,])
 
-write.csv(temp_yhat, here::here("covariate_data", "for_model", "temp", "temp_yhat.csv"), row.names = FALSE)
+
+# extract A values and add to the state
+a_est <- as.data.frame(coef(kem)$A)
+a_MCN <- a_est["a_MCN",]
+a_PRA <- a_est["a_PRA",]
+a_RIS <- a_est["a_RIS",]
+a_RRE <- a_est["a_RRE",]
+a_ICH <- a_est["a_ICH",]
+a_WEL <- a_est["a_WEL",]
+a_LGR <- a_est["a_LGR",]
+
+
+# BON estimate is just the state
+BON_temp_model_est <- kem$states
+
+# every other is just plus the bias term
+MCN_temp_model_est <- kem$states + a_MCN
+PRA_temp_model_est <- kem$states + a_PRA
+RIS_temp_model_est <- kem$states + a_RIS
+RRE_temp_model_est <- kem$states + a_RRE
+ICH_temp_model_est <- kem$states + a_ICH
+WEL_temp_model_est <- kem$states + a_WEL
+LGR_temp_model_est <- kem$states + a_LGR
+
+temp_model_est <- data.frame(date = dates,
+                             MOUTH = rep(NA, 6423),
+                             BON = BON_temp_model_est[1,],
+                             MCN = MCN_temp_model_est[1,],
+                             PRA = PRA_temp_model_est[1,],
+                             RIS = RIS_temp_model_est[1,],
+                             RRE = RRE_temp_model_est[1,],
+                             ICH = ICH_temp_model_est[1,],
+                             WEL = WEL_temp_model_est[1,],
+                             LGR = LGR_temp_model_est[1,])
+
+
+write.csv(temp_model_est, here::here("covariate_data", "for_model", "temp", "temp_mod_est.csv"), row.names = FALSE)
 
 
 
