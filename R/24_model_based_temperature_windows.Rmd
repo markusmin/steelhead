@@ -311,9 +311,11 @@ dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_te
   left_join(dplyr::rename(dplyr::select(PRA_window_temp, date, window_temp), PRA = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(RIS_window_temp, date, window_temp), RIS = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(RRE_window_temp, date, window_temp), RRE = window_temp), by = "date") %>% 
-  left_join(dplyr::rename(dplyr::select(WEL_window_temp, date, window_temp), WEL = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(WEL_quick_window_temp, date, window_temp), WEL_quick = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(WEL_slow_window_temp, date, window_temp), WEL_slow = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(ICH_window_temp, date, window_temp), ICH = window_temp), by = "date") %>% 
-  left_join(dplyr::rename(dplyr::select(LGR_window_temp, date, window_temp), LGR = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(LGR_quick_window_temp, date, window_temp), LGR_quick = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(LGR_slow_window_temp, date, window_temp), LGR_slow = window_temp), by = "date") %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   dplyr::select(-date) %>% 
@@ -326,9 +328,11 @@ window_temps %>%
   mutate(PRA = (PRA - mean(PRA))/sd(PRA)) %>% 
   mutate(RIS = (RIS - mean(RIS))/sd(RIS)) %>% 
   mutate(RRE = (RRE - mean(RRE))/sd(RRE)) %>% 
-  mutate(WEL = (WEL - mean(WEL))/sd(WEL)) %>% 
+  mutate(WEL_quick = (WEL_quick - mean(WEL_quick))/sd(WEL_quick)) %>% 
+  mutate(WEL_slow = (WEL_slow - mean(WEL_slow))/sd(WEL_slow)) %>% 
   mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
-  mutate(LGR = (LGR - mean(LGR))/sd(LGR)) -> window_temps
+    mutate(LGR_quick = (LGR_quick - mean(LGR_quick))/sd(LGR_quick)) %>% 
+  mutate(LGR_slow = (LGR_slow - mean(LGR_slow))/sd(LGR_slow)) -> window_temps
 
 # add an empty column for the first state (that doesn't get a temperature effect)
 # make sure that the order is the same is the order of states
