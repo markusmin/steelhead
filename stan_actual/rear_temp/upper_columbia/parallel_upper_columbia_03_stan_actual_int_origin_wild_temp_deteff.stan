@@ -24,6 +24,7 @@ functions{
                         // categorical covariates (in this case, just origin parameters)
                         // array[n_ind, 7] int cat_X_mat,
                         array[,] int cat_X_mat,
+                        array[,] int temp_X_mat,
                         
                         
                         
@@ -48,10 +49,12 @@ functions{
                         array[,] real btemp_matrix_DE, 
                         array[,] real btempxorigin1_matrix_DE, 
                         array[,] real btempxorigin2_matrix_DE, 
+                        array[,] real btempxorigin3_matrix_DE, 
                         
                         array[,] real btemp_matrix_NDE, 
                         array[,] real btempxorigin1_matrix_NDE, 
                         array[,] real btempxorigin2_matrix_NDE, 
+                        array[,] real btempxorigin3_matrix_NDE, 
                         
                         
                         // below is new data for detection efficiency
@@ -118,10 +121,21 @@ functions{
         // Get the temperature in the current state at the current time, based on the state x date
         // temperature only for eight mainstem sites
         real temp;
+        real temp2;
         if (current >= 2 && current <= 9){
             temp = temperature_data[date, current];
+            // extra if - for WEL and LGR, that get an extra temp covariate
+            if (current == 7) {
+              temp2 = temperature_data[date, 10];
+            } else if (current == 9) {
+              temp2 = temperature_data[date, 11];
+            } else {
+              temp2 = 0;
+            }
+            
         } else {
-          temp = 0; // this just makes it so that there's no effect of temperature,
+          temp = 0; 
+          temp2 = 0; // this just makes it so that there's no effect of temperature,
           // but also the parameter that's multiplied by this will be zero
         }
         
@@ -182,9 +196,10 @@ functions{
                       // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
                   if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
-                    btemp_matrix_DE[current,k] * temp +
-                    cat_X_mat[i,2] * btempxorigin1_matrix_DE[current,k] * temp +
-                    cat_X_mat[i,3] * btempxorigin2_matrix_DE[current,k] * temp +
+                    temp_X_mat[i,1] * btemp_matrix_DE[current,k] * temp +
+                    temp_X_mat[i,2] * btempxorigin1_matrix_DE[current,k] * temp +
+                    temp_X_mat[i,3] * btempxorigin2_matrix_DE[current,k] * temp +
+                    temp_X_mat[i,4] * btempxorigin3_matrix_DE[current,k] * temp +
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_DE[current,k];
                     
@@ -194,9 +209,10 @@ functions{
                     // Else, use the NDE matrix, and don't correct for detection efficiency
                   } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
-                    btemp_matrix_NDE[current,k] * temp +
-                    cat_X_mat[i,2] * btempxorigin1_matrix_NDE[current,k] * temp +
-                    cat_X_mat[i,3] * btempxorigin2_matrix_NDE[current,k] * temp +
+                    temp_X_mat[i,1] * btemp_matrix_NDE[current,k] * temp +
+                    temp_X_mat[i,2] * btempxorigin1_matrix_NDE[current,k] * temp +
+                    temp_X_mat[i,3] * btempxorigin2_matrix_NDE[current,k] * temp +
+                    temp_X_mat[i,4] * btempxorigin3_matrix_NDE[current,k] * temp +
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_NDE[current,k];
                     
@@ -356,6 +372,7 @@ data {
   // array[n_ind, 48] int dates; // a matrix containing dates (as integers) where rows = number of fish and columns = site visits
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
   array[n_ind, 3] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (origin)
+  array[n_ind, 3] int temp_X_mat; // a matrix with rows = individual fish and columns = design matrix for temperature
   
   matrix[35,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   
@@ -462,24 +479,11 @@ real btemp_matrix_2_16_NDE;
 real btemp_matrix_2_18_DE;
 real btemp_matrix_2_18_NDE;
 real btemp_matrix_2_41;
-real btemp_matrix_3_4;
 real btemp_matrix_3_8;
 real btemp_matrix_3_20_DE;
 real btemp_matrix_3_20_NDE;
 real btemp_matrix_3_22_DE;
 real btemp_matrix_3_22_NDE;
-real btemp_matrix_4_5;
-real btemp_matrix_5_6;
-real btemp_matrix_5_24_DE;
-real btemp_matrix_5_24_NDE;
-real btemp_matrix_6_7;
-real btemp_matrix_6_26_DE;
-real btemp_matrix_6_26_NDE;
-real btemp_matrix_7_28_DE;
-real btemp_matrix_7_28_NDE;
-real btemp_matrix_7_30_DE;
-real btemp_matrix_7_30_NDE;
-real btemp_matrix_7_42;
 real btemp_matrix_8_9;
 real btemp_matrix_8_32_DE;
 real btemp_matrix_8_32_NDE;
@@ -519,19 +523,19 @@ real btempxorigin2_matrix_7_30_DE;
 real btempxorigin2_matrix_7_30_NDE;
 real btempxorigin2_matrix_7_42;
 
-// real btempxorigin3_matrix_3_4;
-// real btempxorigin3_matrix_4_5;
-// real btempxorigin3_matrix_5_6;
-// real btempxorigin3_matrix_5_24_DE;
-// real btempxorigin3_matrix_5_24_NDE;
-// real btempxorigin3_matrix_6_7;
-// real btempxorigin3_matrix_6_26_DE;
-// real btempxorigin3_matrix_6_26_NDE;
-// real btempxorigin3_matrix_7_28_DE;
-// real btempxorigin3_matrix_7_28_NDE;
-// real btempxorigin3_matrix_7_30_DE;
-// real btempxorigin3_matrix_7_30_NDE;
-// real btempxorigin3_matrix_7_42;
+real btempxorigin3_matrix_3_4;
+real btempxorigin3_matrix_4_5;
+real btempxorigin3_matrix_5_6;
+real btempxorigin3_matrix_5_24_DE;
+real btempxorigin3_matrix_5_24_NDE;
+real btempxorigin3_matrix_6_7;
+real btempxorigin3_matrix_6_26_DE;
+real btempxorigin3_matrix_6_26_NDE;
+real btempxorigin3_matrix_7_28_DE;
+real btempxorigin3_matrix_7_28_NDE;
+real btempxorigin3_matrix_7_30_DE;
+real btempxorigin3_matrix_7_30_NDE;
+real btempxorigin3_matrix_7_42;
 
 real borigin1_matrix_3_4;
 real borigin1_matrix_4_3;
@@ -664,11 +668,11 @@ transformed parameters {
   btempxorigin2_matrix_DE = rep_array(0, 43, 43);
   array[43,43] real btempxorigin2_matrix_NDE;
   btempxorigin2_matrix_NDE = rep_array(0, 43, 43);
-  // Origin 3 x temp (no extra parameter, this is just the btemp)
-  // array[43,43] real btempxorigin3_matrix_DE;
-  // btempxorigin3_matrix_DE = rep_array(0, 43, 43);
-  // array[43,43] real btempxorigin3_matrix_NDE;
-  // btempxorigin3_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 3 x temp
+  array[43,43] real btempxorigin3_matrix_DE;
+  btempxorigin3_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btempxorigin3_matrix_NDE;
+  btempxorigin3_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin1 params
   // matrix[43,43] borigin1_matrix;
@@ -880,8 +884,6 @@ btemp_matrix_DE[2,19] = -100000;
 btemp_matrix_NDE[2,19] = btemp_matrix_2_18_NDE;
 btemp_matrix_DE[2,41] = btemp_matrix_2_41;
 btemp_matrix_NDE[2,41] = btemp_matrix_2_41;
-btemp_matrix_DE[3,4] = btemp_matrix_3_4;
-btemp_matrix_NDE[3,4] = btemp_matrix_3_4;
 btemp_matrix_DE[3,8] = btemp_matrix_3_8;
 btemp_matrix_NDE[3,8] = btemp_matrix_3_8;
 btemp_matrix_DE[3,20] = btemp_matrix_3_20_DE;
@@ -892,30 +894,6 @@ btemp_matrix_DE[3,22] = btemp_matrix_3_22_DE;
 btemp_matrix_NDE[3,22] = btemp_matrix_3_22_NDE;
 btemp_matrix_DE[3,23] = -100000;
 btemp_matrix_NDE[3,23] = btemp_matrix_3_22_NDE;
-btemp_matrix_DE[4,5] = btemp_matrix_4_5;
-btemp_matrix_NDE[4,5] = btemp_matrix_4_5;
-btemp_matrix_DE[5,6] = btemp_matrix_5_6;
-btemp_matrix_NDE[5,6] = btemp_matrix_5_6;
-btemp_matrix_DE[5,24] = btemp_matrix_5_24_DE;
-btemp_matrix_NDE[5,24] = btemp_matrix_5_24_NDE;
-btemp_matrix_DE[5,25] = -100000;
-btemp_matrix_NDE[5,25] = btemp_matrix_5_24_NDE;
-btemp_matrix_DE[6,7] = btemp_matrix_6_7;
-btemp_matrix_NDE[6,7] = btemp_matrix_6_7;
-btemp_matrix_DE[6,26] = btemp_matrix_6_26_DE;
-btemp_matrix_NDE[6,26] = btemp_matrix_6_26_NDE;
-btemp_matrix_DE[6,27] = -100000;
-btemp_matrix_NDE[6,27] = btemp_matrix_6_26_NDE;
-btemp_matrix_DE[7,28] = btemp_matrix_7_28_DE;
-btemp_matrix_NDE[7,28] = btemp_matrix_7_28_NDE;
-btemp_matrix_DE[7,29] = -100000;
-btemp_matrix_NDE[7,29] = btemp_matrix_7_28_NDE;
-btemp_matrix_DE[7,30] = btemp_matrix_7_30_DE;
-btemp_matrix_NDE[7,30] = btemp_matrix_7_30_NDE;
-btemp_matrix_DE[7,31] = -100000;
-btemp_matrix_NDE[7,31] = btemp_matrix_7_30_NDE;
-btemp_matrix_DE[7,42] = btemp_matrix_7_42;
-btemp_matrix_NDE[7,42] = btemp_matrix_7_42;
 btemp_matrix_DE[8,9] = btemp_matrix_8_9;
 btemp_matrix_NDE[8,9] = btemp_matrix_8_9;
 btemp_matrix_DE[8,32] = btemp_matrix_8_32_DE;
@@ -983,28 +961,28 @@ btempxorigin2_matrix_NDE[7,31] = btempxorigin2_matrix_7_30_NDE;
 btempxorigin2_matrix_DE[7,42] = btempxorigin2_matrix_7_42;
 btempxorigin2_matrix_NDE[7,42] = btempxorigin2_matrix_7_42;
 
-// btempxorigin3_matrix_DE[3,4] = btempxorigin3_matrix_3_4;
-// btempxorigin3_matrix_NDE[3,4] = btempxorigin3_matrix_3_4;
-// btempxorigin3_matrix_DE[4,5] = btempxorigin3_matrix_4_5;
-// btempxorigin3_matrix_NDE[4,5] = btempxorigin3_matrix_4_5;
-// btempxorigin3_matrix_DE[5,6] = btempxorigin3_matrix_5_6;
-// btempxorigin3_matrix_NDE[5,6] = btempxorigin3_matrix_5_6;
-// btempxorigin3_matrix_DE[5,24] = btempxorigin3_matrix_5_24_DE;
-// btempxorigin3_matrix_NDE[5,24] = btempxorigin3_matrix_5_24_NDE;
-// btempxorigin3_matrix_NDE[5,25] = btempxorigin3_matrix_5_24_NDE;
-// btempxorigin3_matrix_DE[6,7] = btempxorigin3_matrix_6_7;
-// btempxorigin3_matrix_NDE[6,7] = btempxorigin3_matrix_6_7;
-// btempxorigin3_matrix_DE[6,26] = btempxorigin3_matrix_6_26_DE;
-// btempxorigin3_matrix_NDE[6,26] = btempxorigin3_matrix_6_26_NDE;
-// btempxorigin3_matrix_NDE[6,27] = btempxorigin3_matrix_6_26_NDE;
-// btempxorigin3_matrix_DE[7,28] = btempxorigin3_matrix_7_28_DE;
-// btempxorigin3_matrix_NDE[7,28] = btempxorigin3_matrix_7_28_NDE;
-// btempxorigin3_matrix_NDE[7,29] = btempxorigin3_matrix_7_28_NDE;
-// btempxorigin3_matrix_DE[7,30] = btempxorigin3_matrix_7_30_DE;
-// btempxorigin3_matrix_NDE[7,30] = btempxorigin3_matrix_7_30_NDE;
-// btempxorigin3_matrix_NDE[7,31] = btempxorigin3_matrix_7_30_NDE;
-// btempxorigin3_matrix_DE[7,42] = btempxorigin3_matrix_7_42;
-// btempxorigin3_matrix_NDE[7,42] = btempxorigin3_matrix_7_42;
+btempxorigin3_matrix_DE[3,4] = btempxorigin3_matrix_3_4;
+btempxorigin3_matrix_NDE[3,4] = btempxorigin3_matrix_3_4;
+btempxorigin3_matrix_DE[4,5] = btempxorigin3_matrix_4_5;
+btempxorigin3_matrix_NDE[4,5] = btempxorigin3_matrix_4_5;
+btempxorigin3_matrix_DE[5,6] = btempxorigin3_matrix_5_6;
+btempxorigin3_matrix_NDE[5,6] = btempxorigin3_matrix_5_6;
+btempxorigin3_matrix_DE[5,24] = btempxorigin3_matrix_5_24_DE;
+btempxorigin3_matrix_NDE[5,24] = btempxorigin3_matrix_5_24_NDE;
+btempxorigin3_matrix_NDE[5,25] = btempxorigin3_matrix_5_24_NDE;
+btempxorigin3_matrix_DE[6,7] = btempxorigin3_matrix_6_7;
+btempxorigin3_matrix_NDE[6,7] = btempxorigin3_matrix_6_7;
+btempxorigin3_matrix_DE[6,26] = btempxorigin3_matrix_6_26_DE;
+btempxorigin3_matrix_NDE[6,26] = btempxorigin3_matrix_6_26_NDE;
+btempxorigin3_matrix_NDE[6,27] = btempxorigin3_matrix_6_26_NDE;
+btempxorigin3_matrix_DE[7,28] = btempxorigin3_matrix_7_28_DE;
+btempxorigin3_matrix_NDE[7,28] = btempxorigin3_matrix_7_28_NDE;
+btempxorigin3_matrix_NDE[7,29] = btempxorigin3_matrix_7_28_NDE;
+btempxorigin3_matrix_DE[7,30] = btempxorigin3_matrix_7_30_DE;
+btempxorigin3_matrix_NDE[7,30] = btempxorigin3_matrix_7_30_NDE;
+btempxorigin3_matrix_NDE[7,31] = btempxorigin3_matrix_7_30_NDE;
+btempxorigin3_matrix_DE[7,42] = btempxorigin3_matrix_7_42;
+btempxorigin3_matrix_NDE[7,42] = btempxorigin3_matrix_7_42;
 
 borigin1_matrix_DE[3,4] = borigin1_matrix_3_4;
 borigin1_matrix_NDE[3,4] = borigin1_matrix_3_4;
@@ -1348,24 +1326,11 @@ btemp_matrix_2_16_NDE ~ normal(0,10);
 btemp_matrix_2_18_DE ~ normal(0,10);
 btemp_matrix_2_18_NDE ~ normal(0,10);
 btemp_matrix_2_41 ~ normal(0,10);
-btemp_matrix_3_4 ~ normal(0,10);
 btemp_matrix_3_8 ~ normal(0,10);
 btemp_matrix_3_20_DE ~ normal(0,10);
 btemp_matrix_3_20_NDE ~ normal(0,10);
 btemp_matrix_3_22_DE ~ normal(0,10);
 btemp_matrix_3_22_NDE ~ normal(0,10);
-btemp_matrix_4_5 ~ normal(0,10);
-btemp_matrix_5_6 ~ normal(0,10);
-btemp_matrix_5_24_DE ~ normal(0,10);
-btemp_matrix_5_24_NDE ~ normal(0,10);
-btemp_matrix_6_7 ~ normal(0,10);
-btemp_matrix_6_26_DE ~ normal(0,10);
-btemp_matrix_6_26_NDE ~ normal(0,10);
-btemp_matrix_7_28_DE ~ normal(0,10);
-btemp_matrix_7_28_NDE ~ normal(0,10);
-btemp_matrix_7_30_DE ~ normal(0,10);
-btemp_matrix_7_30_NDE ~ normal(0,10);
-btemp_matrix_7_42 ~ normal(0,10);
 btemp_matrix_8_9 ~ normal(0,10);
 btemp_matrix_8_32_DE ~ normal(0,10);
 btemp_matrix_8_32_NDE ~ normal(0,10);
@@ -1405,19 +1370,19 @@ btempxorigin2_matrix_7_30_DE ~ normal(0,10);
 btempxorigin2_matrix_7_30_NDE ~ normal(0,10);
 btempxorigin2_matrix_7_42 ~ normal(0,10);
 
-// btempxorigin3_matrix_3_4 ~ normal(0,10);
-// btempxorigin3_matrix_4_5 ~ normal(0,10);
-// btempxorigin3_matrix_5_6 ~ normal(0,10);
-// btempxorigin3_matrix_5_24_DE ~ normal(0,10);
-// btempxorigin3_matrix_5_24_NDE ~ normal(0,10);
-// btempxorigin3_matrix_6_7 ~ normal(0,10);
-// btempxorigin3_matrix_6_26_DE ~ normal(0,10);
-// btempxorigin3_matrix_6_26_NDE ~ normal(0,10);
-// btempxorigin3_matrix_7_28_DE ~ normal(0,10);
-// btempxorigin3_matrix_7_28_NDE ~ normal(0,10);
-// btempxorigin3_matrix_7_30_DE ~ normal(0,10);
-// btempxorigin3_matrix_7_30_NDE ~ normal(0,10);
-// btempxorigin3_matrix_7_42 ~ normal(0,10);
+btempxorigin3_matrix_3_4 ~ normal(0,10);
+btempxorigin3_matrix_4_5 ~ normal(0,10);
+btempxorigin3_matrix_5_6 ~ normal(0,10);
+btempxorigin3_matrix_5_24_DE ~ normal(0,10);
+btempxorigin3_matrix_5_24_NDE ~ normal(0,10);
+btempxorigin3_matrix_6_7 ~ normal(0,10);
+btempxorigin3_matrix_6_26_DE ~ normal(0,10);
+btempxorigin3_matrix_6_26_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_28_DE ~ normal(0,10);
+btempxorigin3_matrix_7_28_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_30_DE ~ normal(0,10);
+btempxorigin3_matrix_7_30_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_42 ~ normal(0,10);
 
 borigin1_matrix_3_4 ~ normal(0,10);
 borigin1_matrix_4_3 ~ normal(0,10);
@@ -1520,12 +1485,12 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
 // This should allow us to increment log density across fish, rather than observations within a fish, allowing us to 
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, transition_dates, temperature_data, cat_X_mat, states_mat, n_obs, // arguments 1-10
-  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 11-13
-  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 14-16
-  btemp_matrix_DE, btempxorigin1_matrix_DE, btempxorigin2_matrix_DE, // arguments 17-19
-  btemp_matrix_NDE, btempxorigin1_matrix_NDE, btempxorigin2_matrix_NDE, // arguments 20-22
-  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 23-26
+  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, transition_dates, temperature_data, cat_X_mat, temp_X_mat, states_mat, n_obs, // arguments 1-11
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 12-14
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 15-17
+  btemp_matrix_DE, btempxorigin1_matrix_DE, btempxorigin2_matrix_DE, btempxorigin3_matrix_DE, // arguments 18-21
+  btemp_matrix_NDE, btempxorigin1_matrix_NDE, btempxorigin2_matrix_NDE, btempxorigin3_matrix_NDE, // arguments 22-25
+  tributary_design_matrices_array, transition_run_years, run_year_DE_array, det_eff_param_vector); // arguments 26-29
 
 }
 

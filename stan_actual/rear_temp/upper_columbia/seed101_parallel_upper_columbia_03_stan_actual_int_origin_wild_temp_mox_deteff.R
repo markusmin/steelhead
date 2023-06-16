@@ -505,7 +505,8 @@ upper_columbia_movements %>%
   filter(!(col == (row - 1))) %>% 
   filter(!(row == 8 & col == 3)) %>% 
   # remove all movements from tributaries back to the mainstem
-  filter(!(col < 10 & row >= 10)) -> upper_columbia_tempxorigin
+  filter(!(col < 10 & row >= 10)) %>% 
+  mutate(row_col = paste0(row, "_", col)) -> upper_columbia_tempxorigin
 
 
 b0_matrix_names %>% 
@@ -586,6 +587,11 @@ btemp_matrix_names %>%
 btemp_matrix_names %>% 
   arrange(row,col) -> btemp_matrix_names
 
+# REMOVE ALL THE ONES WITHIN THE ESU - these are only origin-specific
+btemp_matrix_names %>% 
+  mutate(row_col = paste0(row, "_", col)) %>% 
+  filter(!(row_col %in% upper_columbia_tempxorigin$row_col)) -> btemp_matrix_names
+
 
 # Note that this block doesn't change between models for different ESUs
 for (i in 1:(nrow(btemp_matrix_names))){
@@ -660,7 +666,7 @@ btempxorigin_matrix_names %>%
   arrange(row,col) -> btempxorigin_matrix_names
 
 # print only for the movements that are within the ESU
-for (i in 1:3){ # since we only have three origins for wild, don't need to copy origin3
+for (i in 1:3){ # since we only have three origins for wild
   for (j in 1:nrow(upper_columbia_tempxorigin)){
     
     # Movements from mainstem to river mouth: print two versions
@@ -1815,7 +1821,7 @@ n.ind <- dim(state_data)[3]
   }
   
   
-  # Create the design matrix for categorical variables
+  # Create the design matrix for origin + run year
   # new for detection efficiency: add a run year field to allow for glm calculation
   # of detection efficiency, as well as to note when certain movements are not possible
   # cat_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 4)
@@ -1840,6 +1846,25 @@ n.ind <- dim(state_data)[3]
       cat_X_mat_actual[i,2:3] <- -1
     }
   }
+  
+  # Create a design matrix for temperature - each origin gets an effect; outside of the DPS boundaries, all share an effect
+  temp_X_mat_actual <- matrix(0, nrow = n.ind, ncol = 4)
+  # The first column everyone gets a 1 (this is temperature effect for all fish, outside of DPS boundaries)
+  temp_X_mat_actual[,1] <- 1
+  
+  for (i in 1:n.ind){
+    if (fish_sim_cat_data_actual$natal_origin[i] == 16){ # Wenatchee River
+      temp_X_mat_actual[i,2] <- 1
+    }
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 4){ # Entiat River
+      temp_X_mat_actual[i,3] <- 1
+    }
+    else if (fish_sim_cat_data_actual$natal_origin[i] == 10){ # Methow River
+      temp_X_mat_actual[i,4] <- 1
+    }
+  }
+  
+  
   # "Tucannon_River", "Asotin_Creek", "Clearwater_River", "Salmon_River", "Grande_Ronde_River", "Imnaha_River"
   # One tweak: We have to replace all NAs in our input data for stan to accept it
   states_mat[is.na(states_mat)] <- -999
@@ -1987,7 +2012,7 @@ n.ind <- dim(state_data)[3]
   ntransitions = length(transition_run_years)
   
   # load in the temperature data
-  temp_data <- read.csv("window_temps_for_stan.csv", row.names = 1)
+  temp_data <- read.csv("window_temps_for_stan.csv")
   
   
   ##### Run stan model #####
@@ -1998,7 +2023,7 @@ n.ind <- dim(state_data)[3]
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, 
                transition_dates = transition_date_numeric, temperature_data = temp_data,
-               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual,
+               n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual, temp_X_mat = temp_X_mat_actual,
                grainsize = 1, N = dim(state_data_2)[1],
                # New data for detection efficiency
                tributary_design_matrices_array = tributary_design_matrices_array,
