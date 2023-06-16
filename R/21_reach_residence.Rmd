@@ -226,6 +226,8 @@ residence_time <- function(residence_state){
   passage_df <- data.frame(tag_code_2 = one_state_df$tag_code_2[seq(1,(nrow(one_state_df)-1),2)],
                            ESU = one_state_df$ESU[seq(1,(nrow(one_state_df)-1),2)],
                            natal_origin = one_state_df$natal_origin[seq(1,(nrow(one_state_df)-1),2)],
+                           entry_date = one_state_df$date_time[seq(1,(nrow(one_state_df)-1),2)],
+                           entry_day_of_year = yday(one_state_df$date_time[seq(1,(nrow(one_state_df)-1),2)]),
                            passage_time = NA)
   
   
@@ -236,6 +238,19 @@ residence_time <- function(residence_state){
   
   return(passage_df)
   
+}
+
+# plot to visualize residence time vs. date of entry
+passage_time_vs_entry_date_plot <- function(passage_df, reach){
+  passage_time_vs_entry_date_plot <- ggplot(passage_df, aes(x = entry_day_of_year, y = passage_time, color = ESU)) +
+    # geom_histogram(binwidth = 1) +
+    geom_point() +
+    ylab("Residence time in state") +
+    xlab("Day entering state") +
+    ggtitle(reach) +
+    scale_color_tableau(palette = "Tableau 10")
+ 
+  return(passage_time_vs_entry_date_plot) 
 }
 ```
 
@@ -277,6 +292,7 @@ plots_days <- list()
 plots_logdays <- list()
 plots_days_origin <- list()
 plots_logdays_origin <- list()
+plots_passage_time_vs_entry_date <- list()
 
 for (i in 1:length(mainstem_states)) {
   residence_df <- residence_time(residence_state = mainstem_states[i])
@@ -292,7 +308,10 @@ for (i in 1:length(mainstem_states)) {
   
   passage_plot_log_origin <- passage_time_plot_logdays_origin(passage_df = residence_df, reach = mainstem_states[i])
   plots_logdays_origin[[i]] <- passage_plot_log_origin
-
+  
+  passage_plot_time_vs_entry_date <- passage_time_vs_entry_date_plot(passage_df = residence_df, reach = mainstem_states[i])
+  plots_passage_time_vs_entry_date[[i]] <- passage_plot_time_vs_entry_date
+  
   # give summary of passage time
   summary(residence_df$passage_time)
   
@@ -389,14 +408,17 @@ plots_logdays_windows[[6]]
 #### Lower/Middle Columbia
 ```{r}
 plots_days_windows[[1]]
+plots_passage_time_vs_entry_date[[1]]
 plots_logdays[[1]]
 # plots_days_origin[[1]]
 # plots_logdays_origin[[1]]
 plots_days[[2]]
+plots_passage_time_vs_entry_date[[2]]
 plots_logdays[[2]]
 # plots_days_origin[[2]]
 plots_logdays_origin[[2]]
 plots_days[[3]]
+plots_passage_time_vs_entry_date[[3]]
 plots_logdays[[3]]
 # plots_days_origin[[3]]
 plots_logdays_origin[[3]]
@@ -405,18 +427,22 @@ plots_logdays_origin[[3]]
 #### Upper Columbia
 ```{r}
 plots_days[[4]]
+plots_passage_time_vs_entry_date[[4]]
 plots_logdays[[4]]
 # plots_days_origin[[4]]
 plots_logdays_origin[[4]]
 plots_days[[5]]
+plots_passage_time_vs_entry_date[[5]]
 plots_logdays[[5]]
 # plots_days_origin[[5]]
 plots_logdays_origin[[5]]
 plots_days[[6]]
+plots_passage_time_vs_entry_date[[6]]
 plots_logdays[[6]]
 # plots_days_origin[[6]]
 plots_logdays_origin[[6]]
 plots_days[[7]]
+plots_passage_time_vs_entry_date[[7]]
 plots_logdays[[7]]
 # plots_days_origin[[7]]
 plots_logdays_origin[[7]]
@@ -425,10 +451,12 @@ plots_logdays_origin[[7]]
 #### Snake
 ```{r}
 plots_days[[8]]
+plots_passage_time_vs_entry_date[[8]]
 plots_logdays[[8]]
 # plots_days_origin[[8]]
 plots_logdays_origin[[8]]
 plots_days[[9]]
+plots_passage_time_vs_entry_date[[9]]
 plots_logdays[[9]]
 # plots_days_origin[[9]]
 plots_logdays_origin[[9]]
@@ -751,7 +779,7 @@ summary(subset(mainstem_fish, pathway != "MCN (adult)")$temp)
 ```
 
 #### run the multinomial logit again with fish, but now only those going upstream
-```{r}
+```{r, eval = FALSE}
 states <- as.numeric(factor(subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) == "MCN (adult)")),2),]$state, levels = 
                                  c("Walla Walla River", "mainstem, ICH to LGR", 
                                    "mainstem, PRA to RIS","mainstem, BON to MCN","Yakima River")))
@@ -807,7 +835,7 @@ ggplot(movement_probs_long, aes(x = temp, y = value, color = next_movement)) +
 
 
 #### run the multinomial logit again with fish, but now only those going downstream
-```{r}
+```{r, eval = FALSE}
 states <- as.numeric(factor(subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")[seq(2,nrow(subset(WAWA_ASC_subset, lag(pathway) != "MCN (adult)")),2),]$state, levels = 
                                  c("Walla Walla River", "mainstem, ICH to LGR", 
                                    "mainstem, PRA to RIS","mainstem, BON to MCN","Yakima River")))
