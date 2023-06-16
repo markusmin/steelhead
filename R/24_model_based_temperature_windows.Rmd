@@ -321,10 +321,10 @@ dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_te
   left_join(dplyr::rename(dplyr::select(RIS_window_temp, date, window_temp), RIS = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(RRE_window_temp, date, window_temp), RRE = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(WEL_quick_window_temp, date, window_temp), WEL_quick = window_temp), by = "date") %>% 
-  left_join(dplyr::rename(dplyr::select(WEL_slow_window_temp, date, window_temp), WEL_slow = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(ICH_window_temp, date, window_temp), ICH = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(LGR_quick_window_temp, date, window_temp), LGR_quick = window_temp), by = "date") %>% 
-  left_join(dplyr::rename(dplyr::select(LGR_slow_window_temp, date, window_temp), LGR_slow = window_temp), by = "date") %>% 
+  left_join(dplyr::rename(dplyr::select(WEL_slow_window_temp, date, window_temp), WEL_slow = window_temp), by = "date") %>%
+  left_join(dplyr::rename(dplyr::select(LGR_slow_window_temp, date, window_temp), LGR_slow = window_temp), by = "date") %>%
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   dplyr::select(-date) %>% 
