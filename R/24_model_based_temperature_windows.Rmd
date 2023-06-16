@@ -26,19 +26,19 @@ library(ggpubr)
 
 ### load data
 ```{r load_data}
-temp_yhat <- read.csv(here::here("covariate_data", "for_model", "temp", "temp_yhat.csv"))
+temp_mod_est <- read.csv(here::here("covariate_data", "for_model", "temp", "temp_mod_est.csv"))
 
-temp_yhat$date <- ymd(temp_yhat$date)
+temp_mod_est$date <- ymd(temp_mod_est$date)
 
 # extract each dam
-BON_temp_ts <- dplyr::select(temp_yhat, date, BON)
-MCN_temp_ts <- dplyr::select(temp_yhat, date, MCN)
-PRA_temp_ts <- dplyr::select(temp_yhat, date, PRA)
-RIS_temp_ts <- dplyr::select(temp_yhat, date, RIS)
-RRE_temp_ts <- dplyr::select(temp_yhat, date, RRE)
-WEL_temp_ts <- dplyr::select(temp_yhat, date, WEL)
-ICH_temp_ts <- dplyr::select(temp_yhat, date, ICH)
-LGR_temp_ts <- dplyr::select(temp_yhat, date, LGR)
+BON_temp_ts <- dplyr::select(temp_mod_est, date, BON)
+MCN_temp_ts <- dplyr::select(temp_mod_est, date, MCN)
+PRA_temp_ts <- dplyr::select(temp_mod_est, date, PRA)
+RIS_temp_ts <- dplyr::select(temp_mod_est, date, RIS)
+RRE_temp_ts <- dplyr::select(temp_mod_est, date, RRE)
+WEL_temp_ts <- dplyr::select(temp_mod_est, date, WEL)
+ICH_temp_ts <- dplyr::select(temp_mod_est, date, ICH)
+LGR_temp_ts <- dplyr::select(temp_mod_est, date, LGR)
 
 ```
 
@@ -237,7 +237,8 @@ quantiles_table %>%
 # match them using outflow
 
 # use a function
-window_temp <- function(temp_data, median_time){
+# optional argument if you want to start window at a different time
+window_temp <- function(temp_data, start_window_days = 0, end_window_days){
   colnames(temp_data) <- c("date", "temp")
   
   temp_data %>% 
@@ -245,41 +246,49 @@ window_temp <- function(temp_data, median_time){
 
 # loop to get all windows
 for (i in 1:nrow(temp_data)){
-  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] & date <= temp_data$date[i] + days(x = median_time))$temp)
+  temp_data$window_temp[i] <- mean(subset(temp_data, date >= temp_data$date[i] + days(x = start_window_days) & date <= temp_data$date[i] + days(x = end_window_days))$temp)
 }
   
   return(temp_data)
 }
 
 # Bonneville Dam, for mainstem, BON to MCN reach
-BON_window_temp <- window_temp(temp_data = BON_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, BON to MCN")$median)
+BON_window_temp <- window_temp(temp_data = BON_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, BON to MCN")$median)
 
 # McNary Dam, for mainstem, MCN to ICH or PRA reach
-MCN_window_temp <- window_temp(temp_data = MCN_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, MCN to ICH or PRA")$median)
+MCN_window_temp <- window_temp(temp_data = MCN_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, MCN to ICH or PRA")$median)
 
 # PRA Dam, for PRA to RIS reach
-PRA_window_temp <- window_temp(temp_data = PRA_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, PRA to RIS")$median)
+PRA_window_temp <- window_temp(temp_data = PRA_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, PRA to RIS")$median)
 
 # RIS Dam, for RIS to RRE reach
-RIS_window_temp <- window_temp(temp_data = RIS_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, RIS to RRE")$median)
+RIS_window_temp <- window_temp(temp_data = RIS_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, RIS to RRE")$median)
 
 # RRE Dam, for RRE to WEL reach
-RRE_window_temp <- window_temp(temp_data = RRE_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, RRE to WEL")$median)
+RRE_window_temp <- window_temp(temp_data = RRE_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, RRE to WEL")$median)
 
 # Ice Harbor Dam, for ICH to LGR reach
-ICH_window_temp <- window_temp(temp_data = ICH_temp_ts, median_time = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
+ICH_window_temp <- window_temp(temp_data = ICH_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
 
 # Wells Dam, for upstream of WEL reach - quick fish
-WEL_quick_window_temp <- window_temp(temp_data = WEL_temp_ts, median_time = round(WEL_mix$mu[1]))
+WEL_quick_window_temp <- window_temp(temp_data = WEL_temp_ts, 
+                                     start_window_days = round(WEL_mix$mu[1] - WEL_mix$sigma[1]), 
+                                     end_window_days = round(WEL_mix$mu[1] + WEL_mix$sigma[1]))
 
 # Wells Dam, for upstream of WEL reach - slow fish
-WEL_slow_window_temp <- window_temp(temp_data = WEL_temp_ts, median_time = round(WEL_mix$mu[2]))
+WEL_slow_window_temp <- window_temp(temp_data = WEL_temp_ts, 
+                                     start_window_days = round(WEL_mix$mu[2] - WEL_mix$sigma[2]), 
+                                     end_window_days = round(WEL_mix$mu[2] + WEL_mix$sigma[2]))
 
 # Lower Granite Dam, for upstream of LGR reach - quick fish
-LGR_quick_window_temp <- window_temp(temp_data = LGR_temp_ts, median_time = round(LGR_mix$mu[1]))
+LGR_quick_window_temp <- window_temp(temp_data = LGR_temp_ts, 
+                                     start_window_days = round(LGR_mix$mu[1] - LGR_mix$sigma[1]), 
+                                     end_window_days = round(LGR_mix$mu[1] + LGR_mix$sigma[1]))
 
 # Lower Granite Dam, for upstream of LGR reach - slow fish
-LGR_slow_window_temp <- window_temp(temp_data = LGR_temp_ts, median_time = round(LGR_mix$mu[2]))
+LGR_slow_window_temp <- window_temp(temp_data = LGR_temp_ts, 
+                                     start_window_days = round(LGR_mix$mu[2] - LGR_mix$sigma[2]), 
+                                     end_window_days = round(LGR_mix$mu[2] + LGR_mix$sigma[2]))
 
 # export all of these
 write.csv(BON_window_temp, here::here("covariate_data", "for_model", "temp", "BON_window_temp.csv"), row.names = FALSE)
