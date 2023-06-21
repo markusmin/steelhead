@@ -350,6 +350,32 @@ BON_temp_2_long %>%
 # CONFIRMED - this is forebay temperature
 ```
 
+#### plot spill data availability
+```{r}
+library(viridis)
+spill_by_year_plot <- function(data, dam_name){
+  ggplot(subset(data, year >= 2005), aes(x = day, y = spill, color = year)) +
+  # scale_color_tableau(palette = "Tableau 20") +
+  scale_color_viridis() +
+  geom_point() +
+  ggtitle(dam_name)
+
+}
+
+spill_by_year_plot(data = BON_spill_long, dam_name = "Bonneville")
+spill_by_year_plot(data = MCN_spill_long, dam_name = "McNary")
+spill_by_year_plot(data = PRA_spill_long, dam_name = "Priest Rapids")
+spill_by_year_plot(data = RIS_spill_long, dam_name = "Rock Island")
+spill_by_year_plot(data = RRE_spill_long, dam_name = "Rocky Reach")
+spill_by_year_plot(data = WEL_spill_long, dam_name = "Wells")
+spill_by_year_plot(data = ICH_spill_long, dam_name = "Ice Harbor")
+spill_by_year_plot(data = LGR_spill_long, dam_name = "Lower Granite")
+
+```
+
+
+
+
 #### calculate windows
 ```{r}
 # so, I think that the most up to date files are in the same folders as the model runs
