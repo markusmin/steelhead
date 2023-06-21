@@ -1,7 +1,7 @@
 // 03_parallel_snake_stan_actual_int_origin_wild_deteff
 // wild, upper Columbia Steelhead
 // This model includes a detection efficiency calculation for the tributaries
-// this model has as covariate temperature and origin
+// this model has as covariate temperature and origin and a random effect of year
 
 functions{
     real partial_sum_lpmf( // int[] slice_n_fish, // I don't think that we need this, given that we are using start and end to index the detection histories
@@ -604,8 +604,8 @@ real borigin2_matrix_30_7;
 real borigin2_matrix_42_7;
 
 // random effect of year parameter
-real byear[nyears];
-real sigma_year;
+array [nyear] real byear;
+real<lower=0> sigma_year;
 
 
 // here, write out all of the parameters for detection efficiency
@@ -1455,7 +1455,7 @@ borigin2_matrix_30_7 ~ normal(0,10);
 borigin2_matrix_42_7 ~ normal(0,10);
 
 // random effect of year - here this is just the standard deviation
-sigma_year ~ normal(0,10);
+sigma_year ~ cauchy(0,5);
 
 
 
