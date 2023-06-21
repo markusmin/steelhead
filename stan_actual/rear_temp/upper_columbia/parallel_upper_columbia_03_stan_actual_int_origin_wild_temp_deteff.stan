@@ -361,7 +361,7 @@ data {
   array[n_ind] int n_obs; // n_obs is a vector that contains the number of site visits for each individual - but needs to be declared as array to take integer values
   vector[43] possible_movements; // a vector containing the number of possible transitions out of each state
   array[n_ind, max_visits] int transition_dates; // a matrix of the dates (as numeric string with 2005-06-01 as 1) that each transition took place
-  array[6423,9] real temperature_data; // a matrix of the temperature data for each of eight statess
+  array[6423,11] real temperature_data; // a matrix of the temperature data for each of eight statess
   array[n_ind, max_visits-1] int states_mat; // a matrix (array to take integer values) with rows = each fish and columns = the site visits
   // array[54, 2] int movements; // a matrix that contains the possible transitions out of each state
   int nmovements; // an integer value containing the number of possible transitions (same as rows in movements data)
@@ -372,7 +372,7 @@ data {
   // array[n_ind, 48] int dates; // a matrix containing dates (as integers) where rows = number of fish and columns = site visits
   matrix[43, 43] possible_states; // the transition matrix with 1s for allowable transitions and 0s for non-allowable
   array[n_ind, 3] int cat_X_mat; // a matrix with rows = individual fish and columns = various categorical covariates (origin)
-  array[n_ind, 3] int temp_X_mat; // a matrix with rows = individual fish and columns = design matrix for temperature
+  array[n_ind, 4] int temp_X_mat; // a matrix with rows = individual fish and columns = design matrix for temperature
   
   matrix[35,2] det_eff_param_posteriors; // declare the matrix that contains the posteriors from the det eff script:
   

@@ -2012,7 +2012,7 @@ n.ind <- dim(state_data)[3]
   ntransitions = length(transition_run_years)
   
   # load in the temperature data
-  temp_data <- read.csv("window_temps_for_stan.csv")
+  temp_data <- read.csv("window_temps_for_stan.csv", row.names = 1)
   
   
   ##### Run stan model #####
