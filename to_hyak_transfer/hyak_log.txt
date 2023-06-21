@@ -2361,6 +2361,154 @@ sbatch job_ckpt_UC_W.slurm
 Chain 1 finished in 6737.2 seconds.
 Warning: 42 of 50 (84.0%) transitions hit the maximum treedepth limit of 10.
 
+### 2023-05-15 ###
+
+#Pull the run (from within /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type/from_hyak:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_models/upper_columbia/ ./
+
+I'm going to take back dropping origin/rear combinations based on sample sizes. If they're left
+in, nothing bad really happens except that the origin covariate has a really big confidence interval.
+And then benefit is that you still get some estimate (although very low confidence), and it 
+might help estimate the DPS-level covariates
+
+Okay never mind again, let's drop those. Because those sample sizes are so small they're basically
+meaningless. Will require dropping certain origin parameters.
+
+So I made the edits that I think dropped Okanogan wild fish, so let's try running again
+# from within the directory /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_models/
+# then from within the folder on mox:
+sbatch job_ckpt_UC_W.slurm
+
+Model ran, quite quickly, in almost half the time as the last model (probably because we aren't monitoring a bunch of nonsense parameters):
+Chain 1 Iteration:  1 / 100 [  1%]  (Warmup)
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following i$
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities$
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matric$
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 1
+Chain 1 Iteration: 10 / 100 [ 10%]  (Warmup)
+Chain 1 Iteration: 20 / 100 [ 20%]  (Warmup)
+Chain 1 Iteration: 30 / 100 [ 30%]  (Warmup)
+Chain 1 Iteration: 40 / 100 [ 40%]  (Warmup)
+Chain 1 Iteration: 50 / 100 [ 50%]  (Warmup)
+Chain 1 Iteration: 51 / 100 [ 51%]  (Sampling)
+Chain 1 Iteration: 60 / 100 [ 60%]  (Sampling)
+Chain 1 Iteration: 70 / 100 [ 70%]  (Sampling)
+Chain 1 Iteration: 80 / 100 [ 80%]  (Sampling)
+Chain 1 Iteration: 90 / 100 [ 90%]  (Sampling)
+Chain 1 Iteration: 100 / 100 [100%]  (Sampling)
+Chain 1 finished in 3940.3 seconds.
+Warning: 6 of 50 (12.0%) transitions hit the maximum treedepth limit of 10.
+
+Pull it:
+#Pull the run (from within /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type/from_hyak:)
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_models/upper_columbia/ ./
+
+Other datasets will take a lot longer, this was only 1500 fish or so
+
+Everything looks good, I still had the values for discharge beta off though, so going to turn those
+back on and re-submit just the stan model.
+# on mox, remove executable:
+[mmin@mox1 upper_columbia]$ rm parallel_upper_columbia_03_stan_actual_int_origin_wild_deteff
+# from within the directory /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_type
+scp -r ./upper_columbia/parallel_upper_columbia_03_stan_actual_int_origin_wild_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_models/upper_columbia/
+# then from within the folder on mox:
+sbatch job_ckpt_UC_W.slurm
+
+# Querying temperature data from CBR DART
+- so not all dams have better forebay than tailrace temperature data. For example,
+Ice Harbor is missing winter forebay temperatures for 2007-2009. Perhaps we need to use a script
+that fills in missing tailrace temperatures with forebay temperatures? or vice versa?
+- I don't think that we can have missing data. So a workflow might look like:
+1. Take temperature data from tailrace, if missing
+2. Take temperature data from forebay, if also missing
+3. Interpolate using the relationship of temperature with a nearby dam
+	- This is going to be annoying for the upper columbia dams, since they're all
+	missing temperature data in the winter before April 2013
+	- So Wanapum Dam does have temperature data, for most of this missing time,
+	so we can pull temp data from there
+
+- Dams that have better forebay temperature coverage:
+	- Bonneville
+	
+- Dams that have better tailrace temperature coverage:
+	- John Day
+	- Ice Harbor
+	- Little Goose
+	- Lower Granite
+	- Lower Monumental
+	- McNary
+	- The Dalles
+	
+- Dams that have similar gaps in temperature coverage:
+	- Priest Rapids
+	- Rock Island
+	- Rocky Reach
+	- Wells
+	- Wanapum
+	
+	
+July 2005 - Spring 2006 is a problem for most dams
+For most dams, the tailrace -> forebay -> linear interpolation works well. Exceptions
+are the upper columbia dams (as expected): RIS, RRE, and WEL. PRA has a few gaps, but 
+not nearly as bad
+- let's figure out the relationship with Wanapum temperature
+
+- temperature data completed and exported, with windows for every state and every dam from 2005-2022
+
+### 2023-05-23 ###
+
+Okay, I think the temperature model is working. Move it to hyak and run it 100 iter to test.
+
+# move it to hyak
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/
+
+# run it
+
+# did a bunch of troubleshooting, then I think it ran!
+
+### 2023-05-24
+
+# Pull the temperature model
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/upper_columbia/ ./
+
+Chain 1 finished in 6147.3 seconds.
+Warning: 50 of 50 (100.0%) transitions hit the maximum treedepth limit of 10.
+
+Length of run isn't too bad, the max treedepth is mostly an efficiency problem: https://mc-stan.org/docs/2_24/cmdstan-guide/diagnose.html
+
+There's a typo - I used the same design matrix for origin and originxtemperature, when in reality they're different (1/1/-1, vs 1/1/0)
+- so can't trust those results!!
+
+### 2023-06-16 ###
+
+Updated how temperature is treated:
+- only universal effect outside of DPS boundaries, only origin-specific within boundaries
+- still currently only set up for one temp effect for upstream LGR and upstream WEL
+
+Move it to mox and try running:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/
+sbatch job_ckpt_UC_W_T.slurm
+
+### 2023-06-20 ###
+
+# Fixed a dimensioning issue, moved it back
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/
+sbatch job_ckpt_UC_W_T.slurm
+
+# After a few fixes, the model ran - pull the run and inspect
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/upper_columbia/ ./
+
+# push the run with two temperature covariates to mox
+scp -r ./upper_columbia_2temp/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/
+
+# pull the two temperature covariates run
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/upper_columbia_2temp/ ./
+
+# run RE year model, one temp covariate (two temp covariates doesn't look too interesting)
+# from within the stan_actual/rear_temp_year/ folder:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/
 
 
 
