@@ -512,6 +512,10 @@ upper_columbia_movements %>%
 b0_matrix_names %>% 
   arrange(row,col) -> b0_matrix_names
 
+# create a sigma_year parameter names
+b0_matrix_names %>% 
+  mutate(sigma_year_matrix_name = sub("b0_matrix", "sigma_year_matrix", b0_matrix_name)) %>% 
+  dplyr::select(-b0_matrix_name) -> sigma_year_matrix_names
 
 
 
@@ -552,6 +556,47 @@ for (i in 1:(nrow(b0_matrix_names))){
   # Finally - if it's any other movement, just treat it like normal!
   # If it's not, print just the one version
     cat("real ", b0_matrix_names$b0_matrix_name[i],";", "\n", sep = "")
+  }
+  
+}
+
+# print declaration of year_sigma parameters - distinguish which need two versions based on mainstem_trib_movement column
+# Note that this block doesn't change between models for different ESUs
+for (i in 1:(nrow(sigma_year_matrix_names))){
+  # Paste the numerator
+  
+  # If it is a movement from the mainstem into the river mouth state, then it gets two versions of the parameter.
+  # If it's not, then it just gets one.
+  # If its a movement from the upstream to the river mouth state or vice versa, it doesn't get a parameter at all - 
+  # we don't care about these movements.
+  
+  # Movements from mainstem to river mouth: print two versions
+  if (sigma_year_matrix_names$mainstem_river_mouth_movement[i] == 1){
+    cat("real ", sigma_year_matrix_names$sigma_year_matrix_name[i], "_DE", ";", "\n", sep = "")
+    cat("real ", sigma_year_matrix_names$sigma_year_matrix_name[i], "_NDE", ";", "\n", sep = "")
+  }
+  
+  # If it's a within tributary movement - we don't want it. These have been
+  # removed from the data (we don't care about them!)
+  else if (sigma_year_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream - we don't want a parameter for it,
+  # because it'll share the same parameter (see transformed parameters block) 
+  # as the movement from mainstem to river mouth
+  else if (sigma_year_matrix_names$mainstem_upstream_movement[i] == 1){
+    # do nothing!
+  }
+  
+  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter.
+  # these transitions will get the same parameters as the river mouth to mainstem
+  else if (sigma_year_matrix_names$upstream_mainstem_movement[i] == 1){
+    # do nothing!
+  } else {
+    # Finally - if it's any other movement, just treat it like normal!
+    # If it's not, print just the one version
+    cat("real ", sigma_year_matrix_names$sigma_year_matrix_name[i],";", "\n", sep = "")
   }
   
 }
@@ -772,6 +817,42 @@ for (i in 1:(nrow(b0_matrix_names))){
     
 } 
 
+# Write out two separate matrices for sigma_year - an NDE (no detection efficiency correction) and a DE (detection efficiency) matrix
+for (i in 1:(nrow(sigma_year_matrix_names))){
+  # Movements from mainstem to river mouth: store the two different versions
+  if (sigma_year_matrix_names$mainstem_river_mouth_movement[i] == 1){
+    cat("sigma_year_matrix_DE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i], "_DE",";", "\n", sep = "")
+    cat("sigma_year_matrix_NDE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i], "_NDE",";", "\n", sep = "")
+    
+  }
+  
+  # If it's a within tributary movement - we don't want it
+  else if (sigma_year_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream:
+  # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
+  # For DE - we need to give these all -100000 values, so that in the logit they come out as zeros (since they're not transitions that are allowed)
+  else if (sigma_year_matrix_names$mainstem_upstream_movement[i] == 1){
+    # cat("sigma_year_matrix_DE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i-1], "_DE",";", "\n", sep = "")
+    cat("sigma_year_matrix_DE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", "-100000;", "\n", sep = "")
+    cat("sigma_year_matrix_NDE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+  }
+  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
+  # And note - that these are not DE or NDE parameters
+  # Because of order, we need -2 here instead of -1, to pick the right from state
+  # NO WE DON'T, just use -1
+  else if (sigma_year_matrix_names$upstream_mainstem_movement[i] == 1){
+    cat("sigma_year_matrix_DE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i-1],";", "\n", sep = "")
+    cat("sigma_year_matrix_NDE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i-1],";", "\n", sep = "")
+    # If it's not, store the same parameter in both matrices
+  } else {
+    cat("sigma_year_matrix_DE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i], ";", "\n", sep = "")
+    cat("sigma_year_matrix_NDE[", sigma_year_matrix_names$row[i], ",", sigma_year_matrix_names$col[i], "]", " = ", sigma_year_matrix_names$sigma_year_matrix_name[i], ";", "\n", sep = "")
+  }
+  
+} 
+
 
 # Write out the temp matrix - DE and NDE
 for (i in 1:(nrow(btemp_matrix_names))){
@@ -927,6 +1008,45 @@ for (i in 1:(nrow(b0_matrix_names))){
   }
   
 
+}
+
+# print sigma_year matrix priors
+for (i in 1:(nrow(sigma_year_matrix_names))){
+  
+  # Paste the numerator
+  
+  # If it is a movement from the mainstem into the river mouth state, then it gets two versions of the parameter.
+  # If it's not, then it just gets one.
+  # If its a movement from the upstream to the river mouth state or vice versa, it doesn't get a parameter at all - 
+  # we don't care about these movements.
+  
+  # Movements from mainstem to river mouth: print two versions
+  if (sigma_year_matrix_names$mainstem_river_mouth_movement[i] == 1){
+    cat(sigma_year_matrix_names$sigma_year_matrix_name[i], "_DE", " ~ normal(0,10);", "\n", sep = "")
+    cat(sigma_year_matrix_names$sigma_year_matrix_name[i], "_NDE", " ~ normal(0,10);", "\n", sep = "")
+  }
+  
+  # If it's a within tributary movement - we don't want it (no prior)
+  else if (sigma_year_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream - we also don't want it (no prior)
+  else if (sigma_year_matrix_names$mainstem_upstream_movement[i] == 1){
+    # do nothing!
+  }
+  
+  # If we move from the river mouth state to the mainstem, we want a parameter - this is captured in the below
+  # BUT - if it's a movement from the upstream state to the mainstem, we don't want a parameter (so no prior).
+  # these transitions will get the same parameters as the river mouth to mainstem
+  else if (sigma_year_matrix_names$upstream_mainstem_movement[i] == 1){
+    # do nothing!
+  } else {
+    # Finally - if it's any other movement, just treat it like normal!
+    # If it's not, print just the one version
+    cat(sigma_year_matrix_names$sigma_year_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
+  }
+  
+  
 }
 
 # print btemp matrix priors
@@ -1998,8 +2118,7 @@ n.ind <- dim(state_data)[3]
   # run_year_DE_array[3,20,1:18] <- 1
   # so for now - remove run year 04/05, otherwise it'll all get confused because there's no discharge data for that year
   run_year_DE_array[3,20,2:18] <- 1
-  
-  
+
   
   
   # Load the data from the detection efficiency model to use as priors in this model
@@ -2010,6 +2129,8 @@ n.ind <- dim(state_data)[3]
   transition_run_years <- states_complete$run_year_index
   
   ntransitions = length(transition_run_years)
+  
+  print("nyears = ", max(transition_run_years))
   
   # load in the temperature data
   temp_data <- read.csv("window_temps_for_stan.csv", row.names = 1)
@@ -2029,7 +2150,7 @@ n.ind <- dim(state_data)[3]
                tributary_design_matrices_array = tributary_design_matrices_array,
                ntransitions = ntransitions,
                transition_run_years = transition_run_years,
-               nyears = length(unique(transition_run_years)),
+               nyears = max(transition_run_years), sigma_year_indices = sigma_year_matrix_names[,1:2],
                run_year_DE_array = run_year_DE_array,
                det_eff_param_posteriors = det_eff_param_posteriors)
   

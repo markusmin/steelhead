@@ -10,6 +10,7 @@ functions{
                         // I think we need to re-declare things for our function that are also already declared in our data?
                         int n_ind,
                         int max_visits,
+                        int nmovements,
                         
                         // declare an array with the date of transition for fish
                         // this will have the same dimensions/structure as states_mat
@@ -56,8 +57,12 @@ functions{
                         array[,] real btempxorigin2_matrix_NDE, 
                         array[,] real btempxorigin3_matrix_NDE, 
                         
-                        array[] real byear,
-                        real sigma_year,
+                        // array[,] real byear,
+                        array [,] real sigma_year_matrix_DE,
+                        array [,] real sigma_year_matrix_NDE,
+                        
+                        // indices for sigma_year
+                        array[,] int sigma_year_indices,
                         
                         
                         // below is new data for detection efficiency
@@ -94,7 +99,22 @@ functions{
   // add the RE year effect to total_lp - we don't need to evaluate this for every fish
 // maybe we don't even need this because the effect of year is being evaluated in 
 // the categorical_lpmf part? But then what about sigma_year?
-total_lp += normal_lpdf(byear | 0, sigma_year);
+
+// first, create a temporary df, with each of the individual byear parameters (drawn from normal, using sigma_year)
+  // create an empty array with 3 dimensions: matrix for parameters, slices for years
+  array [43,43,nyears] real byear_parameters_array_DE;
+  array [43,43,nyears] real byear_parameters_array_NDE;
+  
+  // for each of the non-zero elements of byear_parameters_array, evaluate all of the ones for each year as normal
+  // evaluate DE and NDE separately
+  for (p in 1:nmovements){
+     total_lp += normal_lpdf(to_row_vector(byear_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
+     total_lp += normal_lpdf(to_row_vector(byear_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
+  }
+  
+
+
+// total_lp += normal_lpdf(byear | 0, sigma_year);
   
   
   // Now, loop through the detection matrices for each individual IN THIS SLICE OF THE DATA
@@ -215,7 +235,7 @@ total_lp += normal_lpdf(byear | 0, sigma_year);
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_DE[current,k] +
                     // add year as a random effect
-                    byear[run_year_actual];
+                    byear_parameters_array_DE[current, k, run_year_actual];
                     
                     // store in the vector that it's DE
                     DE_correction[k] = 1;
@@ -230,7 +250,7 @@ total_lp += normal_lpdf(byear | 0, sigma_year);
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_NDE[current,k] +
                     // add year as a random effect
-                    byear[run_year_actual];
+                    byear_parameters_array_NDE[current, k, run_year_actual];;
                     
                     // otherwise, store in the vector that it's not DE
                     DE_correction[k] = 0;
@@ -486,6 +506,67 @@ real b0_matrix_39_9;
 real b0_matrix_41_2;
 real b0_matrix_42_7;
 
+// random effect of year parameters
+// array [nyears] real byear;
+// real<lower=0> sigma_year;
+real<lower=0>sigma_year_matrix_1_2;
+real<lower=0>sigma_year_matrix_2_1;
+real<lower=0>sigma_year_matrix_2_3;
+real<lower=0>sigma_year_matrix_2_10_DE;
+real<lower=0>sigma_year_matrix_2_10_NDE;
+real<lower=0>sigma_year_matrix_2_12_DE;
+real<lower=0>sigma_year_matrix_2_12_NDE;
+real<lower=0>sigma_year_matrix_2_14_DE;
+real<lower=0>sigma_year_matrix_2_14_NDE;
+real<lower=0>sigma_year_matrix_2_16_DE;
+real<lower=0>sigma_year_matrix_2_16_NDE;
+real<lower=0>sigma_year_matrix_2_18_DE;
+real<lower=0>sigma_year_matrix_2_18_NDE;
+real<lower=0>sigma_year_matrix_2_41;
+real<lower=0>sigma_year_matrix_3_2;
+real<lower=0>sigma_year_matrix_3_4;
+real<lower=0>sigma_year_matrix_3_8;
+real<lower=0>sigma_year_matrix_3_20_DE;
+real<lower=0>sigma_year_matrix_3_20_NDE;
+real<lower=0>sigma_year_matrix_3_22_DE;
+real<lower=0>sigma_year_matrix_3_22_NDE;
+real<lower=0>sigma_year_matrix_4_3;
+real<lower=0>sigma_year_matrix_4_5;
+real<lower=0>sigma_year_matrix_5_4;
+real<lower=0>sigma_year_matrix_5_6;
+real<lower=0>sigma_year_matrix_5_24_DE;
+real<lower=0>sigma_year_matrix_5_24_NDE;
+real<lower=0>sigma_year_matrix_6_5;
+real<lower=0>sigma_year_matrix_6_7;
+real<lower=0>sigma_year_matrix_6_26_DE;
+real<lower=0>sigma_year_matrix_6_26_NDE;
+real<lower=0>sigma_year_matrix_7_6;
+real<lower=0>sigma_year_matrix_7_28_DE;
+real<lower=0>sigma_year_matrix_7_28_NDE;
+real<lower=0>sigma_year_matrix_7_30_DE;
+real<lower=0>sigma_year_matrix_7_30_NDE;
+real<lower=0>sigma_year_matrix_7_42;
+real<lower=0>sigma_year_matrix_8_3;
+real<lower=0>sigma_year_matrix_8_9;
+real<lower=0>sigma_year_matrix_8_32_DE;
+real<lower=0>sigma_year_matrix_8_32_NDE;
+real<lower=0>sigma_year_matrix_9_8;
+real<lower=0>sigma_year_matrix_9_34_DE;
+real<lower=0>sigma_year_matrix_9_34_NDE;
+real<lower=0>sigma_year_matrix_9_36;
+real<lower=0>sigma_year_matrix_9_37;
+real<lower=0>sigma_year_matrix_9_38;
+real<lower=0>sigma_year_matrix_9_39_DE;
+real<lower=0>sigma_year_matrix_9_39_NDE;
+real<lower=0>sigma_year_matrix_10_2;
+real<lower=0>sigma_year_matrix_14_2;
+real<lower=0>sigma_year_matrix_24_5;
+real<lower=0>sigma_year_matrix_26_6;
+real<lower=0>sigma_year_matrix_28_7;
+real<lower=0>sigma_year_matrix_30_7;
+real<lower=0>sigma_year_matrix_36_9;
+real<lower=0>sigma_year_matrix_42_7;
+
 real btemp_matrix_1_2;
 real btemp_matrix_2_3;
 real btemp_matrix_2_10_DE;
@@ -603,10 +684,6 @@ real borigin2_matrix_28_7;
 real borigin2_matrix_30_7;
 real borigin2_matrix_42_7;
 
-// random effect of year parameter
-array [nyear] real byear;
-real<lower=0> sigma_year;
-
 
 // here, write out all of the parameters for detection efficiency
 // twenty terms for intercepts for different eras (configurations of antennas) in the different tributaries
@@ -668,6 +745,13 @@ transformed parameters {
   // Non-zero elements will be overwritten
   // b0_matrix = rep_matrix(-100000, 43, 43);
   b0_matrix_NDE = rep_array(-100000, 43, 43);
+  
+    // Declare matrices to store sigma_year params
+  array[43,43] real sigma_year_matrix_DE;
+  sigma_year_matrix_DE = rep_array(-100000, 43, 43);
+  
+  array[43,43] real sigma_year_matrix_NDE;
+  sigma_year_matrix_NDE = rep_array(-100000, 43, 43);
   
   // Declare a matrix to store btemp params
   // matrix[43,43] btemp_matrix;
@@ -881,6 +965,129 @@ b0_matrix_DE[41,2] = b0_matrix_41_2;
 b0_matrix_NDE[41,2] = b0_matrix_41_2;
 b0_matrix_DE[42,7] = b0_matrix_42_7;
 b0_matrix_NDE[42,7] = b0_matrix_42_7;
+
+sigma_year_matrix_DE[1,2] = sigma_year_matrix_1_2;
+sigma_year_matrix_NDE[1,2] = sigma_year_matrix_1_2;
+sigma_year_matrix_DE[2,1] = sigma_year_matrix_2_1;
+sigma_year_matrix_NDE[2,1] = sigma_year_matrix_2_1;
+sigma_year_matrix_DE[2,3] = sigma_year_matrix_2_3;
+sigma_year_matrix_NDE[2,3] = sigma_year_matrix_2_3;
+sigma_year_matrix_DE[2,10] = sigma_year_matrix_2_10_DE;
+sigma_year_matrix_NDE[2,10] = sigma_year_matrix_2_10_NDE;
+sigma_year_matrix_DE[2,11] = -100000;
+sigma_year_matrix_NDE[2,11] = sigma_year_matrix_2_10_NDE;
+sigma_year_matrix_DE[2,12] = sigma_year_matrix_2_12_DE;
+sigma_year_matrix_NDE[2,12] = sigma_year_matrix_2_12_NDE;
+sigma_year_matrix_DE[2,13] = -100000;
+sigma_year_matrix_NDE[2,13] = sigma_year_matrix_2_12_NDE;
+sigma_year_matrix_DE[2,14] = sigma_year_matrix_2_14_DE;
+sigma_year_matrix_NDE[2,14] = sigma_year_matrix_2_14_NDE;
+sigma_year_matrix_DE[2,15] = -100000;
+sigma_year_matrix_NDE[2,15] = sigma_year_matrix_2_14_NDE;
+sigma_year_matrix_DE[2,16] = sigma_year_matrix_2_16_DE;
+sigma_year_matrix_NDE[2,16] = sigma_year_matrix_2_16_NDE;
+sigma_year_matrix_DE[2,17] = -100000;
+sigma_year_matrix_NDE[2,17] = sigma_year_matrix_2_16_NDE;
+sigma_year_matrix_DE[2,18] = sigma_year_matrix_2_18_DE;
+sigma_year_matrix_NDE[2,18] = sigma_year_matrix_2_18_NDE;
+sigma_year_matrix_DE[2,19] = -100000;
+sigma_year_matrix_NDE[2,19] = sigma_year_matrix_2_18_NDE;
+sigma_year_matrix_DE[2,41] = sigma_year_matrix_2_41;
+sigma_year_matrix_NDE[2,41] = sigma_year_matrix_2_41;
+sigma_year_matrix_DE[3,2] = sigma_year_matrix_3_2;
+sigma_year_matrix_NDE[3,2] = sigma_year_matrix_3_2;
+sigma_year_matrix_DE[3,4] = sigma_year_matrix_3_4;
+sigma_year_matrix_NDE[3,4] = sigma_year_matrix_3_4;
+sigma_year_matrix_DE[3,8] = sigma_year_matrix_3_8;
+sigma_year_matrix_NDE[3,8] = sigma_year_matrix_3_8;
+sigma_year_matrix_DE[3,20] = sigma_year_matrix_3_20_DE;
+sigma_year_matrix_NDE[3,20] = sigma_year_matrix_3_20_NDE;
+sigma_year_matrix_DE[3,21] = -100000;
+sigma_year_matrix_NDE[3,21] = sigma_year_matrix_3_20_NDE;
+sigma_year_matrix_DE[3,22] = sigma_year_matrix_3_22_DE;
+sigma_year_matrix_NDE[3,22] = sigma_year_matrix_3_22_NDE;
+sigma_year_matrix_DE[3,23] = -100000;
+sigma_year_matrix_NDE[3,23] = sigma_year_matrix_3_22_NDE;
+sigma_year_matrix_DE[4,3] = sigma_year_matrix_4_3;
+sigma_year_matrix_NDE[4,3] = sigma_year_matrix_4_3;
+sigma_year_matrix_DE[4,5] = sigma_year_matrix_4_5;
+sigma_year_matrix_NDE[4,5] = sigma_year_matrix_4_5;
+sigma_year_matrix_DE[5,4] = sigma_year_matrix_5_4;
+sigma_year_matrix_NDE[5,4] = sigma_year_matrix_5_4;
+sigma_year_matrix_DE[5,6] = sigma_year_matrix_5_6;
+sigma_year_matrix_NDE[5,6] = sigma_year_matrix_5_6;
+sigma_year_matrix_DE[5,24] = sigma_year_matrix_5_24_DE;
+sigma_year_matrix_NDE[5,24] = sigma_year_matrix_5_24_NDE;
+sigma_year_matrix_DE[5,25] = -100000;
+sigma_year_matrix_NDE[5,25] = sigma_year_matrix_5_24_NDE;
+sigma_year_matrix_DE[6,5] = sigma_year_matrix_6_5;
+sigma_year_matrix_NDE[6,5] = sigma_year_matrix_6_5;
+sigma_year_matrix_DE[6,7] = sigma_year_matrix_6_7;
+sigma_year_matrix_NDE[6,7] = sigma_year_matrix_6_7;
+sigma_year_matrix_DE[6,26] = sigma_year_matrix_6_26_DE;
+sigma_year_matrix_NDE[6,26] = sigma_year_matrix_6_26_NDE;
+sigma_year_matrix_DE[6,27] = -100000;
+sigma_year_matrix_NDE[6,27] = sigma_year_matrix_6_26_NDE;
+sigma_year_matrix_DE[7,6] = sigma_year_matrix_7_6;
+sigma_year_matrix_NDE[7,6] = sigma_year_matrix_7_6;
+sigma_year_matrix_DE[7,28] = sigma_year_matrix_7_28_DE;
+sigma_year_matrix_NDE[7,28] = sigma_year_matrix_7_28_NDE;
+sigma_year_matrix_DE[7,29] = -100000;
+sigma_year_matrix_NDE[7,29] = sigma_year_matrix_7_28_NDE;
+sigma_year_matrix_DE[7,30] = sigma_year_matrix_7_30_DE;
+sigma_year_matrix_NDE[7,30] = sigma_year_matrix_7_30_NDE;
+sigma_year_matrix_DE[7,31] = -100000;
+sigma_year_matrix_NDE[7,31] = sigma_year_matrix_7_30_NDE;
+sigma_year_matrix_DE[7,42] = sigma_year_matrix_7_42;
+sigma_year_matrix_NDE[7,42] = sigma_year_matrix_7_42;
+sigma_year_matrix_DE[8,3] = sigma_year_matrix_8_3;
+sigma_year_matrix_NDE[8,3] = sigma_year_matrix_8_3;
+sigma_year_matrix_DE[8,9] = sigma_year_matrix_8_9;
+sigma_year_matrix_NDE[8,9] = sigma_year_matrix_8_9;
+sigma_year_matrix_DE[8,32] = sigma_year_matrix_8_32_DE;
+sigma_year_matrix_NDE[8,32] = sigma_year_matrix_8_32_NDE;
+sigma_year_matrix_DE[8,33] = -100000;
+sigma_year_matrix_NDE[8,33] = sigma_year_matrix_8_32_NDE;
+sigma_year_matrix_DE[9,8] = sigma_year_matrix_9_8;
+sigma_year_matrix_NDE[9,8] = sigma_year_matrix_9_8;
+sigma_year_matrix_DE[9,34] = sigma_year_matrix_9_34_DE;
+sigma_year_matrix_NDE[9,34] = sigma_year_matrix_9_34_NDE;
+sigma_year_matrix_DE[9,35] = -100000;
+sigma_year_matrix_NDE[9,35] = sigma_year_matrix_9_34_NDE;
+sigma_year_matrix_DE[9,36] = sigma_year_matrix_9_36;
+sigma_year_matrix_NDE[9,36] = sigma_year_matrix_9_36;
+sigma_year_matrix_DE[9,37] = sigma_year_matrix_9_37;
+sigma_year_matrix_NDE[9,37] = sigma_year_matrix_9_37;
+sigma_year_matrix_DE[9,38] = sigma_year_matrix_9_38;
+sigma_year_matrix_NDE[9,38] = sigma_year_matrix_9_38;
+sigma_year_matrix_DE[9,39] = sigma_year_matrix_9_39_DE;
+sigma_year_matrix_NDE[9,39] = sigma_year_matrix_9_39_NDE;
+sigma_year_matrix_DE[9,40] = -100000;
+sigma_year_matrix_NDE[9,40] = sigma_year_matrix_9_39_NDE;
+sigma_year_matrix_DE[10,2] = sigma_year_matrix_10_2;
+sigma_year_matrix_NDE[10,2] = sigma_year_matrix_10_2;
+sigma_year_matrix_DE[14,2] = sigma_year_matrix_14_2;
+sigma_year_matrix_NDE[14,2] = sigma_year_matrix_14_2;
+sigma_year_matrix_DE[24,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_NDE[24,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_DE[25,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_NDE[25,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_DE[26,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_NDE[26,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_DE[27,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_NDE[27,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_DE[28,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_NDE[28,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_DE[29,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_NDE[29,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_DE[30,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_NDE[30,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_DE[31,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_NDE[31,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_DE[36,9] = sigma_year_matrix_36_9;
+sigma_year_matrix_NDE[36,9] = sigma_year_matrix_36_9;
+sigma_year_matrix_DE[42,7] = sigma_year_matrix_42_7;
+sigma_year_matrix_NDE[42,7] = sigma_year_matrix_42_7;
 
 btemp_matrix_DE[1,2] = btemp_matrix_1_2;
 btemp_matrix_NDE[1,2] = btemp_matrix_1_2;
@@ -1185,6 +1392,10 @@ det_eff_param_vector[33] = 0;
 det_eff_param_vector[34] = 0;
 det_eff_param_vector[35] = 0;
 
+// Calculate each individual byear parameter per movement as a derived parameter
+// this is because in actuality, each byear parameter for a movement is 
+// calculated as a sigma
+
 
 
 // Calculate movement probabilities as derived parameters
@@ -1337,6 +1548,64 @@ b0_matrix_39_9 ~ normal(0,10);
 b0_matrix_41_2 ~ normal(0,10);
 b0_matrix_42_7 ~ normal(0,10);
 
+sigma_year_matrix_1_2 ~ cauchy(0,5);
+sigma_year_matrix_2_1 ~ cauchy(0,5);
+sigma_year_matrix_2_3 ~ cauchy(0,5);
+sigma_year_matrix_2_10_DE ~ cauchy(0,5);
+sigma_year_matrix_2_10_NDE ~ cauchy(0,5);
+sigma_year_matrix_2_12_DE ~ cauchy(0,5);
+sigma_year_matrix_2_12_NDE ~ cauchy(0,5);
+sigma_year_matrix_2_14_DE ~ cauchy(0,5);
+sigma_year_matrix_2_14_NDE ~ cauchy(0,5);
+sigma_year_matrix_2_16_DE ~ cauchy(0,5);
+sigma_year_matrix_2_16_NDE ~ cauchy(0,5);
+sigma_year_matrix_2_18_DE ~ cauchy(0,5);
+sigma_year_matrix_2_18_NDE ~ cauchy(0,5);
+sigma_year_matrix_2_41 ~ cauchy(0,5);
+sigma_year_matrix_3_2 ~ cauchy(0,5);
+sigma_year_matrix_3_4 ~ cauchy(0,5);
+sigma_year_matrix_3_8 ~ cauchy(0,5);
+sigma_year_matrix_3_20_DE ~ cauchy(0,5);
+sigma_year_matrix_3_20_NDE ~ cauchy(0,5);
+sigma_year_matrix_3_22_DE ~ cauchy(0,5);
+sigma_year_matrix_3_22_NDE ~ cauchy(0,5);
+sigma_year_matrix_4_3 ~ cauchy(0,5);
+sigma_year_matrix_4_5 ~ cauchy(0,5);
+sigma_year_matrix_5_4 ~ cauchy(0,5);
+sigma_year_matrix_5_6 ~ cauchy(0,5);
+sigma_year_matrix_5_24_DE ~ cauchy(0,5);
+sigma_year_matrix_5_24_NDE ~ cauchy(0,5);
+sigma_year_matrix_6_5 ~ cauchy(0,5);
+sigma_year_matrix_6_7 ~ cauchy(0,5);
+sigma_year_matrix_6_26_DE ~ cauchy(0,5);
+sigma_year_matrix_6_26_NDE ~ cauchy(0,5);
+sigma_year_matrix_7_6 ~ cauchy(0,5);
+sigma_year_matrix_7_28_DE ~ cauchy(0,5);
+sigma_year_matrix_7_28_NDE ~ cauchy(0,5);
+sigma_year_matrix_7_30_DE ~ cauchy(0,5);
+sigma_year_matrix_7_30_NDE ~ cauchy(0,5);
+sigma_year_matrix_7_42 ~ cauchy(0,5);
+sigma_year_matrix_8_3 ~ cauchy(0,5);
+sigma_year_matrix_8_9 ~ cauchy(0,5);
+sigma_year_matrix_8_32_DE ~ cauchy(0,5);
+sigma_year_matrix_8_32_NDE ~ cauchy(0,5);
+sigma_year_matrix_9_8 ~ cauchy(0,5);
+sigma_year_matrix_9_34_DE ~ cauchy(0,5);
+sigma_year_matrix_9_34_NDE ~ cauchy(0,5);
+sigma_year_matrix_9_36 ~ cauchy(0,5);
+sigma_year_matrix_9_37 ~ cauchy(0,5);
+sigma_year_matrix_9_38 ~ cauchy(0,5);
+sigma_year_matrix_9_39_DE ~ cauchy(0,5);
+sigma_year_matrix_9_39_NDE ~ cauchy(0,5);
+sigma_year_matrix_10_2 ~ cauchy(0,5);
+sigma_year_matrix_14_2 ~ cauchy(0,5);
+sigma_year_matrix_24_5 ~ cauchy(0,5);
+sigma_year_matrix_26_6 ~ cauchy(0,5);
+sigma_year_matrix_28_7 ~ cauchy(0,5);
+sigma_year_matrix_30_7 ~ cauchy(0,5);
+sigma_year_matrix_36_9 ~ cauchy(0,5);
+sigma_year_matrix_42_7 ~ cauchy(0,5);
+
 btemp_matrix_1_2 ~ normal(0,10);
 btemp_matrix_2_3 ~ normal(0,10);
 btemp_matrix_2_10_DE ~ normal(0,10);
@@ -1454,9 +1723,6 @@ borigin2_matrix_28_7 ~ normal(0,10);
 borigin2_matrix_30_7 ~ normal(0,10);
 borigin2_matrix_42_7 ~ normal(0,10);
 
-// random effect of year - here this is just the standard deviation
-sigma_year ~ cauchy(0,5);
-
 
 
 // Prior on detection efficiency parameters - from the other stan script for detection efficiency
@@ -1512,13 +1778,13 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
 // This should allow us to increment log density across fish, rather than observations within a fish, allowing us to 
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, transition_dates, temperature_data, cat_X_mat, temp_X_mat, states_mat, n_obs, // arguments 1-11
-  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 12-14
-  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 15-17
-  btemp_matrix_DE, btempxorigin1_matrix_DE, btempxorigin2_matrix_DE, btempxorigin3_matrix_DE, // arguments 18-21
-  btemp_matrix_NDE, btempxorigin1_matrix_NDE, btempxorigin2_matrix_NDE, btempxorigin3_matrix_NDE, // arguments 22-25
-  byear, sigma_year, // arguments 26-27
-  tributary_design_matrices_array, transition_run_years, nyears, run_year_DE_array, det_eff_param_vector); // arguments 28-32
+  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, nmovements, transition_dates, temperature_data, cat_X_mat, temp_X_mat, states_mat, n_obs, // arguments 1-12
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 13-15
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 16-18
+  btemp_matrix_DE, btempxorigin1_matrix_DE, btempxorigin2_matrix_DE, btempxorigin3_matrix_DE, // arguments 19-22
+  btemp_matrix_NDE, btempxorigin1_matrix_NDE, btempxorigin2_matrix_NDE, btempxorigin3_matrix_NDE, // arguments 23-26
+  sigma_year_matrix_DE, sigma_year_matrix_NDE, sigma_year_indices, // arguments 27-28
+  tributary_design_matrices_array, transition_run_years, nyears, run_year_DE_array, det_eff_param_vector); // arguments 29-33
 
 }
 
