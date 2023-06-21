@@ -11,6 +11,7 @@ library(posterior)
 library(tidyverse)
 library(here)
 library(ggpubr)
+library(stringr)
 
 
 model_states = c(
@@ -73,9 +74,13 @@ to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
 
 # Read in the 100iter test run
 # note that this file is mis-named
-upper_columbia_fit <- readRDS(here::here("stan_actual", "rear_temp", "from_hyak", "upper_columbia", "seed101_500iter_parallel_upper_columbia_stan_actual_int_origin_stan_fit.rds"))
-
+# upper_columbia_fit <- readRDS(here::here("stan_actual", "rear_temp", "upper_columbia_2temp", "seed101_500iter_parallel_upper_columbia_stan_actual_int_origin_stan_fit.rds"))
+upper_columbia_fit <- readRDS(here::here("stan_actual", "rear_temp", "upper_columbia", "seed101_500iter_parallel_upper_columbia_stan_actual_int_origin_stan_fit.rds"))
+ 
 upper_columbia_summary <- upper_columbia_fit$summary()
+
+# add some additional, informative columns
+
 
 # check some quick diagnostics
 # rhat - looks pretty okay
@@ -158,20 +163,290 @@ write.csv(upper_columbia_DE_origin_probs, here::here("stan_actual", "rear_temp",
 
 # Look at temperature effects
 # origins:
+# origin1 = Wenatchee
+# origin2 = Entiat
+# origin3 = Methow
+
+
+# First 82 "variables" that contain "temp" are actual variables
+temp_variables <- upper_columbia_summary$variable[grep("btemp", upper_columbia_summary$variable)][1:82]
+
+# 2temp model - look at upstream of WEL
+upper_columbia_summary[2:195,] %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(to_name = sub(" Mouth", "", to_name)) %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  mutate(movement = paste0(from_name, " -> ", to_name)) %>% 
+  filter(from == 7) -> upstream_WEL_temp_param_summary
+
+upstream_WEL_temp_param_summary %>% 
+  filter(grepl("btemp2", variable))
 
 # Check Entiat, since it had a statistically significant effect in Shelby's
-# First 67 are actual variables
-temp_variables <- upper_columbia_summary$variable[grep("btemp", upper_columbia_summary$variable)][1:67]
 
 # overshoot is 6 -> 7 for Entiat
 # Entiat are origin 2
-subset(upper_columbia_summary, variable %in% c("btemp_matrix_6_7", "btempxorigin2_matrix_6_7"))
+subset(upper_columbia_summary, variable %in% c("btempxorigin2_matrix_6_7"))
+# yes, this is significant
 
-# Let's just look at which are significant
-subset(upper_columbia_summary, variable %in% temp_variables & q5 > 0)
+# Let's just look at which are "significant"
+subset(upper_columbia_summary, variable %in% temp_variables & q5 > 0 | variable %in% temp_variables & q95 < 0)
+# Movement into the Deschutes - 2 -> 10 - there's a huge positive temperature effect
+# Entiat River - overshoot when it's hot
+
+# let's find a way to plot all of these
+subset(upper_columbia_summary, variable %in% temp_variables) %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(origin = ifelse(grepl("btemp_", variable), "DPS",
+                         ifelse(grepl("origin1", variable), "Wenatchee",
+                                ifelse(grepl("origin2", variable), "Entiat",
+                                       ifelse(grepl("origin3", variable), "Methow", NA))))) %>% 
+  mutate(to_name = sub(" Mouth", "", to_name)) %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  mutate(movement = paste0(from_name, " -> ", to_name)) -> temp_param_summary
+
+# plot DPS-wide movement
+DPS_temp_plot <- ggplot(subset(temp_param_summary, origin == "DPS"), aes(x = movement, y = median)) +
+  geom_point() +
+  geom_errorbar(aes(ymax = q95, ymin = q5)) +
+  ylab("Temperature Parameter") +
+  coord_flip(ylim=c(-5, 5)) +
+  geom_hline(yintercept = 0, lty = 2)
+
+# plot origin-specific movements
+origin_temp_plot <- ggplot(subset(temp_param_summary, origin != "DPS"), aes(x = movement, y = median, color = origin)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  geom_errorbar(aes(ymax = q95, ymin = q5), position = position_dodge(width = 0.75)) +
+  ylab("Temperature Parameter") +
+  coord_flip(ylim=c(-5, 5)) +
+  geom_hline(yintercept = 0, lty = 2)
+
+ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia", "DPS_temp_plot.pdf"), 
+       DPS_temp_plot, width = 8, height = 6)
+
+ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia", "origin_temp_plot.pdf"), 
+       origin_temp_plot, width = 8, height = 6)
+
+# ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia_2temp", "DPS_temp_plot.pdf"), 
+#        DPS_temp_plot, width = 8, height = 6)
+# 
+# ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia_2temp", "origin_temp_plot.pdf"), 
+#        origin_temp_plot, width = 8, height = 6)
+
+# what does this translate to in terms of probabilities?
+
+# Example: Entiat River, overshoot
+# the first 2:180 (195 for 2temp) parameters are the movement parameters
+upper_columbia_summary[2:195,] %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(to_name = sub(" Mouth", "", to_name)) %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  mutate(movement = paste0(from_name, " -> ", to_name)) %>% 
+  filter(from == 6) %>% 
+  # drop the other origins
+  filter(!(grepl("btempxorigin1|btempxorigin3", variable))) %>% 
+  filter(!(grepl("borigin1", variable))) -> entiat_state6_param_summary
 
 
-subset(upper_columbia_summary, variable %in% temp_variables)
+# note that temperature is z-scored, so we need to convert it back to real space
+temp_predict <- seq(-2, 2, 0.1)
+
+# load the summary stats for the window temps data
+window_temps_summary <- read.csv(here::here("covariate_data", "for_model", "window_temps_summary.csv"), row.names = 1)
+temp_predict_real = window_temps_summary$RRE_sd * temp_predict + window_temps_summary$RRE_mean
+
+movement_probs_entiat <- data.frame(temp = temp_predict,
+                             temp_real = temp_predict_real,
+                             Entiat_River = NA,
+                             RIS_to_RRE = NA,
+                             Upstream_WEL = NA,
+                             Loss = NA)
+
+for (i in 1:length(temp_predict)){
+  denom <- 1 + exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_26_DE")$median +
+                     subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_26_DE")$median +
+                     subset(entiat_state6_param_summary, variable == "btempxorigin2_matrix_6_26_DE")$median * temp_predict[i]) +
+    exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_5")$median +
+          subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_5")$median) +
+    exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_7")$median +
+          subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_7")$median +
+          subset(entiat_state6_param_summary, variable == "btempxorigin2_matrix_6_7")$median * temp_predict[i])
+  
+  
+  movement_probs_entiat$Entiat_River[i] <- exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_26_DE")$median +
+                                          subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_26_DE")$median +
+                                          subset(entiat_state6_param_summary, variable == "btempxorigin2_matrix_6_26_DE")$median * temp_predict[i])/denom
+  
+  movement_probs_entiat$RIS_to_RRE[i] <- exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_5")$median +
+                                          subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_5")$median)/denom
+  
+  movement_probs_entiat$Upstream_WEL[i] <- exp(subset(entiat_state6_param_summary, variable == "b0_matrix_6_7")$median +
+                                          subset(entiat_state6_param_summary, variable == "borigin2_matrix_6_7")$median +
+                                          subset(entiat_state6_param_summary, variable == "btempxorigin2_matrix_6_7")$median * temp_predict[i])/denom
+  
+  movement_probs_entiat$Loss[i] <- 1 - movement_probs_entiat$Entiat_River[i] - movement_probs_entiat$RIS_to_RRE[i] - movement_probs_entiat$Upstream_WEL[i]
+}
+
+movement_probs_entiat %>% 
+  pivot_longer(., cols = colnames(movement_probs_entiat)[3:6]) %>% 
+  dplyr::rename(next_state = name) -> movement_probs_entiat_long
+
+# next_movement = data.frame(next_movement = c("Overshoot PRA", "Overshoot ICH", 
+#                                              "Yakima River (Stray)",
+#                                              "Walla Walla River (Home)",
+#                                              "Fallback MCN"),
+#                            next_state = unique(movement_probs_entiat_long$next_state))
+
+
+# movement_probs_entiat_long %>% 
+#   left_join(., next_movement, by = "next_state") -> movement_probs_entiat_long
+
+entiat_movement_prob_plot <- ggplot(movement_probs_entiat_long, aes(x = temp_real, y = value, color = next_state)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10") + 
+  scale_y_continuous(limits = c(0,1)) +
+  xlab("Temperature (C)") +
+  ylab("Movement Probability")
+
+# ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia_2temp", "entiat_movement_prob_plot.pdf"), 
+#        entiat_movement_prob_plot, width = 8, height = 6)
+
+
+ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia", "entiat_movement_prob_plot.pdf"), 
+       entiat_movement_prob_plot, width = 8, height = 6)
+
+
+
+
+# Alternative example: Wenatchee River, overshoot
+# the first 2:180 (195 for 2temp) parameters are the movement parameters
+upper_columbia_summary[2:195,] %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(to_name = sub(" Mouth", "", to_name)) %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  mutate(movement = paste0(from_name, " -> ", to_name)) %>% 
+  filter(from == 5) %>% 
+  # drop the other origins
+  filter(!(grepl("btempxorigin2|btempxorigin3", variable))) %>% 
+  filter(!(grepl("borigin2", variable))) -> wenatchee_state5_param_summary
+
+
+# note that temperature is z-scored, so we need to convert it back to real space
+temp_predict <- seq(-2, 2, 0.1)
+
+# load the summary stats for the window temps data
+window_temps_summary <- read.csv(here::here("covariate_data", "for_model", "window_temps_summary.csv"), row.names = 1)
+temp_predict_real = window_temps_summary$RIS_sd * temp_predict + window_temps_summary$RIS_mean
+
+movement_probs_wenatchee <- data.frame(temp = temp_predict,
+                             temp_real = temp_predict_real,
+                             Wenatchee_River = NA,
+                             PRA_to_RIS = NA,
+                             RRE_to_WEL = NA,
+                             Loss = NA)
+
+for (i in 1:length(temp_predict)){
+  denom <- 1 + exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_24_DE")$median +
+                     subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_24_DE")$median +
+                     subset(wenatchee_state5_param_summary, variable == "btempxorigin1_matrix_5_24_DE")$median * temp_predict[i]) +
+    exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_4")$median +
+          subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_4")$median) +
+    exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_6")$median +
+          subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_6")$median +
+          subset(wenatchee_state5_param_summary, variable == "btempxorigin1_matrix_5_6")$median * temp_predict[i])
+  
+  
+  movement_probs_wenatchee$Wenatchee_River[i] <- exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_24_DE")$median +
+                                          subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_24_DE")$median +
+                                          subset(wenatchee_state5_param_summary, variable == "btempxorigin1_matrix_5_24_DE")$median * temp_predict[i])/denom
+  
+  movement_probs_wenatchee$PRA_to_RIS[i] <- exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_4")$median +
+                                        subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_4")$median)/denom
+  
+  movement_probs_wenatchee$RRE_to_WEL[i] <- exp(subset(wenatchee_state5_param_summary, variable == "b0_matrix_5_6")$median +
+                                          subset(wenatchee_state5_param_summary, variable == "borigin1_matrix_5_6")$median +
+                                          subset(wenatchee_state5_param_summary, variable == "btempxorigin1_matrix_5_6")$median * temp_predict[i])/denom
+  
+  movement_probs_wenatchee$Loss[i] <- 1 - movement_probs_wenatchee$Wenatchee_River[i] - movement_probs_wenatchee$PRA_to_RIS[i] - movement_probs_wenatchee$RRE_to_WEL[i]
+}
+
+movement_probs_wenatchee %>% 
+  pivot_longer(., cols = colnames(movement_probs_wenatchee)[3:6]) %>% 
+  dplyr::rename(next_state = name) -> movement_probs_wenatchee_long
+
+# next_movement = data.frame(next_movement = c("Overshoot PRA", "Overshoot ICH", 
+#                                              "Yakima River (Stray)",
+#                                              "Walla Walla River (Home)",
+#                                              "Fallback MCN"),
+#                            next_state = unique(movement_probs_wenatchee_long$next_state))
+
+
+# movement_probs_wenatchee_long %>% 
+#   left_join(., next_movement, by = "next_state") -> movement_probs_wenatchee_long
+
+wenatchee_movement_prob_plot <- ggplot(movement_probs_wenatchee_long, aes(x = temp_real, y = value, color = next_state)) +
+  geom_line() +
+  scale_color_tableau(palette = "Tableau 10") + 
+  scale_y_continuous(limits = c(0,1)) +
+  xlab("Temperature (C)") +
+  ylab("Movement Probability")
+
+ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia", "wenatchee_movement_prob_plot.pdf"), 
+       wenatchee_movement_prob_plot, width = 8, height = 6)
+
+# ggsave(here::here("stan_actual", "rear_temp", "processed", "figures", "upper_columbia_2temp", "wenatchee_movement_prob_plot.pdf"), 
+#        wenatchee_movement_prob_plot, width = 8, height = 6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# BREAK #
+
+
+
+
+
+
+
+
 
 
 
