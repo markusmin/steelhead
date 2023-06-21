@@ -330,6 +330,33 @@ dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_te
   dplyr::select(-date) %>% 
   column_to_rownames("index") -> window_temps
 
+# before z-scoring, export the mean and SD of each set of window temps
+window_temps %>% 
+  mutate(BON_mean = mean(BON)) %>% 
+  mutate(BON_sd = sd(BON)) %>% 
+  mutate(MCN_mean = mean(MCN)) %>% 
+  mutate(MCN_sd = sd(MCN)) %>% 
+  mutate(PRA_mean = mean(PRA)) %>% 
+  mutate(PRA_sd = sd(PRA)) %>% 
+  mutate(RIS_mean = mean(RIS)) %>% 
+  mutate(RIS_sd = sd(RIS)) %>% 
+  mutate(RRE_mean = mean(RRE)) %>% 
+  mutate(RRE_sd = sd(RRE)) %>% 
+  mutate(WEL_quick_mean = mean(WEL_quick)) %>% 
+  mutate(WEL_quick_sd = sd(WEL_quick)) %>% 
+  mutate(WEL_slow_mean = mean(WEL_slow)) %>% 
+  mutate(WEL_slow_sd = sd(WEL_slow)) %>% 
+  mutate(ICH_mean = mean(ICH)) %>% 
+  mutate(ICH_sd = sd(ICH)) %>% 
+  mutate(LGR_quick_mean = mean(LGR_quick)) %>% 
+  mutate(LGR_quick_sd = sd(LGR_quick)) %>% 
+  mutate(LGR_slow_mean = mean(LGR_slow)) %>% 
+  mutate(LGR_slow_sd = sd(LGR_slow)) %>% 
+  dplyr::select(-c(BON, MCN, PRA, RIS, RRE, WEL_quick,
+                   WEL_slow, ICH, LGR_quick, LGR_slow)) %>% 
+  filter(!duplicated(BON_mean)) -> window_temps_summary
+
+
 # now, z-score every column
 window_temps %>% 
   mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
@@ -352,6 +379,7 @@ window_temps %>%
   
 
 write.csv(window_temps, here::here("covariate_data", "for_model", "window_temps_for_stan.csv"))
+write.csv(window_temps_summary, here::here("covariate_data", "for_model", "window_temps_summary.csv"))
 write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp/upper_columbia/window_temps_for_stan.csv")
 
 ```
