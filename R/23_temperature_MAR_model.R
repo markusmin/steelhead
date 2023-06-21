@@ -190,6 +190,71 @@ temp_model_est <- data.frame(date = dates,
                              WEL = WEL_temp_model_est[1,],
                              LGR = LGR_temp_model_est[1,])
 
+# plot fits to data
+BON_temp %>% 
+  pivot_longer(cols = c(BON_tailrace_temp, BON_forebay_temp)) -> BON_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = BON)) +
+  geom_point(data = BON_temp_2, aes(x = ymd(BON_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Bonneville Dam")
+
+MCN_temp %>% 
+  pivot_longer(cols = c(MCN_tailrace_temp, MCN_forebay_temp)) -> MCN_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = MCN)) +
+  geom_point(data = MCN_temp_2, aes(x = ymd(MCN_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at McNary Dam")
+
+PRA_temp %>% 
+  pivot_longer(cols = c(PRA_tailrace_temp, PRA_forebay_temp)) -> PRA_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = PRA)) +
+  geom_point(data = PRA_temp_2, aes(x = ymd(PRA_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Priest Rapids Dam")
+
+RIS_temp %>% 
+  pivot_longer(cols = c(RIS_tailrace_temp, RIS_forebay_temp)) -> RIS_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = RIS)) +
+  geom_point(data = RIS_temp_2, aes(x = ymd(RIS_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Rock Island Dam")
+
+RRE_temp %>% 
+  pivot_longer(cols = c(RRE_tailrace_temp, RRE_forebay_temp)) -> RRE_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = RRE)) +
+  geom_point(data = RRE_temp_2, aes(x = ymd(RRE_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Rocky Reach Dam")
+
+ICH_temp %>% 
+  pivot_longer(cols = c(ICH_tailrace_temp, ICH_forebay_temp)) -> ICH_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = ICH)) +
+  geom_point(data = ICH_temp_2, aes(x = ymd(ICH_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Ice Harbor Dam")
+
+WEL_temp %>% 
+  pivot_longer(cols = c(WEL_tailrace_temp, WEL_forebay_temp)) -> WEL_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = WEL)) +
+  geom_point(data = WEL_temp_2, aes(x = ymd(WEL_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Wells Dam")
+
+LGR_temp %>% 
+  pivot_longer(cols = c(LGR_tailrace_temp, LGR_forebay_temp)) -> LGR_temp_2
+
+ggplot(temp_model_est, aes(x = dates, y = LGR)) +
+  geom_point(data = LGR_temp_2, aes(x = ymd(LGR_date), y = value, color = name)) +
+  geom_line() +
+  ggtitle("Modeled temperature at Lower Granite Dam")
+
 
 write.csv(temp_model_est, here::here("covariate_data", "for_model", "temp", "temp_mod_est.csv"), row.names = FALSE)
 
