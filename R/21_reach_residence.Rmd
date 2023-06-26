@@ -252,6 +252,20 @@ passage_time_vs_entry_date_plot <- function(passage_df, reach){
  
   return(passage_time_vs_entry_date_plot) 
 }
+
+# plot to view histogram of date of entry
+date_of_entry_plot <- function(passage_df, reach){
+  entry_date_plot <- ggplot(passage_df, aes(x = entry_day_of_year, fill = ESU)) +
+    geom_histogram(binwidth = 5) +
+    xlab("Day entering state") +
+    ggtitle(reach) +
+    scale_fill_tableau(palette = "Tableau 10")
+ 
+  return(entry_date_plot) 
+  
+}
+
+
 ```
 
 ```{r BON_to_MCN, eval = FALSE}
@@ -293,6 +307,7 @@ plots_logdays <- list()
 plots_days_origin <- list()
 plots_logdays_origin <- list()
 plots_passage_time_vs_entry_date <- list()
+plots_entry_date <- list()
 
 for (i in 1:length(mainstem_states)) {
   residence_df <- residence_time(residence_state = mainstem_states[i])
@@ -311,6 +326,9 @@ for (i in 1:length(mainstem_states)) {
   
   passage_plot_time_vs_entry_date <- passage_time_vs_entry_date_plot(passage_df = residence_df, reach = mainstem_states[i])
   plots_passage_time_vs_entry_date[[i]] <- passage_plot_time_vs_entry_date
+  
+  passage_plot_entry_date <- date_of_entry_plot(passage_df = residence_df, reach = mainstem_states[i])
+  plots_entry_date[[i]] <- passage_plot_entry_date
   
   # give summary of passage time
   summary(residence_df$passage_time)
@@ -409,16 +427,19 @@ plots_logdays_windows[[6]]
 ```{r}
 plots_days_windows[[1]]
 plots_passage_time_vs_entry_date[[1]]
+plots_entry_date[[1]]
 plots_logdays[[1]]
 # plots_days_origin[[1]]
 # plots_logdays_origin[[1]]
 plots_days[[2]]
 plots_passage_time_vs_entry_date[[2]]
+plots_entry_date[[2]]
 plots_logdays[[2]]
 # plots_days_origin[[2]]
 plots_logdays_origin[[2]]
 plots_days[[3]]
 plots_passage_time_vs_entry_date[[3]]
+plots_entry_date[[3]]
 plots_logdays[[3]]
 # plots_days_origin[[3]]
 plots_logdays_origin[[3]]
@@ -428,21 +449,25 @@ plots_logdays_origin[[3]]
 ```{r}
 plots_days[[4]]
 plots_passage_time_vs_entry_date[[4]]
+plots_entry_date[[4]]
 plots_logdays[[4]]
 # plots_days_origin[[4]]
 plots_logdays_origin[[4]]
 plots_days[[5]]
 plots_passage_time_vs_entry_date[[5]]
+plots_entry_date[[5]]
 plots_logdays[[5]]
 # plots_days_origin[[5]]
 plots_logdays_origin[[5]]
 plots_days[[6]]
 plots_passage_time_vs_entry_date[[6]]
+plots_entry_date[[6]]
 plots_logdays[[6]]
 # plots_days_origin[[6]]
 plots_logdays_origin[[6]]
 plots_days[[7]]
 plots_passage_time_vs_entry_date[[7]]
+plots_entry_date[[7]]
 plots_logdays[[7]]
 # plots_days_origin[[7]]
 plots_logdays_origin[[7]]
@@ -452,11 +477,13 @@ plots_logdays_origin[[7]]
 ```{r}
 plots_days[[8]]
 plots_passage_time_vs_entry_date[[8]]
+plots_entry_date[[8]]
 plots_logdays[[8]]
 # plots_days_origin[[8]]
 plots_logdays_origin[[8]]
 plots_days[[9]]
 plots_passage_time_vs_entry_date[[9]]
+plots_entry_date[[9]]
 plots_logdays[[9]]
 # plots_days_origin[[9]]
 plots_logdays_origin[[9]]
