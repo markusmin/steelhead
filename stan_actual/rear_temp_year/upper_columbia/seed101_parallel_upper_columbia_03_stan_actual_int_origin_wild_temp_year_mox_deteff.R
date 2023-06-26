@@ -9,7 +9,7 @@
 # This script will fit an intercept + origin + temperature model using stan to wild fish from the Upper Columbia
 
 # FOR TESTING: setwd
-# setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_year/upper_columbia/")
+setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_year/upper_columbia/")
 
 # library("rstan")
 library(cmdstanr)
@@ -610,7 +610,8 @@ movements %>%
   filter(!(row == 8 & col == 3)) %>% 
   # remove all movements from tributaries back to the mainstem
   filter(!(col < 10 & row >= 10)) %>% 
-  mutate(btemp_matrix_name = paste0("btemp_matrix_", row, "_", col)) -> btemp_matrix_names
+  mutate(btemp0_matrix_name = paste0("btemp0_matrix_", row, "_", col)) %>% 
+  mutate(btemp1_matrix_name = paste0("btemp1_matrix_", row, "_", col)) -> btemp_matrix_names
 
 # add info on what type of movement it is
 btemp_matrix_names %>% 
@@ -649,8 +650,10 @@ for (i in 1:(nrow(btemp_matrix_names))){
   
   # Movements from mainstem to river mouth: print two versions
   if (btemp_matrix_names$mainstem_river_mouth_movement[i] == 1){
-    cat("real ", btemp_matrix_names$btemp_matrix_name[i], "_DE", ";", "\n", sep = "")
-    cat("real ", btemp_matrix_names$btemp_matrix_name[i], "_NDE", ";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp0_matrix_name[i], "_DE", ";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp0_matrix_name[i], "_NDE", ";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp1_matrix_name[i], "_DE", ";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp1_matrix_name[i], "_NDE", ";", "\n", sep = "")
   }
   
   # If it's a within tributary movement - we don't want it. These have been
@@ -673,7 +676,8 @@ for (i in 1:(nrow(btemp_matrix_names))){
   } else {
     # Finally - if it's any other movement, just treat it like normal!
     # If it's not, print just the one version
-    cat("real ", btemp_matrix_names$btemp_matrix_name[i],";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp0_matrix_name[i],";", "\n", sep = "")
+    cat("real ", btemp_matrix_names$btemp1_matrix_name[i],";", "\n", sep = "")
   }
   
 }
@@ -688,7 +692,8 @@ movements %>%
   filter(!(row == 8 & col == 3)) %>% 
   # remove all movements from tributaries back to the mainstem
   filter(!(col < 10 & row >= 10)) %>% 
-  mutate(btempxorigin_matrix_name = paste0("btempxorigin_matrix_", row, "_", col)) -> btempxorigin_matrix_names
+  mutate(btemp0xorigin_matrix_name = paste0("btemp0xorigin_matrix_", row, "_", col)) %>% 
+  mutate(btemp1xorigin_matrix_name = paste0("btemp1xorigin_matrix_", row, "_", col))-> btempxorigin_matrix_names
 
 # add info on what type of movement it is
 btempxorigin_matrix_names %>% 
@@ -716,8 +721,10 @@ for (i in 1:3){ # since we only have three origins for wild
     
     # Movements from mainstem to river mouth: print two versions
     if (upper_columbia_tempxorigin$mainstem_river_mouth_movement[j] == 1){
-      cat("real ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
-      cat("real ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
+      cat("real ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
+      cat("real ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
+      cat("real ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
+      cat("real ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
     }
     
     # If it's a within tributary movement - we don't want it
@@ -736,7 +743,8 @@ for (i in 1:3){ # since we only have three origins for wild
     } else {
       # Finally - if it's any other movement, just treat it like normal!
       # If it's not, print just the one version
-      cat("real ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("real ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("real ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
     }
     
   }
@@ -858,8 +866,10 @@ for (i in 1:(nrow(sigma_year_matrix_names))){
 for (i in 1:(nrow(btemp_matrix_names))){
   # Movements from mainstem to river mouth: store the two different versions
   if (btemp_matrix_names$mainstem_river_mouth_movement[i] == 1){
-    cat("btemp_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i], "_DE",";", "\n", sep = "")
-    cat("btemp_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i], "_NDE",";", "\n", sep = "")
+    cat("btemp0_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i], "_DE",";", "\n", sep = "")
+    cat("btemp0_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i], "_NDE",";", "\n", sep = "")
+    cat("btemp1_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i], "_DE",";", "\n", sep = "")
+    cat("btemp1_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i], "_NDE",";", "\n", sep = "")
     
   }
   
@@ -872,20 +882,26 @@ for (i in 1:(nrow(btemp_matrix_names))){
   # For DE - we need to give these all -100000 values, so that in the logit they come out as zeros (since they're not transitions that are allowed)
   else if (btemp_matrix_names$mainstem_upstream_movement[i] == 1){
     # cat("btemp_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i-1], "_DE",";", "\n", sep = "")
-    cat("btemp_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", "-100000;", "\n", sep = "")
-    cat("btemp_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+    cat("btemp0_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", "-100000;", "\n", sep = "")
+    cat("btemp0_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i-1], "_NDE",";", "\n", sep = "")
+    cat("btemp1_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", "-100000;", "\n", sep = "")
+    cat("btemp1_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i-1], "_NDE",";", "\n", sep = "")
   }
   # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
   # And note - that these are not DE or NDE parameters
   # Because of order, we need -2 here instead of -1, to pick the right from state
   # NO WE DON'T, just use -1
   else if (btemp_matrix_names$upstream_mainstem_movement[i] == 1){
-    cat("btemp_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i-1],";", "\n", sep = "")
-    cat("btemp_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i-1],";", "\n", sep = "")
+    cat("btemp0_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i-1],";", "\n", sep = "")
+    cat("btemp0_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i-1],";", "\n", sep = "")
+    cat("btemp1_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i-1],";", "\n", sep = "")
+    cat("btemp1_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i-1],";", "\n", sep = "")
     # If it's not, store the same parameter in both matrices
   } else {
-    cat("btemp_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i], ";", "\n", sep = "")
-    cat("btemp_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp_matrix_name[i], ";", "\n", sep = "")
+    cat("btemp0_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i], ";", "\n", sep = "")
+    cat("btemp0_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp0_matrix_name[i], ";", "\n", sep = "")
+    cat("btemp1_matrix_DE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i], ";", "\n", sep = "")
+    cat("btemp1_matrix_NDE[", btemp_matrix_names$row[i], ",", btemp_matrix_names$col[i], "]", " = ", btemp_matrix_names$btemp1_matrix_name[i], ";", "\n", sep = "")
   }
   
 } 
@@ -896,8 +912,10 @@ for (i in 1:3){
   for (j in 1:nrow(upper_columbia_tempxorigin)){
     # Movements from mainstem to river mouth: store the two different versions
     if (upper_columbia_tempxorigin$mainstem_river_mouth_movement[j] == 1){
-      cat("btempxorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
-      cat("btempxorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", ";", "\n", sep = "")
       
     }
     
@@ -909,19 +927,23 @@ for (i in 1:3){
     # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
     # For DE - we don't care about this, because we're removing the upstream states
     else if (upper_columbia_tempxorigin$mainstem_upstream_movement[j] == 1){
-      # cat("btempxorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j-1], "_DE", ";", "\n", sep = "")
-      cat("btempxorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j-1], "_NDE", ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j-1], "_NDE", ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j-1], "_NDE", ";", "\n", sep = "")
       
     }
     # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
     # And note - that these are not DE or NDE parameters
     else if (upper_columbia_tempxorigin$upstream_mainstem_movement[j] == 1){
-      cat("btempxorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
-      cat("btempxorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j-1], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
       # If it's not, store the same parameter in both matrices
     } else {
-      cat("btempxorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
-      cat("btempxorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_DE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], ";", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_NDE[", upper_columbia_tempxorigin$row[j], ",", upper_columbia_tempxorigin$col[j], "]", " = ", "btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j],  ";", "\n", sep = "")
     }
     
   }
@@ -1061,8 +1083,10 @@ for (i in 1:(nrow(btemp_matrix_names))){
   
   # Movements from mainstem to river mouth: print two versions
   if (btemp_matrix_names$mainstem_river_mouth_movement[i] == 1){
-    cat(btemp_matrix_names$btemp_matrix_name[i], "_DE", " ~ normal(0,10);", "\n", sep = "")
-    cat(btemp_matrix_names$btemp_matrix_name[i], "_NDE", " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp0_matrix_name[i], "_DE", " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp0_matrix_name[i], "_NDE", " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp1_matrix_name[i], "_DE", " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp1_matrix_name[i], "_NDE", " ~ normal(0,10);", "\n", sep = "")
   }
   
   # If it's a within tributary movement - we don't want it (no prior)
@@ -1082,7 +1106,8 @@ for (i in 1:(nrow(btemp_matrix_names))){
   } else {
     # Finally - if it's any other movement, just treat it like normal!
     # If it's not, print just the one version
-    cat(btemp_matrix_names$btemp_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp0_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
+    cat(btemp_matrix_names$btemp1_matrix_name[i], " ~ normal(0,10);", "\n", sep = "")
   }
   
   
@@ -1094,8 +1119,10 @@ for (i in 1:3){
     
     # Movements from mainstem to river mouth: print two versions
     if (upper_columbia_tempxorigin$mainstem_river_mouth_movement[j] == 1){
-      cat("btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
-      cat("btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_DE", " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], "_NDE", " ~ normal(0,10);", "\n", sep = "")
     }
     
     # If it's a within tributary movement - we don't want it
@@ -1114,7 +1141,8 @@ for (i in 1:3){
     } else {
       # Finally - if it's any other movement, just treat it like normal!
       # If it's not, print just the one version
-      cat("btempxorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp0xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], " ~ normal(0,10);", "\n", sep = "")
+      cat("btemp1xorigin", i, "_matrix_", upper_columbia_tempxorigin$row[j], "_", upper_columbia_tempxorigin$col[j], " ~ normal(0,10);", "\n", sep = "")
     }
     
   }
@@ -1219,11 +1247,14 @@ run_year_indexing <- data.frame(run_year = run_year[1:18],
 states_complete %>% 
   left_join(., run_year_indexing, by = "run_year") -> states_complete
 
+
 # Remove three fish that have detections in the 22/23 run year
 run_year_2223_fish <- unique(subset(states_complete, is.na(run_year_index))$tag_code)
 
 states_complete %>% 
   subset(., !(tag_code %in% run_year_2223_fish)) -> states_complete
+
+
 
 
 # Create a data frame for when each tributary has detection efficiency capability
@@ -1849,9 +1880,32 @@ transition_date_matrix %>%
   mutate_all(date_numeric) %>% 
   as.matrix() -> transition_date_numeric
 
-# replace all NAs with 0s - they won't be used for anything (and a 0 in this case 
-# is nonsensical), but this keep Stan from freaking out
-transition_date_numeric[is.na(transition_date_numeric)] <- 0
+# Get transition day of year as well
+transition_date_matrix %>%
+  as_tibble() %>%
+  mutate_all(yday) %>% 
+  as.matrix() -> day_of_year_numeric
+
+# Convert day of year to season based on cutoff of June 1
+yday_to_season <- function(x, na.rm = FALSE) ifelse(x < 152, 0, 1)
+
+# 1 = winter/spring; 2 = summer/fall
+transition_date_matrix %>%
+  as_tibble() %>%
+  mutate_all(yday) %>% 
+  mutate_all(yday_to_season) %>% 
+  as.matrix() -> transition_seasons_numeric
+
+# replace all NAs with -999s in the above three matrices - they won't be used for anything (and a -999 in this case 
+# is nonsensical), but this keeps Stan from freaking out
+transition_date_numeric[is.na(transition_date_numeric)] <- -999
+day_of_year_numeric[is.na(day_of_year_numeric)] <- -999
+transition_seasons_numeric[is.na(transition_seasons_numeric)] <- -999
+
+# now, convert this to a vector
+as.vector(transition_seasons_numeric)[!(as.vector(transition_seasons_numeric) == -999)] -> transition_seasons_vector
+
+
 
 ##### Reformat origin information #####
 tag_code_metadata <- read.csv("tag_code_metadata.csv")
@@ -2143,7 +2197,7 @@ n.ind <- dim(state_data)[3]
                states_mat = states_mat, max_visits = dim(state_data_2)[2],
                movements = movements, not_movements = not_movements,
                nmovements = nmovements, 
-               transition_dates = transition_date_numeric, temperature_data = temp_data,
+               transition_dates = transition_date_numeric, transition_seasons_vector = transition_seasons_vector, temperature_data = temp_data,
                n_notmovements = n_notmovements, possible_states = transition_matrix, cat_X_mat = cat_X_mat_actual, temp_X_mat = temp_X_mat_actual,
                grainsize = 1, N = dim(state_data_2)[1],
                # New data for detection efficiency
@@ -2165,10 +2219,10 @@ n.ind <- dim(state_data)[3]
   # Step 1: load the model
   
   # to run this model with interaction terms, you need to increase the fbracket depth:
-  # cpp_options <- list(
-  #   "CXXFLAGS+= -fbracket-depth=1024"
-  # )
-  # cmdstan_make_local(cpp_options = cpp_options)
+  cpp_options <- list(
+    "CXXFLAGS+= -fbracket-depth=512"
+  )
+  cmdstan_make_local(cpp_options = cpp_options)
   
   mod <- cmdstan_model("parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan", compile = FALSE)
   

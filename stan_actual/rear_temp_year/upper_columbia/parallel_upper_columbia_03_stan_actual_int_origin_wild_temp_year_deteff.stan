@@ -19,6 +19,9 @@ functions{
                         // because this is necessary to use this to index covariates
                         array[,] int transition_dates,
                         
+                        // transition seasons (to index temperature parameters)
+                        array[] int transition_seasons_vector,
+                        
                         // declare temperature data
                         array[,] real temperature_data,
                         
@@ -47,15 +50,25 @@ functions{
                         array[,] real borigin1_matrix_NDE,
                         array[,] real borigin2_matrix_NDE,
                         
-                        array[,] real btemp_matrix_DE, 
-                        array[,] real btempxorigin1_matrix_DE, 
-                        array[,] real btempxorigin2_matrix_DE, 
-                        array[,] real btempxorigin3_matrix_DE, 
+                        array[,] real btemp0_matrix_DE, 
+                        array[,] real btemp0xorigin1_matrix_DE, 
+                        array[,] real btemp0xorigin2_matrix_DE, 
+                        array[,] real btemp0xorigin3_matrix_DE, 
                         
-                        array[,] real btemp_matrix_NDE, 
-                        array[,] real btempxorigin1_matrix_NDE, 
-                        array[,] real btempxorigin2_matrix_NDE, 
-                        array[,] real btempxorigin3_matrix_NDE, 
+                        array[,] real btemp0_matrix_NDE, 
+                        array[,] real btemp0xorigin1_matrix_NDE, 
+                        array[,] real btemp0xorigin2_matrix_NDE, 
+                        array[,] real btemp0xorigin3_matrix_NDE, 
+                        
+                        array[,] real btemp1_matrix_DE, 
+                        array[,] real btemp1xorigin1_matrix_DE, 
+                        array[,] real btemp1xorigin2_matrix_DE, 
+                        array[,] real btemp1xorigin3_matrix_DE, 
+                        
+                        array[,] real btemp1_matrix_NDE, 
+                        array[,] real btemp1xorigin1_matrix_NDE, 
+                        array[,] real btemp1xorigin2_matrix_NDE, 
+                        array[,] real btemp1xorigin3_matrix_NDE, 
                         
                         // array[,] real byear,
                         array [,] real sigma_year_matrix_DE,
@@ -102,14 +115,19 @@ functions{
 
 // first, create a temporary df, with each of the individual byear parameters (drawn from normal, using sigma_year)
   // create an empty array with 3 dimensions: matrix for parameters, slices for years
-  array [43,43,nyears] real byear_parameters_array_DE;
-  array [43,43,nyears] real byear_parameters_array_NDE;
+  // matt trick, transform these outside
+  array [43,43,nyears] real byear_raw_parameters_array_DE;
+  array [43,43,nyears] real byear_raw_parameters_array_NDE;
   
   // for each of the non-zero elements of byear_parameters_array, evaluate all of the ones for each year as normal
   // evaluate DE and NDE separately
   for (p in 1:nmovements){
-     total_lp += normal_lpdf(to_row_vector(byear_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
-     total_lp += normal_lpdf(to_row_vector(byear_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
+    // matt trick
+    total_lp += std_normal_lpdf(to_row_vector(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]));
+     total_lp += std_normal_lpdf(to_row_vector(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]));
+    
+     // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
+     // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
   }
   
 
@@ -181,11 +199,18 @@ functions{
             // indexing is different if i == 1
               int run_year_index;      
               int run_year_actual;
+              // index for transition season as well
+              int season_actual;
+              
+              
             if (i == 1) {
               // now, sum the vector to get a single integer value for indexing the run year vector
               run_year_index = j;
               // get the actual run year
               run_year_actual = transition_run_years[run_year_index];
+              // index for transition season as well
+              season_actual = transition_seasons_vector[run_year_index];
+              
             } else {
                 // indexing tweaks
                 // first: declare a vector that stores all of the indices that we need to sum to get the right run year
@@ -197,7 +222,10 @@ functions{
                 // now, sum the vector to get a single integer value for indexing the run year vector
                 run_year_index = sum(run_year_indices_vector);
                 // get the actual run year
-                run_year_actual = transition_run_years[run_year_index];
+                run_year_actual = transition_seasons_vector[run_year_index];
+                
+                // index for transition season as well
+              season_actual = transition_seasons_vector[run_year_index];
 
             }
           
@@ -228,14 +256,14 @@ functions{
                       // if (run_year_DE_array[current,k,transition_run_years[run_year_indices_vector]] == 1){
                   if (DE_index == 1){
                     logits[k] = b0_matrix_DE[current, k]+ 
-                    temp_X_mat[i,1] * btemp_matrix_DE[current,k] * temp +
-                    temp_X_mat[i,2] * btempxorigin1_matrix_DE[current,k] * temp +
-                    temp_X_mat[i,3] * btempxorigin2_matrix_DE[current,k] * temp +
-                    temp_X_mat[i,4] * btempxorigin3_matrix_DE[current,k] * temp +
+                    temp_X_mat[i,1] * ((1 - season_actual) * btemp0_matrix_DE[current,k] + season_actual * btemp1_matrix_DE[current,k]) * temp +
+                    temp_X_mat[i,2] * ((1 - season_actual) * btemp0xorigin1_matrix_DE[current,k] + season_actual * btemp1xorigin1_matrix_DE[current,k]) * temp +
+                    temp_X_mat[i,3] * ((1 - season_actual) * btemp0xorigin2_matrix_DE[current,k] + season_actual * btemp1xorigin2_matrix_DE[current,k]) * temp +
+                    temp_X_mat[i,4] * ((1 - season_actual) * btemp0xorigin3_matrix_DE[current,k] + season_actual * btemp1xorigin3_matrix_DE[current,k]) * temp +
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_DE[current,k] +
                     // add year as a random effect
-                    byear_parameters_array_DE[current, k, run_year_actual];
+                    byear_raw_parameters_array_DE[current, k, run_year_actual] * sigma_year_matrix_DE[current, k];
                     
                     // store in the vector that it's DE
                     DE_correction[k] = 1;
@@ -243,14 +271,13 @@ functions{
                     // Else, use the NDE matrix, and don't correct for detection efficiency
                   } else {
                     logits[k] = b0_matrix_NDE[current, k]+ 
-                    temp_X_mat[i,1] * btemp_matrix_NDE[current,k] * temp +
-                    temp_X_mat[i,2] * btempxorigin1_matrix_NDE[current,k] * temp +
-                    temp_X_mat[i,3] * btempxorigin2_matrix_NDE[current,k] * temp +
-                    temp_X_mat[i,4] * btempxorigin3_matrix_NDE[current,k] * temp +
+                    temp_X_mat[i,2] * ((1 - season_actual) * btemp0xorigin1_matrix_NDE[current,k] + season_actual * btemp1xorigin1_matrix_NDE[current,k]) * temp +
+                    temp_X_mat[i,3] * ((1 - season_actual) * btemp0xorigin2_matrix_NDE[current,k] + season_actual * btemp1xorigin2_matrix_NDE[current,k]) * temp +
+                    temp_X_mat[i,4] * ((1 - season_actual) * btemp0xorigin3_matrix_NDE[current,k] + season_actual * btemp1xorigin3_matrix_NDE[current,k]) * temp +
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_NDE[current,k] +
                     // add year as a random effect
-                    byear_parameters_array_NDE[current, k, run_year_actual];;
+                    byear_raw_parameters_array_NDE[current, k, run_year_actual] * sigma_year_matrix_NDE[current, k];
                     
                     // otherwise, store in the vector that it's not DE
                     DE_correction[k] = 0;
@@ -417,9 +444,15 @@ data {
   // array that contains design matrices for each tributary
   array[18,35,42] int tributary_design_matrices_array;
   
+  // an array that matches the sigma_year values to the correct states
+  array[nmovements, 2] int sigma_year_indices;
+  
   // vector that contains the run years in which each individual transition occurred
   int ntransitions;
   array[ntransitions] int transition_run_years;
+  
+  // a vector of the seasons that each transition took place (0 = winter/spring, before June 1; 1 = summer/fall, June 1 of later)
+  array[ntransitions] int transition_seasons_vector; 
   
   int nyears;
   
@@ -567,76 +600,143 @@ real<lower=0>sigma_year_matrix_30_7;
 real<lower=0>sigma_year_matrix_36_9;
 real<lower=0>sigma_year_matrix_42_7;
 
-real btemp_matrix_1_2;
-real btemp_matrix_2_3;
-real btemp_matrix_2_10_DE;
-real btemp_matrix_2_10_NDE;
-real btemp_matrix_2_12_DE;
-real btemp_matrix_2_12_NDE;
-real btemp_matrix_2_14_DE;
-real btemp_matrix_2_14_NDE;
-real btemp_matrix_2_16_DE;
-real btemp_matrix_2_16_NDE;
-real btemp_matrix_2_18_DE;
-real btemp_matrix_2_18_NDE;
-real btemp_matrix_2_41;
-real btemp_matrix_3_8;
-real btemp_matrix_3_20_DE;
-real btemp_matrix_3_20_NDE;
-real btemp_matrix_3_22_DE;
-real btemp_matrix_3_22_NDE;
-real btemp_matrix_8_9;
-real btemp_matrix_8_32_DE;
-real btemp_matrix_8_32_NDE;
-real btemp_matrix_9_34_DE;
-real btemp_matrix_9_34_NDE;
-real btemp_matrix_9_36;
-real btemp_matrix_9_37;
-real btemp_matrix_9_38;
-real btemp_matrix_9_39_DE;
-real btemp_matrix_9_39_NDE;
+real btemp0_matrix_1_2;
+real btemp1_matrix_1_2;
+real btemp0_matrix_2_3;
+real btemp1_matrix_2_3;
+real btemp0_matrix_2_10_DE;
+real btemp0_matrix_2_10_NDE;
+real btemp1_matrix_2_10_DE;
+real btemp1_matrix_2_10_NDE;
+real btemp0_matrix_2_12_DE;
+real btemp0_matrix_2_12_NDE;
+real btemp1_matrix_2_12_DE;
+real btemp1_matrix_2_12_NDE;
+real btemp0_matrix_2_14_DE;
+real btemp0_matrix_2_14_NDE;
+real btemp1_matrix_2_14_DE;
+real btemp1_matrix_2_14_NDE;
+real btemp0_matrix_2_16_DE;
+real btemp0_matrix_2_16_NDE;
+real btemp1_matrix_2_16_DE;
+real btemp1_matrix_2_16_NDE;
+real btemp0_matrix_2_18_DE;
+real btemp0_matrix_2_18_NDE;
+real btemp1_matrix_2_18_DE;
+real btemp1_matrix_2_18_NDE;
+real btemp0_matrix_2_41;
+real btemp1_matrix_2_41;
+real btemp0_matrix_3_8;
+real btemp1_matrix_3_8;
+real btemp0_matrix_3_20_DE;
+real btemp0_matrix_3_20_NDE;
+real btemp1_matrix_3_20_DE;
+real btemp1_matrix_3_20_NDE;
+real btemp0_matrix_3_22_DE;
+real btemp0_matrix_3_22_NDE;
+real btemp1_matrix_3_22_DE;
+real btemp1_matrix_3_22_NDE;
+real btemp0_matrix_8_9;
+real btemp1_matrix_8_9;
+real btemp0_matrix_8_32_DE;
+real btemp0_matrix_8_32_NDE;
+real btemp1_matrix_8_32_DE;
+real btemp1_matrix_8_32_NDE;
+real btemp0_matrix_9_34_DE;
+real btemp0_matrix_9_34_NDE;
+real btemp1_matrix_9_34_DE;
+real btemp1_matrix_9_34_NDE;
+real btemp0_matrix_9_36;
+real btemp1_matrix_9_36;
+real btemp0_matrix_9_37;
+real btemp1_matrix_9_37;
+real btemp0_matrix_9_38;
+real btemp1_matrix_9_38;
+real btemp0_matrix_9_39_DE;
+real btemp0_matrix_9_39_NDE;
+real btemp1_matrix_9_39_DE;
+real btemp1_matrix_9_39_NDE;
 
-real btempxorigin1_matrix_3_4;
-real btempxorigin1_matrix_4_5;
-real btempxorigin1_matrix_5_6;
-real btempxorigin1_matrix_5_24_DE;
-real btempxorigin1_matrix_5_24_NDE;
-real btempxorigin1_matrix_6_7;
-real btempxorigin1_matrix_6_26_DE;
-real btempxorigin1_matrix_6_26_NDE;
-real btempxorigin1_matrix_7_28_DE;
-real btempxorigin1_matrix_7_28_NDE;
-real btempxorigin1_matrix_7_30_DE;
-real btempxorigin1_matrix_7_30_NDE;
-real btempxorigin1_matrix_7_42;
+real btemp0xorigin1_matrix_3_4;
+real btemp1xorigin1_matrix_3_4;
+real btemp0xorigin1_matrix_4_5;
+real btemp1xorigin1_matrix_4_5;
+real btemp0xorigin1_matrix_5_6;
+real btemp1xorigin1_matrix_5_6;
+real btemp0xorigin1_matrix_5_24_DE;
+real btemp0xorigin1_matrix_5_24_NDE;
+real btemp1xorigin1_matrix_5_24_DE;
+real btemp1xorigin1_matrix_5_24_NDE;
+real btemp0xorigin1_matrix_6_7;
+real btemp1xorigin1_matrix_6_7;
+real btemp0xorigin1_matrix_6_26_DE;
+real btemp0xorigin1_matrix_6_26_NDE;
+real btemp1xorigin1_matrix_6_26_DE;
+real btemp1xorigin1_matrix_6_26_NDE;
+real btemp0xorigin1_matrix_7_28_DE;
+real btemp0xorigin1_matrix_7_28_NDE;
+real btemp1xorigin1_matrix_7_28_DE;
+real btemp1xorigin1_matrix_7_28_NDE;
+real btemp0xorigin1_matrix_7_30_DE;
+real btemp0xorigin1_matrix_7_30_NDE;
+real btemp1xorigin1_matrix_7_30_DE;
+real btemp1xorigin1_matrix_7_30_NDE;
+real btemp0xorigin1_matrix_7_42;
+real btemp1xorigin1_matrix_7_42;
 
-real btempxorigin2_matrix_3_4;
-real btempxorigin2_matrix_4_5;
-real btempxorigin2_matrix_5_6;
-real btempxorigin2_matrix_5_24_DE;
-real btempxorigin2_matrix_5_24_NDE;
-real btempxorigin2_matrix_6_7;
-real btempxorigin2_matrix_6_26_DE;
-real btempxorigin2_matrix_6_26_NDE;
-real btempxorigin2_matrix_7_28_DE;
-real btempxorigin2_matrix_7_28_NDE;
-real btempxorigin2_matrix_7_30_DE;
-real btempxorigin2_matrix_7_30_NDE;
-real btempxorigin2_matrix_7_42;
+real btemp0xorigin2_matrix_3_4;
+real btemp1xorigin2_matrix_3_4;
+real btemp0xorigin2_matrix_4_5;
+real btemp1xorigin2_matrix_4_5;
+real btemp0xorigin2_matrix_5_6;
+real btemp1xorigin2_matrix_5_6;
+real btemp0xorigin2_matrix_5_24_DE;
+real btemp0xorigin2_matrix_5_24_NDE;
+real btemp1xorigin2_matrix_5_24_DE;
+real btemp1xorigin2_matrix_5_24_NDE;
+real btemp0xorigin2_matrix_6_7;
+real btemp1xorigin2_matrix_6_7;
+real btemp0xorigin2_matrix_6_26_DE;
+real btemp0xorigin2_matrix_6_26_NDE;
+real btemp1xorigin2_matrix_6_26_DE;
+real btemp1xorigin2_matrix_6_26_NDE;
+real btemp0xorigin2_matrix_7_28_DE;
+real btemp0xorigin2_matrix_7_28_NDE;
+real btemp1xorigin2_matrix_7_28_DE;
+real btemp1xorigin2_matrix_7_28_NDE;
+real btemp0xorigin2_matrix_7_30_DE;
+real btemp0xorigin2_matrix_7_30_NDE;
+real btemp1xorigin2_matrix_7_30_DE;
+real btemp1xorigin2_matrix_7_30_NDE;
+real btemp0xorigin2_matrix_7_42;
+real btemp1xorigin2_matrix_7_42;
 
-real btempxorigin3_matrix_3_4;
-real btempxorigin3_matrix_4_5;
-real btempxorigin3_matrix_5_6;
-real btempxorigin3_matrix_5_24_DE;
-real btempxorigin3_matrix_5_24_NDE;
-real btempxorigin3_matrix_6_7;
-real btempxorigin3_matrix_6_26_DE;
-real btempxorigin3_matrix_6_26_NDE;
-real btempxorigin3_matrix_7_28_DE;
-real btempxorigin3_matrix_7_28_NDE;
-real btempxorigin3_matrix_7_30_DE;
-real btempxorigin3_matrix_7_30_NDE;
-real btempxorigin3_matrix_7_42;
+real btemp0xorigin3_matrix_3_4;
+real btemp1xorigin3_matrix_3_4;
+real btemp0xorigin3_matrix_4_5;
+real btemp1xorigin3_matrix_4_5;
+real btemp0xorigin3_matrix_5_6;
+real btemp1xorigin3_matrix_5_6;
+real btemp0xorigin3_matrix_5_24_DE;
+real btemp0xorigin3_matrix_5_24_NDE;
+real btemp1xorigin3_matrix_5_24_DE;
+real btemp1xorigin3_matrix_5_24_NDE;
+real btemp0xorigin3_matrix_6_7;
+real btemp1xorigin3_matrix_6_7;
+real btemp0xorigin3_matrix_6_26_DE;
+real btemp0xorigin3_matrix_6_26_NDE;
+real btemp1xorigin3_matrix_6_26_DE;
+real btemp1xorigin3_matrix_6_26_NDE;
+real btemp0xorigin3_matrix_7_28_DE;
+real btemp0xorigin3_matrix_7_28_NDE;
+real btemp1xorigin3_matrix_7_28_DE;
+real btemp1xorigin3_matrix_7_28_NDE;
+real btemp0xorigin3_matrix_7_30_DE;
+real btemp0xorigin3_matrix_7_30_NDE;
+real btemp1xorigin3_matrix_7_30_DE;
+real btemp1xorigin3_matrix_7_30_NDE;
+real btemp0xorigin3_matrix_7_42;
+real btemp1xorigin3_matrix_7_42;
 
 real borigin1_matrix_3_4;
 real borigin1_matrix_4_3;
@@ -752,35 +852,62 @@ transformed parameters {
   
   array[43,43] real sigma_year_matrix_NDE;
   sigma_year_matrix_NDE = rep_array(-100000, 43, 43);
+
   
-  // Declare a matrix to store btemp params
-  // matrix[43,43] btemp_matrix;
-  array[43,43] real btemp_matrix_DE;
+  // Declare a matrix to store btemp0 params
+  array[43,43] real btemp0_matrix_DE;
   // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
   // esepcially important for covariates like temperature to have a zero because
   // they don't apply to all states
-  btemp_matrix_DE = rep_array(0, 43, 43);
+  btemp0_matrix_DE = rep_array(0, 43, 43);
   
-  array[43,43] real btemp_matrix_NDE;
+  array[43,43] real btemp0_matrix_NDE;
   // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
-  btemp_matrix_NDE = rep_array(0, 43, 43);
+  btemp0_matrix_NDE = rep_array(0, 43, 43);
+  
+    // Declare a matrix to store btemp1 params
+  array[43,43] real btemp1_matrix_DE;
+  // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
+  // esepcially important for covariates like temperature to have a zero because
+  // they don't apply to all states
+  btemp1_matrix_DE = rep_array(0, 43, 43);
+  
+  array[43,43] real btemp1_matrix_NDE;
+  // Use a zero instead, since we already have the -100000 in the b0 term. So we just want these to have no effect
+  btemp1_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare matrices to store origin x temperature interactions (DE and NDE)
-  // Origin 1 x temp
-  array[43,43] real btempxorigin1_matrix_DE;
-  btempxorigin1_matrix_DE = rep_array(0, 43, 43);
-  array[43,43] real btempxorigin1_matrix_NDE;
-  btempxorigin1_matrix_NDE = rep_array(0, 43, 43);
-  // Origin 2 x temp
-  array[43,43] real btempxorigin2_matrix_DE;
-  btempxorigin2_matrix_DE = rep_array(0, 43, 43);
-  array[43,43] real btempxorigin2_matrix_NDE;
-  btempxorigin2_matrix_NDE = rep_array(0, 43, 43);
-  // Origin 3 x temp
-  array[43,43] real btempxorigin3_matrix_DE;
-  btempxorigin3_matrix_DE = rep_array(0, 43, 43);
-  array[43,43] real btempxorigin3_matrix_NDE;
-  btempxorigin3_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 1 x temp0
+  array[43,43] real btemp0xorigin1_matrix_DE;
+  btemp0xorigin1_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp0xorigin1_matrix_NDE;
+  btemp0xorigin1_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 2 x temp0
+  array[43,43] real btemp0xorigin2_matrix_DE;
+  btemp0xorigin2_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp0xorigin2_matrix_NDE;
+  btemp0xorigin2_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 3 x temp0
+  array[43,43] real btemp0xorigin3_matrix_DE;
+  btemp0xorigin3_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp0xorigin3_matrix_NDE;
+  btemp0xorigin3_matrix_NDE = rep_array(0, 43, 43);
+  
+    // Origin 1 x temp1
+  array[43,43] real btemp1xorigin1_matrix_DE;
+  btemp1xorigin1_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp1xorigin1_matrix_NDE;
+  btemp1xorigin1_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 2 x temp1
+  array[43,43] real btemp1xorigin2_matrix_DE;
+  btemp1xorigin2_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp1xorigin2_matrix_NDE;
+  btemp1xorigin2_matrix_NDE = rep_array(0, 43, 43);
+  // Origin 3 x temp1
+  array[43,43] real btemp1xorigin3_matrix_DE;
+  btemp1xorigin3_matrix_DE = rep_array(0, 43, 43);
+  array[43,43] real btemp1xorigin3_matrix_NDE;
+  btemp1xorigin3_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare a matrix to store borigin1 params
   // matrix[43,43] borigin1_matrix;
@@ -1089,131 +1216,253 @@ sigma_year_matrix_NDE[36,9] = sigma_year_matrix_36_9;
 sigma_year_matrix_DE[42,7] = sigma_year_matrix_42_7;
 sigma_year_matrix_NDE[42,7] = sigma_year_matrix_42_7;
 
-btemp_matrix_DE[1,2] = btemp_matrix_1_2;
-btemp_matrix_NDE[1,2] = btemp_matrix_1_2;
-btemp_matrix_DE[2,3] = btemp_matrix_2_3;
-btemp_matrix_NDE[2,3] = btemp_matrix_2_3;
-btemp_matrix_DE[2,10] = btemp_matrix_2_10_DE;
-btemp_matrix_NDE[2,10] = btemp_matrix_2_10_NDE;
-btemp_matrix_DE[2,11] = -100000;
-btemp_matrix_NDE[2,11] = btemp_matrix_2_10_NDE;
-btemp_matrix_DE[2,12] = btemp_matrix_2_12_DE;
-btemp_matrix_NDE[2,12] = btemp_matrix_2_12_NDE;
-btemp_matrix_DE[2,13] = -100000;
-btemp_matrix_NDE[2,13] = btemp_matrix_2_12_NDE;
-btemp_matrix_DE[2,14] = btemp_matrix_2_14_DE;
-btemp_matrix_NDE[2,14] = btemp_matrix_2_14_NDE;
-btemp_matrix_DE[2,15] = -100000;
-btemp_matrix_NDE[2,15] = btemp_matrix_2_14_NDE;
-btemp_matrix_DE[2,16] = btemp_matrix_2_16_DE;
-btemp_matrix_NDE[2,16] = btemp_matrix_2_16_NDE;
-btemp_matrix_DE[2,17] = -100000;
-btemp_matrix_NDE[2,17] = btemp_matrix_2_16_NDE;
-btemp_matrix_DE[2,18] = btemp_matrix_2_18_DE;
-btemp_matrix_NDE[2,18] = btemp_matrix_2_18_NDE;
-btemp_matrix_DE[2,19] = -100000;
-btemp_matrix_NDE[2,19] = btemp_matrix_2_18_NDE;
-btemp_matrix_DE[2,41] = btemp_matrix_2_41;
-btemp_matrix_NDE[2,41] = btemp_matrix_2_41;
-btemp_matrix_DE[3,8] = btemp_matrix_3_8;
-btemp_matrix_NDE[3,8] = btemp_matrix_3_8;
-btemp_matrix_DE[3,20] = btemp_matrix_3_20_DE;
-btemp_matrix_NDE[3,20] = btemp_matrix_3_20_NDE;
-btemp_matrix_DE[3,21] = -100000;
-btemp_matrix_NDE[3,21] = btemp_matrix_3_20_NDE;
-btemp_matrix_DE[3,22] = btemp_matrix_3_22_DE;
-btemp_matrix_NDE[3,22] = btemp_matrix_3_22_NDE;
-btemp_matrix_DE[3,23] = -100000;
-btemp_matrix_NDE[3,23] = btemp_matrix_3_22_NDE;
-btemp_matrix_DE[8,9] = btemp_matrix_8_9;
-btemp_matrix_NDE[8,9] = btemp_matrix_8_9;
-btemp_matrix_DE[8,32] = btemp_matrix_8_32_DE;
-btemp_matrix_NDE[8,32] = btemp_matrix_8_32_NDE;
-btemp_matrix_DE[8,33] = -100000;
-btemp_matrix_NDE[8,33] = btemp_matrix_8_32_NDE;
-btemp_matrix_DE[9,34] = btemp_matrix_9_34_DE;
-btemp_matrix_NDE[9,34] = btemp_matrix_9_34_NDE;
-btemp_matrix_DE[9,35] = -100000;
-btemp_matrix_NDE[9,35] = btemp_matrix_9_34_NDE;
-btemp_matrix_DE[9,36] = btemp_matrix_9_36;
-btemp_matrix_NDE[9,36] = btemp_matrix_9_36;
-btemp_matrix_DE[9,37] = btemp_matrix_9_37;
-btemp_matrix_NDE[9,37] = btemp_matrix_9_37;
-btemp_matrix_DE[9,38] = btemp_matrix_9_38;
-btemp_matrix_NDE[9,38] = btemp_matrix_9_38;
-btemp_matrix_DE[9,39] = btemp_matrix_9_39_DE;
-btemp_matrix_NDE[9,39] = btemp_matrix_9_39_NDE;
-btemp_matrix_DE[9,40] = -100000;
-btemp_matrix_NDE[9,40] = btemp_matrix_9_39_NDE;
+btemp0_matrix_DE[1,2] = btemp0_matrix_1_2;
+btemp0_matrix_NDE[1,2] = btemp0_matrix_1_2;
+btemp1_matrix_DE[1,2] = btemp1_matrix_1_2;
+btemp1_matrix_NDE[1,2] = btemp1_matrix_1_2;
+btemp0_matrix_DE[2,3] = btemp0_matrix_2_3;
+btemp0_matrix_NDE[2,3] = btemp0_matrix_2_3;
+btemp1_matrix_DE[2,3] = btemp1_matrix_2_3;
+btemp1_matrix_NDE[2,3] = btemp1_matrix_2_3;
+btemp0_matrix_DE[2,10] = btemp0_matrix_2_10_DE;
+btemp0_matrix_NDE[2,10] = btemp0_matrix_2_10_NDE;
+btemp1_matrix_DE[2,10] = btemp1_matrix_2_10_DE;
+btemp1_matrix_NDE[2,10] = btemp1_matrix_2_10_NDE;
+btemp0_matrix_DE[2,11] = -100000;
+btemp0_matrix_NDE[2,11] = btemp0_matrix_2_10_NDE;
+btemp1_matrix_DE[2,11] = -100000;
+btemp1_matrix_NDE[2,11] = btemp1_matrix_2_10_NDE;
+btemp0_matrix_DE[2,12] = btemp0_matrix_2_12_DE;
+btemp0_matrix_NDE[2,12] = btemp0_matrix_2_12_NDE;
+btemp1_matrix_DE[2,12] = btemp1_matrix_2_12_DE;
+btemp1_matrix_NDE[2,12] = btemp1_matrix_2_12_NDE;
+btemp0_matrix_DE[2,13] = -100000;
+btemp0_matrix_NDE[2,13] = btemp0_matrix_2_12_NDE;
+btemp1_matrix_DE[2,13] = -100000;
+btemp1_matrix_NDE[2,13] = btemp1_matrix_2_12_NDE;
+btemp0_matrix_DE[2,14] = btemp0_matrix_2_14_DE;
+btemp0_matrix_NDE[2,14] = btemp0_matrix_2_14_NDE;
+btemp1_matrix_DE[2,14] = btemp1_matrix_2_14_DE;
+btemp1_matrix_NDE[2,14] = btemp1_matrix_2_14_NDE;
+btemp0_matrix_DE[2,15] = -100000;
+btemp0_matrix_NDE[2,15] = btemp0_matrix_2_14_NDE;
+btemp1_matrix_DE[2,15] = -100000;
+btemp1_matrix_NDE[2,15] = btemp1_matrix_2_14_NDE;
+btemp0_matrix_DE[2,16] = btemp0_matrix_2_16_DE;
+btemp0_matrix_NDE[2,16] = btemp0_matrix_2_16_NDE;
+btemp1_matrix_DE[2,16] = btemp1_matrix_2_16_DE;
+btemp1_matrix_NDE[2,16] = btemp1_matrix_2_16_NDE;
+btemp0_matrix_DE[2,17] = -100000;
+btemp0_matrix_NDE[2,17] = btemp0_matrix_2_16_NDE;
+btemp1_matrix_DE[2,17] = -100000;
+btemp1_matrix_NDE[2,17] = btemp1_matrix_2_16_NDE;
+btemp0_matrix_DE[2,18] = btemp0_matrix_2_18_DE;
+btemp0_matrix_NDE[2,18] = btemp0_matrix_2_18_NDE;
+btemp1_matrix_DE[2,18] = btemp1_matrix_2_18_DE;
+btemp1_matrix_NDE[2,18] = btemp1_matrix_2_18_NDE;
+btemp0_matrix_DE[2,19] = -100000;
+btemp0_matrix_NDE[2,19] = btemp0_matrix_2_18_NDE;
+btemp1_matrix_DE[2,19] = -100000;
+btemp1_matrix_NDE[2,19] = btemp1_matrix_2_18_NDE;
+btemp0_matrix_DE[2,41] = btemp0_matrix_2_41;
+btemp0_matrix_NDE[2,41] = btemp0_matrix_2_41;
+btemp1_matrix_DE[2,41] = btemp1_matrix_2_41;
+btemp1_matrix_NDE[2,41] = btemp1_matrix_2_41;
+btemp0_matrix_DE[3,8] = btemp0_matrix_3_8;
+btemp0_matrix_NDE[3,8] = btemp0_matrix_3_8;
+btemp1_matrix_DE[3,8] = btemp1_matrix_3_8;
+btemp1_matrix_NDE[3,8] = btemp1_matrix_3_8;
+btemp0_matrix_DE[3,20] = btemp0_matrix_3_20_DE;
+btemp0_matrix_NDE[3,20] = btemp0_matrix_3_20_NDE;
+btemp1_matrix_DE[3,20] = btemp1_matrix_3_20_DE;
+btemp1_matrix_NDE[3,20] = btemp1_matrix_3_20_NDE;
+btemp0_matrix_DE[3,21] = -100000;
+btemp0_matrix_NDE[3,21] = btemp0_matrix_3_20_NDE;
+btemp1_matrix_DE[3,21] = -100000;
+btemp1_matrix_NDE[3,21] = btemp1_matrix_3_20_NDE;
+btemp0_matrix_DE[3,22] = btemp0_matrix_3_22_DE;
+btemp0_matrix_NDE[3,22] = btemp0_matrix_3_22_NDE;
+btemp1_matrix_DE[3,22] = btemp1_matrix_3_22_DE;
+btemp1_matrix_NDE[3,22] = btemp1_matrix_3_22_NDE;
+btemp0_matrix_DE[3,23] = -100000;
+btemp0_matrix_NDE[3,23] = btemp0_matrix_3_22_NDE;
+btemp1_matrix_DE[3,23] = -100000;
+btemp1_matrix_NDE[3,23] = btemp1_matrix_3_22_NDE;
+btemp0_matrix_DE[8,9] = btemp0_matrix_8_9;
+btemp0_matrix_NDE[8,9] = btemp0_matrix_8_9;
+btemp1_matrix_DE[8,9] = btemp1_matrix_8_9;
+btemp1_matrix_NDE[8,9] = btemp1_matrix_8_9;
+btemp0_matrix_DE[8,32] = btemp0_matrix_8_32_DE;
+btemp0_matrix_NDE[8,32] = btemp0_matrix_8_32_NDE;
+btemp1_matrix_DE[8,32] = btemp1_matrix_8_32_DE;
+btemp1_matrix_NDE[8,32] = btemp1_matrix_8_32_NDE;
+btemp0_matrix_DE[8,33] = -100000;
+btemp0_matrix_NDE[8,33] = btemp0_matrix_8_32_NDE;
+btemp1_matrix_DE[8,33] = -100000;
+btemp1_matrix_NDE[8,33] = btemp1_matrix_8_32_NDE;
+btemp0_matrix_DE[9,34] = btemp0_matrix_9_34_DE;
+btemp0_matrix_NDE[9,34] = btemp0_matrix_9_34_NDE;
+btemp1_matrix_DE[9,34] = btemp1_matrix_9_34_DE;
+btemp1_matrix_NDE[9,34] = btemp1_matrix_9_34_NDE;
+btemp0_matrix_DE[9,35] = -100000;
+btemp0_matrix_NDE[9,35] = btemp0_matrix_9_34_NDE;
+btemp1_matrix_DE[9,35] = -100000;
+btemp1_matrix_NDE[9,35] = btemp1_matrix_9_34_NDE;
+btemp0_matrix_DE[9,36] = btemp0_matrix_9_36;
+btemp0_matrix_NDE[9,36] = btemp0_matrix_9_36;
+btemp1_matrix_DE[9,36] = btemp1_matrix_9_36;
+btemp1_matrix_NDE[9,36] = btemp1_matrix_9_36;
+btemp0_matrix_DE[9,37] = btemp0_matrix_9_37;
+btemp0_matrix_NDE[9,37] = btemp0_matrix_9_37;
+btemp1_matrix_DE[9,37] = btemp1_matrix_9_37;
+btemp1_matrix_NDE[9,37] = btemp1_matrix_9_37;
+btemp0_matrix_DE[9,38] = btemp0_matrix_9_38;
+btemp0_matrix_NDE[9,38] = btemp0_matrix_9_38;
+btemp1_matrix_DE[9,38] = btemp1_matrix_9_38;
+btemp1_matrix_NDE[9,38] = btemp1_matrix_9_38;
+btemp0_matrix_DE[9,39] = btemp0_matrix_9_39_DE;
+btemp0_matrix_NDE[9,39] = btemp0_matrix_9_39_NDE;
+btemp1_matrix_DE[9,39] = btemp1_matrix_9_39_DE;
+btemp1_matrix_NDE[9,39] = btemp1_matrix_9_39_NDE;
+btemp0_matrix_DE[9,40] = -100000;
+btemp0_matrix_NDE[9,40] = btemp0_matrix_9_39_NDE;
+btemp1_matrix_DE[9,40] = -100000;
+btemp1_matrix_NDE[9,40] = btemp1_matrix_9_39_NDE;
 
-btempxorigin1_matrix_DE[3,4] = btempxorigin1_matrix_3_4;
-btempxorigin1_matrix_NDE[3,4] = btempxorigin1_matrix_3_4;
-btempxorigin1_matrix_DE[4,5] = btempxorigin1_matrix_4_5;
-btempxorigin1_matrix_NDE[4,5] = btempxorigin1_matrix_4_5;
-btempxorigin1_matrix_DE[5,6] = btempxorigin1_matrix_5_6;
-btempxorigin1_matrix_NDE[5,6] = btempxorigin1_matrix_5_6;
-btempxorigin1_matrix_DE[5,24] = btempxorigin1_matrix_5_24_DE;
-btempxorigin1_matrix_NDE[5,24] = btempxorigin1_matrix_5_24_NDE;
-btempxorigin1_matrix_NDE[5,25] = btempxorigin1_matrix_5_24_NDE;
-btempxorigin1_matrix_DE[6,7] = btempxorigin1_matrix_6_7;
-btempxorigin1_matrix_NDE[6,7] = btempxorigin1_matrix_6_7;
-btempxorigin1_matrix_DE[6,26] = btempxorigin1_matrix_6_26_DE;
-btempxorigin1_matrix_NDE[6,26] = btempxorigin1_matrix_6_26_NDE;
-btempxorigin1_matrix_NDE[6,27] = btempxorigin1_matrix_6_26_NDE;
-btempxorigin1_matrix_DE[7,28] = btempxorigin1_matrix_7_28_DE;
-btempxorigin1_matrix_NDE[7,28] = btempxorigin1_matrix_7_28_NDE;
-btempxorigin1_matrix_NDE[7,29] = btempxorigin1_matrix_7_28_NDE;
-btempxorigin1_matrix_DE[7,30] = btempxorigin1_matrix_7_30_DE;
-btempxorigin1_matrix_NDE[7,30] = btempxorigin1_matrix_7_30_NDE;
-btempxorigin1_matrix_NDE[7,31] = btempxorigin1_matrix_7_30_NDE;
-btempxorigin1_matrix_DE[7,42] = btempxorigin1_matrix_7_42;
-btempxorigin1_matrix_NDE[7,42] = btempxorigin1_matrix_7_42;
+btemp0xorigin1_matrix_DE[3,4] = btemp0xorigin1_matrix_3_4;
+btemp0xorigin1_matrix_NDE[3,4] = btemp0xorigin1_matrix_3_4;
+btemp1xorigin1_matrix_DE[3,4] = btemp1xorigin1_matrix_3_4;
+btemp1xorigin1_matrix_NDE[3,4] = btemp1xorigin1_matrix_3_4;
+btemp0xorigin1_matrix_DE[4,5] = btemp0xorigin1_matrix_4_5;
+btemp0xorigin1_matrix_NDE[4,5] = btemp0xorigin1_matrix_4_5;
+btemp1xorigin1_matrix_DE[4,5] = btemp1xorigin1_matrix_4_5;
+btemp1xorigin1_matrix_NDE[4,5] = btemp1xorigin1_matrix_4_5;
+btemp0xorigin1_matrix_DE[5,6] = btemp0xorigin1_matrix_5_6;
+btemp0xorigin1_matrix_NDE[5,6] = btemp0xorigin1_matrix_5_6;
+btemp1xorigin1_matrix_DE[5,6] = btemp1xorigin1_matrix_5_6;
+btemp1xorigin1_matrix_NDE[5,6] = btemp1xorigin1_matrix_5_6;
+btemp0xorigin1_matrix_DE[5,24] = btemp0xorigin1_matrix_5_24_DE;
+btemp0xorigin1_matrix_NDE[5,24] = btemp0xorigin1_matrix_5_24_NDE;
+btemp1xorigin1_matrix_DE[5,24] = btemp1xorigin1_matrix_5_24_DE;
+btemp1xorigin1_matrix_NDE[5,24] = btemp1xorigin1_matrix_5_24_NDE;
+btemp0xorigin1_matrix_NDE[5,25] = btemp0xorigin1_matrix_5_24_NDE;
+btemp1xorigin1_matrix_NDE[5,25] = btemp1xorigin1_matrix_5_24_NDE;
+btemp0xorigin1_matrix_DE[6,7] = btemp0xorigin1_matrix_6_7;
+btemp0xorigin1_matrix_NDE[6,7] = btemp0xorigin1_matrix_6_7;
+btemp1xorigin1_matrix_DE[6,7] = btemp1xorigin1_matrix_6_7;
+btemp1xorigin1_matrix_NDE[6,7] = btemp1xorigin1_matrix_6_7;
+btemp0xorigin1_matrix_DE[6,26] = btemp0xorigin1_matrix_6_26_DE;
+btemp0xorigin1_matrix_NDE[6,26] = btemp0xorigin1_matrix_6_26_NDE;
+btemp1xorigin1_matrix_DE[6,26] = btemp1xorigin1_matrix_6_26_DE;
+btemp1xorigin1_matrix_NDE[6,26] = btemp1xorigin1_matrix_6_26_NDE;
+btemp0xorigin1_matrix_NDE[6,27] = btemp0xorigin1_matrix_6_26_NDE;
+btemp1xorigin1_matrix_NDE[6,27] = btemp1xorigin1_matrix_6_26_NDE;
+btemp0xorigin1_matrix_DE[7,28] = btemp0xorigin1_matrix_7_28_DE;
+btemp0xorigin1_matrix_NDE[7,28] = btemp0xorigin1_matrix_7_28_NDE;
+btemp1xorigin1_matrix_DE[7,28] = btemp1xorigin1_matrix_7_28_DE;
+btemp1xorigin1_matrix_NDE[7,28] = btemp1xorigin1_matrix_7_28_NDE;
+btemp0xorigin1_matrix_NDE[7,29] = btemp0xorigin1_matrix_7_28_NDE;
+btemp1xorigin1_matrix_NDE[7,29] = btemp1xorigin1_matrix_7_28_NDE;
+btemp0xorigin1_matrix_DE[7,30] = btemp0xorigin1_matrix_7_30_DE;
+btemp0xorigin1_matrix_NDE[7,30] = btemp0xorigin1_matrix_7_30_NDE;
+btemp1xorigin1_matrix_DE[7,30] = btemp1xorigin1_matrix_7_30_DE;
+btemp1xorigin1_matrix_NDE[7,30] = btemp1xorigin1_matrix_7_30_NDE;
+btemp0xorigin1_matrix_NDE[7,31] = btemp0xorigin1_matrix_7_30_NDE;
+btemp1xorigin1_matrix_NDE[7,31] = btemp1xorigin1_matrix_7_30_NDE;
+btemp0xorigin1_matrix_DE[7,42] = btemp0xorigin1_matrix_7_42;
+btemp0xorigin1_matrix_NDE[7,42] = btemp0xorigin1_matrix_7_42;
+btemp1xorigin1_matrix_DE[7,42] = btemp1xorigin1_matrix_7_42;
+btemp1xorigin1_matrix_NDE[7,42] = btemp1xorigin1_matrix_7_42;
 
-btempxorigin2_matrix_DE[3,4] = btempxorigin2_matrix_3_4;
-btempxorigin2_matrix_NDE[3,4] = btempxorigin2_matrix_3_4;
-btempxorigin2_matrix_DE[4,5] = btempxorigin2_matrix_4_5;
-btempxorigin2_matrix_NDE[4,5] = btempxorigin2_matrix_4_5;
-btempxorigin2_matrix_DE[5,6] = btempxorigin2_matrix_5_6;
-btempxorigin2_matrix_NDE[5,6] = btempxorigin2_matrix_5_6;
-btempxorigin2_matrix_DE[5,24] = btempxorigin2_matrix_5_24_DE;
-btempxorigin2_matrix_NDE[5,24] = btempxorigin2_matrix_5_24_NDE;
-btempxorigin2_matrix_NDE[5,25] = btempxorigin2_matrix_5_24_NDE;
-btempxorigin2_matrix_DE[6,7] = btempxorigin2_matrix_6_7;
-btempxorigin2_matrix_NDE[6,7] = btempxorigin2_matrix_6_7;
-btempxorigin2_matrix_DE[6,26] = btempxorigin2_matrix_6_26_DE;
-btempxorigin2_matrix_NDE[6,26] = btempxorigin2_matrix_6_26_NDE;
-btempxorigin2_matrix_NDE[6,27] = btempxorigin2_matrix_6_26_NDE;
-btempxorigin2_matrix_DE[7,28] = btempxorigin2_matrix_7_28_DE;
-btempxorigin2_matrix_NDE[7,28] = btempxorigin2_matrix_7_28_NDE;
-btempxorigin2_matrix_NDE[7,29] = btempxorigin2_matrix_7_28_NDE;
-btempxorigin2_matrix_DE[7,30] = btempxorigin2_matrix_7_30_DE;
-btempxorigin2_matrix_NDE[7,30] = btempxorigin2_matrix_7_30_NDE;
-btempxorigin2_matrix_NDE[7,31] = btempxorigin2_matrix_7_30_NDE;
-btempxorigin2_matrix_DE[7,42] = btempxorigin2_matrix_7_42;
-btempxorigin2_matrix_NDE[7,42] = btempxorigin2_matrix_7_42;
+btemp0xorigin2_matrix_DE[3,4] = btemp0xorigin2_matrix_3_4;
+btemp0xorigin2_matrix_NDE[3,4] = btemp0xorigin2_matrix_3_4;
+btemp1xorigin2_matrix_DE[3,4] = btemp1xorigin2_matrix_3_4;
+btemp1xorigin2_matrix_NDE[3,4] = btemp1xorigin2_matrix_3_4;
+btemp0xorigin2_matrix_DE[4,5] = btemp0xorigin2_matrix_4_5;
+btemp0xorigin2_matrix_NDE[4,5] = btemp0xorigin2_matrix_4_5;
+btemp1xorigin2_matrix_DE[4,5] = btemp1xorigin2_matrix_4_5;
+btemp1xorigin2_matrix_NDE[4,5] = btemp1xorigin2_matrix_4_5;
+btemp0xorigin2_matrix_DE[5,6] = btemp0xorigin2_matrix_5_6;
+btemp0xorigin2_matrix_NDE[5,6] = btemp0xorigin2_matrix_5_6;
+btemp1xorigin2_matrix_DE[5,6] = btemp1xorigin2_matrix_5_6;
+btemp1xorigin2_matrix_NDE[5,6] = btemp1xorigin2_matrix_5_6;
+btemp0xorigin2_matrix_DE[5,24] = btemp0xorigin2_matrix_5_24_DE;
+btemp0xorigin2_matrix_NDE[5,24] = btemp0xorigin2_matrix_5_24_NDE;
+btemp1xorigin2_matrix_DE[5,24] = btemp1xorigin2_matrix_5_24_DE;
+btemp1xorigin2_matrix_NDE[5,24] = btemp1xorigin2_matrix_5_24_NDE;
+btemp0xorigin2_matrix_NDE[5,25] = btemp0xorigin2_matrix_5_24_NDE;
+btemp1xorigin2_matrix_NDE[5,25] = btemp1xorigin2_matrix_5_24_NDE;
+btemp0xorigin2_matrix_DE[6,7] = btemp0xorigin2_matrix_6_7;
+btemp0xorigin2_matrix_NDE[6,7] = btemp0xorigin2_matrix_6_7;
+btemp1xorigin2_matrix_DE[6,7] = btemp1xorigin2_matrix_6_7;
+btemp1xorigin2_matrix_NDE[6,7] = btemp1xorigin2_matrix_6_7;
+btemp0xorigin2_matrix_DE[6,26] = btemp0xorigin2_matrix_6_26_DE;
+btemp0xorigin2_matrix_NDE[6,26] = btemp0xorigin2_matrix_6_26_NDE;
+btemp1xorigin2_matrix_DE[6,26] = btemp1xorigin2_matrix_6_26_DE;
+btemp1xorigin2_matrix_NDE[6,26] = btemp1xorigin2_matrix_6_26_NDE;
+btemp0xorigin2_matrix_NDE[6,27] = btemp0xorigin2_matrix_6_26_NDE;
+btemp1xorigin2_matrix_NDE[6,27] = btemp1xorigin2_matrix_6_26_NDE;
+btemp0xorigin2_matrix_DE[7,28] = btemp0xorigin2_matrix_7_28_DE;
+btemp0xorigin2_matrix_NDE[7,28] = btemp0xorigin2_matrix_7_28_NDE;
+btemp1xorigin2_matrix_DE[7,28] = btemp1xorigin2_matrix_7_28_DE;
+btemp1xorigin2_matrix_NDE[7,28] = btemp1xorigin2_matrix_7_28_NDE;
+btemp0xorigin2_matrix_NDE[7,29] = btemp0xorigin2_matrix_7_28_NDE;
+btemp1xorigin2_matrix_NDE[7,29] = btemp1xorigin2_matrix_7_28_NDE;
+btemp0xorigin2_matrix_DE[7,30] = btemp0xorigin2_matrix_7_30_DE;
+btemp0xorigin2_matrix_NDE[7,30] = btemp0xorigin2_matrix_7_30_NDE;
+btemp1xorigin2_matrix_DE[7,30] = btemp1xorigin2_matrix_7_30_DE;
+btemp1xorigin2_matrix_NDE[7,30] = btemp1xorigin2_matrix_7_30_NDE;
+btemp0xorigin2_matrix_NDE[7,31] = btemp0xorigin2_matrix_7_30_NDE;
+btemp1xorigin2_matrix_NDE[7,31] = btemp1xorigin2_matrix_7_30_NDE;
+btemp0xorigin2_matrix_DE[7,42] = btemp0xorigin2_matrix_7_42;
+btemp0xorigin2_matrix_NDE[7,42] = btemp0xorigin2_matrix_7_42;
+btemp1xorigin2_matrix_DE[7,42] = btemp1xorigin2_matrix_7_42;
+btemp1xorigin2_matrix_NDE[7,42] = btemp1xorigin2_matrix_7_42;
 
-btempxorigin3_matrix_DE[3,4] = btempxorigin3_matrix_3_4;
-btempxorigin3_matrix_NDE[3,4] = btempxorigin3_matrix_3_4;
-btempxorigin3_matrix_DE[4,5] = btempxorigin3_matrix_4_5;
-btempxorigin3_matrix_NDE[4,5] = btempxorigin3_matrix_4_5;
-btempxorigin3_matrix_DE[5,6] = btempxorigin3_matrix_5_6;
-btempxorigin3_matrix_NDE[5,6] = btempxorigin3_matrix_5_6;
-btempxorigin3_matrix_DE[5,24] = btempxorigin3_matrix_5_24_DE;
-btempxorigin3_matrix_NDE[5,24] = btempxorigin3_matrix_5_24_NDE;
-btempxorigin3_matrix_NDE[5,25] = btempxorigin3_matrix_5_24_NDE;
-btempxorigin3_matrix_DE[6,7] = btempxorigin3_matrix_6_7;
-btempxorigin3_matrix_NDE[6,7] = btempxorigin3_matrix_6_7;
-btempxorigin3_matrix_DE[6,26] = btempxorigin3_matrix_6_26_DE;
-btempxorigin3_matrix_NDE[6,26] = btempxorigin3_matrix_6_26_NDE;
-btempxorigin3_matrix_NDE[6,27] = btempxorigin3_matrix_6_26_NDE;
-btempxorigin3_matrix_DE[7,28] = btempxorigin3_matrix_7_28_DE;
-btempxorigin3_matrix_NDE[7,28] = btempxorigin3_matrix_7_28_NDE;
-btempxorigin3_matrix_NDE[7,29] = btempxorigin3_matrix_7_28_NDE;
-btempxorigin3_matrix_DE[7,30] = btempxorigin3_matrix_7_30_DE;
-btempxorigin3_matrix_NDE[7,30] = btempxorigin3_matrix_7_30_NDE;
-btempxorigin3_matrix_NDE[7,31] = btempxorigin3_matrix_7_30_NDE;
-btempxorigin3_matrix_DE[7,42] = btempxorigin3_matrix_7_42;
-btempxorigin3_matrix_NDE[7,42] = btempxorigin3_matrix_7_42;
+btemp0xorigin3_matrix_DE[3,4] = btemp0xorigin3_matrix_3_4;
+btemp0xorigin3_matrix_NDE[3,4] = btemp0xorigin3_matrix_3_4;
+btemp1xorigin3_matrix_DE[3,4] = btemp1xorigin3_matrix_3_4;
+btemp1xorigin3_matrix_NDE[3,4] = btemp1xorigin3_matrix_3_4;
+btemp0xorigin3_matrix_DE[4,5] = btemp0xorigin3_matrix_4_5;
+btemp0xorigin3_matrix_NDE[4,5] = btemp0xorigin3_matrix_4_5;
+btemp1xorigin3_matrix_DE[4,5] = btemp1xorigin3_matrix_4_5;
+btemp1xorigin3_matrix_NDE[4,5] = btemp1xorigin3_matrix_4_5;
+btemp0xorigin3_matrix_DE[5,6] = btemp0xorigin3_matrix_5_6;
+btemp0xorigin3_matrix_NDE[5,6] = btemp0xorigin3_matrix_5_6;
+btemp1xorigin3_matrix_DE[5,6] = btemp1xorigin3_matrix_5_6;
+btemp1xorigin3_matrix_NDE[5,6] = btemp1xorigin3_matrix_5_6;
+btemp0xorigin3_matrix_DE[5,24] = btemp0xorigin3_matrix_5_24_DE;
+btemp0xorigin3_matrix_NDE[5,24] = btemp0xorigin3_matrix_5_24_NDE;
+btemp1xorigin3_matrix_DE[5,24] = btemp1xorigin3_matrix_5_24_DE;
+btemp1xorigin3_matrix_NDE[5,24] = btemp1xorigin3_matrix_5_24_NDE;
+btemp0xorigin3_matrix_NDE[5,25] = btemp0xorigin3_matrix_5_24_NDE;
+btemp1xorigin3_matrix_NDE[5,25] = btemp1xorigin3_matrix_5_24_NDE;
+btemp0xorigin3_matrix_DE[6,7] = btemp0xorigin3_matrix_6_7;
+btemp0xorigin3_matrix_NDE[6,7] = btemp0xorigin3_matrix_6_7;
+btemp1xorigin3_matrix_DE[6,7] = btemp1xorigin3_matrix_6_7;
+btemp1xorigin3_matrix_NDE[6,7] = btemp1xorigin3_matrix_6_7;
+btemp0xorigin3_matrix_DE[6,26] = btemp0xorigin3_matrix_6_26_DE;
+btemp0xorigin3_matrix_NDE[6,26] = btemp0xorigin3_matrix_6_26_NDE;
+btemp1xorigin3_matrix_DE[6,26] = btemp1xorigin3_matrix_6_26_DE;
+btemp1xorigin3_matrix_NDE[6,26] = btemp1xorigin3_matrix_6_26_NDE;
+btemp0xorigin3_matrix_NDE[6,27] = btemp0xorigin3_matrix_6_26_NDE;
+btemp1xorigin3_matrix_NDE[6,27] = btemp1xorigin3_matrix_6_26_NDE;
+btemp0xorigin3_matrix_DE[7,28] = btemp0xorigin3_matrix_7_28_DE;
+btemp0xorigin3_matrix_NDE[7,28] = btemp0xorigin3_matrix_7_28_NDE;
+btemp1xorigin3_matrix_DE[7,28] = btemp1xorigin3_matrix_7_28_DE;
+btemp1xorigin3_matrix_NDE[7,28] = btemp1xorigin3_matrix_7_28_NDE;
+btemp0xorigin3_matrix_NDE[7,29] = btemp0xorigin3_matrix_7_28_NDE;
+btemp1xorigin3_matrix_NDE[7,29] = btemp1xorigin3_matrix_7_28_NDE;
+btemp0xorigin3_matrix_DE[7,30] = btemp0xorigin3_matrix_7_30_DE;
+btemp0xorigin3_matrix_NDE[7,30] = btemp0xorigin3_matrix_7_30_NDE;
+btemp1xorigin3_matrix_DE[7,30] = btemp1xorigin3_matrix_7_30_DE;
+btemp1xorigin3_matrix_NDE[7,30] = btemp1xorigin3_matrix_7_30_NDE;
+btemp0xorigin3_matrix_NDE[7,31] = btemp0xorigin3_matrix_7_30_NDE;
+btemp1xorigin3_matrix_NDE[7,31] = btemp1xorigin3_matrix_7_30_NDE;
+btemp0xorigin3_matrix_DE[7,42] = btemp0xorigin3_matrix_7_42;
+btemp0xorigin3_matrix_NDE[7,42] = btemp0xorigin3_matrix_7_42;
+btemp1xorigin3_matrix_DE[7,42] = btemp1xorigin3_matrix_7_42;
+btemp1xorigin3_matrix_NDE[7,42] = btemp1xorigin3_matrix_7_42;
 
 borigin1_matrix_DE[3,4] = borigin1_matrix_3_4;
 borigin1_matrix_NDE[3,4] = borigin1_matrix_3_4;
@@ -1606,76 +1855,143 @@ sigma_year_matrix_30_7 ~ cauchy(0,5);
 sigma_year_matrix_36_9 ~ cauchy(0,5);
 sigma_year_matrix_42_7 ~ cauchy(0,5);
 
-btemp_matrix_1_2 ~ normal(0,10);
-btemp_matrix_2_3 ~ normal(0,10);
-btemp_matrix_2_10_DE ~ normal(0,10);
-btemp_matrix_2_10_NDE ~ normal(0,10);
-btemp_matrix_2_12_DE ~ normal(0,10);
-btemp_matrix_2_12_NDE ~ normal(0,10);
-btemp_matrix_2_14_DE ~ normal(0,10);
-btemp_matrix_2_14_NDE ~ normal(0,10);
-btemp_matrix_2_16_DE ~ normal(0,10);
-btemp_matrix_2_16_NDE ~ normal(0,10);
-btemp_matrix_2_18_DE ~ normal(0,10);
-btemp_matrix_2_18_NDE ~ normal(0,10);
-btemp_matrix_2_41 ~ normal(0,10);
-btemp_matrix_3_8 ~ normal(0,10);
-btemp_matrix_3_20_DE ~ normal(0,10);
-btemp_matrix_3_20_NDE ~ normal(0,10);
-btemp_matrix_3_22_DE ~ normal(0,10);
-btemp_matrix_3_22_NDE ~ normal(0,10);
-btemp_matrix_8_9 ~ normal(0,10);
-btemp_matrix_8_32_DE ~ normal(0,10);
-btemp_matrix_8_32_NDE ~ normal(0,10);
-btemp_matrix_9_34_DE ~ normal(0,10);
-btemp_matrix_9_34_NDE ~ normal(0,10);
-btemp_matrix_9_36 ~ normal(0,10);
-btemp_matrix_9_37 ~ normal(0,10);
-btemp_matrix_9_38 ~ normal(0,10);
-btemp_matrix_9_39_DE ~ normal(0,10);
-btemp_matrix_9_39_NDE ~ normal(0,10);
+btemp0_matrix_1_2 ~ normal(0,10);
+btemp1_matrix_1_2 ~ normal(0,10);
+btemp0_matrix_2_3 ~ normal(0,10);
+btemp1_matrix_2_3 ~ normal(0,10);
+btemp0_matrix_2_10_DE ~ normal(0,10);
+btemp0_matrix_2_10_NDE ~ normal(0,10);
+btemp1_matrix_2_10_DE ~ normal(0,10);
+btemp1_matrix_2_10_NDE ~ normal(0,10);
+btemp0_matrix_2_12_DE ~ normal(0,10);
+btemp0_matrix_2_12_NDE ~ normal(0,10);
+btemp1_matrix_2_12_DE ~ normal(0,10);
+btemp1_matrix_2_12_NDE ~ normal(0,10);
+btemp0_matrix_2_14_DE ~ normal(0,10);
+btemp0_matrix_2_14_NDE ~ normal(0,10);
+btemp1_matrix_2_14_DE ~ normal(0,10);
+btemp1_matrix_2_14_NDE ~ normal(0,10);
+btemp0_matrix_2_16_DE ~ normal(0,10);
+btemp0_matrix_2_16_NDE ~ normal(0,10);
+btemp1_matrix_2_16_DE ~ normal(0,10);
+btemp1_matrix_2_16_NDE ~ normal(0,10);
+btemp0_matrix_2_18_DE ~ normal(0,10);
+btemp0_matrix_2_18_NDE ~ normal(0,10);
+btemp1_matrix_2_18_DE ~ normal(0,10);
+btemp1_matrix_2_18_NDE ~ normal(0,10);
+btemp0_matrix_2_41 ~ normal(0,10);
+btemp1_matrix_2_41 ~ normal(0,10);
+btemp0_matrix_3_8 ~ normal(0,10);
+btemp1_matrix_3_8 ~ normal(0,10);
+btemp0_matrix_3_20_DE ~ normal(0,10);
+btemp0_matrix_3_20_NDE ~ normal(0,10);
+btemp1_matrix_3_20_DE ~ normal(0,10);
+btemp1_matrix_3_20_NDE ~ normal(0,10);
+btemp0_matrix_3_22_DE ~ normal(0,10);
+btemp0_matrix_3_22_NDE ~ normal(0,10);
+btemp1_matrix_3_22_DE ~ normal(0,10);
+btemp1_matrix_3_22_NDE ~ normal(0,10);
+btemp0_matrix_8_9 ~ normal(0,10);
+btemp1_matrix_8_9 ~ normal(0,10);
+btemp0_matrix_8_32_DE ~ normal(0,10);
+btemp0_matrix_8_32_NDE ~ normal(0,10);
+btemp1_matrix_8_32_DE ~ normal(0,10);
+btemp1_matrix_8_32_NDE ~ normal(0,10);
+btemp0_matrix_9_34_DE ~ normal(0,10);
+btemp0_matrix_9_34_NDE ~ normal(0,10);
+btemp1_matrix_9_34_DE ~ normal(0,10);
+btemp1_matrix_9_34_NDE ~ normal(0,10);
+btemp0_matrix_9_36 ~ normal(0,10);
+btemp1_matrix_9_36 ~ normal(0,10);
+btemp0_matrix_9_37 ~ normal(0,10);
+btemp1_matrix_9_37 ~ normal(0,10);
+btemp0_matrix_9_38 ~ normal(0,10);
+btemp1_matrix_9_38 ~ normal(0,10);
+btemp0_matrix_9_39_DE ~ normal(0,10);
+btemp0_matrix_9_39_NDE ~ normal(0,10);
+btemp1_matrix_9_39_DE ~ normal(0,10);
+btemp1_matrix_9_39_NDE ~ normal(0,10);
 
-btempxorigin1_matrix_3_4 ~ normal(0,10);
-btempxorigin1_matrix_4_5 ~ normal(0,10);
-btempxorigin1_matrix_5_6 ~ normal(0,10);
-btempxorigin1_matrix_5_24_DE ~ normal(0,10);
-btempxorigin1_matrix_5_24_NDE ~ normal(0,10);
-btempxorigin1_matrix_6_7 ~ normal(0,10);
-btempxorigin1_matrix_6_26_DE ~ normal(0,10);
-btempxorigin1_matrix_6_26_NDE ~ normal(0,10);
-btempxorigin1_matrix_7_28_DE ~ normal(0,10);
-btempxorigin1_matrix_7_28_NDE ~ normal(0,10);
-btempxorigin1_matrix_7_30_DE ~ normal(0,10);
-btempxorigin1_matrix_7_30_NDE ~ normal(0,10);
-btempxorigin1_matrix_7_42 ~ normal(0,10);
+btemp0xorigin1_matrix_3_4 ~ normal(0,10);
+btemp1xorigin1_matrix_3_4 ~ normal(0,10);
+btemp0xorigin1_matrix_4_5 ~ normal(0,10);
+btemp1xorigin1_matrix_4_5 ~ normal(0,10);
+btemp0xorigin1_matrix_5_6 ~ normal(0,10);
+btemp1xorigin1_matrix_5_6 ~ normal(0,10);
+btemp0xorigin1_matrix_5_24_DE ~ normal(0,10);
+btemp0xorigin1_matrix_5_24_NDE ~ normal(0,10);
+btemp1xorigin1_matrix_5_24_DE ~ normal(0,10);
+btemp1xorigin1_matrix_5_24_NDE ~ normal(0,10);
+btemp0xorigin1_matrix_6_7 ~ normal(0,10);
+btemp1xorigin1_matrix_6_7 ~ normal(0,10);
+btemp0xorigin1_matrix_6_26_DE ~ normal(0,10);
+btemp0xorigin1_matrix_6_26_NDE ~ normal(0,10);
+btemp1xorigin1_matrix_6_26_DE ~ normal(0,10);
+btemp1xorigin1_matrix_6_26_NDE ~ normal(0,10);
+btemp0xorigin1_matrix_7_28_DE ~ normal(0,10);
+btemp0xorigin1_matrix_7_28_NDE ~ normal(0,10);
+btemp1xorigin1_matrix_7_28_DE ~ normal(0,10);
+btemp1xorigin1_matrix_7_28_NDE ~ normal(0,10);
+btemp0xorigin1_matrix_7_30_DE ~ normal(0,10);
+btemp0xorigin1_matrix_7_30_NDE ~ normal(0,10);
+btemp1xorigin1_matrix_7_30_DE ~ normal(0,10);
+btemp1xorigin1_matrix_7_30_NDE ~ normal(0,10);
+btemp0xorigin1_matrix_7_42 ~ normal(0,10);
+btemp1xorigin1_matrix_7_42 ~ normal(0,10);
 
-btempxorigin2_matrix_3_4 ~ normal(0,10);
-btempxorigin2_matrix_4_5 ~ normal(0,10);
-btempxorigin2_matrix_5_6 ~ normal(0,10);
-btempxorigin2_matrix_5_24_DE ~ normal(0,10);
-btempxorigin2_matrix_5_24_NDE ~ normal(0,10);
-btempxorigin2_matrix_6_7 ~ normal(0,10);
-btempxorigin2_matrix_6_26_DE ~ normal(0,10);
-btempxorigin2_matrix_6_26_NDE ~ normal(0,10);
-btempxorigin2_matrix_7_28_DE ~ normal(0,10);
-btempxorigin2_matrix_7_28_NDE ~ normal(0,10);
-btempxorigin2_matrix_7_30_DE ~ normal(0,10);
-btempxorigin2_matrix_7_30_NDE ~ normal(0,10);
-btempxorigin2_matrix_7_42 ~ normal(0,10);
+btemp0xorigin2_matrix_3_4 ~ normal(0,10);
+btemp1xorigin2_matrix_3_4 ~ normal(0,10);
+btemp0xorigin2_matrix_4_5 ~ normal(0,10);
+btemp1xorigin2_matrix_4_5 ~ normal(0,10);
+btemp0xorigin2_matrix_5_6 ~ normal(0,10);
+btemp1xorigin2_matrix_5_6 ~ normal(0,10);
+btemp0xorigin2_matrix_5_24_DE ~ normal(0,10);
+btemp0xorigin2_matrix_5_24_NDE ~ normal(0,10);
+btemp1xorigin2_matrix_5_24_DE ~ normal(0,10);
+btemp1xorigin2_matrix_5_24_NDE ~ normal(0,10);
+btemp0xorigin2_matrix_6_7 ~ normal(0,10);
+btemp1xorigin2_matrix_6_7 ~ normal(0,10);
+btemp0xorigin2_matrix_6_26_DE ~ normal(0,10);
+btemp0xorigin2_matrix_6_26_NDE ~ normal(0,10);
+btemp1xorigin2_matrix_6_26_DE ~ normal(0,10);
+btemp1xorigin2_matrix_6_26_NDE ~ normal(0,10);
+btemp0xorigin2_matrix_7_28_DE ~ normal(0,10);
+btemp0xorigin2_matrix_7_28_NDE ~ normal(0,10);
+btemp1xorigin2_matrix_7_28_DE ~ normal(0,10);
+btemp1xorigin2_matrix_7_28_NDE ~ normal(0,10);
+btemp0xorigin2_matrix_7_30_DE ~ normal(0,10);
+btemp0xorigin2_matrix_7_30_NDE ~ normal(0,10);
+btemp1xorigin2_matrix_7_30_DE ~ normal(0,10);
+btemp1xorigin2_matrix_7_30_NDE ~ normal(0,10);
+btemp0xorigin2_matrix_7_42 ~ normal(0,10);
+btemp1xorigin2_matrix_7_42 ~ normal(0,10);
 
-btempxorigin3_matrix_3_4 ~ normal(0,10);
-btempxorigin3_matrix_4_5 ~ normal(0,10);
-btempxorigin3_matrix_5_6 ~ normal(0,10);
-btempxorigin3_matrix_5_24_DE ~ normal(0,10);
-btempxorigin3_matrix_5_24_NDE ~ normal(0,10);
-btempxorigin3_matrix_6_7 ~ normal(0,10);
-btempxorigin3_matrix_6_26_DE ~ normal(0,10);
-btempxorigin3_matrix_6_26_NDE ~ normal(0,10);
-btempxorigin3_matrix_7_28_DE ~ normal(0,10);
-btempxorigin3_matrix_7_28_NDE ~ normal(0,10);
-btempxorigin3_matrix_7_30_DE ~ normal(0,10);
-btempxorigin3_matrix_7_30_NDE ~ normal(0,10);
-btempxorigin3_matrix_7_42 ~ normal(0,10);
+btemp0xorigin3_matrix_3_4 ~ normal(0,10);
+btemp1xorigin3_matrix_3_4 ~ normal(0,10);
+btemp0xorigin3_matrix_4_5 ~ normal(0,10);
+btemp1xorigin3_matrix_4_5 ~ normal(0,10);
+btemp0xorigin3_matrix_5_6 ~ normal(0,10);
+btemp1xorigin3_matrix_5_6 ~ normal(0,10);
+btemp0xorigin3_matrix_5_24_DE ~ normal(0,10);
+btemp0xorigin3_matrix_5_24_NDE ~ normal(0,10);
+btemp1xorigin3_matrix_5_24_DE ~ normal(0,10);
+btemp1xorigin3_matrix_5_24_NDE ~ normal(0,10);
+btemp0xorigin3_matrix_6_7 ~ normal(0,10);
+btemp1xorigin3_matrix_6_7 ~ normal(0,10);
+btemp0xorigin3_matrix_6_26_DE ~ normal(0,10);
+btemp0xorigin3_matrix_6_26_NDE ~ normal(0,10);
+btemp1xorigin3_matrix_6_26_DE ~ normal(0,10);
+btemp1xorigin3_matrix_6_26_NDE ~ normal(0,10);
+btemp0xorigin3_matrix_7_28_DE ~ normal(0,10);
+btemp0xorigin3_matrix_7_28_NDE ~ normal(0,10);
+btemp1xorigin3_matrix_7_28_DE ~ normal(0,10);
+btemp1xorigin3_matrix_7_28_NDE ~ normal(0,10);
+btemp0xorigin3_matrix_7_30_DE ~ normal(0,10);
+btemp0xorigin3_matrix_7_30_NDE ~ normal(0,10);
+btemp1xorigin3_matrix_7_30_DE ~ normal(0,10);
+btemp1xorigin3_matrix_7_30_NDE ~ normal(0,10);
+btemp0xorigin3_matrix_7_42 ~ normal(0,10);
+btemp1xorigin3_matrix_7_42 ~ normal(0,10);
 
 borigin1_matrix_3_4 ~ normal(0,10);
 borigin1_matrix_4_3 ~ normal(0,10);
@@ -1778,13 +2094,16 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
 // This should allow us to increment log density across fish, rather than observations within a fish, allowing us to 
 // break up the dataset by fish and therefore run different chunks of the dataset in parallel.
 
-  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, nmovements, transition_dates, temperature_data, cat_X_mat, temp_X_mat, states_mat, n_obs, // arguments 1-12
-  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 13-15
-  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 16-18
-  btemp_matrix_DE, btempxorigin1_matrix_DE, btempxorigin2_matrix_DE, btempxorigin3_matrix_DE, // arguments 19-22
-  btemp_matrix_NDE, btempxorigin1_matrix_NDE, btempxorigin2_matrix_NDE, btempxorigin3_matrix_NDE, // arguments 23-26
-  sigma_year_matrix_DE, sigma_year_matrix_NDE, sigma_year_indices, // arguments 27-28
-  tributary_design_matrices_array, transition_run_years, nyears, run_year_DE_array, det_eff_param_vector); // arguments 29-33
+  target += reduce_sum(partial_sum_lupmf, y, grainsize, n_ind, max_visits, nmovements, transition_dates, // arguments 1-7
+  transition_seasons_vector, temperature_data, cat_X_mat, temp_X_mat, states_mat, n_obs, // arguments 8-13
+  b0_matrix_DE, borigin1_matrix_DE, borigin2_matrix_DE,  // arguments 14-16
+  b0_matrix_NDE, borigin1_matrix_NDE, borigin2_matrix_NDE,  // arguments 17-19
+  btemp0_matrix_DE, btemp0xorigin1_matrix_DE, btemp0xorigin2_matrix_DE, btemp0xorigin3_matrix_DE, // arguments 20-23
+  btemp0_matrix_NDE, btemp0xorigin1_matrix_NDE, btemp0xorigin2_matrix_NDE, btemp0xorigin3_matrix_NDE, // arguments 24-27
+  btemp1_matrix_DE, btemp1xorigin1_matrix_DE, btemp1xorigin2_matrix_DE, btemp1xorigin3_matrix_DE, // arguments 28-31
+  btemp1_matrix_NDE, btemp1xorigin1_matrix_NDE, btemp1xorigin2_matrix_NDE, btemp1xorigin3_matrix_NDE, // arguments 32-35
+  sigma_year_matrix_DE, sigma_year_matrix_NDE, sigma_year_indices, // arguments 36-38
+  tributary_design_matrices_array, transition_run_years, nyears, run_year_DE_array, det_eff_param_vector); // arguments 39-43
 
 }
 
