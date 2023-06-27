@@ -9,7 +9,7 @@
 # This script will fit an intercept + origin + temperature model using stan to wild fish from the Upper Columbia
 
 # FOR TESTING: setwd
-setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_year/upper_columbia/")
+# setwd("/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_year/upper_columbia/")
 
 # library("rstan")
 library(cmdstanr)
@@ -2219,10 +2219,10 @@ n.ind <- dim(state_data)[3]
   # Step 1: load the model
   
   # to run this model with interaction terms, you need to increase the fbracket depth:
-  cpp_options <- list(
-    "CXXFLAGS+= -fbracket-depth=512"
-  )
-  cmdstan_make_local(cpp_options = cpp_options)
+  # cpp_options <- list(
+  #   "CXXFLAGS+= -fbracket-depth=512"
+  # )
+  # cmdstan_make_local(cpp_options = cpp_options)
   
   mod <- cmdstan_model("parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan", compile = FALSE)
   

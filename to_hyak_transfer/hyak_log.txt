@@ -2510,6 +2510,18 @@ scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/upper_
 # from within the stan_actual/rear_temp_year/ folder:
 scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/
 
+### 2023-06-26 ###
+
+# RE year setup (with matt trick) and two temperature parameters (by season); move to hyak and run
+# from within the stan_actual/rear_temp_year/ folder:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/
+
+# to move just the stan script:
+
+
+scp -r ./upper_columbia/parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/
+
+
 
 
 

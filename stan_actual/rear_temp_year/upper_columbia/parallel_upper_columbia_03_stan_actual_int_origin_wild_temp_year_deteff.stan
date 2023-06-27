@@ -123,8 +123,8 @@ functions{
   // evaluate DE and NDE separately
   for (p in 1:nmovements){
     // matt trick
-    total_lp += std_normal_lpdf(to_row_vector(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]));
-     total_lp += std_normal_lpdf(to_row_vector(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]));
+    // TEST total_lp += std_normal_lpdf(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
+     // TEST total_lp += std_normal_lpdf(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
     
      // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
      // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
@@ -222,7 +222,7 @@ functions{
                 // now, sum the vector to get a single integer value for indexing the run year vector
                 run_year_index = sum(run_year_indices_vector);
                 // get the actual run year
-                run_year_actual = transition_seasons_vector[run_year_index];
+                run_year_actual = transition_run_years[run_year_index];
                 
                 // index for transition season as well
               season_actual = transition_seasons_vector[run_year_index];
@@ -263,7 +263,7 @@ functions{
                     cat_X_mat[i,2] * borigin1_matrix_DE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_DE[current,k] +
                     // add year as a random effect
-                    byear_raw_parameters_array_DE[current, k, run_year_actual] * sigma_year_matrix_DE[current, k];
+                    byear_raw_parameters_array_DE[current, k, run_year_actual] * 1; // TEST sigma_year_matrix_DE[current, k];
                     
                     // store in the vector that it's DE
                     DE_correction[k] = 1;
@@ -277,7 +277,7 @@ functions{
                     cat_X_mat[i,2] * borigin1_matrix_NDE[current,k] +
                     cat_X_mat[i,3] * borigin2_matrix_NDE[current,k] +
                     // add year as a random effect
-                    byear_raw_parameters_array_NDE[current, k, run_year_actual] * sigma_year_matrix_NDE[current, k];
+                    byear_raw_parameters_array_NDE[current, k, run_year_actual] * 1; // TEST sigma_year_matrix_NDE[current, k];
                     
                     // otherwise, store in the vector that it's not DE
                     DE_correction[k] = 0;
