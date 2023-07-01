@@ -1,0 +1,938 @@
+This is cmdstanr version 0.5.2
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /usr/lusers/mmin/.cmdstan/cmdstan-2.30.1
+- CmdStan version: 2.30.1
+This is posterior version 1.2.2
+
+Attaching package: ‘posterior’
+
+The following objects are masked from ‘package:stats’:
+
+    mad, sd, var
+
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+ [1] "1 - mainstem, mouth to BON"          "2 - mainstem, BON to MCN"           
+ [3] "3 - mainstem, MCN to ICH or PRA"     "4 - mainstem, PRA to RIS"           
+ [5] "5 - mainstem, RIS to RRE"            "6 - mainstem, RRE to WEL"           
+ [7] "7 - mainstem, upstream of WEL"       "8 - mainstem, ICH to LGR"           
+ [9] "9 - mainstem, upstream of LGR"       "10 - Deschutes River Mouth"         
+[11] "11 - Deschutes River Upstream"       "12 - John Day River Mouth"          
+[13] "13 - John Day River Upstream"        "14 - Hood River Mouth"              
+[15] "15 - Hood River Upstream"            "16 - Fifteenmile Creek Mouth"       
+[17] "17 - Fifteenmile Creek Upstream"     "18 - Umatilla River Mouth"          
+[19] "19 - Umatilla River Upstream"        "20 - Yakima River Mouth"            
+[21] "21 - Yakima River Upstream"          "22 - Walla Walla River Mouth"       
+[23] "23 - Walla Walla River Upstream"     "24 - Wenatchee River Mouth"         
+[25] "25 - Wenatchee River Upstream"       "26 - Entiat River Mouth"            
+[27] "27 - Entiat River Upstream"          "28 - Okanogan River Mouth"          
+[29] "29 - Okanogan River Upstream"        "30 - Methow River Mouth"            
+[31] "31 - Methow River Upstream"          "32 - Tucannon River Mouth"          
+[33] "33 - Tucannon River Upstream"        "34 - Asotin Creek Mouth"            
+[35] "35 - Asotin Creek Upstream"          "36 - Clearwater River"              
+[37] "37 - Salmon River"                   "38 - Grande Ronde River"            
+[39] "39 - Imnaha River Mouth"             "40 - Imnaha River Upstream"         
+[41] "41 - BON to MCN other tributaries"   "42 - Upstream WEL other tributaries"
+[43] "43 - loss"                          
+real b0_matrix_1_2;
+real b0_matrix_2_1;
+real b0_matrix_2_3;
+real b0_matrix_2_10_DE;
+real b0_matrix_2_10_NDE;
+real b0_matrix_2_12_DE;
+real b0_matrix_2_12_NDE;
+real b0_matrix_2_14_DE;
+real b0_matrix_2_14_NDE;
+real b0_matrix_2_16_DE;
+real b0_matrix_2_16_NDE;
+real b0_matrix_2_18_DE;
+real b0_matrix_2_18_NDE;
+real b0_matrix_2_41;
+real b0_matrix_3_2;
+real b0_matrix_3_4;
+real b0_matrix_3_8;
+real b0_matrix_3_20_DE;
+real b0_matrix_3_20_NDE;
+real b0_matrix_3_22_DE;
+real b0_matrix_3_22_NDE;
+real b0_matrix_4_3;
+real b0_matrix_4_5;
+real b0_matrix_5_4;
+real b0_matrix_5_6;
+real b0_matrix_5_24_DE;
+real b0_matrix_5_24_NDE;
+real b0_matrix_6_5;
+real b0_matrix_6_7;
+real b0_matrix_6_26_DE;
+real b0_matrix_6_26_NDE;
+real b0_matrix_7_6;
+real b0_matrix_7_28_DE;
+real b0_matrix_7_28_NDE;
+real b0_matrix_7_30_DE;
+real b0_matrix_7_30_NDE;
+real b0_matrix_7_42;
+real b0_matrix_8_3;
+real b0_matrix_8_9;
+real b0_matrix_8_32_DE;
+real b0_matrix_8_32_NDE;
+real b0_matrix_9_8;
+real b0_matrix_9_34_DE;
+real b0_matrix_9_34_NDE;
+real b0_matrix_9_36;
+real b0_matrix_9_37;
+real b0_matrix_9_38;
+real b0_matrix_9_39_DE;
+real b0_matrix_9_39_NDE;
+real b0_matrix_10_2;
+real b0_matrix_14_2;
+real b0_matrix_24_5;
+real b0_matrix_26_6;
+real b0_matrix_28_7;
+real b0_matrix_30_7;
+real b0_matrix_36_9;
+real b0_matrix_42_7;
+real btemp_matrix_1_2;
+real btemp_matrix_2_3;
+real btemp_matrix_2_10_DE;
+real btemp_matrix_2_10_NDE;
+real btemp_matrix_2_12_DE;
+real btemp_matrix_2_12_NDE;
+real btemp_matrix_2_14_DE;
+real btemp_matrix_2_14_NDE;
+real btemp_matrix_2_16_DE;
+real btemp_matrix_2_16_NDE;
+real btemp_matrix_2_18_DE;
+real btemp_matrix_2_18_NDE;
+real btemp_matrix_2_41;
+real btemp_matrix_3_8;
+real btemp_matrix_3_20_DE;
+real btemp_matrix_3_20_NDE;
+real btemp_matrix_3_22_DE;
+real btemp_matrix_3_22_NDE;
+real btemp_matrix_8_9;
+real btemp_matrix_8_32_DE;
+real btemp_matrix_8_32_NDE;
+real btemp_matrix_9_34_DE;
+real btemp_matrix_9_34_NDE;
+real btemp_matrix_9_36;
+real btemp_matrix_9_37;
+real btemp_matrix_9_38;
+real btemp_matrix_9_39_DE;
+real btemp_matrix_9_39_NDE;
+real btempxorigin1_matrix_3_4;
+real btempxorigin1_matrix_4_5;
+real btempxorigin1_matrix_5_6;
+real btempxorigin1_matrix_5_24_DE;
+real btempxorigin1_matrix_5_24_NDE;
+real btempxorigin1_matrix_6_7;
+real btempxorigin1_matrix_6_26_DE;
+real btempxorigin1_matrix_6_26_NDE;
+real btempxorigin1_matrix_7_28_DE;
+real btempxorigin1_matrix_7_28_NDE;
+real btempxorigin1_matrix_7_30_DE;
+real btempxorigin1_matrix_7_30_NDE;
+real btempxorigin1_matrix_7_42;
+
+real btempxorigin2_matrix_3_4;
+real btempxorigin2_matrix_4_5;
+real btempxorigin2_matrix_5_6;
+real btempxorigin2_matrix_5_24_DE;
+real btempxorigin2_matrix_5_24_NDE;
+real btempxorigin2_matrix_6_7;
+real btempxorigin2_matrix_6_26_DE;
+real btempxorigin2_matrix_6_26_NDE;
+real btempxorigin2_matrix_7_28_DE;
+real btempxorigin2_matrix_7_28_NDE;
+real btempxorigin2_matrix_7_30_DE;
+real btempxorigin2_matrix_7_30_NDE;
+real btempxorigin2_matrix_7_42;
+
+real btempxorigin3_matrix_3_4;
+real btempxorigin3_matrix_4_5;
+real btempxorigin3_matrix_5_6;
+real btempxorigin3_matrix_5_24_DE;
+real btempxorigin3_matrix_5_24_NDE;
+real btempxorigin3_matrix_6_7;
+real btempxorigin3_matrix_6_26_DE;
+real btempxorigin3_matrix_6_26_NDE;
+real btempxorigin3_matrix_7_28_DE;
+real btempxorigin3_matrix_7_28_NDE;
+real btempxorigin3_matrix_7_30_DE;
+real btempxorigin3_matrix_7_30_NDE;
+real btempxorigin3_matrix_7_42;
+
+real borigin1_matrix_3_4;
+real borigin1_matrix_4_3;
+real borigin1_matrix_4_5;
+real borigin1_matrix_5_4;
+real borigin1_matrix_5_6;
+real borigin1_matrix_5_24_DE;
+real borigin1_matrix_5_24_NDE;
+real borigin1_matrix_6_5;
+real borigin1_matrix_6_7;
+real borigin1_matrix_6_26_DE;
+real borigin1_matrix_6_26_NDE;
+real borigin1_matrix_7_6;
+real borigin1_matrix_7_28_DE;
+real borigin1_matrix_7_28_NDE;
+real borigin1_matrix_7_30_DE;
+real borigin1_matrix_7_30_NDE;
+real borigin1_matrix_7_42;
+real borigin1_matrix_24_5;
+real borigin1_matrix_26_6;
+real borigin1_matrix_28_7;
+real borigin1_matrix_30_7;
+real borigin1_matrix_42_7;
+
+real borigin2_matrix_3_4;
+real borigin2_matrix_4_3;
+real borigin2_matrix_4_5;
+real borigin2_matrix_5_4;
+real borigin2_matrix_5_6;
+real borigin2_matrix_5_24_DE;
+real borigin2_matrix_5_24_NDE;
+real borigin2_matrix_6_5;
+real borigin2_matrix_6_7;
+real borigin2_matrix_6_26_DE;
+real borigin2_matrix_6_26_NDE;
+real borigin2_matrix_7_6;
+real borigin2_matrix_7_28_DE;
+real borigin2_matrix_7_28_NDE;
+real borigin2_matrix_7_30_DE;
+real borigin2_matrix_7_30_NDE;
+real borigin2_matrix_7_42;
+real borigin2_matrix_24_5;
+real borigin2_matrix_26_6;
+real borigin2_matrix_28_7;
+real borigin2_matrix_30_7;
+real borigin2_matrix_42_7;
+
+real borigin3_matrix_3_4;
+real borigin3_matrix_4_3;
+real borigin3_matrix_4_5;
+real borigin3_matrix_5_4;
+real borigin3_matrix_5_6;
+real borigin3_matrix_5_24_DE;
+real borigin3_matrix_5_24_NDE;
+real borigin3_matrix_6_5;
+real borigin3_matrix_6_7;
+real borigin3_matrix_6_26_DE;
+real borigin3_matrix_6_26_NDE;
+real borigin3_matrix_7_6;
+real borigin3_matrix_7_28_DE;
+real borigin3_matrix_7_28_NDE;
+real borigin3_matrix_7_30_DE;
+real borigin3_matrix_7_30_NDE;
+real borigin3_matrix_7_42;
+real borigin3_matrix_24_5;
+real borigin3_matrix_26_6;
+real borigin3_matrix_28_7;
+real borigin3_matrix_30_7;
+real borigin3_matrix_42_7;
+
+b0_matrix_DE[1,2] = b0_matrix_1_2;
+b0_matrix_NDE[1,2] = b0_matrix_1_2;
+b0_matrix_DE[2,1] = b0_matrix_2_1;
+b0_matrix_NDE[2,1] = b0_matrix_2_1;
+b0_matrix_DE[2,3] = b0_matrix_2_3;
+b0_matrix_NDE[2,3] = b0_matrix_2_3;
+b0_matrix_DE[2,10] = b0_matrix_2_10_DE;
+b0_matrix_NDE[2,10] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,11] = -100000;
+b0_matrix_NDE[2,11] = b0_matrix_2_10_NDE;
+b0_matrix_DE[2,12] = b0_matrix_2_12_DE;
+b0_matrix_NDE[2,12] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,13] = -100000;
+b0_matrix_NDE[2,13] = b0_matrix_2_12_NDE;
+b0_matrix_DE[2,14] = b0_matrix_2_14_DE;
+b0_matrix_NDE[2,14] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,15] = -100000;
+b0_matrix_NDE[2,15] = b0_matrix_2_14_NDE;
+b0_matrix_DE[2,16] = b0_matrix_2_16_DE;
+b0_matrix_NDE[2,16] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,17] = -100000;
+b0_matrix_NDE[2,17] = b0_matrix_2_16_NDE;
+b0_matrix_DE[2,18] = b0_matrix_2_18_DE;
+b0_matrix_NDE[2,18] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,19] = -100000;
+b0_matrix_NDE[2,19] = b0_matrix_2_18_NDE;
+b0_matrix_DE[2,41] = b0_matrix_2_41;
+b0_matrix_NDE[2,41] = b0_matrix_2_41;
+b0_matrix_DE[3,2] = b0_matrix_3_2;
+b0_matrix_NDE[3,2] = b0_matrix_3_2;
+b0_matrix_DE[3,4] = b0_matrix_3_4;
+b0_matrix_NDE[3,4] = b0_matrix_3_4;
+b0_matrix_DE[3,8] = b0_matrix_3_8;
+b0_matrix_NDE[3,8] = b0_matrix_3_8;
+b0_matrix_DE[3,20] = b0_matrix_3_20_DE;
+b0_matrix_NDE[3,20] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,21] = -100000;
+b0_matrix_NDE[3,21] = b0_matrix_3_20_NDE;
+b0_matrix_DE[3,22] = b0_matrix_3_22_DE;
+b0_matrix_NDE[3,22] = b0_matrix_3_22_NDE;
+b0_matrix_DE[3,23] = -100000;
+b0_matrix_NDE[3,23] = b0_matrix_3_22_NDE;
+b0_matrix_DE[4,3] = b0_matrix_4_3;
+b0_matrix_NDE[4,3] = b0_matrix_4_3;
+b0_matrix_DE[4,5] = b0_matrix_4_5;
+b0_matrix_NDE[4,5] = b0_matrix_4_5;
+b0_matrix_DE[5,4] = b0_matrix_5_4;
+b0_matrix_NDE[5,4] = b0_matrix_5_4;
+b0_matrix_DE[5,6] = b0_matrix_5_6;
+b0_matrix_NDE[5,6] = b0_matrix_5_6;
+b0_matrix_DE[5,24] = b0_matrix_5_24_DE;
+b0_matrix_NDE[5,24] = b0_matrix_5_24_NDE;
+b0_matrix_DE[5,25] = -100000;
+b0_matrix_NDE[5,25] = b0_matrix_5_24_NDE;
+b0_matrix_DE[6,5] = b0_matrix_6_5;
+b0_matrix_NDE[6,5] = b0_matrix_6_5;
+b0_matrix_DE[6,7] = b0_matrix_6_7;
+b0_matrix_NDE[6,7] = b0_matrix_6_7;
+b0_matrix_DE[6,26] = b0_matrix_6_26_DE;
+b0_matrix_NDE[6,26] = b0_matrix_6_26_NDE;
+b0_matrix_DE[6,27] = -100000;
+b0_matrix_NDE[6,27] = b0_matrix_6_26_NDE;
+b0_matrix_DE[7,6] = b0_matrix_7_6;
+b0_matrix_NDE[7,6] = b0_matrix_7_6;
+b0_matrix_DE[7,28] = b0_matrix_7_28_DE;
+b0_matrix_NDE[7,28] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,29] = -100000;
+b0_matrix_NDE[7,29] = b0_matrix_7_28_NDE;
+b0_matrix_DE[7,30] = b0_matrix_7_30_DE;
+b0_matrix_NDE[7,30] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,31] = -100000;
+b0_matrix_NDE[7,31] = b0_matrix_7_30_NDE;
+b0_matrix_DE[7,42] = b0_matrix_7_42;
+b0_matrix_NDE[7,42] = b0_matrix_7_42;
+b0_matrix_DE[8,3] = b0_matrix_8_3;
+b0_matrix_NDE[8,3] = b0_matrix_8_3;
+b0_matrix_DE[8,9] = b0_matrix_8_9;
+b0_matrix_NDE[8,9] = b0_matrix_8_9;
+b0_matrix_DE[8,32] = b0_matrix_8_32_DE;
+b0_matrix_NDE[8,32] = b0_matrix_8_32_NDE;
+b0_matrix_DE[8,33] = -100000;
+b0_matrix_NDE[8,33] = b0_matrix_8_32_NDE;
+b0_matrix_DE[9,8] = b0_matrix_9_8;
+b0_matrix_NDE[9,8] = b0_matrix_9_8;
+b0_matrix_DE[9,34] = b0_matrix_9_34_DE;
+b0_matrix_NDE[9,34] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,35] = -100000;
+b0_matrix_NDE[9,35] = b0_matrix_9_34_NDE;
+b0_matrix_DE[9,36] = b0_matrix_9_36;
+b0_matrix_NDE[9,36] = b0_matrix_9_36;
+b0_matrix_DE[9,37] = b0_matrix_9_37;
+b0_matrix_NDE[9,37] = b0_matrix_9_37;
+b0_matrix_DE[9,38] = b0_matrix_9_38;
+b0_matrix_NDE[9,38] = b0_matrix_9_38;
+b0_matrix_DE[9,39] = b0_matrix_9_39_DE;
+b0_matrix_NDE[9,39] = b0_matrix_9_39_NDE;
+b0_matrix_DE[9,40] = -100000;
+b0_matrix_NDE[9,40] = b0_matrix_9_39_NDE;
+b0_matrix_DE[10,2] = b0_matrix_10_2;
+b0_matrix_NDE[10,2] = b0_matrix_10_2;
+b0_matrix_DE[14,2] = b0_matrix_14_2;
+b0_matrix_NDE[14,2] = b0_matrix_14_2;
+b0_matrix_DE[24,5] = b0_matrix_24_5;
+b0_matrix_NDE[24,5] = b0_matrix_24_5;
+b0_matrix_DE[25,5] = b0_matrix_24_5;
+b0_matrix_NDE[25,5] = b0_matrix_24_5;
+b0_matrix_DE[26,6] = b0_matrix_26_6;
+b0_matrix_NDE[26,6] = b0_matrix_26_6;
+b0_matrix_DE[27,6] = b0_matrix_26_6;
+b0_matrix_NDE[27,6] = b0_matrix_26_6;
+b0_matrix_DE[28,7] = b0_matrix_28_7;
+b0_matrix_NDE[28,7] = b0_matrix_28_7;
+b0_matrix_DE[29,7] = b0_matrix_28_7;
+b0_matrix_NDE[29,7] = b0_matrix_28_7;
+b0_matrix_DE[30,7] = b0_matrix_30_7;
+b0_matrix_NDE[30,7] = b0_matrix_30_7;
+b0_matrix_DE[31,7] = b0_matrix_30_7;
+b0_matrix_NDE[31,7] = b0_matrix_30_7;
+b0_matrix_DE[36,9] = b0_matrix_36_9;
+b0_matrix_NDE[36,9] = b0_matrix_36_9;
+b0_matrix_DE[42,7] = b0_matrix_42_7;
+b0_matrix_NDE[42,7] = b0_matrix_42_7;
+btemp_matrix_DE[1,2] = btemp_matrix_1_2;
+btemp_matrix_NDE[1,2] = btemp_matrix_1_2;
+btemp_matrix_DE[2,3] = btemp_matrix_2_3;
+btemp_matrix_NDE[2,3] = btemp_matrix_2_3;
+btemp_matrix_DE[2,10] = btemp_matrix_2_10_DE;
+btemp_matrix_NDE[2,10] = btemp_matrix_2_10_NDE;
+btemp_matrix_DE[2,11] = -100000;
+btemp_matrix_NDE[2,11] = btemp_matrix_2_10_NDE;
+btemp_matrix_DE[2,12] = btemp_matrix_2_12_DE;
+btemp_matrix_NDE[2,12] = btemp_matrix_2_12_NDE;
+btemp_matrix_DE[2,13] = -100000;
+btemp_matrix_NDE[2,13] = btemp_matrix_2_12_NDE;
+btemp_matrix_DE[2,14] = btemp_matrix_2_14_DE;
+btemp_matrix_NDE[2,14] = btemp_matrix_2_14_NDE;
+btemp_matrix_DE[2,15] = -100000;
+btemp_matrix_NDE[2,15] = btemp_matrix_2_14_NDE;
+btemp_matrix_DE[2,16] = btemp_matrix_2_16_DE;
+btemp_matrix_NDE[2,16] = btemp_matrix_2_16_NDE;
+btemp_matrix_DE[2,17] = -100000;
+btemp_matrix_NDE[2,17] = btemp_matrix_2_16_NDE;
+btemp_matrix_DE[2,18] = btemp_matrix_2_18_DE;
+btemp_matrix_NDE[2,18] = btemp_matrix_2_18_NDE;
+btemp_matrix_DE[2,19] = -100000;
+btemp_matrix_NDE[2,19] = btemp_matrix_2_18_NDE;
+btemp_matrix_DE[2,41] = btemp_matrix_2_41;
+btemp_matrix_NDE[2,41] = btemp_matrix_2_41;
+btemp_matrix_DE[3,8] = btemp_matrix_3_8;
+btemp_matrix_NDE[3,8] = btemp_matrix_3_8;
+btemp_matrix_DE[3,20] = btemp_matrix_3_20_DE;
+btemp_matrix_NDE[3,20] = btemp_matrix_3_20_NDE;
+btemp_matrix_DE[3,21] = -100000;
+btemp_matrix_NDE[3,21] = btemp_matrix_3_20_NDE;
+btemp_matrix_DE[3,22] = btemp_matrix_3_22_DE;
+btemp_matrix_NDE[3,22] = btemp_matrix_3_22_NDE;
+btemp_matrix_DE[3,23] = -100000;
+btemp_matrix_NDE[3,23] = btemp_matrix_3_22_NDE;
+btemp_matrix_DE[8,9] = btemp_matrix_8_9;
+btemp_matrix_NDE[8,9] = btemp_matrix_8_9;
+btemp_matrix_DE[8,32] = btemp_matrix_8_32_DE;
+btemp_matrix_NDE[8,32] = btemp_matrix_8_32_NDE;
+btemp_matrix_DE[8,33] = -100000;
+btemp_matrix_NDE[8,33] = btemp_matrix_8_32_NDE;
+btemp_matrix_DE[9,34] = btemp_matrix_9_34_DE;
+btemp_matrix_NDE[9,34] = btemp_matrix_9_34_NDE;
+btemp_matrix_DE[9,35] = -100000;
+btemp_matrix_NDE[9,35] = btemp_matrix_9_34_NDE;
+btemp_matrix_DE[9,36] = btemp_matrix_9_36;
+btemp_matrix_NDE[9,36] = btemp_matrix_9_36;
+btemp_matrix_DE[9,37] = btemp_matrix_9_37;
+btemp_matrix_NDE[9,37] = btemp_matrix_9_37;
+btemp_matrix_DE[9,38] = btemp_matrix_9_38;
+btemp_matrix_NDE[9,38] = btemp_matrix_9_38;
+btemp_matrix_DE[9,39] = btemp_matrix_9_39_DE;
+btemp_matrix_NDE[9,39] = btemp_matrix_9_39_NDE;
+btemp_matrix_DE[9,40] = -100000;
+btemp_matrix_NDE[9,40] = btemp_matrix_9_39_NDE;
+btempxorigin1_matrix_DE[3,4] = btempxorigin1_matrix_3_4;
+btempxorigin1_matrix_NDE[3,4] = btempxorigin1_matrix_3_4;
+btempxorigin1_matrix_DE[4,5] = btempxorigin1_matrix_4_5;
+btempxorigin1_matrix_NDE[4,5] = btempxorigin1_matrix_4_5;
+btempxorigin1_matrix_DE[5,6] = btempxorigin1_matrix_5_6;
+btempxorigin1_matrix_NDE[5,6] = btempxorigin1_matrix_5_6;
+btempxorigin1_matrix_DE[5,24] = btempxorigin1_matrix_5_24_DE;
+btempxorigin1_matrix_NDE[5,24] = btempxorigin1_matrix_5_24_NDE;
+btempxorigin1_matrix_NDE[5,25] = btempxorigin1_matrix_5_24_NDE;
+btempxorigin1_matrix_DE[6,7] = btempxorigin1_matrix_6_7;
+btempxorigin1_matrix_NDE[6,7] = btempxorigin1_matrix_6_7;
+btempxorigin1_matrix_DE[6,26] = btempxorigin1_matrix_6_26_DE;
+btempxorigin1_matrix_NDE[6,26] = btempxorigin1_matrix_6_26_NDE;
+btempxorigin1_matrix_NDE[6,27] = btempxorigin1_matrix_6_26_NDE;
+btempxorigin1_matrix_DE[7,28] = btempxorigin1_matrix_7_28_DE;
+btempxorigin1_matrix_NDE[7,28] = btempxorigin1_matrix_7_28_NDE;
+btempxorigin1_matrix_NDE[7,29] = btempxorigin1_matrix_7_28_NDE;
+btempxorigin1_matrix_DE[7,30] = btempxorigin1_matrix_7_30_DE;
+btempxorigin1_matrix_NDE[7,30] = btempxorigin1_matrix_7_30_NDE;
+btempxorigin1_matrix_NDE[7,31] = btempxorigin1_matrix_7_30_NDE;
+btempxorigin1_matrix_DE[7,42] = btempxorigin1_matrix_7_42;
+btempxorigin1_matrix_NDE[7,42] = btempxorigin1_matrix_7_42;
+
+btempxorigin2_matrix_DE[3,4] = btempxorigin2_matrix_3_4;
+btempxorigin2_matrix_NDE[3,4] = btempxorigin2_matrix_3_4;
+btempxorigin2_matrix_DE[4,5] = btempxorigin2_matrix_4_5;
+btempxorigin2_matrix_NDE[4,5] = btempxorigin2_matrix_4_5;
+btempxorigin2_matrix_DE[5,6] = btempxorigin2_matrix_5_6;
+btempxorigin2_matrix_NDE[5,6] = btempxorigin2_matrix_5_6;
+btempxorigin2_matrix_DE[5,24] = btempxorigin2_matrix_5_24_DE;
+btempxorigin2_matrix_NDE[5,24] = btempxorigin2_matrix_5_24_NDE;
+btempxorigin2_matrix_NDE[5,25] = btempxorigin2_matrix_5_24_NDE;
+btempxorigin2_matrix_DE[6,7] = btempxorigin2_matrix_6_7;
+btempxorigin2_matrix_NDE[6,7] = btempxorigin2_matrix_6_7;
+btempxorigin2_matrix_DE[6,26] = btempxorigin2_matrix_6_26_DE;
+btempxorigin2_matrix_NDE[6,26] = btempxorigin2_matrix_6_26_NDE;
+btempxorigin2_matrix_NDE[6,27] = btempxorigin2_matrix_6_26_NDE;
+btempxorigin2_matrix_DE[7,28] = btempxorigin2_matrix_7_28_DE;
+btempxorigin2_matrix_NDE[7,28] = btempxorigin2_matrix_7_28_NDE;
+btempxorigin2_matrix_NDE[7,29] = btempxorigin2_matrix_7_28_NDE;
+btempxorigin2_matrix_DE[7,30] = btempxorigin2_matrix_7_30_DE;
+btempxorigin2_matrix_NDE[7,30] = btempxorigin2_matrix_7_30_NDE;
+btempxorigin2_matrix_NDE[7,31] = btempxorigin2_matrix_7_30_NDE;
+btempxorigin2_matrix_DE[7,42] = btempxorigin2_matrix_7_42;
+btempxorigin2_matrix_NDE[7,42] = btempxorigin2_matrix_7_42;
+
+btempxorigin3_matrix_DE[3,4] = btempxorigin3_matrix_3_4;
+btempxorigin3_matrix_NDE[3,4] = btempxorigin3_matrix_3_4;
+btempxorigin3_matrix_DE[4,5] = btempxorigin3_matrix_4_5;
+btempxorigin3_matrix_NDE[4,5] = btempxorigin3_matrix_4_5;
+btempxorigin3_matrix_DE[5,6] = btempxorigin3_matrix_5_6;
+btempxorigin3_matrix_NDE[5,6] = btempxorigin3_matrix_5_6;
+btempxorigin3_matrix_DE[5,24] = btempxorigin3_matrix_5_24_DE;
+btempxorigin3_matrix_NDE[5,24] = btempxorigin3_matrix_5_24_NDE;
+btempxorigin3_matrix_NDE[5,25] = btempxorigin3_matrix_5_24_NDE;
+btempxorigin3_matrix_DE[6,7] = btempxorigin3_matrix_6_7;
+btempxorigin3_matrix_NDE[6,7] = btempxorigin3_matrix_6_7;
+btempxorigin3_matrix_DE[6,26] = btempxorigin3_matrix_6_26_DE;
+btempxorigin3_matrix_NDE[6,26] = btempxorigin3_matrix_6_26_NDE;
+btempxorigin3_matrix_NDE[6,27] = btempxorigin3_matrix_6_26_NDE;
+btempxorigin3_matrix_DE[7,28] = btempxorigin3_matrix_7_28_DE;
+btempxorigin3_matrix_NDE[7,28] = btempxorigin3_matrix_7_28_NDE;
+btempxorigin3_matrix_NDE[7,29] = btempxorigin3_matrix_7_28_NDE;
+btempxorigin3_matrix_DE[7,30] = btempxorigin3_matrix_7_30_DE;
+btempxorigin3_matrix_NDE[7,30] = btempxorigin3_matrix_7_30_NDE;
+btempxorigin3_matrix_NDE[7,31] = btempxorigin3_matrix_7_30_NDE;
+btempxorigin3_matrix_DE[7,42] = btempxorigin3_matrix_7_42;
+btempxorigin3_matrix_NDE[7,42] = btempxorigin3_matrix_7_42;
+
+borigin1_matrix_DE[3,4] = borigin1_matrix_3_4;
+borigin1_matrix_NDE[3,4] = borigin1_matrix_3_4;
+borigin1_matrix_DE[4,3] = borigin1_matrix_4_3;
+borigin1_matrix_NDE[4,3] = borigin1_matrix_4_3;
+borigin1_matrix_DE[4,5] = borigin1_matrix_4_5;
+borigin1_matrix_NDE[4,5] = borigin1_matrix_4_5;
+borigin1_matrix_DE[5,4] = borigin1_matrix_5_4;
+borigin1_matrix_NDE[5,4] = borigin1_matrix_5_4;
+borigin1_matrix_DE[5,6] = borigin1_matrix_5_6;
+borigin1_matrix_NDE[5,6] = borigin1_matrix_5_6;
+borigin1_matrix_DE[5,24] = borigin1_matrix_5_24_DE;
+borigin1_matrix_NDE[5,24] = borigin1_matrix_5_24_NDE;
+borigin1_matrix_NDE[5,25] = borigin1_matrix_5_24_NDE;
+borigin1_matrix_DE[6,5] = borigin1_matrix_6_5;
+borigin1_matrix_NDE[6,5] = borigin1_matrix_6_5;
+borigin1_matrix_DE[6,7] = borigin1_matrix_6_7;
+borigin1_matrix_NDE[6,7] = borigin1_matrix_6_7;
+borigin1_matrix_DE[6,26] = borigin1_matrix_6_26_DE;
+borigin1_matrix_NDE[6,26] = borigin1_matrix_6_26_NDE;
+borigin1_matrix_NDE[6,27] = borigin1_matrix_6_26_NDE;
+borigin1_matrix_DE[7,6] = borigin1_matrix_7_6;
+borigin1_matrix_NDE[7,6] = borigin1_matrix_7_6;
+borigin1_matrix_DE[7,28] = borigin1_matrix_7_28_DE;
+borigin1_matrix_NDE[7,28] = borigin1_matrix_7_28_NDE;
+borigin1_matrix_NDE[7,29] = borigin1_matrix_7_28_NDE;
+borigin1_matrix_DE[7,30] = borigin1_matrix_7_30_DE;
+borigin1_matrix_NDE[7,30] = borigin1_matrix_7_30_NDE;
+borigin1_matrix_NDE[7,31] = borigin1_matrix_7_30_NDE;
+borigin1_matrix_DE[7,42] = borigin1_matrix_7_42;
+borigin1_matrix_NDE[7,42] = borigin1_matrix_7_42;
+borigin1_matrix_DE[24,5] = borigin1_matrix_24_5;
+borigin1_matrix_NDE[24,5] = borigin1_matrix_24_5;
+borigin1_matrix_DE[25,5] = borigin1_matrix_24_5;
+borigin1_matrix_NDE[25,5] = borigin1_matrix_24_5;
+borigin1_matrix_DE[26,6] = borigin1_matrix_26_6;
+borigin1_matrix_NDE[26,6] = borigin1_matrix_26_6;
+borigin1_matrix_DE[27,6] = borigin1_matrix_26_6;
+borigin1_matrix_NDE[27,6] = borigin1_matrix_26_6;
+borigin1_matrix_DE[28,7] = borigin1_matrix_28_7;
+borigin1_matrix_NDE[28,7] = borigin1_matrix_28_7;
+borigin1_matrix_DE[29,7] = borigin1_matrix_28_7;
+borigin1_matrix_NDE[29,7] = borigin1_matrix_28_7;
+borigin1_matrix_DE[30,7] = borigin1_matrix_30_7;
+borigin1_matrix_NDE[30,7] = borigin1_matrix_30_7;
+borigin1_matrix_DE[31,7] = borigin1_matrix_30_7;
+borigin1_matrix_NDE[31,7] = borigin1_matrix_30_7;
+borigin1_matrix_DE[42,7] = borigin1_matrix_42_7;
+borigin1_matrix_NDE[42,7] = borigin1_matrix_42_7;
+
+borigin2_matrix_DE[3,4] = borigin2_matrix_3_4;
+borigin2_matrix_NDE[3,4] = borigin2_matrix_3_4;
+borigin2_matrix_DE[4,3] = borigin2_matrix_4_3;
+borigin2_matrix_NDE[4,3] = borigin2_matrix_4_3;
+borigin2_matrix_DE[4,5] = borigin2_matrix_4_5;
+borigin2_matrix_NDE[4,5] = borigin2_matrix_4_5;
+borigin2_matrix_DE[5,4] = borigin2_matrix_5_4;
+borigin2_matrix_NDE[5,4] = borigin2_matrix_5_4;
+borigin2_matrix_DE[5,6] = borigin2_matrix_5_6;
+borigin2_matrix_NDE[5,6] = borigin2_matrix_5_6;
+borigin2_matrix_DE[5,24] = borigin2_matrix_5_24_DE;
+borigin2_matrix_NDE[5,24] = borigin2_matrix_5_24_NDE;
+borigin2_matrix_NDE[5,25] = borigin2_matrix_5_24_NDE;
+borigin2_matrix_DE[6,5] = borigin2_matrix_6_5;
+borigin2_matrix_NDE[6,5] = borigin2_matrix_6_5;
+borigin2_matrix_DE[6,7] = borigin2_matrix_6_7;
+borigin2_matrix_NDE[6,7] = borigin2_matrix_6_7;
+borigin2_matrix_DE[6,26] = borigin2_matrix_6_26_DE;
+borigin2_matrix_NDE[6,26] = borigin2_matrix_6_26_NDE;
+borigin2_matrix_NDE[6,27] = borigin2_matrix_6_26_NDE;
+borigin2_matrix_DE[7,6] = borigin2_matrix_7_6;
+borigin2_matrix_NDE[7,6] = borigin2_matrix_7_6;
+borigin2_matrix_DE[7,28] = borigin2_matrix_7_28_DE;
+borigin2_matrix_NDE[7,28] = borigin2_matrix_7_28_NDE;
+borigin2_matrix_NDE[7,29] = borigin2_matrix_7_28_NDE;
+borigin2_matrix_DE[7,30] = borigin2_matrix_7_30_DE;
+borigin2_matrix_NDE[7,30] = borigin2_matrix_7_30_NDE;
+borigin2_matrix_NDE[7,31] = borigin2_matrix_7_30_NDE;
+borigin2_matrix_DE[7,42] = borigin2_matrix_7_42;
+borigin2_matrix_NDE[7,42] = borigin2_matrix_7_42;
+borigin2_matrix_DE[24,5] = borigin2_matrix_24_5;
+borigin2_matrix_NDE[24,5] = borigin2_matrix_24_5;
+borigin2_matrix_DE[25,5] = borigin2_matrix_24_5;
+borigin2_matrix_NDE[25,5] = borigin2_matrix_24_5;
+borigin2_matrix_DE[26,6] = borigin2_matrix_26_6;
+borigin2_matrix_NDE[26,6] = borigin2_matrix_26_6;
+borigin2_matrix_DE[27,6] = borigin2_matrix_26_6;
+borigin2_matrix_NDE[27,6] = borigin2_matrix_26_6;
+borigin2_matrix_DE[28,7] = borigin2_matrix_28_7;
+borigin2_matrix_NDE[28,7] = borigin2_matrix_28_7;
+borigin2_matrix_DE[29,7] = borigin2_matrix_28_7;
+borigin2_matrix_NDE[29,7] = borigin2_matrix_28_7;
+borigin2_matrix_DE[30,7] = borigin2_matrix_30_7;
+borigin2_matrix_NDE[30,7] = borigin2_matrix_30_7;
+borigin2_matrix_DE[31,7] = borigin2_matrix_30_7;
+borigin2_matrix_NDE[31,7] = borigin2_matrix_30_7;
+borigin2_matrix_DE[42,7] = borigin2_matrix_42_7;
+borigin2_matrix_NDE[42,7] = borigin2_matrix_42_7;
+
+borigin3_matrix_DE[3,4] = borigin3_matrix_3_4;
+borigin3_matrix_NDE[3,4] = borigin3_matrix_3_4;
+borigin3_matrix_DE[4,3] = borigin3_matrix_4_3;
+borigin3_matrix_NDE[4,3] = borigin3_matrix_4_3;
+borigin3_matrix_DE[4,5] = borigin3_matrix_4_5;
+borigin3_matrix_NDE[4,5] = borigin3_matrix_4_5;
+borigin3_matrix_DE[5,4] = borigin3_matrix_5_4;
+borigin3_matrix_NDE[5,4] = borigin3_matrix_5_4;
+borigin3_matrix_DE[5,6] = borigin3_matrix_5_6;
+borigin3_matrix_NDE[5,6] = borigin3_matrix_5_6;
+borigin3_matrix_DE[5,24] = borigin3_matrix_5_24_DE;
+borigin3_matrix_NDE[5,24] = borigin3_matrix_5_24_NDE;
+borigin3_matrix_NDE[5,25] = borigin3_matrix_5_24_NDE;
+borigin3_matrix_DE[6,5] = borigin3_matrix_6_5;
+borigin3_matrix_NDE[6,5] = borigin3_matrix_6_5;
+borigin3_matrix_DE[6,7] = borigin3_matrix_6_7;
+borigin3_matrix_NDE[6,7] = borigin3_matrix_6_7;
+borigin3_matrix_DE[6,26] = borigin3_matrix_6_26_DE;
+borigin3_matrix_NDE[6,26] = borigin3_matrix_6_26_NDE;
+borigin3_matrix_NDE[6,27] = borigin3_matrix_6_26_NDE;
+borigin3_matrix_DE[7,6] = borigin3_matrix_7_6;
+borigin3_matrix_NDE[7,6] = borigin3_matrix_7_6;
+borigin3_matrix_DE[7,28] = borigin3_matrix_7_28_DE;
+borigin3_matrix_NDE[7,28] = borigin3_matrix_7_28_NDE;
+borigin3_matrix_NDE[7,29] = borigin3_matrix_7_28_NDE;
+borigin3_matrix_DE[7,30] = borigin3_matrix_7_30_DE;
+borigin3_matrix_NDE[7,30] = borigin3_matrix_7_30_NDE;
+borigin3_matrix_NDE[7,31] = borigin3_matrix_7_30_NDE;
+borigin3_matrix_DE[7,42] = borigin3_matrix_7_42;
+borigin3_matrix_NDE[7,42] = borigin3_matrix_7_42;
+borigin3_matrix_DE[24,5] = borigin3_matrix_24_5;
+borigin3_matrix_NDE[24,5] = borigin3_matrix_24_5;
+borigin3_matrix_DE[25,5] = borigin3_matrix_24_5;
+borigin3_matrix_NDE[25,5] = borigin3_matrix_24_5;
+borigin3_matrix_DE[26,6] = borigin3_matrix_26_6;
+borigin3_matrix_NDE[26,6] = borigin3_matrix_26_6;
+borigin3_matrix_DE[27,6] = borigin3_matrix_26_6;
+borigin3_matrix_NDE[27,6] = borigin3_matrix_26_6;
+borigin3_matrix_DE[28,7] = borigin3_matrix_28_7;
+borigin3_matrix_NDE[28,7] = borigin3_matrix_28_7;
+borigin3_matrix_DE[29,7] = borigin3_matrix_28_7;
+borigin3_matrix_NDE[29,7] = borigin3_matrix_28_7;
+borigin3_matrix_DE[30,7] = borigin3_matrix_30_7;
+borigin3_matrix_NDE[30,7] = borigin3_matrix_30_7;
+borigin3_matrix_DE[31,7] = borigin3_matrix_30_7;
+borigin3_matrix_NDE[31,7] = borigin3_matrix_30_7;
+borigin3_matrix_DE[42,7] = borigin3_matrix_42_7;
+borigin3_matrix_NDE[42,7] = borigin3_matrix_42_7;
+
+b0_matrix_1_2 ~ normal(0,10);
+b0_matrix_2_1 ~ normal(0,10);
+b0_matrix_2_3 ~ normal(0,10);
+b0_matrix_2_10_DE ~ normal(0,10);
+b0_matrix_2_10_NDE ~ normal(0,10);
+b0_matrix_2_12_DE ~ normal(0,10);
+b0_matrix_2_12_NDE ~ normal(0,10);
+b0_matrix_2_14_DE ~ normal(0,10);
+b0_matrix_2_14_NDE ~ normal(0,10);
+b0_matrix_2_16_DE ~ normal(0,10);
+b0_matrix_2_16_NDE ~ normal(0,10);
+b0_matrix_2_18_DE ~ normal(0,10);
+b0_matrix_2_18_NDE ~ normal(0,10);
+b0_matrix_2_41 ~ normal(0,10);
+b0_matrix_3_2 ~ normal(0,10);
+b0_matrix_3_4 ~ normal(0,10);
+b0_matrix_3_8 ~ normal(0,10);
+b0_matrix_3_20_DE ~ normal(0,10);
+b0_matrix_3_20_NDE ~ normal(0,10);
+b0_matrix_3_22_DE ~ normal(0,10);
+b0_matrix_3_22_NDE ~ normal(0,10);
+b0_matrix_4_3 ~ normal(0,10);
+b0_matrix_4_5 ~ normal(0,10);
+b0_matrix_5_4 ~ normal(0,10);
+b0_matrix_5_6 ~ normal(0,10);
+b0_matrix_5_24_DE ~ normal(0,10);
+b0_matrix_5_24_NDE ~ normal(0,10);
+b0_matrix_6_5 ~ normal(0,10);
+b0_matrix_6_7 ~ normal(0,10);
+b0_matrix_6_26_DE ~ normal(0,10);
+b0_matrix_6_26_NDE ~ normal(0,10);
+b0_matrix_7_6 ~ normal(0,10);
+b0_matrix_7_28_DE ~ normal(0,10);
+b0_matrix_7_28_NDE ~ normal(0,10);
+b0_matrix_7_30_DE ~ normal(0,10);
+b0_matrix_7_30_NDE ~ normal(0,10);
+b0_matrix_7_42 ~ normal(0,10);
+b0_matrix_8_3 ~ normal(0,10);
+b0_matrix_8_9 ~ normal(0,10);
+b0_matrix_8_32_DE ~ normal(0,10);
+b0_matrix_8_32_NDE ~ normal(0,10);
+b0_matrix_9_8 ~ normal(0,10);
+b0_matrix_9_34_DE ~ normal(0,10);
+b0_matrix_9_34_NDE ~ normal(0,10);
+b0_matrix_9_36 ~ normal(0,10);
+b0_matrix_9_37 ~ normal(0,10);
+b0_matrix_9_38 ~ normal(0,10);
+b0_matrix_9_39_DE ~ normal(0,10);
+b0_matrix_9_39_NDE ~ normal(0,10);
+b0_matrix_10_2 ~ normal(0,10);
+b0_matrix_14_2 ~ normal(0,10);
+b0_matrix_24_5 ~ normal(0,10);
+b0_matrix_26_6 ~ normal(0,10);
+b0_matrix_28_7 ~ normal(0,10);
+b0_matrix_30_7 ~ normal(0,10);
+b0_matrix_36_9 ~ normal(0,10);
+b0_matrix_42_7 ~ normal(0,10);
+btemp_matrix_1_2 ~ normal(0,10);
+btemp_matrix_2_3 ~ normal(0,10);
+btemp_matrix_2_10_DE ~ normal(0,10);
+btemp_matrix_2_10_NDE ~ normal(0,10);
+btemp_matrix_2_12_DE ~ normal(0,10);
+btemp_matrix_2_12_NDE ~ normal(0,10);
+btemp_matrix_2_14_DE ~ normal(0,10);
+btemp_matrix_2_14_NDE ~ normal(0,10);
+btemp_matrix_2_16_DE ~ normal(0,10);
+btemp_matrix_2_16_NDE ~ normal(0,10);
+btemp_matrix_2_18_DE ~ normal(0,10);
+btemp_matrix_2_18_NDE ~ normal(0,10);
+btemp_matrix_2_41 ~ normal(0,10);
+btemp_matrix_3_8 ~ normal(0,10);
+btemp_matrix_3_20_DE ~ normal(0,10);
+btemp_matrix_3_20_NDE ~ normal(0,10);
+btemp_matrix_3_22_DE ~ normal(0,10);
+btemp_matrix_3_22_NDE ~ normal(0,10);
+btemp_matrix_8_9 ~ normal(0,10);
+btemp_matrix_8_32_DE ~ normal(0,10);
+btemp_matrix_8_32_NDE ~ normal(0,10);
+btemp_matrix_9_34_DE ~ normal(0,10);
+btemp_matrix_9_34_NDE ~ normal(0,10);
+btemp_matrix_9_36 ~ normal(0,10);
+btemp_matrix_9_37 ~ normal(0,10);
+btemp_matrix_9_38 ~ normal(0,10);
+btemp_matrix_9_39_DE ~ normal(0,10);
+btemp_matrix_9_39_NDE ~ normal(0,10);
+btempxorigin1_matrix_3_4 ~ normal(0,10);
+btempxorigin1_matrix_4_5 ~ normal(0,10);
+btempxorigin1_matrix_5_6 ~ normal(0,10);
+btempxorigin1_matrix_5_24_DE ~ normal(0,10);
+btempxorigin1_matrix_5_24_NDE ~ normal(0,10);
+btempxorigin1_matrix_6_7 ~ normal(0,10);
+btempxorigin1_matrix_6_26_DE ~ normal(0,10);
+btempxorigin1_matrix_6_26_NDE ~ normal(0,10);
+btempxorigin1_matrix_7_28_DE ~ normal(0,10);
+btempxorigin1_matrix_7_28_NDE ~ normal(0,10);
+btempxorigin1_matrix_7_30_DE ~ normal(0,10);
+btempxorigin1_matrix_7_30_NDE ~ normal(0,10);
+btempxorigin1_matrix_7_42 ~ normal(0,10);
+
+btempxorigin2_matrix_3_4 ~ normal(0,10);
+btempxorigin2_matrix_4_5 ~ normal(0,10);
+btempxorigin2_matrix_5_6 ~ normal(0,10);
+btempxorigin2_matrix_5_24_DE ~ normal(0,10);
+btempxorigin2_matrix_5_24_NDE ~ normal(0,10);
+btempxorigin2_matrix_6_7 ~ normal(0,10);
+btempxorigin2_matrix_6_26_DE ~ normal(0,10);
+btempxorigin2_matrix_6_26_NDE ~ normal(0,10);
+btempxorigin2_matrix_7_28_DE ~ normal(0,10);
+btempxorigin2_matrix_7_28_NDE ~ normal(0,10);
+btempxorigin2_matrix_7_30_DE ~ normal(0,10);
+btempxorigin2_matrix_7_30_NDE ~ normal(0,10);
+btempxorigin2_matrix_7_42 ~ normal(0,10);
+
+btempxorigin3_matrix_3_4 ~ normal(0,10);
+btempxorigin3_matrix_4_5 ~ normal(0,10);
+btempxorigin3_matrix_5_6 ~ normal(0,10);
+btempxorigin3_matrix_5_24_DE ~ normal(0,10);
+btempxorigin3_matrix_5_24_NDE ~ normal(0,10);
+btempxorigin3_matrix_6_7 ~ normal(0,10);
+btempxorigin3_matrix_6_26_DE ~ normal(0,10);
+btempxorigin3_matrix_6_26_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_28_DE ~ normal(0,10);
+btempxorigin3_matrix_7_28_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_30_DE ~ normal(0,10);
+btempxorigin3_matrix_7_30_NDE ~ normal(0,10);
+btempxorigin3_matrix_7_42 ~ normal(0,10);
+
+borigin1_matrix_3_4 ~ normal(0,10);
+borigin1_matrix_4_3 ~ normal(0,10);
+borigin1_matrix_4_5 ~ normal(0,10);
+borigin1_matrix_5_4 ~ normal(0,10);
+borigin1_matrix_5_6 ~ normal(0,10);
+borigin1_matrix_5_24_DE ~ normal(0,10);
+borigin1_matrix_5_24_NDE ~ normal(0,10);
+borigin1_matrix_6_5 ~ normal(0,10);
+borigin1_matrix_6_7 ~ normal(0,10);
+borigin1_matrix_6_26_DE ~ normal(0,10);
+borigin1_matrix_6_26_NDE ~ normal(0,10);
+borigin1_matrix_7_6 ~ normal(0,10);
+borigin1_matrix_7_28_DE ~ normal(0,10);
+borigin1_matrix_7_28_NDE ~ normal(0,10);
+borigin1_matrix_7_30_DE ~ normal(0,10);
+borigin1_matrix_7_30_NDE ~ normal(0,10);
+borigin1_matrix_7_42 ~ normal(0,10);
+borigin1_matrix_24_5 ~ normal(0,10);
+borigin1_matrix_26_6 ~ normal(0,10);
+borigin1_matrix_28_7 ~ normal(0,10);
+borigin1_matrix_30_7 ~ normal(0,10);
+borigin1_matrix_42_7 ~ normal(0,10);
+
+borigin2_matrix_3_4 ~ normal(0,10);
+borigin2_matrix_4_3 ~ normal(0,10);
+borigin2_matrix_4_5 ~ normal(0,10);
+borigin2_matrix_5_4 ~ normal(0,10);
+borigin2_matrix_5_6 ~ normal(0,10);
+borigin2_matrix_5_24_DE ~ normal(0,10);
+borigin2_matrix_5_24_NDE ~ normal(0,10);
+borigin2_matrix_6_5 ~ normal(0,10);
+borigin2_matrix_6_7 ~ normal(0,10);
+borigin2_matrix_6_26_DE ~ normal(0,10);
+borigin2_matrix_6_26_NDE ~ normal(0,10);
+borigin2_matrix_7_6 ~ normal(0,10);
+borigin2_matrix_7_28_DE ~ normal(0,10);
+borigin2_matrix_7_28_NDE ~ normal(0,10);
+borigin2_matrix_7_30_DE ~ normal(0,10);
+borigin2_matrix_7_30_NDE ~ normal(0,10);
+borigin2_matrix_7_42 ~ normal(0,10);
+borigin2_matrix_24_5 ~ normal(0,10);
+borigin2_matrix_26_6 ~ normal(0,10);
+borigin2_matrix_28_7 ~ normal(0,10);
+borigin2_matrix_30_7 ~ normal(0,10);
+borigin2_matrix_42_7 ~ normal(0,10);
+
+borigin3_matrix_3_4 ~ normal(0,10);
+borigin3_matrix_4_3 ~ normal(0,10);
+borigin3_matrix_4_5 ~ normal(0,10);
+borigin3_matrix_5_4 ~ normal(0,10);
+borigin3_matrix_5_6 ~ normal(0,10);
+borigin3_matrix_5_24_DE ~ normal(0,10);
+borigin3_matrix_5_24_NDE ~ normal(0,10);
+borigin3_matrix_6_5 ~ normal(0,10);
+borigin3_matrix_6_7 ~ normal(0,10);
+borigin3_matrix_6_26_DE ~ normal(0,10);
+borigin3_matrix_6_26_NDE ~ normal(0,10);
+borigin3_matrix_7_6 ~ normal(0,10);
+borigin3_matrix_7_28_DE ~ normal(0,10);
+borigin3_matrix_7_28_NDE ~ normal(0,10);
+borigin3_matrix_7_30_DE ~ normal(0,10);
+borigin3_matrix_7_30_NDE ~ normal(0,10);
+borigin3_matrix_7_42 ~ normal(0,10);
+borigin3_matrix_24_5 ~ normal(0,10);
+borigin3_matrix_26_6 ~ normal(0,10);
+borigin3_matrix_28_7 ~ normal(0,10);
+borigin3_matrix_30_7 ~ normal(0,10);
+borigin3_matrix_42_7 ~ normal(0,10);
+
+[1] "2023-06-20 22:51:42 PDT"
+[1] "2023-06-20 22:52:11 PDT"
+
+              Deschutes River Mouth - mainstem, BON to MCN 
+                                                        37 
+                 Entiat River Mouth - mainstem, RRE to WEL 
+                                                        10 
+              mainstem, BON to MCN - Deschutes River Mouth 
+                                                        44 
+        mainstem, BON to MCN - mainstem, MCN to ICH or PRA 
+                                                      1026 
+             mainstem, BON to MCN - mainstem, mouth to BON 
+                                                        21 
+          mainstem, ICH to LGR - mainstem, upstream of LGR 
+                                                         3 
+        mainstem, MCN to ICH or PRA - mainstem, BON to MCN 
+                                                         9 
+        mainstem, MCN to ICH or PRA - mainstem, ICH to LGR 
+                                                         3 
+        mainstem, MCN to ICH or PRA - mainstem, PRA to RIS 
+                                                      1029 
+             mainstem, mouth to BON - mainstem, BON to MCN 
+                                                        31 
+        mainstem, PRA to RIS - mainstem, MCN to ICH or PRA 
+                                                        18 
+               mainstem, PRA to RIS - mainstem, RIS to RRE 
+                                                      1011 
+               mainstem, RIS to RRE - mainstem, PRA to RIS 
+                                                        13 
+               mainstem, RIS to RRE - mainstem, RRE to WEL 
+                                                       731 
+              mainstem, RIS to RRE - Wenatchee River Mouth 
+                                                       126 
+           mainstem, RIS to RRE - Wenatchee River Upstream 
+                                                        47 
+                 mainstem, RRE to WEL - Entiat River Mouth 
+                                                       301 
+                               mainstem, RRE to WEL - loss 
+                                                         7 
+               mainstem, RRE to WEL - mainstem, RIS to RRE 
+                                                        40 
+          mainstem, RRE to WEL - mainstem, upstream of WEL 
+                                                       518 
+              mainstem, upstream of LGR - Clearwater River 
+                                                         1 
+          mainstem, upstream of WEL - mainstem, RRE to WEL 
+                                                       169 
+            mainstem, upstream of WEL - Methow River Mouth 
+                                                       220 
+         mainstem, upstream of WEL - Methow River Upstream 
+                                                         8 
+          mainstem, upstream of WEL - Okanogan River Mouth 
+                                                        12 
+       mainstem, upstream of WEL - Okanogan River Upstream 
+                                                         2 
+mainstem, upstream of WEL - Upstream WEL other tributaries 
+                                                         1 
+            Methow River Mouth - mainstem, upstream of WEL 
+                                                        32 
+          Okanogan River Mouth - mainstem, upstream of WEL 
+                                                         1 
+              Wenatchee River Mouth - mainstem, RIS to RRE 
+                                                         4 
+[1] "2023-06-20 22:52:11 PDT"
+[1] "2023-06-20 22:52:13 PDT"
+ [1] "1 - mainstem, mouth to BON"          "2 - mainstem, BON to MCN"           
+ [3] "3 - mainstem, MCN to ICH or PRA"     "4 - mainstem, PRA to RIS"           
+ [5] "5 - mainstem, RIS to RRE"            "6 - mainstem, RRE to WEL"           
+ [7] "7 - mainstem, upstream of WEL"       "8 - mainstem, ICH to LGR"           
+ [9] "9 - mainstem, upstream of LGR"       "10 - Deschutes River Mouth"         
+[11] "11 - Deschutes River Upstream"       "12 - John Day River Mouth"          
+[13] "13 - John Day River Upstream"        "14 - Hood River Mouth"              
+[15] "15 - Hood River Upstream"            "16 - Fifteenmile Creek Mouth"       
+[17] "17 - Fifteenmile Creek Upstream"     "18 - Umatilla River Mouth"          
+[19] "19 - Umatilla River Upstream"        "20 - Yakima River Mouth"            
+[21] "21 - Yakima River Upstream"          "22 - Walla Walla River Mouth"       
+[23] "23 - Walla Walla River Upstream"     "24 - Wenatchee River Mouth"         
+[25] "25 - Wenatchee River Upstream"       "26 - Entiat River Mouth"            
+[27] "27 - Entiat River Upstream"          "28 - Okanogan River Mouth"          
+[29] "29 - Okanogan River Upstream"        "30 - Methow River Mouth"            
+[31] "31 - Methow River Upstream"          "32 - Tucannon River Mouth"          
+[33] "33 - Tucannon River Upstream"        "34 - Asotin Creek Mouth"            
+[35] "35 - Asotin Creek Upstream"          "36 - Clearwater River"              
+[37] "37 - Salmon River"                   "38 - Grande Ronde River"            
+[39] "39 - Imnaha River Mouth"             "40 - Imnaha River Upstream"         
+[41] "41 - BON to MCN other tributaries"   "42 - Upstream WEL other tributaries"
+[43] "43 - loss"                          
+[1] "2023-06-20 22:52:20 PDT"
+[1] "Compiling model"
+Syntax error in '/tmp/RtmpNuiwz3/model-3aa654ce1dd.stan', line 1, column 0 to column 1, parsing error:
+   -------------------------------------------------
+     1:  \// 03_parallel_snake_stan_actual_int_origin_wild_deteff
+         ^
+     2:  // wild, upper Columbia Steelhead
+     3:  // This model includes a detection efficiency calculation for the tributaries
+   -------------------------------------------------
+
+Expected "functions {" or "data {" or "transformed data {" or "parameters {" or "transformed parameters {" or "model {" or "generated quantities {".
+
+make: *** [/tmp/RtmpNuiwz3/model-3aa654ce1dd.hpp] Error 1
+
+Error: An error occured during compilation! See the message above for more information.
+Execution halted

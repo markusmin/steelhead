@@ -2521,6 +2521,19 @@ scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_
 
 scp -r ./upper_columbia/parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/
 
+### 2023-06-30
+
+So after lots of troubleshooting, the model ran, but it ran way too fast (100 iter in 132 seconds);
+makes me think that something is wrong with the year RE. Let's pull and inspect outputs.
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/ ./
+
+Yep, so the issue is the statement of evaluating the byear params as being drawn from a normal.
+It causes them never to move off of zero; when these statements are commented out, the
+model runs (and takes much longer) - in one hour, it hasn't gotten past 10 iter; this might present an issue...
+
+
+
 
 
 
