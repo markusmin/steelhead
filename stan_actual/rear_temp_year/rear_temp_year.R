@@ -80,8 +80,142 @@ upper_columbia_summary <- upper_columbia_fit$summary()
 
 # some quick traceplots to look at chains
 mcmc_trace(upper_columbia_fit$draws(), pars = c("b0_matrix_1_2"))
-# yep - it's not moving
+# yep - it's not moving - but at least now they're not all stuck at zero
 mcmc_trace(upper_columbia_fit$draws(), pars = c("btemp0_matrix_1_2"))
+
+# trace for deschutes
+deschutes_summer_trace <- mcmc_trace(upper_columbia_fit$draws(), pars = c("btemp1_matrix_2_10_DE"))
+
+sigma_year_matrix_1_2_trace <- mcmc_trace(upper_columbia_fit$draws(), pars = c("sigma_year_matrix_1_2"))
+
+# tracking all of these is what's causing this to be huge
+byear_raw_vector_9_36_8_trace <- mcmc_trace(upper_columbia_fit$draws(), pars = c("byear_raw_vector_9_38[6]"))
+
+# save these as examples
+ggsave(here::here("stan_actual", "rear_temp_year", "processed", "sigma_year_matrix_1_2_trace.pdf"), plot = sigma_year_matrix_1_2_trace, height = 6, width = 10)
+ggsave(here::here("stan_actual", "rear_temp_year", "processed", "byear_raw_vector_9_36_8_trace.pdf"), plot = byear_raw_vector_9_36_8_trace, height = 6, width = 10)
+ggsave(here::here("stan_actual", "rear_temp_year", "processed", "deschutes_summer_trace.pdf"), plot = deschutes_summer_trace, height = 6, width = 10)
+
+# should also look at sigma_year parameters
+upper_columbia_summary %>% 
+  filter(grepl("sigma_year_matrix_[[:digit:]]", variable)) -> sigma_year_params
+
+# what do these look like?
+ggplot(sigma_year_params, aes(x = variable, y = median)) +
+  geom_point() +
+  geom_errorbar(aes(ymax = q95, ymin = q5)) +
+  coord_flip() +
+  ylab("Year Effect Scaling")
+
+# Inspect the distribution of byear parameters
+upper_columbia_summary %>% 
+  filter(grepl("byear_raw_vector", variable)) %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*_[^_]*")))) %>%
+  # mutate(to = as.numeric(sub("\D*", "", sub("[^_]*_[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  mutate(to = as.numeric(str_extract(sub("[^_]*_[^_]*_[^_]*_[^_]*_", "", variable), "\\d+")))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  arrange(from, to) -> byear_params
+
+# are any of these different from zero?
+subset(byear_params, q5 > 0 | q95 < 0)
+# zero
+
+# write a function to plot the distribution of each of these
+byear_2_3_plot <- ggplot(subset(byear_params, from  == 2 & to == 3), aes(x = variable, y = median)) +
+  geom_point() +
+  geom_errorbar(aes(ymax = q95, ymin = q5)) +
+  coord_flip() +
+  ylab("Year Effect")
+
+ggsave(here::here("stan_actual", "rear_temp_year", "processed", "byear_2_3_plot.pdf"), plot = byear_2_3_plot, height = 6, width = 10)
+
+##### investigate two temperature parameters #####
+
+# keep only temperatuer parameters that don't have brackets (these are the actual parameters)
+temp_variables <- upper_columbia_summary$variable[grep("btemp", upper_columbia_summary$variable)][1:82]
+
+# 2temp model - look at upstream of WEL
+upper_columbia_summary %>% 
+  filter(grepl("btemp", variable)) %>% 
+  filter(!(grepl("\\[", variable))) %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable))))  %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(origin = ifelse(grepl("btemp_", variable), "DPS",
+                         ifelse(grepl("origin1", variable), "Wenatchee",
+                                ifelse(grepl("origin2", variable), "Entiat",
+                                       ifelse(grepl("origin3", variable), "Methow", NA))))) %>% 
+  mutate(to_name = sub(" Mouth", "", to_name)) %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  mutate(movement = paste0(from_name, " -> ", to_name)) -> temp_param_summary
+
+
+# Let's just look at which are "significant"
+subset(temp_param_summary, q5 > 0 |  q95 < 0) -> significant_temp_variables_2
+
+# Movement into the Deschutes - 2 -> 10 - there's a huge positive temperature effect, regardless of time of year
+# Entiat River - overshoot when it's hot
+
+
+# Check Entiat, since it had a statistically significant effect in Shelby's
+
+# overshoot is 6 -> 7 for Entiat
+# Entiat are origin 2
+subset(upper_columbia_summary, variable %in% c("btemp0xorigin2_matrix_6_7", "btemp1xorigin2_matrix_6_7"))
+# yes, these are both significant
+
+
+
+
+# compare to the old temperature model
+  
+write.csv(significant_temp_variables_2, here::here("stan_actual", "rear_temp", "processed", "significant_temp_variable_2.csv"))
+
+significant_temp_variables_2 %>% 
+  mutate(movement = paste0(from, "_", to)) %>% 
+  dplyr::select(variable, median, q5, q95, movement, from, to) -> significant_temp_variables_2_for_join
+
+
+# read in the other one
+significant_temp_variables_1 <- read.csv(here::here("stan_actual", "rear_temp", "processed", "significant_temp_variable_1.csv"), row.names = 1)
+  
+
+significant_temp_variables_1 %>% 
+  # for now, drop all NDE versions of parameters 
+  filter(!(grepl("NDE", variable))) %>% 
+  dplyr::select(variable, median, q5, q95) %>% 
+  # dplyr::rename(median_old = median, q5_old = q5, q95_old = q95) %>% 
+  mutate(from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(variable, "[^_]*_[^_]*_[^_]*")))) %>%
+  mutate(to = as.numeric(sub("_.*", "", sub("[^_]*_[^_]*_[^_]*_", "", variable)))) %>% 
+  mutate(movement = paste0(from, "_", to)) -> significant_temp_variables_1
+
+significant_temp_variables_2_for_join %>% 
+  bind_rows(., significant_temp_variables_1) %>% 
+  mutate(parameter = ifelse(grepl("temp0", variable), "winter_spring_temp",
+                            ifelse(grepl("temp1", variable), "summer_fall_temp", "single_temp"))) %>% 
+  mutate(origin_type = ifelse(grepl("origin1", variable), "Wenatchee",
+                              ifelse(grepl("origin2", variable), "Entiat",
+                                     ifelse(grepl("origin3", variable), "Methow", "DPS-wide")))) %>% 
+  left_join(from_state_number_names, by = "from") %>% 
+  left_join(to_state_number_names, by = "to") %>% 
+  mutate(movement = paste0(from_name, "->", to_name)) -> temp_comp
+
+temp_comp_plot <- ggplot(temp_comp, aes(x = movement, y = median, color = parameter)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  geom_errorbar(aes(ymax = q95, ymin = q5), position = position_dodge(width = 0.75)) +
+  coord_flip() +
+  facet_wrap(~origin_type) +
+  geom_hline(yintercept = 0, lty = 2) +
+  ylab("Temperature Parameter Magnitude")
+
+ggsave(here::here("stan_actual", "rear_temp_year", "processed", "temp_comparison_plot.pdf"), plot = temp_comp_plot, height = 6, width = 10)
+
+
+
+
 
 
 

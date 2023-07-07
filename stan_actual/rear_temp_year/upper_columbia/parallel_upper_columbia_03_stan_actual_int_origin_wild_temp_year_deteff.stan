@@ -70,12 +70,12 @@ functions{
                         array[,] real btemp1xorigin2_matrix_NDE, 
                         array[,] real btemp1xorigin3_matrix_NDE, 
                         
-                        // array[,] real byear,
-                        array [,] real sigma_year_matrix_DE,
-                        array [,] real sigma_year_matrix_NDE,
-                        
                         // indices for sigma_year
                         array[,] int sigma_year_indices,
+                        // arrays to store sigma_year_matrices (DE and NDE)
+                        array[,] real sigma_year_matrix_DE,
+                        array[,] real sigma_year_matrix_NDE,
+                        
                         
                         // arrays to store byear parameters
                         // first, create a temporary df, with each of the individual byear parameters (drawn from normal, using sigma_year)
@@ -118,42 +118,6 @@ functions{
                           
   // First, declare the total lp (log probability) variable that we will be returning
   real total_lp = 0;
-  
-  // add the RE year effect to total_lp - we don't need to evaluate this for every fish
-// maybe we don't even need this because the effect of year is being evaluated in 
-// the categorical_lpmf part? But then what about sigma_year?
-  
-  // for each of the non-zero elements of byear_parameters_array, evaluate all of the ones for each year as normal
-  // evaluate DE and NDE separately
-  
-  // matt trick
-  // create the actual matrices
-  // array [43,43,nyears] real byear_actual_parameters_array_DE;
-  // array [43,43,nyears] real byear_actual_parameters_array_NDE;
-  
-  for (p in 1:nmovements){
-    // matt trick - evaluate the raw matrices
-    total_lp += std_normal_lpdf(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-    total_lp += std_normal_lpdf(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-    
-    // // now, transform to the real matrices
-    // byear_actual_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],] =  to_array_1d(to_row_vector(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) * sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
-    // byear_actual_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],] =  to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) * sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
-    // 
-    // print("byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],] = ", byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-    // print("byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],] = ", byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-    
-    // print("byear_actual_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],] = ", byear_actual_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-    // print("byear_actual_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],] = ", byear_actual_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]);
-     // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
-     // total_lp += normal_lpdf(to_row_vector(byear_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) | 0, sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
-  }
-  
-
-  
-
-
-// total_lp += normal_lpdf(byear | 0, sigma_year);
   
   
   // Now, loop through the detection matrices for each individual IN THIS SLICE OF THE DATA
@@ -427,24 +391,21 @@ functions{
         // We are going to try to vectorize this and sum it outside of the loop, rather than repeatedly updating a variable.
         
         // print - what the logits are 
-        print("logits = ", logits);
+        // print("logits = ", logits);
         // print what the byear params are
         // print("byear_actual_parameters_array_NDE = ", byear_actual_parameters_array_NDE);
         // print("byear_actual_parameters_array_DE = ", byear_actual_parameters_array_DE);
         
         
-        // comment out for testing lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
-        // lp_fish += categorical_lpmf(slice_y[i,j+1] | p_vec);
+        lp_fish += categorical_lpmf(slice_y[i - start + 1,j+1] | p_vec_observed);
       
     }
     
     // Now, increment the log density
-    // total_lp += sum(lp_fish);
     total_lp += lp_fish;
     
     
 } // end looping through fish in this slice
-
 
 return total_lp;
 
@@ -633,10 +594,6 @@ real<lower=0>sigma_year_matrix_28_7;
 real<lower=0>sigma_year_matrix_30_7;
 real<lower=0>sigma_year_matrix_36_9;
 real<lower=0>sigma_year_matrix_42_7;
-
-// parameter arrays to store raw byear params parameters (DE and NDE)
-// array [43,43,nyears] real byear_raw_parameters_array_DE;
-// array [43,43,nyears] real byear_raw_parameters_array_NDE;
 
 // vectors to store byear parameters for each movement
 vector[nyears] byear_raw_vector_1_2;
@@ -946,11 +903,14 @@ transformed parameters {
   
     // Declare matrices to store sigma_year params 
     // 2023-03-60 - I don't think we need these anymore, given updated syntax
-  // array[43,43] real sigma_year_matrix_DE;
-  // sigma_year_matrix_DE = rep_array(0, 43, 43);
+    // 2023-07-05 - I do think we need these, because you need to be able
+    // to pass them as arguments to reduce_sum so it knows to change them (and the 
+    // parameters within) when finding the minimum NLL
+  array[43,43] real sigma_year_matrix_DE;
+  sigma_year_matrix_DE = rep_array(0, 43, 43);
   // 
-  // array[43,43] real sigma_year_matrix_NDE;
-  // sigma_year_matrix_NDE = rep_array(0, 43, 43);
+  array[43,43] real sigma_year_matrix_NDE;
+  sigma_year_matrix_NDE = rep_array(0, 43, 43);
   
   // Declare matrices to store byear actual parameters (DE and NDE)
   array [43,43,nyears] real byear_actual_parameters_array_DE;
@@ -958,140 +918,265 @@ transformed parameters {
   array [43,43,nyears] real byear_actual_parameters_array_NDE;
   byear_actual_parameters_array_NDE = rep_array(0, 43, 43, nyears);
   
+  // Declare matrices to store byear raw parameters (DE and NDE)
+  array [43,43,nyears] real byear_raw_parameters_array_DE;
+  byear_raw_parameters_array_DE = rep_array(0, 43, 43, nyears);
+  array [43,43,nyears] real byear_raw_parameters_array_NDE;
+  byear_raw_parameters_array_NDE = rep_array(0, 43, 43, nyears);
+  
+  // store the byear_raw_vectors in the array
+byear_raw_parameters_array_DE[1,2, ] = to_array_1d(byear_raw_vector_1_2);
+byear_raw_parameters_array_NDE[1,2, ] = to_array_1d(byear_raw_vector_1_2);
+byear_raw_parameters_array_DE[2,1, ] = to_array_1d(byear_raw_vector_2_1);
+byear_raw_parameters_array_NDE[2,1, ] = to_array_1d(byear_raw_vector_2_1);
+byear_raw_parameters_array_DE[2,3, ] = to_array_1d(byear_raw_vector_2_3);
+byear_raw_parameters_array_NDE[2,3, ] = to_array_1d(byear_raw_vector_2_3);
+byear_raw_parameters_array_DE[2,10, ] = to_array_1d(byear_raw_vector_2_10_DE);
+byear_raw_parameters_array_NDE[2,10, ] = to_array_1d(byear_raw_vector_2_10_NDE);
+byear_raw_parameters_array_DE[2,11, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[2,11, ] = to_array_1d(byear_raw_vector_2_10_NDE);
+byear_raw_parameters_array_DE[2,12, ] = to_array_1d(byear_raw_vector_2_12_DE);
+byear_raw_parameters_array_NDE[2,12, ] = to_array_1d(byear_raw_vector_2_12_NDE);
+byear_raw_parameters_array_DE[2,13, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[2,13, ] = to_array_1d(byear_raw_vector_2_12_NDE);
+byear_raw_parameters_array_DE[2,14, ] = to_array_1d(byear_raw_vector_2_14_DE);
+byear_raw_parameters_array_NDE[2,14, ] = to_array_1d(byear_raw_vector_2_14_NDE);
+byear_raw_parameters_array_DE[2,15, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[2,15, ] = to_array_1d(byear_raw_vector_2_14_NDE);
+byear_raw_parameters_array_DE[2,16, ] = to_array_1d(byear_raw_vector_2_16_DE);
+byear_raw_parameters_array_NDE[2,16, ] = to_array_1d(byear_raw_vector_2_16_NDE);
+byear_raw_parameters_array_DE[2,17, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[2,17, ] = to_array_1d(byear_raw_vector_2_16_NDE);
+byear_raw_parameters_array_DE[2,18, ] = to_array_1d(byear_raw_vector_2_18_DE);
+byear_raw_parameters_array_NDE[2,18, ] = to_array_1d(byear_raw_vector_2_18_NDE);
+byear_raw_parameters_array_DE[2,19, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[2,19, ] = to_array_1d(byear_raw_vector_2_18_NDE);
+byear_raw_parameters_array_DE[2,41, ] = to_array_1d(byear_raw_vector_2_41);
+byear_raw_parameters_array_NDE[2,41, ] = to_array_1d(byear_raw_vector_2_41);
+byear_raw_parameters_array_DE[3,2, ] = to_array_1d(byear_raw_vector_3_2);
+byear_raw_parameters_array_NDE[3,2, ] = to_array_1d(byear_raw_vector_3_2);
+byear_raw_parameters_array_DE[3,4, ] = to_array_1d(byear_raw_vector_3_4);
+byear_raw_parameters_array_NDE[3,4, ] = to_array_1d(byear_raw_vector_3_4);
+byear_raw_parameters_array_DE[3,8, ] = to_array_1d(byear_raw_vector_3_8);
+byear_raw_parameters_array_NDE[3,8, ] = to_array_1d(byear_raw_vector_3_8);
+byear_raw_parameters_array_DE[3,20, ] = to_array_1d(byear_raw_vector_3_20_DE);
+byear_raw_parameters_array_NDE[3,20, ] = to_array_1d(byear_raw_vector_3_20_NDE);
+byear_raw_parameters_array_DE[3,21, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[3,21, ] = to_array_1d(byear_raw_vector_3_20_NDE);
+byear_raw_parameters_array_DE[3,22, ] = to_array_1d(byear_raw_vector_3_22_DE);
+byear_raw_parameters_array_NDE[3,22, ] = to_array_1d(byear_raw_vector_3_22_NDE);
+byear_raw_parameters_array_DE[3,23, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[3,23, ] = to_array_1d(byear_raw_vector_3_22_NDE);
+byear_raw_parameters_array_DE[4,3, ] = to_array_1d(byear_raw_vector_4_3);
+byear_raw_parameters_array_NDE[4,3, ] = to_array_1d(byear_raw_vector_4_3);
+byear_raw_parameters_array_DE[4,5, ] = to_array_1d(byear_raw_vector_4_5);
+byear_raw_parameters_array_NDE[4,5, ] = to_array_1d(byear_raw_vector_4_5);
+byear_raw_parameters_array_DE[5,4, ] = to_array_1d(byear_raw_vector_5_4);
+byear_raw_parameters_array_NDE[5,4, ] = to_array_1d(byear_raw_vector_5_4);
+byear_raw_parameters_array_DE[5,6, ] = to_array_1d(byear_raw_vector_5_6);
+byear_raw_parameters_array_NDE[5,6, ] = to_array_1d(byear_raw_vector_5_6);
+byear_raw_parameters_array_DE[5,24, ] = to_array_1d(byear_raw_vector_5_24_DE);
+byear_raw_parameters_array_NDE[5,24, ] = to_array_1d(byear_raw_vector_5_24_NDE);
+byear_raw_parameters_array_DE[5,25, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[5,25, ] = to_array_1d(byear_raw_vector_5_24_NDE);
+byear_raw_parameters_array_DE[6,5, ] = to_array_1d(byear_raw_vector_6_5);
+byear_raw_parameters_array_NDE[6,5, ] = to_array_1d(byear_raw_vector_6_5);
+byear_raw_parameters_array_DE[6,7, ] = to_array_1d(byear_raw_vector_6_7);
+byear_raw_parameters_array_NDE[6,7, ] = to_array_1d(byear_raw_vector_6_7);
+byear_raw_parameters_array_DE[6,26, ] = to_array_1d(byear_raw_vector_6_26_DE);
+byear_raw_parameters_array_NDE[6,26, ] = to_array_1d(byear_raw_vector_6_26_NDE);
+byear_raw_parameters_array_DE[6,27, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[6,27, ] = to_array_1d(byear_raw_vector_6_26_NDE);
+byear_raw_parameters_array_DE[7,6, ] = to_array_1d(byear_raw_vector_7_6);
+byear_raw_parameters_array_NDE[7,6, ] = to_array_1d(byear_raw_vector_7_6);
+byear_raw_parameters_array_DE[7,28, ] = to_array_1d(byear_raw_vector_7_28_DE);
+byear_raw_parameters_array_NDE[7,28, ] = to_array_1d(byear_raw_vector_7_28_NDE);
+byear_raw_parameters_array_DE[7,29, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[7,29, ] = to_array_1d(byear_raw_vector_7_28_NDE);
+byear_raw_parameters_array_DE[7,30, ] = to_array_1d(byear_raw_vector_7_30_DE);
+byear_raw_parameters_array_NDE[7,30, ] = to_array_1d(byear_raw_vector_7_30_NDE);
+byear_raw_parameters_array_DE[7,31, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[7,31, ] = to_array_1d(byear_raw_vector_7_30_NDE);
+byear_raw_parameters_array_DE[7,42, ] = to_array_1d(byear_raw_vector_7_42);
+byear_raw_parameters_array_NDE[7,42, ] = to_array_1d(byear_raw_vector_7_42);
+byear_raw_parameters_array_DE[8,3, ] = to_array_1d(byear_raw_vector_8_3);
+byear_raw_parameters_array_NDE[8,3, ] = to_array_1d(byear_raw_vector_8_3);
+byear_raw_parameters_array_DE[8,9, ] = to_array_1d(byear_raw_vector_8_9);
+byear_raw_parameters_array_NDE[8,9, ] = to_array_1d(byear_raw_vector_8_9);
+byear_raw_parameters_array_DE[8,32, ] = to_array_1d(byear_raw_vector_8_32_DE);
+byear_raw_parameters_array_NDE[8,32, ] = to_array_1d(byear_raw_vector_8_32_NDE);
+byear_raw_parameters_array_DE[8,33, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[8,33, ] = to_array_1d(byear_raw_vector_8_32_NDE);
+byear_raw_parameters_array_DE[9,8, ] = to_array_1d(byear_raw_vector_9_8);
+byear_raw_parameters_array_NDE[9,8, ] = to_array_1d(byear_raw_vector_9_8);
+byear_raw_parameters_array_DE[9,34, ] = to_array_1d(byear_raw_vector_9_34_DE);
+byear_raw_parameters_array_NDE[9,34, ] = to_array_1d(byear_raw_vector_9_34_NDE);
+byear_raw_parameters_array_DE[9,35, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[9,35, ] = to_array_1d(byear_raw_vector_9_34_NDE);
+byear_raw_parameters_array_DE[9,36, ] = to_array_1d(byear_raw_vector_9_36);
+byear_raw_parameters_array_NDE[9,36, ] = to_array_1d(byear_raw_vector_9_36);
+byear_raw_parameters_array_DE[9,37, ] = to_array_1d(byear_raw_vector_9_37);
+byear_raw_parameters_array_NDE[9,37, ] = to_array_1d(byear_raw_vector_9_37);
+byear_raw_parameters_array_DE[9,38, ] = to_array_1d(byear_raw_vector_9_38);
+byear_raw_parameters_array_NDE[9,38, ] = to_array_1d(byear_raw_vector_9_38);
+byear_raw_parameters_array_DE[9,39, ] = to_array_1d(byear_raw_vector_9_39_DE);
+byear_raw_parameters_array_NDE[9,39, ] = to_array_1d(byear_raw_vector_9_39_NDE);
+byear_raw_parameters_array_DE[9,40, ] = rep_array(-100000, nyears);
+byear_raw_parameters_array_NDE[9,40, ] = to_array_1d(byear_raw_vector_9_39_NDE);
+byear_raw_parameters_array_DE[10,2, ] = to_array_1d(byear_raw_vector_10_2);
+byear_raw_parameters_array_NDE[10,2, ] = to_array_1d(byear_raw_vector_10_2);
+byear_raw_parameters_array_DE[14,2, ] = to_array_1d(byear_raw_vector_14_2);
+byear_raw_parameters_array_NDE[14,2, ] = to_array_1d(byear_raw_vector_14_2);
+byear_raw_parameters_array_DE[24,5, ] = to_array_1d(byear_raw_vector_24_5);
+byear_raw_parameters_array_NDE[24,5, ] = to_array_1d(byear_raw_vector_24_5);
+byear_raw_parameters_array_DE[25,5, ] = to_array_1d(byear_raw_vector_24_5);
+byear_raw_parameters_array_NDE[25,5, ] = to_array_1d(byear_raw_vector_24_5);
+byear_raw_parameters_array_DE[26,6, ] = to_array_1d(byear_raw_vector_26_6);
+byear_raw_parameters_array_NDE[26,6, ] = to_array_1d(byear_raw_vector_26_6);
+byear_raw_parameters_array_DE[27,6, ] = to_array_1d(byear_raw_vector_26_6);
+byear_raw_parameters_array_NDE[27,6, ] = to_array_1d(byear_raw_vector_26_6);
+byear_raw_parameters_array_DE[28,7, ] = to_array_1d(byear_raw_vector_28_7);
+byear_raw_parameters_array_NDE[28,7, ] = to_array_1d(byear_raw_vector_28_7);
+byear_raw_parameters_array_DE[29,7, ] = to_array_1d(byear_raw_vector_28_7);
+byear_raw_parameters_array_NDE[29,7, ] = to_array_1d(byear_raw_vector_28_7);
+byear_raw_parameters_array_DE[30,7, ] = to_array_1d(byear_raw_vector_30_7);
+byear_raw_parameters_array_NDE[30,7, ] = to_array_1d(byear_raw_vector_30_7);
+byear_raw_parameters_array_DE[31,7, ] = to_array_1d(byear_raw_vector_30_7);
+byear_raw_parameters_array_NDE[31,7, ] = to_array_1d(byear_raw_vector_30_7);
+byear_raw_parameters_array_DE[36,9, ] = to_array_1d(byear_raw_vector_36_9);
+byear_raw_parameters_array_NDE[36,9, ] = to_array_1d(byear_raw_vector_36_9);
+byear_raw_parameters_array_DE[42,7, ] = to_array_1d(byear_raw_vector_42_7);
+byear_raw_parameters_array_NDE[42,7, ] = to_array_1d(byear_raw_vector_42_7);
+  
+  
   
   // now, take the byear_raw_vector parameters and multiply them by the sigma (scale) to store them)
-  for (p in 1:nmovements){
     // take the raw matrices and transform them to the actual matrices
     // byear_actual_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],] =  to_array_1d(to_row_vector(byear_raw_parameters_array_DE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) * sigma_year_matrix_DE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
     // byear_actual_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],] =  to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2],]) * sigma_year_matrix_NDE[sigma_year_indices[p,1], sigma_year_indices[p,2]]);
     
-
-byear_actual_parameters_array_DE[1,2, ] = to_array_1d(byear_raw_vector_1_2 * sigma_year_matrix_1_2);
-byear_actual_parameters_array_NDE[1,2, ] = to_array_1d(byear_raw_vector_1_2 * sigma_year_matrix_1_2);
-byear_actual_parameters_array_DE[2,1, ] = to_array_1d(byear_raw_vector_2_1 * sigma_year_matrix_2_1);
-byear_actual_parameters_array_NDE[2,1, ] = to_array_1d(byear_raw_vector_2_1 * sigma_year_matrix_2_1);
-byear_actual_parameters_array_DE[2,3, ] = to_array_1d(byear_raw_vector_2_3 * sigma_year_matrix_2_3);
-byear_actual_parameters_array_NDE[2,3, ] = to_array_1d(byear_raw_vector_2_3 * sigma_year_matrix_2_3);
-byear_actual_parameters_array_DE[2,10, ] = to_array_1d(byear_raw_vector_2_10_DE * sigma_year_matrix_2_10_DE);
-byear_actual_parameters_array_NDE[2,10, ] = to_array_1d(byear_raw_vector_2_10_NDE * sigma_year_matrix_2_10_NDE);
+byear_actual_parameters_array_DE[1,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[1,2, ]) * sigma_year_matrix_DE[1,2]);
+byear_actual_parameters_array_NDE[1,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[1,2, ]) * sigma_year_matrix_NDE[1,2]);
+byear_actual_parameters_array_DE[2,1, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,1, ]) * sigma_year_matrix_DE[2,1]);
+byear_actual_parameters_array_NDE[2,1, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,1, ]) * sigma_year_matrix_NDE[2,1]);
+byear_actual_parameters_array_DE[2,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,3, ]) * sigma_year_matrix_DE[2,3]);
+byear_actual_parameters_array_NDE[2,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,3, ]) * sigma_year_matrix_NDE[2,3]);
+byear_actual_parameters_array_DE[2,10, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,10, ]) * sigma_year_matrix_DE[2,10]);
+byear_actual_parameters_array_NDE[2,10, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,10, ]) * sigma_year_matrix_NDE[2,10]);
 byear_actual_parameters_array_DE[2,11, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[2,11, ] = to_array_1d(byear_raw_vector_2_10_NDE * sigma_year_matrix_2_10_NDE);
-byear_actual_parameters_array_DE[2,12, ] = to_array_1d(byear_raw_vector_2_12_DE * sigma_year_matrix_2_12_DE);
-byear_actual_parameters_array_NDE[2,12, ] = to_array_1d(byear_raw_vector_2_12_NDE * sigma_year_matrix_2_12_NDE);
+byear_actual_parameters_array_NDE[2,11, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,10, ]) * sigma_year_matrix_NDE[2,10]);
+byear_actual_parameters_array_DE[2,12, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,12, ]) * sigma_year_matrix_DE[2,12]);
+byear_actual_parameters_array_NDE[2,12, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,12, ]) * sigma_year_matrix_NDE[2,12]);
 byear_actual_parameters_array_DE[2,13, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[2,13, ] = to_array_1d(byear_raw_vector_2_12_NDE * sigma_year_matrix_2_12_NDE);
-byear_actual_parameters_array_DE[2,14, ] = to_array_1d(byear_raw_vector_2_14_DE * sigma_year_matrix_2_14_DE);
-byear_actual_parameters_array_NDE[2,14, ] = to_array_1d(byear_raw_vector_2_14_NDE * sigma_year_matrix_2_14_NDE);
+byear_actual_parameters_array_NDE[2,13, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,12, ]) * sigma_year_matrix_NDE[2,12]);
+byear_actual_parameters_array_DE[2,14, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,14, ]) * sigma_year_matrix_DE[2,14]);
+byear_actual_parameters_array_NDE[2,14, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,14, ]) * sigma_year_matrix_NDE[2,14]);
 byear_actual_parameters_array_DE[2,15, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[2,15, ] = to_array_1d(byear_raw_vector_2_14_NDE * sigma_year_matrix_2_14_NDE);
-byear_actual_parameters_array_DE[2,16, ] = to_array_1d(byear_raw_vector_2_16_DE * sigma_year_matrix_2_16_DE);
-byear_actual_parameters_array_NDE[2,16, ] = to_array_1d(byear_raw_vector_2_16_NDE * sigma_year_matrix_2_16_NDE);
+byear_actual_parameters_array_NDE[2,15, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,14, ]) * sigma_year_matrix_NDE[2,14]);
+byear_actual_parameters_array_DE[2,16, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,16, ]) * sigma_year_matrix_DE[2,16]);
+byear_actual_parameters_array_NDE[2,16, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,16, ]) * sigma_year_matrix_NDE[2,16]);
 byear_actual_parameters_array_DE[2,17, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[2,17, ] = to_array_1d(byear_raw_vector_2_16_NDE * sigma_year_matrix_2_16_NDE);
-byear_actual_parameters_array_DE[2,18, ] = to_array_1d(byear_raw_vector_2_18_DE * sigma_year_matrix_2_18_DE);
-byear_actual_parameters_array_NDE[2,18, ] = to_array_1d(byear_raw_vector_2_18_NDE * sigma_year_matrix_2_18_NDE);
+byear_actual_parameters_array_NDE[2,17, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,16, ]) * sigma_year_matrix_NDE[2,16]);
+byear_actual_parameters_array_DE[2,18, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,18, ]) * sigma_year_matrix_DE[2,18]);
+byear_actual_parameters_array_NDE[2,18, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,18, ]) * sigma_year_matrix_NDE[2,18]);
 byear_actual_parameters_array_DE[2,19, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[2,19, ] = to_array_1d(byear_raw_vector_2_18_NDE * sigma_year_matrix_2_18_NDE);
-byear_actual_parameters_array_DE[2,41, ] = to_array_1d(byear_raw_vector_2_41 * sigma_year_matrix_2_41);
-byear_actual_parameters_array_NDE[2,41, ] = to_array_1d(byear_raw_vector_2_41 * sigma_year_matrix_2_41);
-byear_actual_parameters_array_DE[3,2, ] = to_array_1d(byear_raw_vector_3_2 * sigma_year_matrix_3_2);
-byear_actual_parameters_array_NDE[3,2, ] = to_array_1d(byear_raw_vector_3_2 * sigma_year_matrix_3_2);
-byear_actual_parameters_array_DE[3,4, ] = to_array_1d(byear_raw_vector_3_4 * sigma_year_matrix_3_4);
-byear_actual_parameters_array_NDE[3,4, ] = to_array_1d(byear_raw_vector_3_4 * sigma_year_matrix_3_4);
-byear_actual_parameters_array_DE[3,8, ] = to_array_1d(byear_raw_vector_3_8 * sigma_year_matrix_3_8);
-byear_actual_parameters_array_NDE[3,8, ] = to_array_1d(byear_raw_vector_3_8 * sigma_year_matrix_3_8);
-byear_actual_parameters_array_DE[3,20, ] = to_array_1d(byear_raw_vector_3_20_DE * sigma_year_matrix_3_20_DE);
-byear_actual_parameters_array_NDE[3,20, ] = to_array_1d(byear_raw_vector_3_20_NDE * sigma_year_matrix_3_20_NDE);
+byear_actual_parameters_array_NDE[2,19, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,18, ]) * sigma_year_matrix_NDE[2,18]);
+byear_actual_parameters_array_DE[2,41, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[2,41, ]) * sigma_year_matrix_DE[2,41]);
+byear_actual_parameters_array_NDE[2,41, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[2,41, ]) * sigma_year_matrix_NDE[2,41]);
+byear_actual_parameters_array_DE[3,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[3,2, ]) * sigma_year_matrix_DE[3,2]);
+byear_actual_parameters_array_NDE[3,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,2, ]) * sigma_year_matrix_NDE[3,2]);
+byear_actual_parameters_array_DE[3,4, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[3,4, ]) * sigma_year_matrix_DE[3,4]);
+byear_actual_parameters_array_NDE[3,4, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,4, ]) * sigma_year_matrix_NDE[3,4]);
+byear_actual_parameters_array_DE[3,8, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[3,8, ]) * sigma_year_matrix_DE[3,8]);
+byear_actual_parameters_array_NDE[3,8, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,8, ]) * sigma_year_matrix_NDE[3,8]);
+byear_actual_parameters_array_DE[3,20, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[3,20, ]) * sigma_year_matrix_DE[3,20]);
+byear_actual_parameters_array_NDE[3,20, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,20, ]) * sigma_year_matrix_NDE[3,20]);
 byear_actual_parameters_array_DE[3,21, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[3,21, ] = to_array_1d(byear_raw_vector_3_20_NDE * sigma_year_matrix_3_20_NDE);
-byear_actual_parameters_array_DE[3,22, ] = to_array_1d(byear_raw_vector_3_22_DE * sigma_year_matrix_3_22_DE);
-byear_actual_parameters_array_NDE[3,22, ] = to_array_1d(byear_raw_vector_3_22_NDE * sigma_year_matrix_3_22_NDE);
+byear_actual_parameters_array_NDE[3,21, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,20, ]) * sigma_year_matrix_NDE[3,20]);
+byear_actual_parameters_array_DE[3,22, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[3,22, ]) * sigma_year_matrix_DE[3,22]);
+byear_actual_parameters_array_NDE[3,22, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,22, ]) * sigma_year_matrix_NDE[3,22]);
 byear_actual_parameters_array_DE[3,23, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[3,23, ] = to_array_1d(byear_raw_vector_3_22_NDE * sigma_year_matrix_3_22_NDE);
-byear_actual_parameters_array_DE[4,3, ] = to_array_1d(byear_raw_vector_4_3 * sigma_year_matrix_4_3);
-byear_actual_parameters_array_NDE[4,3, ] = to_array_1d(byear_raw_vector_4_3 * sigma_year_matrix_4_3);
-byear_actual_parameters_array_DE[4,5, ] = to_array_1d(byear_raw_vector_4_5 * sigma_year_matrix_4_5);
-byear_actual_parameters_array_NDE[4,5, ] = to_array_1d(byear_raw_vector_4_5 * sigma_year_matrix_4_5);
-byear_actual_parameters_array_DE[5,4, ] = to_array_1d(byear_raw_vector_5_4 * sigma_year_matrix_5_4);
-byear_actual_parameters_array_NDE[5,4, ] = to_array_1d(byear_raw_vector_5_4 * sigma_year_matrix_5_4);
-byear_actual_parameters_array_DE[5,6, ] = to_array_1d(byear_raw_vector_5_6 * sigma_year_matrix_5_6);
-byear_actual_parameters_array_NDE[5,6, ] = to_array_1d(byear_raw_vector_5_6 * sigma_year_matrix_5_6);
-byear_actual_parameters_array_DE[5,24, ] = to_array_1d(byear_raw_vector_5_24_DE * sigma_year_matrix_5_24_DE);
-byear_actual_parameters_array_NDE[5,24, ] = to_array_1d(byear_raw_vector_5_24_NDE * sigma_year_matrix_5_24_NDE);
+byear_actual_parameters_array_NDE[3,23, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[3,22, ]) * sigma_year_matrix_NDE[3,22]);
+byear_actual_parameters_array_DE[4,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[4,3, ]) * sigma_year_matrix_DE[4,3]);
+byear_actual_parameters_array_NDE[4,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[4,3, ]) * sigma_year_matrix_NDE[4,3]);
+byear_actual_parameters_array_DE[4,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[4,5, ]) * sigma_year_matrix_DE[4,5]);
+byear_actual_parameters_array_NDE[4,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[4,5, ]) * sigma_year_matrix_NDE[4,5]);
+byear_actual_parameters_array_DE[5,4, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[5,4, ]) * sigma_year_matrix_DE[5,4]);
+byear_actual_parameters_array_NDE[5,4, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[5,4, ]) * sigma_year_matrix_NDE[5,4]);
+byear_actual_parameters_array_DE[5,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[5,6, ]) * sigma_year_matrix_DE[5,6]);
+byear_actual_parameters_array_NDE[5,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[5,6, ]) * sigma_year_matrix_NDE[5,6]);
+byear_actual_parameters_array_DE[5,24, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[5,24, ]) * sigma_year_matrix_DE[5,24]);
+byear_actual_parameters_array_NDE[5,24, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[5,24, ]) * sigma_year_matrix_NDE[5,24]);
 byear_actual_parameters_array_DE[5,25, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[5,25, ] = to_array_1d(byear_raw_vector_5_24_NDE * sigma_year_matrix_5_24_NDE);
-byear_actual_parameters_array_DE[6,5, ] = to_array_1d(byear_raw_vector_6_5 * sigma_year_matrix_6_5);
-byear_actual_parameters_array_NDE[6,5, ] = to_array_1d(byear_raw_vector_6_5 * sigma_year_matrix_6_5);
-byear_actual_parameters_array_DE[6,7, ] = to_array_1d(byear_raw_vector_6_7 * sigma_year_matrix_6_7);
-byear_actual_parameters_array_NDE[6,7, ] = to_array_1d(byear_raw_vector_6_7 * sigma_year_matrix_6_7);
-byear_actual_parameters_array_DE[6,26, ] = to_array_1d(byear_raw_vector_6_26_DE * sigma_year_matrix_6_26_DE);
-byear_actual_parameters_array_NDE[6,26, ] = to_array_1d(byear_raw_vector_6_26_NDE * sigma_year_matrix_6_26_NDE);
+byear_actual_parameters_array_NDE[5,25, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[5,24, ]) * sigma_year_matrix_NDE[5,24]);
+byear_actual_parameters_array_DE[6,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[6,5, ]) * sigma_year_matrix_DE[6,5]);
+byear_actual_parameters_array_NDE[6,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[6,5, ]) * sigma_year_matrix_NDE[6,5]);
+byear_actual_parameters_array_DE[6,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[6,7, ]) * sigma_year_matrix_DE[6,7]);
+byear_actual_parameters_array_NDE[6,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[6,7, ]) * sigma_year_matrix_NDE[6,7]);
+byear_actual_parameters_array_DE[6,26, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[6,26, ]) * sigma_year_matrix_DE[6,26]);
+byear_actual_parameters_array_NDE[6,26, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[6,26, ]) * sigma_year_matrix_NDE[6,26]);
 byear_actual_parameters_array_DE[6,27, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[6,27, ] = to_array_1d(byear_raw_vector_6_26_NDE * sigma_year_matrix_6_26_NDE);
-byear_actual_parameters_array_DE[7,6, ] = to_array_1d(byear_raw_vector_7_6 * sigma_year_matrix_7_6);
-byear_actual_parameters_array_NDE[7,6, ] = to_array_1d(byear_raw_vector_7_6 * sigma_year_matrix_7_6);
-byear_actual_parameters_array_DE[7,28, ] = to_array_1d(byear_raw_vector_7_28_DE * sigma_year_matrix_7_28_DE);
-byear_actual_parameters_array_NDE[7,28, ] = to_array_1d(byear_raw_vector_7_28_NDE * sigma_year_matrix_7_28_NDE);
+byear_actual_parameters_array_NDE[6,27, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[6,26, ]) * sigma_year_matrix_NDE[6,26]);
+byear_actual_parameters_array_DE[7,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[7,6, ]) * sigma_year_matrix_DE[7,6]);
+byear_actual_parameters_array_NDE[7,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,6, ]) * sigma_year_matrix_NDE[7,6]);
+byear_actual_parameters_array_DE[7,28, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[7,28, ]) * sigma_year_matrix_DE[7,28]);
+byear_actual_parameters_array_NDE[7,28, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,28, ]) * sigma_year_matrix_NDE[7,28]);
 byear_actual_parameters_array_DE[7,29, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[7,29, ] = to_array_1d(byear_raw_vector_7_28_NDE * sigma_year_matrix_7_28_NDE);
-byear_actual_parameters_array_DE[7,30, ] = to_array_1d(byear_raw_vector_7_30_DE * sigma_year_matrix_7_30_DE);
-byear_actual_parameters_array_NDE[7,30, ] = to_array_1d(byear_raw_vector_7_30_NDE * sigma_year_matrix_7_30_NDE);
+byear_actual_parameters_array_NDE[7,29, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,28, ]) * sigma_year_matrix_NDE[7,28]);
+byear_actual_parameters_array_DE[7,30, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[7,30, ]) * sigma_year_matrix_DE[7,30]);
+byear_actual_parameters_array_NDE[7,30, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,30, ]) * sigma_year_matrix_NDE[7,30]);
 byear_actual_parameters_array_DE[7,31, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[7,31, ] = to_array_1d(byear_raw_vector_7_30_NDE * sigma_year_matrix_7_30_NDE);
-byear_actual_parameters_array_DE[7,42, ] = to_array_1d(byear_raw_vector_7_42 * sigma_year_matrix_7_42);
-byear_actual_parameters_array_NDE[7,42, ] = to_array_1d(byear_raw_vector_7_42 * sigma_year_matrix_7_42);
-byear_actual_parameters_array_DE[8,3, ] = to_array_1d(byear_raw_vector_8_3 * sigma_year_matrix_8_3);
-byear_actual_parameters_array_NDE[8,3, ] = to_array_1d(byear_raw_vector_8_3 * sigma_year_matrix_8_3);
-byear_actual_parameters_array_DE[8,9, ] = to_array_1d(byear_raw_vector_8_9 * sigma_year_matrix_8_9);
-byear_actual_parameters_array_NDE[8,9, ] = to_array_1d(byear_raw_vector_8_9 * sigma_year_matrix_8_9);
-byear_actual_parameters_array_DE[8,32, ] = to_array_1d(byear_raw_vector_8_32_DE * sigma_year_matrix_8_32_DE);
-byear_actual_parameters_array_NDE[8,32, ] = to_array_1d(byear_raw_vector_8_32_NDE * sigma_year_matrix_8_32_NDE);
+byear_actual_parameters_array_NDE[7,31, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,30, ]) * sigma_year_matrix_NDE[7,30]);
+byear_actual_parameters_array_DE[7,42, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[7,42, ]) * sigma_year_matrix_DE[7,42]);
+byear_actual_parameters_array_NDE[7,42, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[7,42, ]) * sigma_year_matrix_NDE[7,42]);
+byear_actual_parameters_array_DE[8,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[8,3, ]) * sigma_year_matrix_DE[8,3]);
+byear_actual_parameters_array_NDE[8,3, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[8,3, ]) * sigma_year_matrix_NDE[8,3]);
+byear_actual_parameters_array_DE[8,9, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[8,9, ]) * sigma_year_matrix_DE[8,9]);
+byear_actual_parameters_array_NDE[8,9, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[8,9, ]) * sigma_year_matrix_NDE[8,9]);
+byear_actual_parameters_array_DE[8,32, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[8,32, ]) * sigma_year_matrix_DE[8,32]);
+byear_actual_parameters_array_NDE[8,32, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[8,32, ]) * sigma_year_matrix_NDE[8,32]);
 byear_actual_parameters_array_DE[8,33, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[8,33, ] = to_array_1d(byear_raw_vector_8_32_NDE * sigma_year_matrix_8_32_NDE);
-byear_actual_parameters_array_DE[9,8, ] = to_array_1d(byear_raw_vector_9_8 * sigma_year_matrix_9_8);
-byear_actual_parameters_array_NDE[9,8, ] = to_array_1d(byear_raw_vector_9_8 * sigma_year_matrix_9_8);
-byear_actual_parameters_array_DE[9,34, ] = to_array_1d(byear_raw_vector_9_34_DE * sigma_year_matrix_9_34_DE);
-byear_actual_parameters_array_NDE[9,34, ] = to_array_1d(byear_raw_vector_9_34_NDE * sigma_year_matrix_9_34_NDE);
+byear_actual_parameters_array_NDE[8,33, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[8,32, ]) * sigma_year_matrix_NDE[8,32]);
+byear_actual_parameters_array_DE[9,8, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,8, ]) * sigma_year_matrix_DE[9,8]);
+byear_actual_parameters_array_NDE[9,8, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,8, ]) * sigma_year_matrix_NDE[9,8]);
+byear_actual_parameters_array_DE[9,34, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,34, ]) * sigma_year_matrix_DE[9,34]);
+byear_actual_parameters_array_NDE[9,34, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,34, ]) * sigma_year_matrix_NDE[9,34]);
 byear_actual_parameters_array_DE[9,35, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[9,35, ] = to_array_1d(byear_raw_vector_9_34_NDE * sigma_year_matrix_9_34_NDE);
-byear_actual_parameters_array_DE[9,36, ] = to_array_1d(byear_raw_vector_9_36 * sigma_year_matrix_9_36);
-byear_actual_parameters_array_NDE[9,36, ] = to_array_1d(byear_raw_vector_9_36 * sigma_year_matrix_9_36);
-byear_actual_parameters_array_DE[9,37, ] = to_array_1d(byear_raw_vector_9_37 * sigma_year_matrix_9_37);
-byear_actual_parameters_array_NDE[9,37, ] = to_array_1d(byear_raw_vector_9_37 * sigma_year_matrix_9_37);
-byear_actual_parameters_array_DE[9,38, ] = to_array_1d(byear_raw_vector_9_38 * sigma_year_matrix_9_38);
-byear_actual_parameters_array_NDE[9,38, ] = to_array_1d(byear_raw_vector_9_38 * sigma_year_matrix_9_38);
-byear_actual_parameters_array_DE[9,39, ] = to_array_1d(byear_raw_vector_9_39_DE * sigma_year_matrix_9_39_DE);
-byear_actual_parameters_array_NDE[9,39, ] = to_array_1d(byear_raw_vector_9_39_NDE * sigma_year_matrix_9_39_NDE);
+byear_actual_parameters_array_NDE[9,35, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,34, ]) * sigma_year_matrix_NDE[9,34]);
+byear_actual_parameters_array_DE[9,36, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,36, ]) * sigma_year_matrix_DE[9,36]);
+byear_actual_parameters_array_NDE[9,36, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,36, ]) * sigma_year_matrix_NDE[9,36]);
+byear_actual_parameters_array_DE[9,37, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,37, ]) * sigma_year_matrix_DE[9,37]);
+byear_actual_parameters_array_NDE[9,37, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,37, ]) * sigma_year_matrix_NDE[9,37]);
+byear_actual_parameters_array_DE[9,38, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,38, ]) * sigma_year_matrix_DE[9,38]);
+byear_actual_parameters_array_NDE[9,38, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,38, ]) * sigma_year_matrix_NDE[9,38]);
+byear_actual_parameters_array_DE[9,39, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[9,39, ]) * sigma_year_matrix_DE[9,39]);
+byear_actual_parameters_array_NDE[9,39, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,39, ]) * sigma_year_matrix_NDE[9,39]);
 byear_actual_parameters_array_DE[9,40, ] = rep_array(-100000, nyears);
-byear_actual_parameters_array_NDE[9,40, ] = to_array_1d(byear_raw_vector_9_39_NDE * sigma_year_matrix_9_39_NDE);
-byear_actual_parameters_array_DE[10,2, ] = to_array_1d(byear_raw_vector_10_2 * sigma_year_matrix_10_2);
-byear_actual_parameters_array_NDE[10,2, ] = to_array_1d(byear_raw_vector_10_2 * sigma_year_matrix_10_2);
-byear_actual_parameters_array_DE[14,2, ] = to_array_1d(byear_raw_vector_14_2 * sigma_year_matrix_14_2);
-byear_actual_parameters_array_NDE[14,2, ] = to_array_1d(byear_raw_vector_14_2 * sigma_year_matrix_14_2);
-byear_actual_parameters_array_DE[24,5, ] = to_array_1d(byear_raw_vector_24_5 * sigma_year_matrix_24_5);
-byear_actual_parameters_array_NDE[24,5, ] = to_array_1d(byear_raw_vector_24_5 * sigma_year_matrix_24_5);
-byear_actual_parameters_array_DE[25,5, ] = to_array_1d(byear_raw_vector_24_5_DE * sigma_year_matrix_24_5_DE);
-byear_actual_parameters_array_NDE[25,5, ] = to_array_1d(byear_raw_vector_24_5_NDE * sigma_year_matrix_24_5_NDE);
-byear_actual_parameters_array_DE[26,6, ] = to_array_1d(byear_raw_vector_26_6 * sigma_year_matrix_26_6);
-byear_actual_parameters_array_NDE[26,6, ] = to_array_1d(byear_raw_vector_26_6 * sigma_year_matrix_26_6);
-byear_actual_parameters_array_DE[27,6, ] = to_array_1d(byear_raw_vector_26_6_DE * sigma_year_matrix_26_6_DE);
-byear_actual_parameters_array_NDE[27,6, ] = to_array_1d(byear_raw_vector_26_6_NDE * sigma_year_matrix_26_6_NDE);
-byear_actual_parameters_array_DE[28,7, ] = to_array_1d(byear_raw_vector_28_7 * sigma_year_matrix_28_7);
-byear_actual_parameters_array_NDE[28,7, ] = to_array_1d(byear_raw_vector_28_7 * sigma_year_matrix_28_7);
-byear_actual_parameters_array_DE[29,7, ] = to_array_1d(byear_raw_vector_28_7_DE * sigma_year_matrix_28_7_DE);
-byear_actual_parameters_array_NDE[29,7, ] = to_array_1d(byear_raw_vector_28_7_NDE * sigma_year_matrix_28_7_NDE);
-byear_actual_parameters_array_DE[30,7, ] = to_array_1d(byear_raw_vector_30_7 * sigma_year_matrix_30_7);
-byear_actual_parameters_array_NDE[30,7, ] = to_array_1d(byear_raw_vector_30_7 * sigma_year_matrix_30_7);
-byear_actual_parameters_array_DE[31,7, ] = to_array_1d(byear_raw_vector_30_7_DE * sigma_year_matrix_30_7_DE);
-byear_actual_parameters_array_NDE[31,7, ] = to_array_1d(byear_raw_vector_30_7_NDE * sigma_year_matrix_30_7_NDE);
-byear_actual_parameters_array_DE[36,9, ] = to_array_1d(byear_raw_vector_36_9 * sigma_year_matrix_36_9);
-byear_actual_parameters_array_NDE[36,9, ] = to_array_1d(byear_raw_vector_36_9 * sigma_year_matrix_36_9);
-byear_actual_parameters_array_DE[42,7, ] = to_array_1d(byear_raw_vector_42_7 * sigma_year_matrix_42_7);
-byear_actual_parameters_array_NDE[42,7, ] = to_array_1d(byear_raw_vector_42_7 * sigma_year_matrix_42_7);
-    
-    
-    
-  }
+byear_actual_parameters_array_NDE[9,40, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[9,39, ]) * sigma_year_matrix_NDE[9,39]);
+byear_actual_parameters_array_DE[10,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[10,2, ]) * sigma_year_matrix_DE[10,2]);
+byear_actual_parameters_array_NDE[10,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[10,2, ]) * sigma_year_matrix_NDE[10,2]);
+byear_actual_parameters_array_DE[14,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[14,2, ]) * sigma_year_matrix_DE[14,2]);
+byear_actual_parameters_array_NDE[14,2, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[14,2, ]) * sigma_year_matrix_NDE[14,2]);
+byear_actual_parameters_array_DE[24,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[24,5, ]) * sigma_year_matrix_DE[24,5]);
+byear_actual_parameters_array_NDE[24,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[24,5, ]) * sigma_year_matrix_NDE[24,5]);
+byear_actual_parameters_array_DE[25,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[24,5, ]) * sigma_year_matrix_DE[24,5]);
+byear_actual_parameters_array_NDE[25,5, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[24,5, ]) * sigma_year_matrix_NDE[24,5]);
+byear_actual_parameters_array_DE[26,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[26,6, ]) * sigma_year_matrix_DE[26,6]);
+byear_actual_parameters_array_NDE[26,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[26,6, ]) * sigma_year_matrix_NDE[26,6]);
+byear_actual_parameters_array_DE[27,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[26,6, ]) * sigma_year_matrix_DE[26,6]);
+byear_actual_parameters_array_NDE[27,6, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[26,6, ]) * sigma_year_matrix_NDE[26,6]);
+byear_actual_parameters_array_DE[28,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[28,7, ]) * sigma_year_matrix_DE[28,7]);
+byear_actual_parameters_array_NDE[28,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[28,7, ]) * sigma_year_matrix_NDE[28,7]);
+byear_actual_parameters_array_DE[29,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[28,7, ]) * sigma_year_matrix_DE[28,7]);
+byear_actual_parameters_array_NDE[29,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[28,7, ]) * sigma_year_matrix_NDE[28,7]);
+byear_actual_parameters_array_DE[30,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[30,7, ]) * sigma_year_matrix_DE[30,7]);
+byear_actual_parameters_array_NDE[30,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[30,7, ]) * sigma_year_matrix_NDE[30,7]);
+byear_actual_parameters_array_DE[31,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[30,7, ]) * sigma_year_matrix_DE[30,7]);
+byear_actual_parameters_array_NDE[31,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[30,7, ]) * sigma_year_matrix_NDE[30,7]);
+byear_actual_parameters_array_DE[36,9, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[36,9, ]) * sigma_year_matrix_DE[36,9]);
+byear_actual_parameters_array_NDE[36,9, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[36,9, ]) * sigma_year_matrix_NDE[36,9]);
+byear_actual_parameters_array_DE[42,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_DE[42,7, ]) * sigma_year_matrix_DE[42,7]);
+byear_actual_parameters_array_NDE[42,7, ] = to_array_1d(to_row_vector(byear_raw_parameters_array_NDE[42,7, ]) * sigma_year_matrix_NDE[42,7]);
 
   
   // Declare a matrix to store btemp0 params
@@ -1333,114 +1418,116 @@ b0_matrix_NDE[41,2] = b0_matrix_41_2;
 b0_matrix_DE[42,7] = b0_matrix_42_7;
 b0_matrix_NDE[42,7] = b0_matrix_42_7;
 
-// sigma_year_matrix_DE[1,2] = sigma_year_matrix_1_2;
-// sigma_year_matrix_NDE[1,2] = sigma_year_matrix_1_2;
-// sigma_year_matrix_DE[2,1] = sigma_year_matrix_2_1;
-// sigma_year_matrix_NDE[2,1] = sigma_year_matrix_2_1;
-// sigma_year_matrix_DE[2,3] = sigma_year_matrix_2_3;
-// sigma_year_matrix_NDE[2,3] = sigma_year_matrix_2_3;
-// sigma_year_matrix_DE[2,10] = sigma_year_matrix_2_10_DE;
-// sigma_year_matrix_NDE[2,10] = sigma_year_matrix_2_10_NDE;
-// sigma_year_matrix_NDE[2,11] = sigma_year_matrix_2_10_NDE;
-// sigma_year_matrix_DE[2,12] = sigma_year_matrix_2_12_DE;
-// sigma_year_matrix_NDE[2,12] = sigma_year_matrix_2_12_NDE;
-// sigma_year_matrix_NDE[2,13] = sigma_year_matrix_2_12_NDE;
-// sigma_year_matrix_DE[2,14] = sigma_year_matrix_2_14_DE;
-// sigma_year_matrix_NDE[2,14] = sigma_year_matrix_2_14_NDE;
-// sigma_year_matrix_NDE[2,15] = sigma_year_matrix_2_14_NDE;
-// sigma_year_matrix_DE[2,16] = sigma_year_matrix_2_16_DE;
-// sigma_year_matrix_NDE[2,16] = sigma_year_matrix_2_16_NDE;
-// sigma_year_matrix_NDE[2,17] = sigma_year_matrix_2_16_NDE;
-// sigma_year_matrix_DE[2,18] = sigma_year_matrix_2_18_DE;
-// sigma_year_matrix_NDE[2,18] = sigma_year_matrix_2_18_NDE;
-// sigma_year_matrix_NDE[2,19] = sigma_year_matrix_2_18_NDE;
-// sigma_year_matrix_DE[2,41] = sigma_year_matrix_2_41;
-// sigma_year_matrix_NDE[2,41] = sigma_year_matrix_2_41;
-// sigma_year_matrix_DE[3,2] = sigma_year_matrix_3_2;
-// sigma_year_matrix_NDE[3,2] = sigma_year_matrix_3_2;
-// sigma_year_matrix_DE[3,4] = sigma_year_matrix_3_4;
-// sigma_year_matrix_NDE[3,4] = sigma_year_matrix_3_4;
-// sigma_year_matrix_DE[3,8] = sigma_year_matrix_3_8;
-// sigma_year_matrix_NDE[3,8] = sigma_year_matrix_3_8;
-// sigma_year_matrix_DE[3,20] = sigma_year_matrix_3_20_DE;
-// sigma_year_matrix_NDE[3,20] = sigma_year_matrix_3_20_NDE;
-// sigma_year_matrix_NDE[3,21] = sigma_year_matrix_3_20_NDE;
-// sigma_year_matrix_DE[3,22] = sigma_year_matrix_3_22_DE;
-// sigma_year_matrix_NDE[3,22] = sigma_year_matrix_3_22_NDE;
-// sigma_year_matrix_NDE[3,23] = sigma_year_matrix_3_22_NDE;
-// sigma_year_matrix_DE[4,3] = sigma_year_matrix_4_3;
-// sigma_year_matrix_NDE[4,3] = sigma_year_matrix_4_3;
-// sigma_year_matrix_DE[4,5] = sigma_year_matrix_4_5;
-// sigma_year_matrix_NDE[4,5] = sigma_year_matrix_4_5;
-// sigma_year_matrix_DE[5,4] = sigma_year_matrix_5_4;
-// sigma_year_matrix_NDE[5,4] = sigma_year_matrix_5_4;
-// sigma_year_matrix_DE[5,6] = sigma_year_matrix_5_6;
-// sigma_year_matrix_NDE[5,6] = sigma_year_matrix_5_6;
-// sigma_year_matrix_DE[5,24] = sigma_year_matrix_5_24_DE;
-// sigma_year_matrix_NDE[5,24] = sigma_year_matrix_5_24_NDE;
-// sigma_year_matrix_NDE[5,25] = sigma_year_matrix_5_24_NDE;
-// sigma_year_matrix_DE[6,5] = sigma_year_matrix_6_5;
-// sigma_year_matrix_NDE[6,5] = sigma_year_matrix_6_5;
-// sigma_year_matrix_DE[6,7] = sigma_year_matrix_6_7;
-// sigma_year_matrix_NDE[6,7] = sigma_year_matrix_6_7;
-// sigma_year_matrix_DE[6,26] = sigma_year_matrix_6_26_DE;
-// sigma_year_matrix_NDE[6,26] = sigma_year_matrix_6_26_NDE;
-// sigma_year_matrix_NDE[6,27] = sigma_year_matrix_6_26_NDE;
-// sigma_year_matrix_DE[7,6] = sigma_year_matrix_7_6;
-// sigma_year_matrix_NDE[7,6] = sigma_year_matrix_7_6;
-// sigma_year_matrix_DE[7,28] = sigma_year_matrix_7_28_DE;
-// sigma_year_matrix_NDE[7,28] = sigma_year_matrix_7_28_NDE;
-// sigma_year_matrix_NDE[7,29] = sigma_year_matrix_7_28_NDE;
-// sigma_year_matrix_DE[7,30] = sigma_year_matrix_7_30_DE;
-// sigma_year_matrix_NDE[7,30] = sigma_year_matrix_7_30_NDE;
-// sigma_year_matrix_NDE[7,31] = sigma_year_matrix_7_30_NDE;
-// sigma_year_matrix_DE[7,42] = sigma_year_matrix_7_42;
-// sigma_year_matrix_NDE[7,42] = sigma_year_matrix_7_42;
-// sigma_year_matrix_DE[8,3] = sigma_year_matrix_8_3;
-// sigma_year_matrix_NDE[8,3] = sigma_year_matrix_8_3;
-// sigma_year_matrix_DE[8,9] = sigma_year_matrix_8_9;
-// sigma_year_matrix_NDE[8,9] = sigma_year_matrix_8_9;
-// sigma_year_matrix_DE[8,32] = sigma_year_matrix_8_32_DE;
-// sigma_year_matrix_NDE[8,32] = sigma_year_matrix_8_32_NDE;
-// sigma_year_matrix_NDE[8,33] = sigma_year_matrix_8_32_NDE;
-// sigma_year_matrix_DE[9,8] = sigma_year_matrix_9_8;
-// sigma_year_matrix_NDE[9,8] = sigma_year_matrix_9_8;
-// sigma_year_matrix_DE[9,34] = sigma_year_matrix_9_34_DE;
-// sigma_year_matrix_NDE[9,34] = sigma_year_matrix_9_34_NDE;
-// sigma_year_matrix_NDE[9,35] = sigma_year_matrix_9_34_NDE;
-// sigma_year_matrix_DE[9,36] = sigma_year_matrix_9_36;
-// sigma_year_matrix_NDE[9,36] = sigma_year_matrix_9_36;
-// sigma_year_matrix_DE[9,37] = sigma_year_matrix_9_37;
-// sigma_year_matrix_NDE[9,37] = sigma_year_matrix_9_37;
-// sigma_year_matrix_DE[9,38] = sigma_year_matrix_9_38;
-// sigma_year_matrix_NDE[9,38] = sigma_year_matrix_9_38;
-// sigma_year_matrix_DE[9,39] = sigma_year_matrix_9_39_DE;
-// sigma_year_matrix_NDE[9,39] = sigma_year_matrix_9_39_NDE;
-// sigma_year_matrix_NDE[9,40] = sigma_year_matrix_9_39_NDE;
-// sigma_year_matrix_DE[10,2] = sigma_year_matrix_10_2;
-// sigma_year_matrix_NDE[10,2] = sigma_year_matrix_10_2;
-// sigma_year_matrix_DE[14,2] = sigma_year_matrix_14_2;
-// sigma_year_matrix_NDE[14,2] = sigma_year_matrix_14_2;
-// sigma_year_matrix_DE[24,5] = sigma_year_matrix_24_5;
-// sigma_year_matrix_NDE[24,5] = sigma_year_matrix_24_5;
-// sigma_year_matrix_DE[25,5] = sigma_year_matrix_24_5;
-// sigma_year_matrix_NDE[25,5] = sigma_year_matrix_24_5;
-// sigma_year_matrix_DE[26,6] = sigma_year_matrix_26_6;
-// sigma_year_matrix_NDE[26,6] = sigma_year_matrix_26_6;
-// sigma_year_matrix_DE[27,6] = sigma_year_matrix_26_6;
-// sigma_year_matrix_NDE[27,6] = sigma_year_matrix_26_6;
-// sigma_year_matrix_DE[28,7] = sigma_year_matrix_28_7;
-// sigma_year_matrix_NDE[28,7] = sigma_year_matrix_28_7;
-// sigma_year_matrix_DE[29,7] = sigma_year_matrix_28_7;
-// sigma_year_matrix_NDE[29,7] = sigma_year_matrix_28_7;
-// sigma_year_matrix_DE[30,7] = sigma_year_matrix_30_7;
-// sigma_year_matrix_NDE[30,7] = sigma_year_matrix_30_7;
-// sigma_year_matrix_DE[31,7] = sigma_year_matrix_30_7;
-// sigma_year_matrix_NDE[31,7] = sigma_year_matrix_30_7;
-// sigma_year_matrix_DE[36,9] = sigma_year_matrix_36_9;
-// sigma_year_matrix_NDE[36,9] = sigma_year_matrix_36_9;
-// sigma_year_matrix_DE[42,7] = sigma_year_matrix_42_7;
-// sigma_year_matrix_NDE[42,7] = sigma_year_matrix_42_7;
+// I think this is necessary so that sigma_year_matrix_DE[,] can be passed
+// as an argument to reduce_sum, and therefore those parameters can change
+sigma_year_matrix_DE[1,2] = sigma_year_matrix_1_2;
+sigma_year_matrix_NDE[1,2] = sigma_year_matrix_1_2;
+sigma_year_matrix_DE[2,1] = sigma_year_matrix_2_1;
+sigma_year_matrix_NDE[2,1] = sigma_year_matrix_2_1;
+sigma_year_matrix_DE[2,3] = sigma_year_matrix_2_3;
+sigma_year_matrix_NDE[2,3] = sigma_year_matrix_2_3;
+sigma_year_matrix_DE[2,10] = sigma_year_matrix_2_10_DE;
+sigma_year_matrix_NDE[2,10] = sigma_year_matrix_2_10_NDE;
+sigma_year_matrix_NDE[2,11] = sigma_year_matrix_2_10_NDE;
+sigma_year_matrix_DE[2,12] = sigma_year_matrix_2_12_DE;
+sigma_year_matrix_NDE[2,12] = sigma_year_matrix_2_12_NDE;
+sigma_year_matrix_NDE[2,13] = sigma_year_matrix_2_12_NDE;
+sigma_year_matrix_DE[2,14] = sigma_year_matrix_2_14_DE;
+sigma_year_matrix_NDE[2,14] = sigma_year_matrix_2_14_NDE;
+sigma_year_matrix_NDE[2,15] = sigma_year_matrix_2_14_NDE;
+sigma_year_matrix_DE[2,16] = sigma_year_matrix_2_16_DE;
+sigma_year_matrix_NDE[2,16] = sigma_year_matrix_2_16_NDE;
+sigma_year_matrix_NDE[2,17] = sigma_year_matrix_2_16_NDE;
+sigma_year_matrix_DE[2,18] = sigma_year_matrix_2_18_DE;
+sigma_year_matrix_NDE[2,18] = sigma_year_matrix_2_18_NDE;
+sigma_year_matrix_NDE[2,19] = sigma_year_matrix_2_18_NDE;
+sigma_year_matrix_DE[2,41] = sigma_year_matrix_2_41;
+sigma_year_matrix_NDE[2,41] = sigma_year_matrix_2_41;
+sigma_year_matrix_DE[3,2] = sigma_year_matrix_3_2;
+sigma_year_matrix_NDE[3,2] = sigma_year_matrix_3_2;
+sigma_year_matrix_DE[3,4] = sigma_year_matrix_3_4;
+sigma_year_matrix_NDE[3,4] = sigma_year_matrix_3_4;
+sigma_year_matrix_DE[3,8] = sigma_year_matrix_3_8;
+sigma_year_matrix_NDE[3,8] = sigma_year_matrix_3_8;
+sigma_year_matrix_DE[3,20] = sigma_year_matrix_3_20_DE;
+sigma_year_matrix_NDE[3,20] = sigma_year_matrix_3_20_NDE;
+sigma_year_matrix_NDE[3,21] = sigma_year_matrix_3_20_NDE;
+sigma_year_matrix_DE[3,22] = sigma_year_matrix_3_22_DE;
+sigma_year_matrix_NDE[3,22] = sigma_year_matrix_3_22_NDE;
+sigma_year_matrix_NDE[3,23] = sigma_year_matrix_3_22_NDE;
+sigma_year_matrix_DE[4,3] = sigma_year_matrix_4_3;
+sigma_year_matrix_NDE[4,3] = sigma_year_matrix_4_3;
+sigma_year_matrix_DE[4,5] = sigma_year_matrix_4_5;
+sigma_year_matrix_NDE[4,5] = sigma_year_matrix_4_5;
+sigma_year_matrix_DE[5,4] = sigma_year_matrix_5_4;
+sigma_year_matrix_NDE[5,4] = sigma_year_matrix_5_4;
+sigma_year_matrix_DE[5,6] = sigma_year_matrix_5_6;
+sigma_year_matrix_NDE[5,6] = sigma_year_matrix_5_6;
+sigma_year_matrix_DE[5,24] = sigma_year_matrix_5_24_DE;
+sigma_year_matrix_NDE[5,24] = sigma_year_matrix_5_24_NDE;
+sigma_year_matrix_NDE[5,25] = sigma_year_matrix_5_24_NDE;
+sigma_year_matrix_DE[6,5] = sigma_year_matrix_6_5;
+sigma_year_matrix_NDE[6,5] = sigma_year_matrix_6_5;
+sigma_year_matrix_DE[6,7] = sigma_year_matrix_6_7;
+sigma_year_matrix_NDE[6,7] = sigma_year_matrix_6_7;
+sigma_year_matrix_DE[6,26] = sigma_year_matrix_6_26_DE;
+sigma_year_matrix_NDE[6,26] = sigma_year_matrix_6_26_NDE;
+sigma_year_matrix_NDE[6,27] = sigma_year_matrix_6_26_NDE;
+sigma_year_matrix_DE[7,6] = sigma_year_matrix_7_6;
+sigma_year_matrix_NDE[7,6] = sigma_year_matrix_7_6;
+sigma_year_matrix_DE[7,28] = sigma_year_matrix_7_28_DE;
+sigma_year_matrix_NDE[7,28] = sigma_year_matrix_7_28_NDE;
+sigma_year_matrix_NDE[7,29] = sigma_year_matrix_7_28_NDE;
+sigma_year_matrix_DE[7,30] = sigma_year_matrix_7_30_DE;
+sigma_year_matrix_NDE[7,30] = sigma_year_matrix_7_30_NDE;
+sigma_year_matrix_NDE[7,31] = sigma_year_matrix_7_30_NDE;
+sigma_year_matrix_DE[7,42] = sigma_year_matrix_7_42;
+sigma_year_matrix_NDE[7,42] = sigma_year_matrix_7_42;
+sigma_year_matrix_DE[8,3] = sigma_year_matrix_8_3;
+sigma_year_matrix_NDE[8,3] = sigma_year_matrix_8_3;
+sigma_year_matrix_DE[8,9] = sigma_year_matrix_8_9;
+sigma_year_matrix_NDE[8,9] = sigma_year_matrix_8_9;
+sigma_year_matrix_DE[8,32] = sigma_year_matrix_8_32_DE;
+sigma_year_matrix_NDE[8,32] = sigma_year_matrix_8_32_NDE;
+sigma_year_matrix_NDE[8,33] = sigma_year_matrix_8_32_NDE;
+sigma_year_matrix_DE[9,8] = sigma_year_matrix_9_8;
+sigma_year_matrix_NDE[9,8] = sigma_year_matrix_9_8;
+sigma_year_matrix_DE[9,34] = sigma_year_matrix_9_34_DE;
+sigma_year_matrix_NDE[9,34] = sigma_year_matrix_9_34_NDE;
+sigma_year_matrix_NDE[9,35] = sigma_year_matrix_9_34_NDE;
+sigma_year_matrix_DE[9,36] = sigma_year_matrix_9_36;
+sigma_year_matrix_NDE[9,36] = sigma_year_matrix_9_36;
+sigma_year_matrix_DE[9,37] = sigma_year_matrix_9_37;
+sigma_year_matrix_NDE[9,37] = sigma_year_matrix_9_37;
+sigma_year_matrix_DE[9,38] = sigma_year_matrix_9_38;
+sigma_year_matrix_NDE[9,38] = sigma_year_matrix_9_38;
+sigma_year_matrix_DE[9,39] = sigma_year_matrix_9_39_DE;
+sigma_year_matrix_NDE[9,39] = sigma_year_matrix_9_39_NDE;
+sigma_year_matrix_NDE[9,40] = sigma_year_matrix_9_39_NDE;
+sigma_year_matrix_DE[10,2] = sigma_year_matrix_10_2;
+sigma_year_matrix_NDE[10,2] = sigma_year_matrix_10_2;
+sigma_year_matrix_DE[14,2] = sigma_year_matrix_14_2;
+sigma_year_matrix_NDE[14,2] = sigma_year_matrix_14_2;
+sigma_year_matrix_DE[24,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_NDE[24,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_DE[25,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_NDE[25,5] = sigma_year_matrix_24_5;
+sigma_year_matrix_DE[26,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_NDE[26,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_DE[27,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_NDE[27,6] = sigma_year_matrix_26_6;
+sigma_year_matrix_DE[28,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_NDE[28,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_DE[29,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_NDE[29,7] = sigma_year_matrix_28_7;
+sigma_year_matrix_DE[30,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_NDE[30,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_DE[31,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_NDE[31,7] = sigma_year_matrix_30_7;
+sigma_year_matrix_DE[36,9] = sigma_year_matrix_36_9;
+sigma_year_matrix_NDE[36,9] = sigma_year_matrix_36_9;
+sigma_year_matrix_DE[42,7] = sigma_year_matrix_42_7;
+sigma_year_matrix_NDE[42,7] = sigma_year_matrix_42_7;
 
 btemp0_matrix_DE[1,2] = btemp0_matrix_1_2;
 btemp0_matrix_NDE[1,2] = btemp0_matrix_1_2;
@@ -2003,63 +2090,63 @@ b0_matrix_39_9 ~ normal(0,10);
 b0_matrix_41_2 ~ normal(0,10);
 b0_matrix_42_7 ~ normal(0,10);
 
-sigma_year_matrix_1_2 ~ cauchy(0,5);
-sigma_year_matrix_2_1 ~ cauchy(0,5);
-sigma_year_matrix_2_3 ~ cauchy(0,5);
-sigma_year_matrix_2_10_DE ~ cauchy(0,5);
-sigma_year_matrix_2_10_NDE ~ cauchy(0,5);
-sigma_year_matrix_2_12_DE ~ cauchy(0,5);
-sigma_year_matrix_2_12_NDE ~ cauchy(0,5);
-sigma_year_matrix_2_14_DE ~ cauchy(0,5);
-sigma_year_matrix_2_14_NDE ~ cauchy(0,5);
-sigma_year_matrix_2_16_DE ~ cauchy(0,5);
-sigma_year_matrix_2_16_NDE ~ cauchy(0,5);
-sigma_year_matrix_2_18_DE ~ cauchy(0,5);
-sigma_year_matrix_2_18_NDE ~ cauchy(0,5);
-sigma_year_matrix_2_41 ~ cauchy(0,5);
-sigma_year_matrix_3_2 ~ cauchy(0,5);
-sigma_year_matrix_3_4 ~ cauchy(0,5);
-sigma_year_matrix_3_8 ~ cauchy(0,5);
-sigma_year_matrix_3_20_DE ~ cauchy(0,5);
-sigma_year_matrix_3_20_NDE ~ cauchy(0,5);
-sigma_year_matrix_3_22_DE ~ cauchy(0,5);
-sigma_year_matrix_3_22_NDE ~ cauchy(0,5);
-sigma_year_matrix_4_3 ~ cauchy(0,5);
-sigma_year_matrix_4_5 ~ cauchy(0,5);
-sigma_year_matrix_5_4 ~ cauchy(0,5);
-sigma_year_matrix_5_6 ~ cauchy(0,5);
-sigma_year_matrix_5_24_DE ~ cauchy(0,5);
-sigma_year_matrix_5_24_NDE ~ cauchy(0,5);
-sigma_year_matrix_6_5 ~ cauchy(0,5);
-sigma_year_matrix_6_7 ~ cauchy(0,5);
-sigma_year_matrix_6_26_DE ~ cauchy(0,5);
-sigma_year_matrix_6_26_NDE ~ cauchy(0,5);
-sigma_year_matrix_7_6 ~ cauchy(0,5);
-sigma_year_matrix_7_28_DE ~ cauchy(0,5);
-sigma_year_matrix_7_28_NDE ~ cauchy(0,5);
-sigma_year_matrix_7_30_DE ~ cauchy(0,5);
-sigma_year_matrix_7_30_NDE ~ cauchy(0,5);
-sigma_year_matrix_7_42 ~ cauchy(0,5);
-sigma_year_matrix_8_3 ~ cauchy(0,5);
-sigma_year_matrix_8_9 ~ cauchy(0,5);
-sigma_year_matrix_8_32_DE ~ cauchy(0,5);
-sigma_year_matrix_8_32_NDE ~ cauchy(0,5);
-sigma_year_matrix_9_8 ~ cauchy(0,5);
-sigma_year_matrix_9_34_DE ~ cauchy(0,5);
-sigma_year_matrix_9_34_NDE ~ cauchy(0,5);
-sigma_year_matrix_9_36 ~ cauchy(0,5);
-sigma_year_matrix_9_37 ~ cauchy(0,5);
-sigma_year_matrix_9_38 ~ cauchy(0,5);
-sigma_year_matrix_9_39_DE ~ cauchy(0,5);
-sigma_year_matrix_9_39_NDE ~ cauchy(0,5);
-sigma_year_matrix_10_2 ~ cauchy(0,5);
-sigma_year_matrix_14_2 ~ cauchy(0,5);
-sigma_year_matrix_24_5 ~ cauchy(0,5);
-sigma_year_matrix_26_6 ~ cauchy(0,5);
-sigma_year_matrix_28_7 ~ cauchy(0,5);
-sigma_year_matrix_30_7 ~ cauchy(0,5);
-sigma_year_matrix_36_9 ~ cauchy(0,5);
-sigma_year_matrix_42_7 ~ cauchy(0,5);
+sigma_year_matrix_1_2 ~ cauchy(0,1);
+sigma_year_matrix_2_1 ~ cauchy(0,1);
+sigma_year_matrix_2_3 ~ cauchy(0,1);
+sigma_year_matrix_2_10_DE ~ cauchy(0,1);
+sigma_year_matrix_2_10_NDE ~ cauchy(0,1);
+sigma_year_matrix_2_12_DE ~ cauchy(0,1);
+sigma_year_matrix_2_12_NDE ~ cauchy(0,1);
+sigma_year_matrix_2_14_DE ~ cauchy(0,1);
+sigma_year_matrix_2_14_NDE ~ cauchy(0,1);
+sigma_year_matrix_2_16_DE ~ cauchy(0,1);
+sigma_year_matrix_2_16_NDE ~ cauchy(0,1);
+sigma_year_matrix_2_18_DE ~ cauchy(0,1);
+sigma_year_matrix_2_18_NDE ~ cauchy(0,1);
+sigma_year_matrix_2_41 ~ cauchy(0,1);
+sigma_year_matrix_3_2 ~ cauchy(0,1);
+sigma_year_matrix_3_4 ~ cauchy(0,1);
+sigma_year_matrix_3_8 ~ cauchy(0,1);
+sigma_year_matrix_3_20_DE ~ cauchy(0,1);
+sigma_year_matrix_3_20_NDE ~ cauchy(0,1);
+sigma_year_matrix_3_22_DE ~ cauchy(0,1);
+sigma_year_matrix_3_22_NDE ~ cauchy(0,1);
+sigma_year_matrix_4_3 ~ cauchy(0,1);
+sigma_year_matrix_4_5 ~ cauchy(0,1);
+sigma_year_matrix_5_4 ~ cauchy(0,1);
+sigma_year_matrix_5_6 ~ cauchy(0,1);
+sigma_year_matrix_5_24_DE ~ cauchy(0,1);
+sigma_year_matrix_5_24_NDE ~ cauchy(0,1);
+sigma_year_matrix_6_5 ~ cauchy(0,1);
+sigma_year_matrix_6_7 ~ cauchy(0,1);
+sigma_year_matrix_6_26_DE ~ cauchy(0,1);
+sigma_year_matrix_6_26_NDE ~ cauchy(0,1);
+sigma_year_matrix_7_6 ~ cauchy(0,1);
+sigma_year_matrix_7_28_DE ~ cauchy(0,1);
+sigma_year_matrix_7_28_NDE ~ cauchy(0,1);
+sigma_year_matrix_7_30_DE ~ cauchy(0,1);
+sigma_year_matrix_7_30_NDE ~ cauchy(0,1);
+sigma_year_matrix_7_42 ~ cauchy(0,1);
+sigma_year_matrix_8_3 ~ cauchy(0,1);
+sigma_year_matrix_8_9 ~ cauchy(0,1);
+sigma_year_matrix_8_32_DE ~ cauchy(0,1);
+sigma_year_matrix_8_32_NDE ~ cauchy(0,1);
+sigma_year_matrix_9_8 ~ cauchy(0,1);
+sigma_year_matrix_9_34_DE ~ cauchy(0,1);
+sigma_year_matrix_9_34_NDE ~ cauchy(0,1);
+sigma_year_matrix_9_36 ~ cauchy(0,1);
+sigma_year_matrix_9_37 ~ cauchy(0,1);
+sigma_year_matrix_9_38 ~ cauchy(0,1);
+sigma_year_matrix_9_39_DE ~ cauchy(0,1);
+sigma_year_matrix_9_39_NDE ~ cauchy(0,1);
+sigma_year_matrix_10_2 ~ cauchy(0,1);
+sigma_year_matrix_14_2 ~ cauchy(0,1);
+sigma_year_matrix_24_5 ~ cauchy(0,1);
+sigma_year_matrix_26_6 ~ cauchy(0,1);
+sigma_year_matrix_28_7 ~ cauchy(0,1);
+sigma_year_matrix_30_7 ~ cauchy(0,1);
+sigma_year_matrix_36_9 ~ cauchy(0,1);
+sigma_year_matrix_42_7 ~ cauchy(0,1);
 
 // prior on the byear_raw parameters arrays
 // byear_raw_parameters_array_DE ~ normal(0,1);
@@ -2374,7 +2461,7 @@ yakima_beta ~ normal(det_eff_param_posteriors[35,1], det_eff_param_posteriors[35
   btemp0_matrix_NDE, btemp0xorigin1_matrix_NDE, btemp0xorigin2_matrix_NDE, btemp0xorigin3_matrix_NDE, // arguments 24-27
   btemp1_matrix_DE, btemp1xorigin1_matrix_DE, btemp1xorigin2_matrix_DE, btemp1xorigin3_matrix_DE, // arguments 28-31
   btemp1_matrix_NDE, btemp1xorigin1_matrix_NDE, btemp1xorigin2_matrix_NDE, btemp1xorigin3_matrix_NDE, // arguments 32-35
-  sigma_year_matrix_DE, sigma_year_matrix_NDE, sigma_year_indices, // arguments 36-38
+  sigma_year_indices, sigma_year_matrix_DE, sigma_year_matrix_NDE,  // arguments 36-38
   byear_raw_parameters_array_DE, byear_raw_parameters_array_NDE, // arguments 39-40
   byear_actual_parameters_array_DE, byear_actual_parameters_array_NDE, // arguments 41-42
   tributary_design_matrices_array, transition_run_years, nyears, run_year_DE_array, det_eff_param_vector); // arguments 43-47

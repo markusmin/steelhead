@@ -910,7 +910,58 @@ for (i in 1:(nrow(sigma_year_matrix_names))){
   
 } 
 
-# Write out two separate matrices for byear - an NDE (no detection efficiency correction) and a DE (detection efficiency) matrix
+# Write out two separate matrices for byear, raw - an NDE (no detection efficiency correction) and a DE (detection efficiency) matrix
+
+# print out the following syntax:
+# byear_actual_parameters_array_DE[1, 2 ,] = byear_raw_vector_1_2;
+
+for (i in 1:(nrow(byear_matrix_names))){
+  # Movements from mainstem to river mouth: store the two different versions
+  if (byear_matrix_names$mainstem_river_mouth_movement[i] == 1){
+    cat("byear_raw_parameters_array_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i], "_", byear_matrix_names$col[i], "_DE", ");", "\n", sep = "")
+    cat("byear_raw_parameters_array_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i], "_", byear_matrix_names$col[i], "_NDE" ,");", "\n", sep = "")
+    
+    
+  }
+  
+  # If it's a within tributary movement - we don't want it
+  else if (byear_matrix_names$within_trib_movement[i] == 1){
+    # do nothing!
+  }
+  # If it's a movement from mainstem to upstream:
+  # For NDE - give it the same parameter as the one for the mainstem to the river mouth site (which by index, is the site before)
+  # For DE - we need to give these all -100000 values, so that in the logit they come out as zeros (since they're not transitions that are allowed)
+  else if (byear_matrix_names$mainstem_upstream_movement[i] == 1){
+    cat("byear_raw_parameters_array_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = rep_array(-100000, nyears)", ";", "\n", sep = "")
+    cat("byear_raw_parameters_array_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], "_NDE" , ");", "\n", sep = "")
+  }
+  # If it's a movement from the upstream state back to the mainstem, give it the same parameter as movement from the river mouth to the upstream
+  # And note - that these are not DE or NDE parameters
+  # Because of order, we need -2 here instead of -1, to pick the right from state
+  # NO WE DON'T, just use -1
+  else if (byear_matrix_names$upstream_mainstem_movement[i] == 1){
+    # cat("byear_matrix_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i-1],";", "\n", sep = "")
+    # cat("byear_matrix_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i-1],";", "\n", sep = "")
+    cat("byear_raw_parameters_array_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], ");", "\n", sep = "")
+    cat("byear_raw_parameters_array_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], ");", "\n", sep = "")
+    # If it's not, store the same parameter in both matrices
+  } else {
+    # cat("byear_matrix_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i], ";", "\n", sep = "")
+    # cat("byear_matrix_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i], ";", "\n", sep = "")
+    cat("byear_raw_parameters_array_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i], "_", byear_matrix_names$col[i], ");", "\n", sep = "")
+    cat("byear_raw_parameters_array_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
+        byear_matrix_names$row[i], "_", byear_matrix_names$col[i], ");", "\n", sep = "")
+  }
+  
+}
+
+# Write out two separate matrices for byear, actual - an NDE (no detection efficiency correction) and a DE (detection efficiency) matrix
 
 # print out the following syntax:
 # byear_actual_parameters_array_DE[1, 2 ,] = byear_raw_vector_1_2 * sigma_year_matrix_1_2;
@@ -946,9 +997,9 @@ for (i in 1:(nrow(byear_matrix_names))){
     # cat("byear_matrix_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i-1],";", "\n", sep = "")
     # cat("byear_matrix_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i-1],";", "\n", sep = "")
     cat("byear_actual_parameters_array_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
-        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], "_DE" , " * sigma_year_matrix_", byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], "_DE",");", "\n", sep = "")
+        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], " * sigma_year_matrix_", byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1],");", "\n", sep = "")
     cat("byear_actual_parameters_array_NDE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], ", ]", " = ", "to_array_1d(byear_raw_vector_", 
-        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], "_NDE" , " * sigma_year_matrix_", byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], "_NDE",");", "\n", sep = "")
+        byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1], " * sigma_year_matrix_", byear_matrix_names$row[i-1], "_", byear_matrix_names$col[i-1],");", "\n", sep = "")
     # If it's not, store the same parameter in both matrices
   } else {
     # cat("byear_matrix_DE[", byear_matrix_names$row[i], ",", byear_matrix_names$col[i], "]", " = ", byear_matrix_names$byear_matrix_name[i], ";", "\n", sep = "")
