@@ -23,4 +23,4 @@ module load contrib/gcc/6.2.0
 module load contrib/R-4.2.0/4.2.0
 
 ##  Scripts to be executed here
-Rscript seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_temp2_mox_deteff.R
+Rscript seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_2temp_mox_deteff.R

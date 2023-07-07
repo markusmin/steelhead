@@ -194,7 +194,10 @@ subset(upper_columbia_summary, variable %in% c("btempxorigin2_matrix_6_7"))
 # yes, this is significant
 
 # Let's just look at which are "significant"
-subset(upper_columbia_summary, variable %in% temp_variables & q5 > 0 | variable %in% temp_variables & q95 < 0)
+subset(upper_columbia_summary, variable %in% temp_variables & q5 > 0 | variable %in% temp_variables & q95 < 0) -> significant_temp_variables_1
+
+write.csv(significant_temp_variables_1, here::here("stan_actual", "rear_temp", "processed", "significant_temp_variable_1.csv"))
+
 # Movement into the Deschutes - 2 -> 10 - there's a huge positive temperature effect
 # Entiat River - overshoot when it's hot
 
