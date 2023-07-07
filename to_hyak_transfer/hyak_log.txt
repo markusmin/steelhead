@@ -2533,6 +2533,90 @@ It causes them never to move off of zero; when these statements are commented ou
 model runs (and takes much longer) - in one hour, it hasn't gotten past 10 iter; this might present an issue...
 
 
+### 2023-07-03 ###
+
+So, something weird I noticed - currently in the transformed parameters block, we don't have any
+parameters governing the transitions from upstream states back to the mainstem - the R code looks like
+it was written to give these the same parameters as moving from the mouth back to the mainstem (which
+makes sense), but they aren't getting printed to the model, and apparently it's never caused an
+issue (seeing as this is in all previous model runs). Either I'm missing something as to why
+this was done, or it was a typo that was missed but turns out not to matter, because this transition
+is never observed anyway? Since anything in the transformed matrices that isn't explicitly assigned
+a parameter value is getting -100000, so you would get a "nope" from stan if it observed that
+
+AH - feature not a bug. There's a part of the script (around line 367) where all of the states
+where fish were never observed entering get removed from the transition matrix and hence
+the matrix of parameter names. So that's why.
+
+Alright, I got the model to run - but it's still way too fast. Looking at when the logits
+were printed, it would appear that once again they're not moving off of zero.
+- Oops, categorical_lmpf call was off. Turn it back on and run again
+- turned it on, and it ran but way too fast - 240 seconds. But - it did give
+me a warning that makes me think it's working? This warning:
+Chain 1 Iteration:  1 / 100 [  1%]  (Warmup)
+Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 1 Exception: Exception: categorical_lpmf: Probabilities parameter is not a valid simplex. sum(Probabilities parameter) = -nan, but should be 1 (in '/tmp/Rtmplzmvs4/model-132f7d4eb916.stan', line 432, column 8 to column 81) (in '/tmp/Rtmplzmvs4/model-132f7d4eb916.stan', line 2490, column 2 to line 2501, column 106)
+Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 1
+Chain 1 Iteration: 10 / 100 [ 10%]  (Warmup)
+Chain 1 Iteration: 20 / 100 [ 20%]  (Warmup)
+Chain 1 Iteration: 30 / 100 [ 30%]  (Warmup)
+Chain 1 Iteration: 40 / 100 [ 40%]  (Warmup)
+
+It always takes a while after it says the chains have finished, and I think that's because
+it's tracking so many parameters now with the random effects.
+
+### 2023-07-05 ###
+
+Pull the run that finished very quickly and inspect
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/ ./
+
+Should make sure that the 2temp model, without RE year effects, works - so created a new folder for that
+# move that one to hyak and try running it 
+scp -r ./upper_columbia_2temp/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_models/
+# run appears to have worked, finished in 7151 seconds
+
+So back to RE year model - putting the sigma_year parameters into a matrix and using that
+to calculate byear_actual didn't work at all. Parameters still aren't moving from initial values
+
+So commenting out the std_normal_lpdf for the RE byear parameters made the model run, and it
+completed in 6068 seconds. Should inspect that output.
+
+# what if we just try moving the loop for the RE to after the categorical_lpmf?
+# move the new stan script:
+scp -r ./parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/
+
+Nope, that didn't matter at all!!!
+
+### 2023-07-06 ###
+
+# tried having a separate lp object for the RE - but that didn't seem to matter either, because
+chains aren't moving again
+Are these just entirely different magnitudes? What if we ask stan to print each lp object
+
+Alright, so according to Mark I don't need to incorporate RE into the lp directly, just having
+them have priors is okay.
+
+So move this model to hyak and run:
+scp -r ./parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_year_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_year_models/upper_columbia/
+
+So, running quite slow, but running! We'll take it
+
+Note that in the outputs, we have so many tracked parameters from the various arrays that
+parameters are packed in. If we can reduce that the model will run faster
+
+# pull it!
+
+### 2023-07-07 ###
+
+Let's have a RE year only model
+copy the code from the rear_temp_year model and delete/comment out all fixed effects
+
+# move to hyak and try running
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models/
+
+
 
 
 
