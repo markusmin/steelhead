@@ -2437,8 +2437,8 @@ n.ind <- dim(state_data)[3]
     parallel_chains = 1,
     # parallel_chains = 3,
     refresh = 10, # print update every 10 iter
-    iter_warmup = 100,
-    iter_sampling = 100,
+    iter_warmup = 50,
+    iter_sampling = 50,
     # adapt_delta = 0.95,
     init = 0,
     threads_per_chain = 28

@@ -2614,9 +2614,14 @@ Let's have a RE year only model
 copy the code from the rear_temp_year model and delete/comment out all fixed effects
 
 # move to hyak and try running
-scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models/
+scp -r ./upper_columbia/parallel_upper_columbia_03_stan_actual_int_origin_year_deteff.stan mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models/
 
+### 2023-07-10 ###
 
+The year-only model ran in 3340 seconds for 100 total iter, 13740 seconds for 150 total iter. Why so different?
+
+Pull it and inspect:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models/upper_columbia/ ./
 
 
 
