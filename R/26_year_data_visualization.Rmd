@@ -11,7 +11,7 @@ This Rmd will explore year-to-year variability in movement rates to explore whet
 
 
 ```{r libraries-setup, echo = FALSE, message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 10, fig.width = 8)
 
 # load libraries
 library(here)
@@ -21,6 +21,7 @@ library(lubridate)
 library(car)
 library(ggthemes)
 library(viridis)
+library(ggpubr)
 ```
 
 
@@ -115,7 +116,9 @@ read.csv(here::here("covariate_data", "for_model", "temp", "temp_mod_est.csv")) 
   mutate(date = ymd(date)) %>% 
   rowwise() %>%
   dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date & run_year_end >= date)$run_year) %>% 
-  dplyr::mutate(run_year_numeric = subset(run_year_df, run_year_start <= date & run_year_end >= date)$run_year_numeric) -> temp_data
+  dplyr::mutate(run_year_numeric = subset(run_year_df, run_year_start <= date & run_year_end >= date)$run_year_numeric) %>% 
+  # keep only run years up to 21/22 (last year of full data)
+  filter(run_year_numeric <= 21) -> temp_data
 
 # summarise each into run year averages
 temp_data %>% 
@@ -155,6 +158,24 @@ temp_data %>%
 
 
 
+# Data by DPS
+```{r, fig.height = 5, fig.width = 7}
+ASC %>% 
+  mutate(run_year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
+  group_by(run_year_numeric, ESU) %>% 
+  summarise(count = n()) %>% 
+  filter(ESU != "Lower Columbia") %>% 
+  dplyr::rename(DPS = ESU) -> DPS_counts
+
+ggplot(DPS_counts, aes(x = run_year_numeric, y = count, fill = DPS))+
+  geom_bar(stat = "identity") +
+  scale_fill_tableau(palette = "Tableau 10") +
+  xlab("Run Year")
+```
+
+**Note:** Some of the trends you see by year are a result of the changing sample sizes of DPSs, rather than changes in underlying movement probabilities.
+
+
 
 ```{r functions}
 # function to reformat data to show movements by year out of a state
@@ -182,6 +203,8 @@ state_movement_summary <- function(from_state, origin = "all origins", rear_type
   
   # summarize this by year
   one_state_df %>% 
+      # combine the upstream and mouth states for easier visualization
+    mutate(next_state = sub(" Mouth| Upstream", "", next_state)) %>% 
     mutate(run_year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
     group_by(run_year_numeric, next_state) %>% 
     summarise(count = n()) %>% 
@@ -189,40 +212,176 @@ state_movement_summary <- function(from_state, origin = "all origins", rear_type
     mutate(prop = count/total) %>% 
     ungroup() -> movement_counts
   
+  
+  
+  
   return(movement_counts)
 }
 
-# function to plot movements out of a state
+# also need to be able to visualize sample sizes
 
-state_movement_summary_plot <- function(movement_counts){
-  plot <- ggplot(movement_counts, aes(x = run_year_numeric, y = prop, color = next_state)) +
-    geom_point() +
-    geom_line() +
-    scale_color_tableau(palette = "Tableau 20") +
-    xlab("Run Year")
+# function to combine temp, sample size, and prop plots
+movements_counts_aux_df <- function(movement_counts, temp_data){
+ movement_counts %>% 
+  filter(!(duplicated(run_year_numeric))) %>% 
+  left_join(., temp_data, by = "run_year_numeric") -> aux_df
   
-  return(plot)
+  return(aux_df)
   
 }
 
 
-BON_to_MCN_movement_summary <- state_movement_summary(from_state = "mainstem, BON to MCN")
+# function to plot movements out of a state
 
-BON_to_MCN_movement_summary_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary)
+state_movement_summary_plot <- function(movement_counts, movement_counts_aux_df, state_name){
+  prop_plot <- ggplot(movement_counts, aes(x = run_year_numeric, y = prop, color = next_state)) +
+    geom_point() +
+    geom_line() +
+    scale_color_tableau(palette = "Tableau 10") +
+    guides(color=guide_legend(nrow=3,byrow=TRUE)) +
+    xlab("Run Year")
+  
+  N_plot <- ggplot(movement_counts_aux_df, aes(x = run_year_numeric, y = total)) +
+    geom_bar(stat = "identity") +
+    ylab("N")
+
+  T_plot <-ggplot(movement_counts_aux_df, aes(x = run_year_numeric, y = avg_temp)) +
+    geom_line() +
+    ylab("Mean T (C)")
+
+  comb_plot <- ggarrange(plotlist = list(T_plot + rremove("xlab") + rremove("x.text"), N_plot +  rremove("xlab") + rremove("x.text"), prop_plot),
+          nrow = 3, ncol = 1, common.legend = TRUE, legend = "bottom", heights = c(2,2,6))
+   comb_plot <- annotate_figure(comb_plot, top = text_grob(state_name, 
+               size = 14))
+  
+  return(comb_plot)
+  
+}
 
 # a number of confounding things when interpreting this - presence/absence of detection sites, e.g. at Deschutes,
 # not accounting for detection efficiency, and different sample sizes of different origin
 # fish in different years, hatchery vs. wild
 
+# check out JDR, Wild
 BON_to_MCN_movement_summary_JDR_W <- state_movement_summary(from_state = "mainstem, BON to MCN", origin = "John_Day_River", rear_type = "W")
+BON_to_MCN_movement_summary_JDR_W_aux <- movements_counts_aux_df(movement_counts = BON_to_MCN_movement_summary_JDR_W, temp_data = MCN_annual_temp)
 
-BON_to_MCN_movement_summary_JDR_W_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary_JDR_W)
+BON_to_MCN_movement_summary_JDR_W_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary_JDR_W,
+                                                                      movement_counts_aux_df = BON_to_MCN_movement_summary_JDR_W_aux,
+                                                                      state_name = "Mainstem, BON to MCN")
+
+# ggsave(here::here("figures", "year_plots", "JDR_W_comb_plot.pdf"), plot = JDR_W_comb_plot, height = 10, width = 8)
+
+
+
+
+```
+
+# Plots for all mainstem states
+```{r}
+# mainstem, BON_to_MCN
+BON_to_MCN_movement_summary <- state_movement_summary(from_state = "mainstem, BON to MCN")
+BON_to_MCN_movement_summary_aux <- movements_counts_aux_df(movement_counts = BON_to_MCN_movement_summary, temp_data = BON_annual_temp)
+
+BON_to_MCN_movement_summary_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary,
+                                                                      movement_counts_aux_df = BON_to_MCN_movement_summary_aux,
+                                                                state_name = "Mainstem, BON to MCN")
 
 BON_to_MCN_movement_summary_plot
-BON_to_MCN_movement_summary_JDR_W_plot
-
-# also need to be able to visualize sample sizes
 ```
+*Note that the Deschutes River Mouth array was only active from 2013-2019.*
+
+```{r}
+
+# mainstem, MCN_to_ICH_or_PRA
+MCN_to_ICH_or_PRA_movement_summary <- state_movement_summary(from_state = "mainstem, MCN to ICH or PRA")
+MCN_to_ICH_or_PRA_movement_summary_aux <- movements_counts_aux_df(movement_counts = MCN_to_ICH_or_PRA_movement_summary, temp_data = MCN_annual_temp)
+
+MCN_to_ICH_or_PRA_movement_summary_plot <- state_movement_summary_plot(movement_counts = MCN_to_ICH_or_PRA_movement_summary,
+                                                                      movement_counts_aux_df = MCN_to_ICH_or_PRA_movement_summary_aux,
+                                                                      state_name = "Mainstem, MCN to ICH or PRA")
+
+MCN_to_ICH_or_PRA_movement_summary_plot
+```
+
+*Note that this pattern is driven primarily by sample sizes of different populations.*
+
+
+```{r}
+# mainstem, PRA_to_RIS
+PRA_to_RIS_movement_summary <- state_movement_summary(from_state = "mainstem, PRA to RIS")
+PRA_to_RIS_movement_summary_aux <- movements_counts_aux_df(movement_counts = PRA_to_RIS_movement_summary, temp_data = PRA_annual_temp)
+
+PRA_to_RIS_movement_summary_plot <- state_movement_summary_plot(movement_counts = PRA_to_RIS_movement_summary,
+                                                                      movement_counts_aux_df = PRA_to_RIS_movement_summary_aux,
+                                                                state_name = "Mainstem, PRA to RIS")
+
+PRA_to_RIS_movement_summary_plot
+```
+
+```{r}
+# mainstem, RIS_to_RRE
+RIS_to_RRE_movement_summary <- state_movement_summary(from_state = "mainstem, RIS to RRE")
+RIS_to_RRE_movement_summary_aux <- movements_counts_aux_df(movement_counts = RIS_to_RRE_movement_summary, temp_data = RIS_annual_temp)
+
+RIS_to_RRE_movement_summary_plot <- state_movement_summary_plot(movement_counts = RIS_to_RRE_movement_summary,
+                                                                      movement_counts_aux_df = RIS_to_RRE_movement_summary_aux,
+                                                                state_name = "Mainstem, RIS to RRE")
+
+RIS_to_RRE_movement_summary_plot
+```
+
+```{r}
+# mainstem, RRE_to_WEL
+RRE_to_WEL_movement_summary <- state_movement_summary(from_state = "mainstem, RRE to WEL")
+RRE_to_WEL_movement_summary_aux <- movements_counts_aux_df(movement_counts = RRE_to_WEL_movement_summary, temp_data = MCN_annual_temp)
+
+RRE_to_WEL_movement_summary_plot <- state_movement_summary_plot(movement_counts = RRE_to_WEL_movement_summary,
+                                                                      movement_counts_aux_df = RRE_to_WEL_movement_summary_aux,
+                                                                state_name = "Mainstem, RRE to WEL")
+
+RRE_to_WEL_movement_summary_plot
+```
+
+```{r}
+# mainstem, upstream_WEL
+upstream_WEL_movement_summary <- state_movement_summary(from_state = "mainstem, upstream of WEL")
+upstream_WEL_movement_summary_aux <- movements_counts_aux_df(movement_counts = upstream_WEL_movement_summary, temp_data = WEL_annual_temp)
+
+upstream_WEL_movement_summary_plot <- state_movement_summary_plot(movement_counts = upstream_WEL_movement_summary,
+                                                                      movement_counts_aux_df = upstream_WEL_movement_summary_aux,
+                                                                  state_name = "Mainstem, upstream of WEL")
+
+upstream_WEL_movement_summary_plot
+```
+
+*Note that this pattern is driven primarily by the availability of arrays in the tributaries. The Methow River array near the mouth comes online in 2009, and the Okanogan River array near the mouth comes online in 2013. There are some other upstream arrays available for both tributaries in earlier years.*
+
+```{r}
+# mainstem, ICH_to_LGR
+ICH_to_LGR_movement_summary <- state_movement_summary(from_state = "mainstem, ICH to LGR")
+ICH_to_LGR_movement_summary_aux <- movements_counts_aux_df(movement_counts = ICH_to_LGR_movement_summary, temp_data = ICH_annual_temp)
+
+ICH_to_LGR_movement_summary_plot <- state_movement_summary_plot(movement_counts = ICH_to_LGR_movement_summary,
+                                                                      movement_counts_aux_df = ICH_to_LGR_movement_summary_aux,
+                                                                state_name = "Mainstem, ICH to LGR")
+
+ICH_to_LGR_movement_summary_plot
+```
+
+```{r}
+# mainstem, upstream_LGR
+upstream_LGR_movement_summary <- state_movement_summary(from_state = "mainstem, upstream of LGR")
+upstream_LGR_movement_summary_aux <- movements_counts_aux_df(movement_counts = upstream_LGR_movement_summary, temp_data = LGR_annual_temp)
+
+upstream_LGR_movement_summary_plot <- state_movement_summary_plot(movement_counts = upstream_LGR_movement_summary,
+                                                                      movement_counts_aux_df = upstream_LGR_movement_summary_aux,
+                                                                  state_name = "Mainstem, upstream of LGR")
+
+upstream_LGR_movement_summary_plot
+```
+
+*Note that most Snake River tribuatries have poor detection efficiency.*
 
 
 
