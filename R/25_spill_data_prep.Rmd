@@ -434,46 +434,6 @@ dplyr::rename(dplyr::select(BON_window_spill, date, window_spill), BON = window_
   dplyr::select(-date) %>% 
   column_to_rownames("index") -> window_spill
 
-# before z-scoring, export the mean and SD of each set of window spill
-window_spill %>% 
-  mutate(BON_mean = mean(BON)) %>% 
-  mutate(BON_sd = sd(BON)) %>% 
-  mutate(MCN_mean = mean(MCN)) %>% 
-  mutate(MCN_sd = sd(MCN)) %>% 
-  mutate(PRA_mean = mean(PRA)) %>% 
-  mutate(PRA_sd = sd(PRA)) %>% 
-  mutate(RIS_mean = mean(RIS)) %>% 
-  mutate(RIS_sd = sd(RIS)) %>% 
-  mutate(RRE_mean = mean(RRE)) %>% 
-  mutate(RRE_sd = sd(RRE)) %>% 
-  mutate(WEL_quick_mean = mean(WEL_quick)) %>% 
-  mutate(WEL_quick_sd = sd(WEL_quick)) %>% 
-  mutate(WEL_slow_mean = mean(WEL_slow)) %>% 
-  mutate(WEL_slow_sd = sd(WEL_slow)) %>% 
-  mutate(ICH_mean = mean(ICH)) %>% 
-  mutate(ICH_sd = sd(ICH)) %>% 
-  mutate(LGR_quick_mean = mean(LGR_quick)) %>% 
-  mutate(LGR_quick_sd = sd(LGR_quick)) %>% 
-  mutate(LGR_slow_mean = mean(LGR_slow)) %>% 
-  mutate(LGR_slow_sd = sd(LGR_slow)) %>% 
-  dplyr::select(-c(BON, MCN, PRA, RIS, RRE, WEL_quick,
-                   WEL_slow, ICH, LGR_quick, LGR_slow)) %>% 
-  filter(!duplicated(BON_mean)) -> window_spill_summary
-
-
-# now, z-score every column
-window_spill %>% 
-  mutate(BON = (BON - mean(BON))/sd(BON)) %>% 
-  mutate(MCN = (MCN - mean(MCN))/sd(MCN)) %>% 
-  mutate(PRA = (PRA - mean(PRA))/sd(PRA)) %>% 
-  mutate(RIS = (RIS - mean(RIS))/sd(RIS)) %>% 
-  mutate(RRE = (RRE - mean(RRE))/sd(RRE)) %>% 
-  mutate(WEL_quick = (WEL_quick - mean(WEL_quick))/sd(WEL_quick)) %>% 
-  mutate(WEL_slow = (WEL_slow - mean(WEL_slow))/sd(WEL_slow)) %>% 
-  mutate(ICH = (ICH - mean(ICH))/sd(ICH)) %>% 
-  mutate(LGR_quick = (LGR_quick - mean(LGR_quick))/sd(LGR_quick)) %>% 
-  mutate(LGR_slow = (LGR_slow - mean(LGR_slow))/sd(LGR_slow)) -> window_spill
-
 # add an empty column for the first state (that doesn't get a spill effect)
 # make sure that the order is the same is the order of states
 window_spill %>% 
@@ -483,7 +443,6 @@ window_spill %>%
   
 
 write.csv(window_spill, here::here("covariate_data", "for_model", "window_spill_for_stan.csv"))
-write.csv(window_spill_summary, here::here("covariate_data", "for_model", "window_spill_summary.csv"))
 
 ```
 
@@ -491,8 +450,27 @@ write.csv(window_spill_summary, here::here("covariate_data", "for_model", "windo
 
 ## Post-overshoot processing
 
-### Export March days of spill as covariate
+### Export January, February, March, and April days of spill as covariate
 ```{r}
+april_spill_days <- function(spill_data){
+  spill_data %>% 
+    # keep only 2005-2022
+    subset(year >= 2005 & year <= 2022) %>% 
+    mutate(date = ymd(date)) %>% 
+    mutate(month = month(date)) %>% 
+    mutate(any_spill = ifelse(spill > 0, "yes", "no")) %>% 
+    group_by(year, month) %>% 
+    count(any_spill == "yes") %>% 
+    dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
+    subset(positive_spill == TRUE & month == 4) %>% 
+    dplyr::rename(april_spill_days = n) %>% 
+    ungroup() %>% 
+    complete(year = seq(2005,2022,1), fill = list(april_spill_days = 0)) %>% 
+    dplyr::select(year, april_spill_days) -> april_spill_days
+  
+  return(april_spill_days)
+}
+
 march_spill_days <- function(spill_data){
   spill_data %>% 
     # keep only 2005-2022
@@ -550,6 +528,16 @@ january_spill_days <- function(spill_data){
   return(january_spill_days)
 }
 
+BON_april_spill <- april_spill_days(spill_data = BON_spill_long)
+MCN_april_spill <- april_spill_days(spill_data = MCN_spill_long)
+PRA_april_spill <- april_spill_days(spill_data = PRA_spill_long)
+RIS_april_spill <- april_spill_days(spill_data = RIS_spill_long)
+RRE_april_spill <- april_spill_days(spill_data = RRE_spill_long)
+WEL_april_spill <- april_spill_days(spill_data = WEL_spill_long)
+ICH_april_spill <- april_spill_days(spill_data = ICH_spill_long)
+LGR_april_spill <- april_spill_days(spill_data = LGR_spill_long)
+
+
 BON_march_spill <- march_spill_days(spill_data = BON_spill_long)
 MCN_march_spill <- march_spill_days(spill_data = MCN_spill_long)
 PRA_march_spill <- march_spill_days(spill_data = PRA_spill_long)
@@ -576,6 +564,15 @@ RRE_january_spill <- january_spill_days(spill_data = RRE_spill_long)
 WEL_january_spill <- january_spill_days(spill_data = WEL_spill_long)
 ICH_january_spill <- january_spill_days(spill_data = ICH_spill_long)
 LGR_january_spill <- january_spill_days(spill_data = LGR_spill_long)
+
+write.csv(BON_april_spill, here::here("covariate_data", "for_model", "spill", "BON_april_spill.csv"), row.names = FALSE)
+write.csv(MCN_april_spill, here::here("covariate_data", "for_model", "spill", "MCN_april_spill.csv"), row.names = FALSE)
+write.csv(PRA_april_spill, here::here("covariate_data", "for_model", "spill", "PRA_april_spill.csv"), row.names = FALSE)
+write.csv(RIS_april_spill, here::here("covariate_data", "for_model", "spill", "RIS_april_spill.csv"), row.names = FALSE)
+write.csv(RRE_april_spill, here::here("covariate_data", "for_model", "spill", "RRE_april_spill.csv"), row.names = FALSE)
+write.csv(WEL_april_spill, here::here("covariate_data", "for_model", "spill", "WEL_april_spill.csv"), row.names = FALSE)
+write.csv(ICH_april_spill, here::here("covariate_data", "for_model", "spill", "ICH_april_spill.csv"), row.names = FALSE)
+write.csv(LGR_april_spill, here::here("covariate_data", "for_model", "spill", "LGR_april_spill.csv"), row.names = FALSE)
 
 write.csv(BON_march_spill, here::here("covariate_data", "for_model", "spill", "BON_march_spill.csv"), row.names = FALSE)
 write.csv(MCN_march_spill, here::here("covariate_data", "for_model", "spill", "MCN_march_spill.csv"), row.names = FALSE)
@@ -606,72 +603,80 @@ write.csv(LGR_january_spill, here::here("covariate_data", "for_model", "spill", 
 
 # make a quick plot for spill availability
 BON_march_spill %>% 
+  left_join(., BON_april_spill, by = "year") %>% 
   left_join(., BON_february_spill, by = "year") %>% 
   left_join(., BON_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> BON_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> BON_monthly_spill
 
 ggplot(BON_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("BON")
 
 MCN_march_spill %>% 
+  left_join(., MCN_april_spill, by = "year") %>% 
   left_join(., MCN_february_spill, by = "year") %>% 
   left_join(., MCN_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> MCN_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> MCN_monthly_spill
 
 ggplot(MCN_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("MCN")
 
 PRA_march_spill %>% 
+  left_join(., PRA_april_spill, by = "year") %>% 
   left_join(., PRA_february_spill, by = "year") %>% 
   left_join(., PRA_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> PRA_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> PRA_monthly_spill
 
 ggplot(PRA_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("PRA")
 
 RIS_march_spill %>% 
+  left_join(., RIS_april_spill, by = "year") %>% 
   left_join(., RIS_february_spill, by = "year") %>% 
   left_join(., RIS_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> RIS_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> RIS_monthly_spill
 
 ggplot(RIS_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("RIS")
 
 RRE_march_spill %>% 
+  left_join(., RRE_april_spill, by = "year") %>% 
   left_join(., RRE_february_spill, by = "year") %>% 
   left_join(., RRE_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> RRE_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> RRE_monthly_spill
 
 ggplot(RRE_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("RRE")
 
 WEL_march_spill %>% 
+  left_join(., WEL_april_spill, by = "year") %>% 
   left_join(., WEL_february_spill, by = "year") %>% 
   left_join(., WEL_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> WEL_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> WEL_monthly_spill
 
 ggplot(WEL_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("WEL")
 
 ICH_march_spill %>% 
+  left_join(., ICH_april_spill, by = "year") %>% 
   left_join(., ICH_february_spill, by = "year") %>% 
   left_join(., ICH_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> ICH_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> ICH_monthly_spill
 
 ggplot(ICH_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("ICH")
 
 LGR_march_spill %>% 
+  left_join(., LGR_april_spill, by = "year") %>% 
   left_join(., LGR_february_spill, by = "year") %>% 
   left_join(., LGR_january_spill, by = "year") %>% 
-  pivot_longer(., cols = c("march_spill_days", "february_spill_days", "january_spill_days")) -> LGR_monthly_spill
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> LGR_monthly_spill
 
 ggplot(LGR_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
@@ -680,4 +685,84 @@ ggplot(LGR_monthly_spill, aes(x = year, y = value, color = name)) +
 
 ```
 
+#### export in the format needed for stan
+```{r}
+dplyr::rename(BON_january_spill, BON = january_spill_days) %>% 
+  left_join(dplyr::rename(MCN_january_spill, MCN = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(PRA_january_spill, PRA = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RIS_january_spill, RIS = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RRE_january_spill, RRE = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(WEL_january_spill, WEL = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(ICH_january_spill, ICH = january_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(LGR_january_spill, LGR = january_spill_days), by = "year") %>% 
+  mutate(index = row_number()) %>% 
+  relocate(index) %>% 
+  column_to_rownames("index") -> january_spill_df
 
+# add an empty column for the first state (that doesn't get a temperature effect)
+# make sure that the order is the same is the order of states
+january_spill_df %>% 
+  mutate(MOUTH = 0) %>% 
+  relocate(MOUTH) -> january_spill_df
+  
+dplyr::rename(BON_february_spill, BON = february_spill_days) %>% 
+  left_join(dplyr::rename(MCN_february_spill, MCN = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(PRA_february_spill, PRA = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RIS_february_spill, RIS = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RRE_february_spill, RRE = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(WEL_february_spill, WEL = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(ICH_february_spill, ICH = february_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(LGR_february_spill, LGR = february_spill_days), by = "year") %>% 
+  mutate(index = row_number()) %>% 
+  relocate(index) %>% 
+  column_to_rownames("index") -> february_spill_df
+
+# add an empty column for the first state (that doesn't get a temperature effect)
+# make sure that the order is the same is the order of states
+february_spill_df %>% 
+  mutate(MOUTH = 0) %>% 
+  relocate(MOUTH) -> february_spill_df
+
+dplyr::rename(BON_march_spill, BON = march_spill_days) %>% 
+  left_join(dplyr::rename(MCN_march_spill, MCN = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(PRA_march_spill, PRA = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RIS_march_spill, RIS = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RRE_march_spill, RRE = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(WEL_march_spill, WEL = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(ICH_march_spill, ICH = march_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(LGR_march_spill, LGR = march_spill_days), by = "year") %>% 
+  mutate(index = row_number()) %>% 
+  relocate(index) %>% 
+  column_to_rownames("index") -> march_spill_df
+
+# add an empty column for the first state (that doesn't get a temperature effect)
+# make sure that the order is the same is the order of states
+march_spill_df %>% 
+  mutate(MOUTH = 0) %>% 
+  relocate(MOUTH) -> march_spill_df
+
+dplyr::rename(BON_april_spill, BON = april_spill_days) %>% 
+  left_join(dplyr::rename(MCN_april_spill, MCN = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(PRA_april_spill, PRA = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RIS_april_spill, RIS = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(RRE_april_spill, RRE = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(WEL_april_spill, WEL = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(ICH_april_spill, ICH = april_spill_days), by = "year") %>% 
+  left_join(dplyr::rename(LGR_april_spill, LGR = april_spill_days), by = "year") %>% 
+  mutate(index = row_number()) %>% 
+  relocate(index) %>% 
+  column_to_rownames("index") -> april_spill_df
+
+# add an empty column for the first state (that doesn't get a temperature effect)
+# make sure that the order is the same is the order of states
+april_spill_df %>% 
+  mutate(MOUTH = 0) %>% 
+  relocate(MOUTH) -> april_spill_df
+
+write.csv(january_spill_df, here::here("covariate_data", "for_model", "january_spill_df_for_stan.csv"))
+write.csv(february_spill_df, here::here("covariate_data", "for_model", "february_spill_df_for_stan.csv"))
+write.csv(march_spill_df, here::here("covariate_data", "for_model", "march_spill_df_for_stan.csv"))
+write.csv(april_spill_df, here::here("covariate_data", "for_model", "april_spill_df_for_stan.csv"))
+
+
+```
