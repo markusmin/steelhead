@@ -9,6 +9,8 @@ output: html_document
 #### Description
 This Rmd will explore year-to-year variability in movement rates to explore whether year effects should be expected/included in our model.
 
+**Note that this updated Rmd now only contains wild, Upper Columbia steelhead for consistency with the modeling results.**
+
 
 ```{r libraries-setup, echo = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 10, fig.width = 8)
@@ -158,7 +160,6 @@ temp_data %>%
 
 
 
-# Data by DPS
 ```{r, fig.height = 5, fig.width = 7}
 ASC %>% 
   mutate(run_year_numeric = as.numeric(sub("\\/.*", "", run_year))) %>% 
@@ -167,35 +168,33 @@ ASC %>%
   filter(ESU != "Lower Columbia") %>% 
   dplyr::rename(DPS = ESU) -> DPS_counts
 
-ggplot(DPS_counts, aes(x = run_year_numeric, y = count, fill = DPS))+
-  geom_bar(stat = "identity") +
-  scale_fill_tableau(palette = "Tableau 10") +
-  xlab("Run Year")
+# ggplot(DPS_counts, aes(x = run_year_numeric, y = count, fill = DPS))+
+#   geom_bar(stat = "identity") +
+#   scale_fill_tableau(palette = "Tableau 10") +
+#   xlab("Run Year")
 ```
-
-**Note:** Some of the trends you see by year are a result of the changing sample sizes of DPSs, rather than changes in underlying movement probabilities.
 
 
 
 ```{r functions}
 # function to reformat data to show movements by year out of a state
-state_movement_summary <- function(from_state, origin = "all origins", rear_type = "all rear types"){
-  if (origin == "all origins" & rear_type == "all rear types"){
+state_movement_summary <- function(from_state, DPS = "all DPSs", rear_type = "all rear types"){
+  if (DPS == "all DPSs" & rear_type == "all rear types"){
     ASC %>% 
       filter(state == from_state) -> one_state_df
-  } else if (origin == "all origins" & rear_type != "all rear types"){
+  } else if (DPS == "all DPSs" & rear_type != "all rear types"){
     ASC %>% 
       filter(state == from_state) %>% 
       filter(rear_type == rear_type)-> one_state_df
-  } else if (origin != "all origins" & rear_type == "all rear types"){
+  } else if (DPS != "all DPSs" & rear_type == "all rear types"){
     ASC %>% 
       filter(state == from_state) %>% 
-      filter(natal_origin == origin)-> one_state_df
+      filter(ESU == DPS)-> one_state_df
     
   } else {
     ASC %>% 
       filter(state == from_state) %>% 
-      filter(rear_type == rear_type & natal_origin == origin) -> one_state_df
+      filter(rear_type == rear_type & ESU == DPS) -> one_state_df
     
   }
   
@@ -238,7 +237,7 @@ state_movement_summary_plot <- function(movement_counts, movement_counts_aux_df,
     geom_point() +
     geom_line() +
     scale_color_tableau(palette = "Tableau 10") +
-    guides(color=guide_legend(nrow=3,byrow=TRUE)) +
+    # guides(color=guide_legend(nrow=3,byrow=TRUE)) +
     xlab("Run Year")
   
   N_plot <- ggplot(movement_counts_aux_df, aes(x = run_year_numeric, y = total)) +
@@ -259,16 +258,16 @@ state_movement_summary_plot <- function(movement_counts, movement_counts_aux_df,
 }
 
 # a number of confounding things when interpreting this - presence/absence of detection sites, e.g. at Deschutes,
-# not accounting for detection efficiency, and different sample sizes of different origin
+# not accounting for detection efficiency, and different sample sizes of different DPS/origins
 # fish in different years, hatchery vs. wild
 
 # check out JDR, Wild
-BON_to_MCN_movement_summary_JDR_W <- state_movement_summary(from_state = "mainstem, BON to MCN", origin = "John_Day_River", rear_type = "W")
-BON_to_MCN_movement_summary_JDR_W_aux <- movements_counts_aux_df(movement_counts = BON_to_MCN_movement_summary_JDR_W, temp_data = MCN_annual_temp)
-
-BON_to_MCN_movement_summary_JDR_W_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary_JDR_W,
-                                                                      movement_counts_aux_df = BON_to_MCN_movement_summary_JDR_W_aux,
-                                                                      state_name = "Mainstem, BON to MCN")
+# BON_to_MCN_movement_summary_JDR_W <- state_movement_summary(from_state = "mainstem, BON to MCN", origin = "John_Day_River", rear_type = "W")
+# BON_to_MCN_movement_summary_JDR_W_aux <- movements_counts_aux_df(movement_counts = BON_to_MCN_movement_summary_JDR_W, temp_data = MCN_annual_temp)
+# 
+# BON_to_MCN_movement_summary_JDR_W_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary_JDR_W,
+#                                                                       movement_counts_aux_df = BON_to_MCN_movement_summary_JDR_W_aux,
+#                                                                       state_name = "Mainstem, BON to MCN")
 
 # ggsave(here::here("figures", "year_plots", "JDR_W_comb_plot.pdf"), plot = JDR_W_comb_plot, height = 10, width = 8)
 
@@ -280,7 +279,7 @@ BON_to_MCN_movement_summary_JDR_W_plot <- state_movement_summary_plot(movement_c
 # Plots for all mainstem states
 ```{r}
 # mainstem, BON_to_MCN
-BON_to_MCN_movement_summary <- state_movement_summary(from_state = "mainstem, BON to MCN")
+BON_to_MCN_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, BON to MCN")
 BON_to_MCN_movement_summary_aux <- movements_counts_aux_df(movement_counts = BON_to_MCN_movement_summary, temp_data = BON_annual_temp)
 
 BON_to_MCN_movement_summary_plot <- state_movement_summary_plot(movement_counts = BON_to_MCN_movement_summary,
@@ -289,12 +288,13 @@ BON_to_MCN_movement_summary_plot <- state_movement_summary_plot(movement_counts 
 
 BON_to_MCN_movement_summary_plot
 ```
+
 *Note that the Deschutes River Mouth array was only active from 2013-2019.*
 
 ```{r}
 
 # mainstem, MCN_to_ICH_or_PRA
-MCN_to_ICH_or_PRA_movement_summary <- state_movement_summary(from_state = "mainstem, MCN to ICH or PRA")
+MCN_to_ICH_or_PRA_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, MCN to ICH or PRA")
 MCN_to_ICH_or_PRA_movement_summary_aux <- movements_counts_aux_df(movement_counts = MCN_to_ICH_or_PRA_movement_summary, temp_data = MCN_annual_temp)
 
 MCN_to_ICH_or_PRA_movement_summary_plot <- state_movement_summary_plot(movement_counts = MCN_to_ICH_or_PRA_movement_summary,
@@ -304,12 +304,10 @@ MCN_to_ICH_or_PRA_movement_summary_plot <- state_movement_summary_plot(movement_
 MCN_to_ICH_or_PRA_movement_summary_plot
 ```
 
-*Note that this pattern is driven primarily by sample sizes of different populations.*
-
 
 ```{r}
 # mainstem, PRA_to_RIS
-PRA_to_RIS_movement_summary <- state_movement_summary(from_state = "mainstem, PRA to RIS")
+PRA_to_RIS_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, PRA to RIS")
 PRA_to_RIS_movement_summary_aux <- movements_counts_aux_df(movement_counts = PRA_to_RIS_movement_summary, temp_data = PRA_annual_temp)
 
 PRA_to_RIS_movement_summary_plot <- state_movement_summary_plot(movement_counts = PRA_to_RIS_movement_summary,
@@ -321,7 +319,7 @@ PRA_to_RIS_movement_summary_plot
 
 ```{r}
 # mainstem, RIS_to_RRE
-RIS_to_RRE_movement_summary <- state_movement_summary(from_state = "mainstem, RIS to RRE")
+RIS_to_RRE_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, RIS to RRE")
 RIS_to_RRE_movement_summary_aux <- movements_counts_aux_df(movement_counts = RIS_to_RRE_movement_summary, temp_data = RIS_annual_temp)
 
 RIS_to_RRE_movement_summary_plot <- state_movement_summary_plot(movement_counts = RIS_to_RRE_movement_summary,
@@ -331,9 +329,11 @@ RIS_to_RRE_movement_summary_plot <- state_movement_summary_plot(movement_counts 
 RIS_to_RRE_movement_summary_plot
 ```
 
+*Note that many arrays in the Wenatchee River came online between 2008 and 2010.*
+
 ```{r}
 # mainstem, RRE_to_WEL
-RRE_to_WEL_movement_summary <- state_movement_summary(from_state = "mainstem, RRE to WEL")
+RRE_to_WEL_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, RRE to WEL")
 RRE_to_WEL_movement_summary_aux <- movements_counts_aux_df(movement_counts = RRE_to_WEL_movement_summary, temp_data = MCN_annual_temp)
 
 RRE_to_WEL_movement_summary_plot <- state_movement_summary_plot(movement_counts = RRE_to_WEL_movement_summary,
@@ -345,7 +345,7 @@ RRE_to_WEL_movement_summary_plot
 
 ```{r}
 # mainstem, upstream_WEL
-upstream_WEL_movement_summary <- state_movement_summary(from_state = "mainstem, upstream of WEL")
+upstream_WEL_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, upstream of WEL")
 upstream_WEL_movement_summary_aux <- movements_counts_aux_df(movement_counts = upstream_WEL_movement_summary, temp_data = WEL_annual_temp)
 
 upstream_WEL_movement_summary_plot <- state_movement_summary_plot(movement_counts = upstream_WEL_movement_summary,
@@ -359,7 +359,7 @@ upstream_WEL_movement_summary_plot
 
 ```{r}
 # mainstem, ICH_to_LGR
-ICH_to_LGR_movement_summary <- state_movement_summary(from_state = "mainstem, ICH to LGR")
+ICH_to_LGR_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, ICH to LGR")
 ICH_to_LGR_movement_summary_aux <- movements_counts_aux_df(movement_counts = ICH_to_LGR_movement_summary, temp_data = ICH_annual_temp)
 
 ICH_to_LGR_movement_summary_plot <- state_movement_summary_plot(movement_counts = ICH_to_LGR_movement_summary,
@@ -371,7 +371,7 @@ ICH_to_LGR_movement_summary_plot
 
 ```{r}
 # mainstem, upstream_LGR
-upstream_LGR_movement_summary <- state_movement_summary(from_state = "mainstem, upstream of LGR")
+upstream_LGR_movement_summary <- state_movement_summary(DPS = "Upper Columbia", rear_type = "W", from_state = "mainstem, upstream of LGR")
 upstream_LGR_movement_summary_aux <- movements_counts_aux_df(movement_counts = upstream_LGR_movement_summary, temp_data = LGR_annual_temp)
 
 upstream_LGR_movement_summary_plot <- state_movement_summary_plot(movement_counts = upstream_LGR_movement_summary,
