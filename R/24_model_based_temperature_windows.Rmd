@@ -280,24 +280,31 @@ RRE_window_temp <- window_temp(temp_data = RRE_temp_ts, end_window_days = subset
 ICH_window_temp <- window_temp(temp_data = ICH_temp_ts, end_window_days = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
 
 # Wells Dam, for upstream of WEL reach - quick fish
+WEL_quick_index <- which.min(WEL_mix$mu)
+WEL_slow_index <- which.max(WEL_mix$mu)
+
+
 WEL_quick_window_temp <- window_temp(temp_data = WEL_temp_ts, 
-                                     start_window_days = round(WEL_mix$mu[1] - WEL_mix$sigma[1]), 
-                                     end_window_days = round(WEL_mix$mu[1] + WEL_mix$sigma[1]))
+                                     start_window_days = round(WEL_mix$mu[WEL_quick_index] - WEL_mix$sigma[WEL_quick_index]), 
+                                     end_window_days = round(WEL_mix$mu[WEL_quick_index] + WEL_mix$sigma[WEL_quick_index]))
 
 # Wells Dam, for upstream of WEL reach - slow fish
 WEL_slow_window_temp <- window_temp(temp_data = WEL_temp_ts, 
-                                     start_window_days = round(WEL_mix$mu[2] - WEL_mix$sigma[2]), 
-                                     end_window_days = round(WEL_mix$mu[2] + WEL_mix$sigma[2]))
+                                     start_window_days = round(WEL_mix$mu[WEL_slow_index] - WEL_mix$sigma[WEL_slow_index]), 
+                                     end_window_days = round(WEL_mix$mu[WEL_slow_index] + WEL_mix$sigma[WEL_slow_index]))
 
 # Lower Granite Dam, for upstream of LGR reach - quick fish
+LGR_quick_index <- which.min(LGR_mix$mu)
+LGR_slow_index <- which.max(LGR_mix$mu)
+
 LGR_quick_window_temp <- window_temp(temp_data = LGR_temp_ts, 
-                                     start_window_days = round(LGR_mix$mu[1] - LGR_mix$sigma[1]), 
-                                     end_window_days = round(LGR_mix$mu[1] + LGR_mix$sigma[1]))
+                                     start_window_days = round(LGR_mix$mu[LGR_quick_index] - LGR_mix$sigma[LGR_quick_index]), 
+                                     end_window_days = round(LGR_mix$mu[LGR_quick_index] + LGR_mix$sigma[LGR_quick_index]))
 
 # Lower Granite Dam, for upstream of LGR reach - slow fish
 LGR_slow_window_temp <- window_temp(temp_data = LGR_temp_ts, 
-                                     start_window_days = round(LGR_mix$mu[2] - LGR_mix$sigma[2]), 
-                                     end_window_days = round(LGR_mix$mu[2] + LGR_mix$sigma[2]))
+                                     start_window_days = round(LGR_mix$mu[LGR_slow_index] - LGR_mix$sigma[LGR_slow_index]), 
+                                     end_window_days = round(LGR_mix$mu[LGR_slow_index] + LGR_mix$sigma[LGR_slow_index]))
 
 # export all of these
 write.csv(BON_window_temp, here::here("covariate_data", "for_model", "temp", "BON_window_temp.csv"), row.names = FALSE)

@@ -384,24 +384,31 @@ RRE_window_spill <- window_spill(spill_data = RRE_spill_long, end_window_days = 
 ICH_window_spill <- window_spill(spill_data = ICH_spill_long, end_window_days = subset(quantiles_table, reach == "mainstem, ICH to LGR")$median)
 
 # Wells Dam, for upstream of WEL reach - quick fish
+WEL_quick_index <- which.min(WEL_mix$mu)
+WEL_slow_index <- which.max(WEL_mix$mu)
+
+
 WEL_quick_window_spill <- window_spill(spill_data = WEL_spill_long, 
-                                     start_window_days = round(WEL_mix$mu[1] - WEL_mix$sigma[1]), 
-                                     end_window_days = round(WEL_mix$mu[1] + WEL_mix$sigma[1]))
+                                     start_window_days = round(WEL_mix$mu[WEL_quick_index] - WEL_mix$sigma[WEL_quick_index]), 
+                                     end_window_days = round(WEL_mix$mu[WEL_quick_index] + WEL_mix$sigma[WEL_quick_index]))
 
 # Wells Dam, for upstream of WEL reach - slow fish
 WEL_slow_window_spill <- window_spill(spill_data = WEL_spill_long, 
-                                     start_window_days = round(WEL_mix$mu[2] - WEL_mix$sigma[2]), 
-                                     end_window_days = round(WEL_mix$mu[2] + WEL_mix$sigma[2]))
+                                     start_window_days = round(WEL_mix$mu[WEL_slow_index] - WEL_mix$sigma[WEL_slow_index]), 
+                                     end_window_days = round(WEL_mix$mu[WEL_slow_index] + WEL_mix$sigma[WEL_slow_index]))
 
 # Lower Granite Dam, for upstream of LGR reach - quick fish
+LGR_quick_index <- which.min(LGR_mix$mu)
+LGR_slow_index <- which.max(LGR_mix$mu)
+
 LGR_quick_window_spill <- window_spill(spill_data = LGR_spill_long, 
-                                     start_window_days = round(LGR_mix$mu[1] - LGR_mix$sigma[1]), 
-                                     end_window_days = round(LGR_mix$mu[1] + LGR_mix$sigma[1]))
+                                     start_window_days = round(LGR_mix$mu[LGR_quick_index] - LGR_mix$sigma[LGR_quick_index]), 
+                                     end_window_days = round(LGR_mix$mu[LGR_quick_index] + LGR_mix$sigma[LGR_quick_index]))
 
 # Lower Granite Dam, for upstream of LGR reach - slow fish
 LGR_slow_window_spill <- window_spill(spill_data = LGR_spill_long, 
-                                     start_window_days = round(LGR_mix$mu[2] - LGR_mix$sigma[2]), 
-                                     end_window_days = round(LGR_mix$mu[2] + LGR_mix$sigma[2]))
+                                     start_window_days = round(LGR_mix$mu[LGR_slow_index] - LGR_mix$sigma[LGR_slow_index]), 
+                                     end_window_days = round(LGR_mix$mu[LGR_slow_index] + LGR_mix$sigma[LGR_slow_index]))
 
 # export all of these
 write.csv(BON_window_spill, here::here("covariate_data", "for_model", "spill", "BON_window_spill.csv"), row.names = FALSE)
@@ -440,8 +447,6 @@ window_spill %>%
   mutate(MOUTH = 0) %>% 
   relocate(MOUTH) -> window_spill
   
-  
-
 write.csv(window_spill, here::here("covariate_data", "for_model", "window_spill_for_stan.csv"))
 
 ```
@@ -695,6 +700,7 @@ dplyr::rename(BON_january_spill, BON = january_spill_days) %>%
   left_join(dplyr::rename(WEL_january_spill, WEL = january_spill_days), by = "year") %>% 
   left_join(dplyr::rename(ICH_january_spill, ICH = january_spill_days), by = "year") %>% 
   left_join(dplyr::rename(LGR_january_spill, LGR = january_spill_days), by = "year") %>% 
+  dplyr::select(-year) %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   column_to_rownames("index") -> january_spill_df
@@ -713,6 +719,7 @@ dplyr::rename(BON_february_spill, BON = february_spill_days) %>%
   left_join(dplyr::rename(WEL_february_spill, WEL = february_spill_days), by = "year") %>% 
   left_join(dplyr::rename(ICH_february_spill, ICH = february_spill_days), by = "year") %>% 
   left_join(dplyr::rename(LGR_february_spill, LGR = february_spill_days), by = "year") %>% 
+  dplyr::select(-year) %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   column_to_rownames("index") -> february_spill_df
@@ -731,6 +738,7 @@ dplyr::rename(BON_march_spill, BON = march_spill_days) %>%
   left_join(dplyr::rename(WEL_march_spill, WEL = march_spill_days), by = "year") %>% 
   left_join(dplyr::rename(ICH_march_spill, ICH = march_spill_days), by = "year") %>% 
   left_join(dplyr::rename(LGR_march_spill, LGR = march_spill_days), by = "year") %>% 
+  dplyr::select(-year) %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   column_to_rownames("index") -> march_spill_df
@@ -749,6 +757,7 @@ dplyr::rename(BON_april_spill, BON = april_spill_days) %>%
   left_join(dplyr::rename(WEL_april_spill, WEL = april_spill_days), by = "year") %>% 
   left_join(dplyr::rename(ICH_april_spill, ICH = april_spill_days), by = "year") %>% 
   left_join(dplyr::rename(LGR_april_spill, LGR = april_spill_days), by = "year") %>% 
+  dplyr::select(-year) %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   column_to_rownames("index") -> april_spill_df
