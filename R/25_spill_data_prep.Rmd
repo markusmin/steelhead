@@ -96,6 +96,15 @@ RRE_spill_long <- cov_reformat(input_data = RRE_spill, variable_name = "spill")
 WEL_spill <- read.csv(here::here("covariate_data", "WEL", "basin_spill_WEL_allyears.csv"))[1:366,]
 WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
 
+# so, some gaps in WEL spill data, on Jan 1 and 2 2020, and in December 2021.
+# I think it's safe to assume that these are zero, especially looking at typical spill during these months
+# let's look at that data
+ggplot(filter(WEL_spill_long, year %in% c(2020, 2021)), aes(x = ymd(date), y = spill)) + geom_point()
+# yeah, most likely zeros. will interpolate as such
+
+WEL_spill_long %>% 
+  mutate(spill = ifelse(is.na(spill) & year < 2023, 0, spill)) -> WEL_spill_long
+
 ```
 
 ### data exploration
@@ -448,6 +457,9 @@ window_spill %>%
   relocate(MOUTH) -> window_spill
   
 write.csv(window_spill, here::here("covariate_data", "for_model", "window_spill_for_stan.csv"))
+
+window_spill %>% 
+  filter(is.na(LGR_slow))
 
 ```
 
