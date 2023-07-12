@@ -341,7 +341,7 @@ quantiles_table %>%
 # also update to make it flexible at the end of the time series to shorten window at the end of the time series (but this shouldn't really matter, we're not really seeing any movements in December 2022); but it'll just take the spill at that day
 window_spill <- function(spill_data, start_window_days = 0, end_window_days){
   spill_data %>% 
-    filter(year >= 2005) %>% 
+    filter(year >= 2005 & year <= 2022) %>% 
     mutate(date = ymd(date)) %>% 
     dplyr::select(date, spill) %>% 
     relocate(date) -> spill_data
