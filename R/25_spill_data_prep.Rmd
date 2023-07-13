@@ -350,8 +350,8 @@ quantiles_table %>%
 # also update to make it flexible at the end of the time series to shorten window at the end of the time series (but this shouldn't really matter, we're not really seeing any movements in December 2022); but it'll just take the spill at that day
 window_spill <- function(spill_data, start_window_days = 0, end_window_days){
   spill_data %>% 
-    filter(year >= 2005 & year <= 2022) %>% 
     mutate(date = ymd(date)) %>% 
+    filter(date >= ymd("2005-06-01") & date <= ymd("2022-12-31")) %>% 
     dplyr::select(date, spill) %>% 
     relocate(date) -> spill_data
   
@@ -457,10 +457,6 @@ window_spill %>%
   relocate(MOUTH) -> window_spill
   
 write.csv(window_spill, here::here("covariate_data", "for_model", "window_spill_for_stan.csv"))
-
-window_spill %>% 
-  filter(is.na(LGR_slow))
-
 ```
 
 
