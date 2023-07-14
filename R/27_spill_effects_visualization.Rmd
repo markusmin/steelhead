@@ -1,0 +1,351 @@
+---
+title: "27_spill_effects_visualization"
+author: "Markus Min"
+date: "2023-07-13"
+output: html_document
+---
+
+
+### Description
+This Rmd will investigate patterns of fallback with spill, to examine what the data that's going into the model looks like.
+
+**Note that this Rmd only contains wild, Upper Columbia steelhead for consistency with the modeling results**
+
+```{r libraries-setup, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 10, fig.width = 8)
+
+# load libraries
+library(here)
+library(janitor)
+library(tidyverse)
+library(lubridate)
+library(car)
+library(ggthemes)
+library(viridis)
+library(ggpubr)
+```
+
+```{r load_data}
+# so, I think that the most up to date files are in the same folders as the model runs
+snake_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "snake", "snake_adults_states_complete.csv"), row.names = 1)
+lowcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "lower_columbia", "lower_columbia_adults_states_complete.csv"), row.names = 1)
+midcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "middle_columbia", "middle_columbia_adults_states_complete.csv"), row.names = 1)
+uppcol_adults_states_complete <- read.csv(here::here("stan_actual", "deteff_ESU_models", "500iter_3chain_runs", "upper_columbia", "upper_columbia_adults_states_complete.csv"), row.names = 1)
+
+# combine them all
+snake_adults_states_complete %>% 
+  bind_rows(., midcol_adults_states_complete) %>% 
+  bind_rows(., uppcol_adults_states_complete) %>% 
+  bind_rows(., lowcol_adults_states_complete) %>% 
+  mutate(date_time = ymd_hms(date_time)) -> ASC
+
+# now add tag code metadata, for natal origins
+origin_numeric <- data.frame(natal_origin = c("Asotin_Creek", 
+                                        "Clearwater_River",
+                                        "Deschutes_River", 
+                                        "Entiat_River", 
+                                        "Fifteenmile_Creek", 
+                                        "Grande_Ronde_River", 
+                                        "Hood_River",
+                                        "Imnaha_River",
+                                        "John_Day_River", 
+                                        "Methow_River", 
+                                        "Okanogan_River", 
+                                        "Salmon_River", 
+                                        "Tucannon_River", 
+                                        "Umatilla_River",
+                                        "Walla_Walla_River",
+                                        "Wenatchee_River", 
+                                        "Yakima_River"),
+                             natal_origin_numeric = seq(1,17,1))
+
+origin_rear_actual <- read.csv(here::here("stan_actual", "origin_rear_actual.csv"), row.names = 1)
+origin_rear_actual %>% 
+  dplyr::rename(natal_origin_numeric = natal_origin) %>% 
+  left_join(origin_numeric, by = "natal_origin_numeric") %>% 
+  dplyr::select(tag_code_2, natal_origin) -> tag_code_origins
+
+ASC %>% 
+  left_join(., tag_code_origins, by = "tag_code_2") -> ASC
+
+# also note which ESU they're from, for plotting
+ESU_origins <- data.frame(natal_origin = unique(ASC$natal_origin),
+                          ESU = c(rep("Snake", 6),
+                                  rep("Middle Columbia", 6),
+                                  rep("Upper Columbia", 4),
+                                  "Lower Columbia"))
+
+ASC %>% 
+  left_join(., ESU_origins, by = "natal_origin") -> ASC
+
+
+# introduce the loss state
+ASC %>% 
+  mutate(prev_tag_code = lag(tag_code_2)) %>% 
+  mutate(next_tag_code = lead(tag_code_2)) %>% 
+  mutate(next_state = lead(state)) %>% 
+  mutate(next_state = ifelse(next_tag_code != tag_code_2, "loss", next_state)) -> ASC 
+
+# add run year - takes a long time
+
+# get run year df for joining
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_start <- seq(ymd_hms("2004-06-01 00:00:00"), ymd_hms("2022-06-01 00:00:00"), by = "years")
+run_year_end <- seq(ymd_hms("2005-05-31 23:59:59"), ymd_hms("2023-05-31 23:59:59"), by = "years")
+run_year_numeric = seq(4, 22, 1)
+run_year_df <- data.frame(run_year, run_year_start, run_year_end, run_year_numeric)
+
+# join run year
+ASC %>% 
+    rowwise() %>%
+    dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date_time & run_year_end >= date_time)$run_year) -> ASC
+
+# add info on run type
+tag_code_metadata <- read.csv(here::here("covariate_data", "tag_code_metadata.csv"))
+
+ASC %>% 
+  left_join(., dplyr::select(tag_code_metadata, tag_code, rear_type_code), by = "tag_code") %>% 
+  mutate(rear_type = ifelse(rear_type_code %in% c("U", "H"), "H", "W"))-> ASC 
+
+# Keep only upper columbia, wild
+ASC %>% 
+  filter(ESU == "Upper Columbia" & rear_type == "W") %>% 
+  # also drop okanogan, because they get dropped in the model due to small sample size
+  filter(natal_origin != "Okanogan_River") %>% 
+  # also extract just the date, so it can be joined
+  mutate(date = date(date_time)) -> UCW_ASC
+
+
+```
+
+```{r load_spill_data}
+spill_window_data <- read.csv(here::here("covariate_data", "for_model", "window_spill_for_stan.csv"), row.names = 1)
+jan_spill_days <- read.csv(here::here("covariate_data", "for_model", "january_spill_df_for_stan.csv"), row.names = 1)
+feb_spill_days <- read.csv(here::here("covariate_data", "for_model", "february_spill_df_for_stan.csv"), row.names = 1)
+mar_spill_days <- read.csv(here::here("covariate_data", "for_model", "march_spill_df_for_stan.csv"), row.names = 1)
+apr_spill_days <- read.csv(here::here("covariate_data", "for_model", "april_spill_df_for_stan.csv"), row.names = 1)
+
+# need to add dates back into window spill for combining with movement data
+spill_window_data$date <- seq(ymd("2005-06-01"), ymd("2022-12-31"), by = "days")
+spill_window_data %>% 
+  relocate(date) -> spill_window_data
+
+# need to add run years back into days of spill for combining with movement data
+feb_spill_days$run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+feb_spill_days %>% 
+  relocate(run_year) -> feb_spill_days
+
+mar_spill_days$run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+mar_spill_days %>% 
+  relocate(run_year) -> mar_spill_days
+
+apr_spill_days$run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+apr_spill_days %>% 
+  relocate(run_year) -> apr_spill_days
+
+jan_spill_days$run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+jan_spill_days %>% 
+  relocate(run_year) -> jan_spill_days
+
+
+# add the spill window data to the ASC
+UCW_ASC %>% 
+  left_join(., spill_window_data, by = "date") -> UCW_ASC_spill
+```
+
+## En-route fallback
+
+#### Fallback over Bonneville
+
+```{r}
+UCW_ASC_spill %>% 
+  filter(state == "mainstem, BON to MCN") %>% 
+  mutate(fallback = ifelse(next_state == "mainstem, mouth to BON", 1, 0))-> UCW_ASC_spill_BON_to_MCN
+
+table(UCW_ASC_spill_BON_to_MCN$next_state)
+# table(UCW_ASC_spill_BON_to_MCN$fallback)
+
+BON_spill_fallback_glm <- glm(fallback ~ BON, data = UCW_ASC_spill_BON_to_MCN, family = binomial)
+
+
+BON_fallback_plot <- ggplot(UCW_ASC_spill_BON_to_MCN, aes(x = BON, y = fallback)) +
+  geom_point() +
+  xlab("Spill Volume at Bonneville Dam (over median travel time window)") +
+  stat_smooth(method = "glm", method.args = list(family = binomial))
+
+# also plot a histogram of distribution of spill
+BON_spill_hist <- ggplot(UCW_ASC_spill_BON_to_MCN, aes(x = BON)) +
+  geom_histogram() +
+  xlab("Spill Volume at Bonneville Dam (over median travel time window)")
+
+ggarrange(plotlist = list(BON_fallback_plot + rremove("xlab") + rremove("x.text"), BON_spill_hist),
+          nrow = 2, heights = c(6,4))
+```
+
+
+#### Fallback over Priest Rapids
+
+```{r}
+UCW_ASC_spill %>% 
+  filter(state == "mainstem, PRA to RIS") %>% 
+  mutate(fallback = ifelse(next_state == "mainstem, MCN to ICH or PRA", 1, 0))-> UCW_ASC_spill_PRA_to_RIS
+
+table(UCW_ASC_spill_PRA_to_RIS$next_state)
+# table(UCW_ASC_spill_PRA_to_RIS$fallback)
+
+PRA_spill_fallback_glm <- glm(fallback ~ PRA, data = UCW_ASC_spill_PRA_to_RIS, family = binomial)
+
+
+PRA_fallback_plot <- ggplot(UCW_ASC_spill_PRA_to_RIS, aes(x = PRA, y = fallback)) +
+  geom_point() +
+  xlab("Spill Volume at Priest Rapids Dam (over median travel time window)") +
+  stat_smooth(method = "glm", method.args = list(family = binomial))
+
+# also plot a histogram of distribution of spill
+PRA_spill_hist <- ggplot(UCW_ASC_spill_PRA_to_RIS, aes(x = PRA)) +
+  geom_histogram() +
+  xlab("Spill Volume at Priest Rapids Dam (over median travel time window)")
+
+ggarrange(plotlist = list(PRA_fallback_plot + rremove("xlab") + rremove("x.text"), PRA_spill_hist),
+          nrow = 2, heights = c(6,4))
+```
+
+
+## Post-overshoot fallback
+
+The two parameters with a reasonable ess are bjanspill_matrix_7_6 and baprspill_matrix_7_6; we'll visualize those
+
+This parameter should be assigned to Wenatchee and Entiat fish.
+
+
+#### January Spill at Wells Dam
+```{r}
+UCW_ASC %>% 
+  left_join(., jan_spill_days, by = "run_year") %>% 
+  filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
+  filter(state == "mainstem, upstream of WEL") %>% 
+  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) -> UCW_ASC_7_6_janspill
+
+table(UCW_ASC_7_6_janspill$next_state)
+# table(UCW_ASC_7_6_janspill$fallback)
+# so here, most fish are actually falling back
+
+# visualize spill relative to january spill
+
+
+WEL_janspill_fallback_glm <- glm(fallback ~ WEL, data = UCW_ASC_7_6_janspill, family = binomial)
+
+# get a predicted line to plot
+# WEL_janspill_predict <- data.frame(fallback = rep(c(0,1), each = 32),
+#                        WEL = rep(seq(0,31,1), 2))
+WEL_janspill_predict <- data.frame(WEL = seq(0,31,1))
+
+WEL_janspill_predict$fallback <- predict(WEL_janspill_fallback_glm, newdata = WEL_janspill_predict, type = "response")
+
+
+# for visualization, summarise
+UCW_ASC_7_6_janspill %>% 
+  group_by(WEL) %>% 
+  summarise(not_fallback = n() - sum(fallback), fallback = sum(fallback))  %>% 
+  pivot_longer(cols = c(not_fallback, fallback)) %>% 
+  dplyr::rename(fallback = name) %>% 
+  mutate(fallback = ifelse(fallback == "fallback", 1, 0)) -> UCW_ASC_7_6_janspill_counts
+
+
+# WEL_janspill_fallback_plot <- ggplot(UCW_ASC_7_6_janspill_props, aes(x = WEL, y = prop)) +
+#   geom_bar(stat = "identity") +
+#   xlab("January Spill Days at Wells Dam")
+  # stat_smooth(method = "glm", method.args = list(family = binomial))
+
+WEL_janspill_fallback_plot <- ggplot(UCW_ASC_7_6_janspill_counts, aes(x = WEL, y = fallback)) +
+  geom_point(aes(size = value)) +
+  xlab("January Spill Days at Wells Dam") +
+  geom_line(data = WEL_janspill_predict, lty = 2)
+  
+
+WEL_janspill_fallback_plot_og <- ggplot(UCW_ASC_7_6_janspill, aes(x = WEL, y = fallback)) +
+  geom_point() +
+  xlab("January Spill Days at Wells Dam") +
+  stat_smooth(method = "glm", method.args = list(family = binomial))
+
+# also plot a histogram of distribution of spill
+WEL_janspill_hist <- ggplot(UCW_ASC_7_6_janspill, aes(x = WEL)) +
+  geom_histogram() +
+  xlab("January Spill Days at Wells Dam")
+
+# ggarrange(plotlist = list(WEL_janspill_fallback_plot + rremove("xlab") + rremove("x.text"), WEL_janspill_hist),
+#           nrow = 2, heights = c(6,4))
+
+# WEL_janspill_fallback_plot_og
+WEL_janspill_fallback_plot
+
+```
+
+#### April Spill at Wells Dam
+```{r}
+UCW_ASC %>% 
+  left_join(., apr_spill_days, by = "run_year") %>% 
+  filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
+  filter(state == "mainstem, upstream of WEL") %>% 
+  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) -> UCW_ASC_7_6_aprspill
+
+table(UCW_ASC_7_6_aprspill$next_state)
+# table(UCW_ASC_7_6_aprspill$fallback)
+# so here, most fish are actually falling back
+
+# visualize spill relative to april spill
+
+
+WEL_aprspill_fallback_glm <- glm(fallback ~ WEL, data = UCW_ASC_7_6_aprspill, family = binomial)
+
+# get a predicted line to plot
+# WEL_aprspill_predict <- data.frame(fallback = rep(c(0,1), each = 32),
+#                        WEL = rep(seq(0,31,1), 2))
+WEL_aprspill_predict <- data.frame(WEL = seq(0,31,1))
+
+WEL_aprspill_predict$fallback <- predict(WEL_aprspill_fallback_glm, newdata = WEL_aprspill_predict, type = "response")
+
+
+# for visualization, summarise
+UCW_ASC_7_6_aprspill %>% 
+  group_by(WEL) %>% 
+  summarise(not_fallback = n() - sum(fallback), fallback = sum(fallback))  %>% 
+  pivot_longer(cols = c(not_fallback, fallback)) %>% 
+  dplyr::rename(fallback = name) %>% 
+  mutate(fallback = ifelse(fallback == "fallback", 1, 0)) -> UCW_ASC_7_6_aprspill_counts
+
+
+# WEL_aprspill_fallback_plot <- ggplot(UCW_ASC_7_6_aprspill_props, aes(x = WEL, y = prop)) +
+#   geom_bar(stat = "identity") +
+#   xlab("april Spill Days at Wells Dam")
+  # stat_smooth(method = "glm", method.args = list(family = binomial))
+
+WEL_aprspill_fallback_plot <- ggplot(UCW_ASC_7_6_aprspill_counts, aes(x = WEL, y = fallback)) +
+  geom_point(aes(size = value)) +
+  xlab("April Spill Days at Wells Dam") +
+  geom_line(data = WEL_aprspill_predict, lty = 2)
+  
+
+WEL_aprspill_fallback_plot_og <- ggplot(UCW_ASC_7_6_aprspill, aes(x = WEL, y = fallback)) +
+  geom_point() +
+  xlab("April Spill Days at Wells Dam") +
+  stat_smooth(method = "glm", method.args = list(family = binomial))
+
+# also plot a histogram of distribution of spill
+WEL_aprspill_hist <- ggplot(UCW_ASC_7_6_aprspill, aes(x = WEL)) +
+  geom_histogram() +
+  xlab("April Spill Days at Wells Dam")
+
+# ggarrange(plotlist = list(WEL_aprspill_fallback_plot + rremove("xlab") + rremove("x.text"), WEL_aprspill_hist),
+#           nrow = 2, heights = c(6,4))
+
+# WEL_aprspill_fallback_plot_og
+WEL_aprspill_fallback_plot
+
+```
+
+
+So here the MLE estimate is actually positive; so if we ran the chain longer the stan result would presumably get closer to that
+
+
+
