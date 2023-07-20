@@ -2624,6 +2624,130 @@ Pull it and inspect:
 scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models/upper_columbia/ ./
 
 
+### 2023-07-12 ###
+
+Spill model appears to be compiling locally, so move to hyak and run
+
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/
+
+### 2023-07-13 ###
+
+Spill model finished in 8506 seconds with 100 iter. 
+Pull it and inspect:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
+
+
+Building a year-only model
+- move away from having every transition get a year effect, and instead limit it to the
+ones that we're most interested in, i.e., movements around the natal tributary (which
+would therefore include post-overhsoot fallback, overshoot, homing, straying)
+- the disadvantage of setting it up this way is that we're missing out on effects that might
+be downstream, for example higher loss during the upstream migration, or extra good
+conditions in a tributary (e.g., the Deschutes) that is a popular staging area
+
+This model is now compiling locally - move it to hyak and test
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models2/
+
+# putting stf (200 iter) versions of rear_temp_spill and year_only; running over the weekend
+
+
+### 2023-07-18 ###
+
+The 200 iter year-only and rear-temp-spill models should have run on STF over the weekend;
+let's pull them and inspect
+
+Rear-temp-spill: 
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling)
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling)
+Chain 1 finished in 25877.6 seconds.
+
+-> took 7.2 hours to run. That's not bad at all for 400 total iter
+
+year-only:
+Chain 1 Iteration: 240 / 250 [ 96%]  (Sampling)
+Chain 1 Iteration: 250 / 250 [100%]  (Sampling)
+Chain 1 finished in 43606.8 seconds.
+
+-> so even with only 250 total iter, this took 12.1 hours to run the chain (and then
+there's also all the time that it takes to save the giant model output). So clearly 
+RE year models are going to take much longer
+
+# Pull them both so we can really get a look
+# from dir /Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_spill:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia ./
+
+
+# from dir /Users/markusmin/Documents/CBR/steelhead/stan_actual/year_only_v2:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models2/upper_columbia ./
+# well apparently I used 200 warmup and 50 sampling, which is very dumb
+# Change to 150 warmup and 150 sampling, then resubmit on stf and hopefully it's done by tomorrow morning
+
+# Trying to understand the interplay between year effects and DE. We are drawing a year effect for 
+# DE and NDE for every year, even though every year can only be either DE or NDE. So my understanding
+# is that for every DE year effect pulled for a year that's NDE, it shouldn't deviate from
+# zero because it's not part of the likelihood. Or is it problematic because of how every year param
+# is evaluated as part of an normal, but really here some years are just going to be zero?
+
+# MAJOR MODELING CHANGE - changing some tributary years from DE to NDE to be more conservative
+# this is based on when arrays came online + when we see fish entering the tributary
+# 10/11 for Wenatchee is now an NDE year, not a DE year (because array doesn't come online until January 2011)
+# 07/08 for Entiat is now an NDE year, not a DE year
+# 11/12 for Fifteenmile is now an NDE, not DE
+# 12/13 for Hood is now an NDE, not DE
+# 10/11 for Imnaha is now NDE not DE
+# 10/11 for Tucannon is now NDE not DE
+# 06/07 for Umatilla is now NDE not DE
+
+# note that this needs to be changed in two blocks - around line 1500 and right before running the model
+# I also fixed an issue with the Umatilla where there was a typo in terms of which years were considered
+DE vs. not DE in the first block - I fixed a line where it said that DE only started with the second 
+time period
+
+# NOTE THAT THESE CHANGES ARE CURRENTLY ONLY IN THESE SCRIPTS:
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/year_only_v2/seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_year_mox_deteff_stf.R
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_spill/seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_mox_deteff_stf.R
+
+# so cancel the current run, and change that and resubmit; only run 200 iter
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models2/
+
+# Found a typo in the spill model. Make the change and resubmit
+
+### 2023-07-19 ###
+
+With the year only run - chain completed in 15 hours;
+run has been going for 18 hours total though, which means saving the outputs is taking at least three hours
+
+Chain 1 Iteration: 190 / 200 [ 95%]  (Sampling)
+Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1 finished in 53902.1 seconds.
+
+# finished in about 19.5 hours total
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
