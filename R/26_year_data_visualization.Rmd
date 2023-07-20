@@ -178,7 +178,7 @@ ASC %>%
 
 ```{r functions}
 # function to reformat data to show movements by year out of a state
-state_movement_summary <- function(from_state, DPS = "all DPSs", rear_type = "all rear types"){
+state_movement_summary <- function(from_state, DPS = "all DPSs", origin = "all origins", rear_type = "all rear types"){
   if (DPS == "all DPSs" & rear_type == "all rear types"){
     ASC %>% 
       filter(state == from_state) -> one_state_df
@@ -196,6 +196,12 @@ state_movement_summary <- function(from_state, DPS = "all DPSs", rear_type = "al
       filter(state == from_state) %>% 
       filter(rear_type == rear_type & ESU == DPS) -> one_state_df
     
+  }
+  
+  # filter by origin (optional)
+  if(origin != "all origins"){
+    one_state_df %>% 
+      filter(natal_origin == origin) -> one_state_df
   }
   
 
@@ -328,6 +334,20 @@ RIS_to_RRE_movement_summary_plot <- state_movement_summary_plot(movement_counts 
 
 RIS_to_RRE_movement_summary_plot
 ```
+
+#### Wenatchee River only
+```{r}
+# mainstem, RIS_to_RRE - Wenatchee only
+RIS_to_RRE_movement_summary_wenatchee <- state_movement_summary(DPS = "Upper Columbia", origin = "Wenatchee_River", rear_type = "W", from_state = "mainstem, RIS to RRE")
+RIS_to_RRE_movement_summary_wenatchee_aux <- movements_counts_aux_df(movement_counts = RIS_to_RRE_movement_summary_wenatchee, temp_data = RIS_annual_temp)
+
+RIS_to_RRE_movement_summary_wenatchee_plot <- state_movement_summary_plot(movement_counts = RIS_to_RRE_movement_summary_wenatchee,
+                                                                      movement_counts_aux_df = RIS_to_RRE_movement_summary_wenatchee_aux,
+                                                                state_name = "Mainstem, RIS to RRE")
+
+RIS_to_RRE_movement_summary_wenatchee_plot
+```
+
 
 *Note that many arrays in the Wenatchee River came online between 2008 and 2010.*
 

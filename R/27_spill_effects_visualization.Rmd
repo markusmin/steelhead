@@ -83,6 +83,8 @@ ASC %>%
 ASC %>% 
   mutate(prev_tag_code = lag(tag_code_2)) %>% 
   mutate(next_tag_code = lead(tag_code_2)) %>% 
+  # add in the next date
+  mutate(date_time_2 = lead(date_time)) %>% 
   mutate(next_state = lead(state)) %>% 
   mutate(next_state = ifelse(next_tag_code != tag_code_2, "loss", next_state)) -> ASC 
 
@@ -153,6 +155,8 @@ UCW_ASC %>%
   left_join(., spill_window_data, by = "date") -> UCW_ASC_spill
 ```
 
+
+
 ## En-route fallback
 
 #### Fallback over Bonneville
@@ -213,6 +217,191 @@ ggarrange(plotlist = list(PRA_fallback_plot + rremove("xlab") + rremove("x.text"
 
 ## Post-overshoot fallback
 
+#### How correlated are number of spill days in different months?
+
+```{r load_spill_days_data}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 8)
+
+BON_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "BON_april_spill.csv"))
+MCN_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "MCN_april_spill.csv"))
+PRA_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "PRA_april_spill.csv"))
+RIS_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RIS_april_spill.csv"))
+RRE_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RRE_april_spill.csv"))
+WEL_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "WEL_april_spill.csv"))
+ICH_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "ICH_april_spill.csv"))
+LGR_april_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "LGR_april_spill.csv"))
+
+BON_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "BON_march_spill.csv"))
+MCN_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "MCN_march_spill.csv"))
+PRA_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "PRA_march_spill.csv"))
+RIS_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RIS_march_spill.csv"))
+RRE_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RRE_march_spill.csv"))
+WEL_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "WEL_march_spill.csv"))
+ICH_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "ICH_march_spill.csv"))
+LGR_march_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "LGR_march_spill.csv"))
+
+BON_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "BON_february_spill.csv"))
+MCN_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "MCN_february_spill.csv"))
+PRA_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "PRA_february_spill.csv"))
+RIS_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RIS_february_spill.csv"))
+RRE_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RRE_february_spill.csv"))
+WEL_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "WEL_february_spill.csv"))
+ICH_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "ICH_february_spill.csv"))
+LGR_february_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "LGR_february_spill.csv"))
+
+BON_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "BON_january_spill.csv"))
+MCN_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "MCN_january_spill.csv"))
+PRA_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "PRA_january_spill.csv"))
+RIS_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RIS_january_spill.csv"))
+RRE_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "RRE_january_spill.csv"))
+WEL_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "WEL_january_spill.csv"))
+ICH_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "ICH_january_spill.csv"))
+LGR_january_spill <- read.csv(here::here("covariate_data", "for_model", "spill", "LGR_january_spill.csv"))
+```
+
+
+```{r plot_spill_vif}
+spill_days_vif <- function(monthly_spill){
+  # reformat for VIF 
+  monthly_spill %>% 
+    pivot_wider(names_from = name, values_from = value) -> monthly_spill_wide
+  
+  # run multiple linear regressions and calculate VIF
+  jan_spill_mlm <- lm(january_spill_days ~ february_spill_days + march_spill_days + april_spill_days, data = monthly_spill_wide)
+  jan_spill_vif <- vif(jan_spill_mlm)
+
+  feb_spill_mlm <- lm(february_spill_days ~ january_spill_days + march_spill_days + april_spill_days, data = monthly_spill_wide)
+  feb_spill_vif <- vif(feb_spill_mlm)
+  
+  mar_spill_mlm <- lm(march_spill_days ~ january_spill_days + february_spill_days + april_spill_days, data = monthly_spill_wide)
+  mar_spill_vif <- vif(mar_spill_mlm)
+  
+  apr_spill_mlm <- lm(april_spill_days ~ january_spill_days + february_spill_days + march_spill_days, data = monthly_spill_wide)
+  apr_spill_vif <- vif(apr_spill_mlm)
+  
+  return(list(jan_spill_vif, feb_spill_vif, mar_spill_vif, apr_spill_vif))
+} 
+
+```
+
+``` {r}
+# make a quick plot for spill availability
+BON_march_spill %>% 
+  left_join(., BON_april_spill, by = "year") %>% 
+  left_join(., BON_february_spill, by = "year") %>% 
+  left_join(., BON_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> BON_monthly_spill
+
+ggplot(BON_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("BON")
+
+# Bonneville doesn't matter because it's not an overshoot fallback movement for any origins
+# spill_days_vif(monthly_spill = BON_monthly_spill)
+```
+
+``` {r}
+MCN_march_spill %>% 
+  left_join(., MCN_april_spill, by = "year") %>% 
+  left_join(., MCN_february_spill, by = "year") %>% 
+  left_join(., MCN_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> MCN_monthly_spill
+
+ggplot(MCN_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("MCN")
+
+spill_days_vif(monthly_spill = MCN_monthly_spill)
+```
+
+``` {r}
+PRA_march_spill %>% 
+  left_join(., PRA_april_spill, by = "year") %>% 
+  left_join(., PRA_february_spill, by = "year") %>% 
+  left_join(., PRA_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> PRA_monthly_spill
+
+ggplot(PRA_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("PRA")
+
+spill_days_vif(monthly_spill = PRA_monthly_spill)
+```
+
+``` {r}
+RIS_march_spill %>% 
+  left_join(., RIS_april_spill, by = "year") %>% 
+  left_join(., RIS_february_spill, by = "year") %>% 
+  left_join(., RIS_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> RIS_monthly_spill
+
+ggplot(RIS_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("RIS")
+
+spill_days_vif(monthly_spill = RIS_monthly_spill)
+```
+
+``` {r}
+RRE_march_spill %>% 
+  left_join(., RRE_april_spill, by = "year") %>% 
+  left_join(., RRE_february_spill, by = "year") %>% 
+  left_join(., RRE_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> RRE_monthly_spill
+
+ggplot(RRE_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("RRE")
+
+spill_days_vif(monthly_spill = RRE_monthly_spill)
+```
+
+``` {r}
+WEL_march_spill %>% 
+  left_join(., WEL_april_spill, by = "year") %>% 
+  left_join(., WEL_february_spill, by = "year") %>% 
+  left_join(., WEL_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> WEL_monthly_spill
+
+ggplot(WEL_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("WEL")
+
+spill_days_vif(monthly_spill = WEL_monthly_spill)
+```
+
+``` {r}
+ICH_march_spill %>% 
+  left_join(., ICH_april_spill, by = "year") %>% 
+  left_join(., ICH_february_spill, by = "year") %>% 
+  left_join(., ICH_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> ICH_monthly_spill
+
+ggplot(ICH_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("ICH")
+
+spill_days_vif(monthly_spill = ICH_monthly_spill)
+```
+
+``` {r}
+LGR_march_spill %>% 
+  left_join(., LGR_april_spill, by = "year") %>% 
+  left_join(., LGR_february_spill, by = "year") %>% 
+  left_join(., LGR_january_spill, by = "year") %>% 
+  pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> LGR_monthly_spill
+
+ggplot(LGR_monthly_spill, aes(x = year, y = value, color = name)) +
+  geom_point(position = position_dodge(width = 0.75)) +
+  ggtitle("LGR")
+
+spill_days_vif(monthly_spill = LGR_monthly_spill)
+```
+
+
+
+
+
 The two parameters with a reasonable ess are bjanspill_matrix_7_6 and baprspill_matrix_7_6; we'll visualize those
 
 This parameter should be assigned to Wenatchee and Entiat fish.
@@ -224,7 +413,8 @@ UCW_ASC %>%
   left_join(., jan_spill_days, by = "run_year") %>% 
   filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
   filter(state == "mainstem, upstream of WEL") %>% 
-  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) -> UCW_ASC_7_6_janspill
+  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) %>% 
+  filter() -> UCW_ASC_7_6_janspill
 
 table(UCW_ASC_7_6_janspill$next_state)
 # table(UCW_ASC_7_6_janspill$fallback)
@@ -287,9 +477,18 @@ UCW_ASC %>%
   left_join(., apr_spill_days, by = "run_year") %>% 
   filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
   filter(state == "mainstem, upstream of WEL") %>% 
-  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) -> UCW_ASC_7_6_aprspill
+  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) %>% 
+  mutate(month_1 = month(date_time)) %>% 
+  mutate(month_2 = month(date_time_2)) %>% 
+  mutate(apr = ifelse(month_1 > month_2,
+                      ifelse(4 %in% c(seq(month_1, 12), seq(1, month_2)), 1, 0),
+                ifelse(4 %in% seq(month_1, month_2), 1, 0)))  %>% 
+  filter(apr == 1)  -> UCW_ASC_7_6_aprspill
 
+         
+         
 table(UCW_ASC_7_6_aprspill$next_state)
+# table(UCW_ASC_7_6_aprspill$natal_origin)
 # table(UCW_ASC_7_6_aprspill$fallback)
 # so here, most fish are actually falling back
 
@@ -325,27 +524,12 @@ WEL_aprspill_fallback_plot <- ggplot(UCW_ASC_7_6_aprspill_counts, aes(x = WEL, y
   xlab("April Spill Days at Wells Dam") +
   geom_line(data = WEL_aprspill_predict, lty = 2)
   
-
-WEL_aprspill_fallback_plot_og <- ggplot(UCW_ASC_7_6_aprspill, aes(x = WEL, y = fallback)) +
-  geom_point() +
-  xlab("April Spill Days at Wells Dam") +
-  stat_smooth(method = "glm", method.args = list(family = binomial))
-
-# also plot a histogram of distribution of spill
-WEL_aprspill_hist <- ggplot(UCW_ASC_7_6_aprspill, aes(x = WEL)) +
-  geom_histogram() +
-  xlab("April Spill Days at Wells Dam")
-
-# ggarrange(plotlist = list(WEL_aprspill_fallback_plot + rremove("xlab") + rremove("x.text"), WEL_aprspill_hist),
-#           nrow = 2, heights = c(6,4))
-
-# WEL_aprspill_fallback_plot_og
 WEL_aprspill_fallback_plot
 
 ```
 
 
-So here the MLE estimate is actually positive; so if we ran the chain longer the stan result would presumably get closer to that
+A very weakly negative relationship (but this doesn't make sense to me).
 
 
 
