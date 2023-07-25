@@ -2721,32 +2721,111 @@ Chain 1 Iteration: 190 / 200 [ 95%]  (Sampling)
 Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
 Chain 1 finished in 53902.1 seconds.
 
-# finished in about 19.5 hours total
+# finished in about 19.5 hours total; so 4.5 hours for saving the parameter values
+
+# pull the year-only run
+# from within the year_only_v2 directory:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/year_only_models2/upper_columbia/ ./
+
+
+# pull the spill run
+# from within the rear_temp_spill directory:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
 
 
 
+### 2023-07-21 ###
+
+Some of the spill days results don't make sense, so I'm looking back at the model code
+One issue: the overshoot_vector and state_data have different lengths (by 7)
+there seven fish in the loss state in states complete? That's the only difference here - 
+explains the seven fish difference, and might be an indexing issue
+
+> length(transition_run_years)
+[1] 6812
+> length(apr_post_overshoot_vector)
+[1] 6812
+
+as.vector(t(state_data_2))-> state_data_2_test
+state_data_2_test[!(state_data_2_test %in% c(0, 43))] -> state_data_2_test_noloss
+
+> length(state_data_2_test_noloss)
+[1] 6805
+
+And again, the difference here is that in states_complete, which was used to generate
+transition_run_years and apr_post_overshoot_vector, there are seven fish in the loss state
+These are the seven fish that we identified as having been trapped, and therefore
+assigned the loss state to; this occurs outside of this script
+Happens in this script, in to_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4.R
+- I really need to reorganize these scripts...
+
+# So I believe that I fixed it - it actually has a couple of important changes, because the indexing
+was wrong also for the run years (which would affect DE as well)
+
+# THIS IS THE ONLY SCRIPT THAT HAS THE CHANGES:
+seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_mox_deteff_stf.R
+# will need to make sure that's fixed for the year effects as well, but since that will eventually
+be folded into this one, it should be okay
 
 
+# Push it and run
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/
+
+### 2023-07-23 ### 
+
+There was a typo in the R script that caused the run to fail over the weekend. Fixed and reuploaded just the R script
+(it's still only this script that has it fixed: seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_mox_deteff_stf.R)
+- if there aren't any typos, this should run overnight (takes about eight hours)
 
 
+### 2023-07-24 ###
+
+spill model ran fine - and finished quite quickly:
+
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling)
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling)
+Chain 1 finished in 18459.9 seconds.
+
+just about 5 hours, which is faster than the last run by a good bit
+
+# pull the model run and inspect
+# from within the rear_temp_spill directory:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
+
+# the typo that we fixed is producing much more reasonable spill results (this isn't surprising)
+# Going to plot the raw data vs. number of spill days to inspect this pattern more closely
+
+# So this looks almost okay, except that we have an issue now where if a fish falls back twice,
+the implicit site visit code makes it so that the date of entry is the date that it's next seen.
+See this fish for an example: 3D9.1C2C50DD03
+# SO - this is actually a bad idea, because by fixing one problem you create a much bigger one,
+namely that now the window for fallback is basically zero, because fallback is always implicit,
+so now when you give it the previous time the window becomes literally zero time
+
+# what we need to do is create a window, where the window is between the two times that 
+the fish was actually seen - so no implicit times used in the calculation of this window.
+I think it's fine if implicit site visits are given the next time - that's usually fine.
+But I think if there are multiple implicit site visits in a row, the first one needs to be
+given the previous time, and the second one needs to be given the next time.
+But then what happens when there are three or more implicit movements in a row? This 
+is rare but it does happen
+
+# So - I think we fixed it using a strategy of creating completely new fields called window_date_time_1
+and window_date_time_2, for the maximum window width.
+# upload this latest R script and re-run the model - won't be able to view until tomorrow, but I think that's good.
+scp -r ./upper_columbia/seed101_parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_mox_deteff_stf.R mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/
 
 
+# Latest chain ran quickly:
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling)
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling)
+Chain 1 finished in 14427.5 seconds.
 
+Even faster! Why though
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Pull it:
+# from within the rear_temp_spill directory:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
 
 
 
