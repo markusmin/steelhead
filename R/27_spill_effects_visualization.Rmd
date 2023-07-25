@@ -83,10 +83,47 @@ ASC %>%
 ASC %>% 
   mutate(prev_tag_code = lag(tag_code_2)) %>% 
   mutate(next_tag_code = lead(tag_code_2)) %>% 
-  # add in the next date
-  mutate(date_time_2 = lead(date_time)) %>% 
-  mutate(next_state = lead(state)) %>% 
-  mutate(next_state = ifelse(next_tag_code != tag_code_2, "loss", next_state)) -> ASC 
+  # add in next state, including loss, based on whether the next tag code is the same or not
+  mutate(next_state = ifelse(next_tag_code != tag_code_2, "loss", lead(state))) %>% 
+  # add in the next date (and if it's loss, NA)
+  mutate(date_time_2 = ifelse(next_state == "loss", NA, ymd_hms(format(as_datetime(lead(date_time)))))) -> ASC
+  
+
+
+# Create new variables - window_date_time_1 and window_date_time_2
+# For every movement that's not implicit, this will be the same as date_time and date_time_2
+# For every implicit movement, this will be the previous and next time that the fish was actually seen, to create the widest possible window
+ASC %>% 
+  mutate(implicit_movement_prev_date_time = ymd_hms(ifelse(pathway == "implicit" & lag(pathway != "implicit"), format(as_datetime(lag(date_time))), NA_character_))) %>%
+  fill(implicit_movement_prev_date_time, .direction = "down") %>%
+  mutate(implicit_movement_next_date_time = ymd_hms(ifelse(pathway == "implicit" & lead(pathway != "implicit"), format(as_datetime(lead(date_time))), NA_character_))) %>%
+  fill(implicit_movement_next_date_time, .direction = "up") %>%
+  # drop all of the rows that you don't need an implicit movement date tim
+  mutate(implicit_movement_prev_date_time = ifelse(pathway != "implicit", NA, ymd_hms(format(as_datetime(implicit_movement_prev_date_time))))) %>%
+  mutate(implicit_movement_next_date_time = ifelse(pathway != "implicit", NA, ymd_hms(format(as_datetime(implicit_movement_next_date_time))))) %>% 
+  # dplyr::select(tag_code, state, next_state, pathway, date_time, date_time_2, implicit_movement_prev_date_time, implicit_movement_next_date_time)
+  mutate(window_date_time_1 = ymd_hms(format(as_datetime(ifelse(pathway == "implicit", implicit_movement_prev_date_time, date_time))))) %>% 
+  mutate(window_date_time_2 = ymd_hms(format(as_datetime(ifelse(pathway == "implicit", implicit_movement_next_date_time, date_time_2))))) -> ASC
+  # dplyr::select(tag_code, state, next_state, pathway, date_time, date_time_2, implicit_movement_prev_date_time, implicit_movement_next_date_time, window_date_time_1, window_date_time_2)
+
+  # The below block is actually a bad idea, because since fallback is almost always implicit, 
+  # this change makes it such that the window for fallback is basically nothing
+  # MAJOR CHANGE - how current date_time is calculated
+  # because for our purposes now we want to know the entire duration of the possible window
+  # of time that a fish was in a state, we will have change the treatment of date time
+  # for implicit site visits. In the previous scripts, it's such that the date time
+  # for any implicit site visits is the next time we see the fish (which is good for some purposes)
+  # but for this, we want it now to be the previous time we saw the fish - this gives 
+  # the full possible window
+  # mutate(implicit_movement_date_time = ymd_hms(ifelse(pathway == "implicit" & lag(pathway != "implicit"), format(as_datetime(lag(date_time))), NA_character_))) %>% 
+  # fill(implicit_movement_date_time) %>% 
+  # mutate(implicit_movement_date_time = ifelse(pathway != "implicit", NA, implicit_movement_date_time)) %>% 
+  # mutate(date_time = format(as_datetime(ifelse(pathway == "implicit", implicit_movement_date_time, date_time)))) %>% 
+  # # give it an NA for time if it's loss
+  # mutate(date_time_2 = ifelse(next_state == "loss", NA, format(as_datetime(lead(date_time))))) %>% 
+  # mutate(date_time = ymd_hms(date_time)) %>% 
+  # mutate(date_time_2 = ymd_hms(date_time_2)) %>% 
+  # dplyr::select(-implicit_movement_date_time) -> ASC 
 
 # add run year - takes a long time
 
@@ -400,136 +437,127 @@ spill_days_vif(monthly_spill = LGR_monthly_spill)
 
 
 
+### Explore parameter estimates from model versus data on fallback
 
+- Eight post-overshoot fallback parameters are estimated for Upper Columbia Wild Steelhead: Fallback over Wells Dam (for Entiat and Wenatchee Steelhead) and fallback over Rocky Reach Dam (for Entiat Steelhead), in four months (January, February, March, and April)
 
-The two parameters with a reasonable ess are bjanspill_matrix_7_6 and baprspill_matrix_7_6; we'll visualize those
+The pattern for fallback at Rocky Reach is more in line with our hypotheses: Spill in February, March, and April is weakly correlated with post-overshoot fallback; January Spill is weakly negative correlated (but this credible interval is much wider).
 
-This parameter should be assigned to Wenatchee and Entiat fish.
+The pattern for fallback at Wells Dam is confusing: it oscillates between being positive and negative, with much smaller credible intervals: January and March have a weakly positive correlation with fallback, February and April a weakly negative correlation.
 
-
-#### January Spill at Wells Dam
 ```{r}
-UCW_ASC %>% 
-  left_join(., jan_spill_days, by = "run_year") %>% 
-  filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
-  filter(state == "mainstem, upstream of WEL") %>% 
-  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) %>% 
-  filter() -> UCW_ASC_7_6_janspill
+### functions to visualize fallback versus spill days for a given month and a given dam
 
-table(UCW_ASC_7_6_janspill$next_state)
-# table(UCW_ASC_7_6_janspill$fallback)
-# so here, most fish are actually falling back
-
-# visualize spill relative to january spill
-
-
-WEL_janspill_fallback_glm <- glm(fallback ~ WEL, data = UCW_ASC_7_6_janspill, family = binomial)
-
-# get a predicted line to plot
-# WEL_janspill_predict <- data.frame(fallback = rep(c(0,1), each = 32),
-#                        WEL = rep(seq(0,31,1), 2))
-WEL_janspill_predict <- data.frame(WEL = seq(0,31,1))
-
-WEL_janspill_predict$fallback <- predict(WEL_janspill_fallback_glm, newdata = WEL_janspill_predict, type = "response")
-
-
-# for visualization, summarise
-UCW_ASC_7_6_janspill %>% 
-  group_by(WEL) %>% 
-  summarise(not_fallback = n() - sum(fallback), fallback = sum(fallback))  %>% 
-  pivot_longer(cols = c(not_fallback, fallback)) %>% 
-  dplyr::rename(fallback = name) %>% 
-  mutate(fallback = ifelse(fallback == "fallback", 1, 0)) -> UCW_ASC_7_6_janspill_counts
-
-
-# WEL_janspill_fallback_plot <- ggplot(UCW_ASC_7_6_janspill_props, aes(x = WEL, y = prop)) +
-#   geom_bar(stat = "identity") +
-#   xlab("January Spill Days at Wells Dam")
-  # stat_smooth(method = "glm", method.args = list(family = binomial))
-
-WEL_janspill_fallback_plot <- ggplot(UCW_ASC_7_6_janspill_counts, aes(x = WEL, y = fallback)) +
-  geom_point(aes(size = value)) +
-  xlab("January Spill Days at Wells Dam") +
-  geom_line(data = WEL_janspill_predict, lty = 2)
+# Function 1: filter and refomat data
+fallback_v_spilldays_reformat <- function(movement_data, spill_data, spill_month_numeric, origins, overshoot_state, fallback_state, dam_abbrev){
+  movement_data %>% 
+    left_join(., spill_data, by = "run_year") %>% 
+    filter(natal_origin %in% origins) %>% 
+    filter(state == overshoot_state) %>% 
+    mutate(fallback = ifelse(next_state == fallback_state, 1, 0)) %>% 
+    mutate(month_1 = month(window_date_time_1)) %>% 
+    mutate(month_2 = month(window_date_time_2)) %>% 
+    mutate(spill_month_overlap = ifelse(month_1 > month_2,
+                        ifelse(spill_month_numeric %in% c(seq(month_1, 12), seq(1, month_2)), 1, 0),
+                  ifelse(spill_month_numeric %in% seq(month_1, month_2), 1, 0)))  %>% 
+    # if the next state is loss, month_2 will be NA - so give it spill_month_overlap
+    mutate(spill_month_overlap = ifelse(is.na(month_2), 1, spill_month_overlap)) %>% 
+    filter(spill_month_overlap == 1) %>% 
+    dplyr::select(tag_code, state, next_state, natal_origin, window_date_time_1, window_date_time_2, run_year, fallback, month_1, month_2, spill_month_overlap, dam_abbrev) %>% 
+    # this rename call allows us to use the next function
+    dplyr::rename(spill_days = dam_abbrev) -> fallback_v_spilldays_data
   
+  # return the reformatted data
+  return(fallback_v_spilldays_data)
 
-WEL_janspill_fallback_plot_og <- ggplot(UCW_ASC_7_6_janspill, aes(x = WEL, y = fallback)) +
-  geom_point() +
-  xlab("January Spill Days at Wells Dam") +
-  stat_smooth(method = "glm", method.args = list(family = binomial))
+}
 
-# also plot a histogram of distribution of spill
-WEL_janspill_hist <- ggplot(UCW_ASC_7_6_janspill, aes(x = WEL)) +
-  geom_histogram() +
-  xlab("January Spill Days at Wells Dam")
+# Function 2: Generate the plot
+fallback_v_spilldays_plot <- function(fallback_v_spilldays_data, month_name, dam_name) {
+  # fit a logistic regression to spill days as predictor and predict for vals
+  monthspill_fallback_glm <- glm(fallback ~ spill_days, data = fallback_v_spilldays_data, family = binomial)
+  dam_monthspill_predict <- data.frame(spill_days = seq(0,31,1))
+  dam_monthspill_predict$fallback <- predict(monthspill_fallback_glm, newdata = dam_monthspill_predict, type = "response")
 
-# ggarrange(plotlist = list(WEL_janspill_fallback_plot + rremove("xlab") + rremove("x.text"), WEL_janspill_hist),
-#           nrow = 2, heights = c(6,4))
+  # summarise for the plot
+  fallback_v_spilldays_data %>% 
+    group_by(spill_days) %>% 
+    summarise(not_fallback = n() - sum(fallback), fallback = sum(fallback))  %>% 
+    pivot_longer(cols = c(not_fallback, fallback)) %>% 
+    dplyr::rename(fallback = name) %>% 
+    mutate(fallback = ifelse(fallback == "fallback", 1, 0)) -> fallback_v_spilldays_count
+    
+  # generate the plot
+  fallback_v_spilldays_plot <- ggplot(fallback_v_spilldays_count, aes(x = spill_days, y = fallback)) +
+    geom_point(aes(size = value)) +
+    xlab(paste0(month_name, " spill days at ", dam_name)) +
+    geom_line(data = dam_monthspill_predict, lty = 2)
+  
+  # return the plot and the glm
+  return(list(fallback_v_spilldays_plot, summary(monthspill_fallback_glm)))
 
-# WEL_janspill_fallback_plot_og
-WEL_janspill_fallback_plot
+}
 
 ```
 
-#### April Spill at Wells Dam
+### Spill days for combinations of spill month and dam
+
+#### January Spill, Rocky Reach Dam
 ```{r}
-UCW_ASC %>% 
-  left_join(., apr_spill_days, by = "run_year") %>% 
-  filter(natal_origin %in% c("Wenatchee_River", "Entiat_River")) %>% 
-  filter(state == "mainstem, upstream of WEL") %>% 
-  mutate(fallback = ifelse(next_state == "mainstem, RRE to WEL", 1, 0)) %>% 
-  mutate(month_1 = month(date_time)) %>% 
-  mutate(month_2 = month(date_time_2)) %>% 
-  mutate(apr = ifelse(month_1 > month_2,
-                      ifelse(4 %in% c(seq(month_1, 12), seq(1, month_2)), 1, 0),
-                ifelse(4 %in% seq(month_1, month_2), 1, 0)))  %>% 
-  filter(apr == 1)  -> UCW_ASC_7_6_aprspill
+jan_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = jan_spill_days, 
+                                         spill_month_numeric = 1, 
+                                         origins = c("Wenatchee_River"), 
+                                         overshoot_state = "mainstem, RRE to WEL", 
+                                         fallback_state = "mainstem, RIS to RRE", 
+                                         dam_abbrev = "RRE")
 
-         
-         
-table(UCW_ASC_7_6_aprspill$next_state)
-# table(UCW_ASC_7_6_aprspill$natal_origin)
-# table(UCW_ASC_7_6_aprspill$fallback)
-# so here, most fish are actually falling back
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(jan_RRE, month_name = "January", dam_name = "Rocky Reach Dam")
+```
+#### February Spill, Rocky Reach Dam
+```{r}
+feb_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = feb_spill_days, 
+                                         spill_month_numeric = 2, 
+                                         origins = c("Wenatchee_River"), 
+                                         overshoot_state = "mainstem, RRE to WEL", 
+                                         fallback_state = "mainstem, RIS to RRE", 
+                                         dam_abbrev = "RRE")
 
-# visualize spill relative to april spill
-
-
-WEL_aprspill_fallback_glm <- glm(fallback ~ WEL, data = UCW_ASC_7_6_aprspill, family = binomial)
-
-# get a predicted line to plot
-# WEL_aprspill_predict <- data.frame(fallback = rep(c(0,1), each = 32),
-#                        WEL = rep(seq(0,31,1), 2))
-WEL_aprspill_predict <- data.frame(WEL = seq(0,31,1))
-
-WEL_aprspill_predict$fallback <- predict(WEL_aprspill_fallback_glm, newdata = WEL_aprspill_predict, type = "response")
-
-
-# for visualization, summarise
-UCW_ASC_7_6_aprspill %>% 
-  group_by(WEL) %>% 
-  summarise(not_fallback = n() - sum(fallback), fallback = sum(fallback))  %>% 
-  pivot_longer(cols = c(not_fallback, fallback)) %>% 
-  dplyr::rename(fallback = name) %>% 
-  mutate(fallback = ifelse(fallback == "fallback", 1, 0)) -> UCW_ASC_7_6_aprspill_counts
-
-
-# WEL_aprspill_fallback_plot <- ggplot(UCW_ASC_7_6_aprspill_props, aes(x = WEL, y = prop)) +
-#   geom_bar(stat = "identity") +
-#   xlab("april Spill Days at Wells Dam")
-  # stat_smooth(method = "glm", method.args = list(family = binomial))
-
-WEL_aprspill_fallback_plot <- ggplot(UCW_ASC_7_6_aprspill_counts, aes(x = WEL, y = fallback)) +
-  geom_point(aes(size = value)) +
-  xlab("April Spill Days at Wells Dam") +
-  geom_line(data = WEL_aprspill_predict, lty = 2)
-  
-WEL_aprspill_fallback_plot
-
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(feb_RRE, month_name = "February", dam_name = "Rocky Reach Dam")
 ```
 
+#### March Spill, Rocky Reach Dam
+```{r}
+mar_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = mar_spill_days, 
+                                         spill_month_numeric = 3, 
+                                         origins = c("Wenatchee_River"), 
+                                         overshoot_state = "mainstem, RRE to WEL", 
+                                         fallback_state = "mainstem, RIS to RRE", 
+                                         dam_abbrev = "RRE")
 
-A very weakly negative relationship (but this doesn't make sense to me).
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(mar_RRE, month_name = "March", dam_name = "Rocky Reach Dam")
+```
+
+#### April Spill, Rocky Reach Dam
+```{r}
+apr_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = apr_spill_days, 
+                                         spill_month_numeric = 4, 
+                                         origins = c("Wenatchee_River"), 
+                                         overshoot_state = "mainstem, RRE to WEL", 
+                                         fallback_state = "mainstem, RIS to RRE", 
+                                         dam_abbrev = "RRE")
+
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(apr_RRE, month_name = "April", dam_name = "Rocky Reach Dam")
+
+filter(UCW_ASC, tag_code == "3D9.1C2C50DD03")
+```
 
 
 
