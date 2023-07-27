@@ -400,11 +400,28 @@ WEL_march_spill %>%
   left_join(., WEL_january_spill, by = "year") %>% 
   pivot_longer(., cols = c("april_spill_days", "march_spill_days", "february_spill_days", "january_spill_days")) -> WEL_monthly_spill
 
+WEL_march_spill %>% 
+  left_join(., WEL_april_spill, by = "year") %>% 
+  left_join(., WEL_february_spill, by = "year") %>% 
+  left_join(., WEL_january_spill, by = "year") -> WEL_monthly_spill_wide
+
 ggplot(WEL_monthly_spill, aes(x = year, y = value, color = name)) +
   geom_point(position = position_dodge(width = 0.75)) +
   ggtitle("WEL")
 
 spill_days_vif(monthly_spill = WEL_monthly_spill)
+
+# why are these parameter estimates so weird? Maybe it has to do with correlations?
+# VIF is quite low but still
+
+cor(dplyr::select(WEL_monthly_spill_wide, -year))
+
+cor(WEL_monthly_spill_wide$january_spill_days + WEL_monthly_spill_wide$march_spill_days, WEL_monthly_spill_wide$february_spill_days + WEL_monthly_spill_wide$april_spill_days)
+
+# right now jan and march have a positive effect, feb and april have a negative effect
+ggplot(WEL_monthly_spill_wide, aes(x = january_spill_days + march_spill_days, y = february_spill_days + april_spill_days)) +
+  geom_point() +
+  ggtitle("Wells Dam, Spill Days")
 ```
 
 ``` {r}
@@ -514,6 +531,8 @@ jan_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC,
 
 # Function 2: Generate the plot
 fallback_v_spilldays_plot(jan_RRE, month_name = "January", dam_name = "Rocky Reach Dam")
+
+setdiff(jan_RRE$tag_code, fish_tag_codes_script)
 ```
 #### February Spill, Rocky Reach Dam
 ```{r}
@@ -555,9 +574,79 @@ apr_RRE <- fallback_v_spilldays_reformat(movement_data = UCW_ASC,
 
 # Function 2: Generate the plot
 fallback_v_spilldays_plot(apr_RRE, month_name = "April", dam_name = "Rocky Reach Dam")
-
-filter(UCW_ASC, tag_code == "3D9.1C2C50DD03")
 ```
 
 
+#### January Spill, Wells Dam
+```{r}
+jan_WEL <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = jan_spill_days, 
+                                         spill_month_numeric = 1, 
+                                         origins = c("Wenatchee_River", "Entiat_River"), 
+                                         overshoot_state = "mainstem, upstream of WEL", 
+                                         fallback_state = "mainstem, RRE to WEL", 
+                                         dam_abbrev = "WEL")
+
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(jan_WEL, month_name = "January", dam_name = "Wells Dam")
+```
+#### February Spill, Wells Dam
+```{r}
+feb_WEL <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = feb_spill_days, 
+                                         spill_month_numeric = 2, 
+                                         origins = c("Wenatchee_River", "Entiat_River"), 
+                                         overshoot_state = "mainstem, upstream of WEL", 
+                                         fallback_state = "mainstem, RRE to WEL", 
+                                         dam_abbrev = "WEL")
+
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(feb_WEL, month_name = "February", dam_name = "Wells Dam")
+```
+
+#### March Spill, Wells Dam
+```{r}
+mar_WEL <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = mar_spill_days, 
+                                         spill_month_numeric = 3, 
+                                         origins = c("Wenatchee_River", "Entiat_River"), 
+                                         overshoot_state = "mainstem, upstream of WEL", 
+                                         fallback_state = "mainstem, RRE to WEL", 
+                                         dam_abbrev = "WEL")
+
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(mar_WEL, month_name = "March", dam_name = "Wells Dam")
+```
+
+#### April Spill, Wells Dam
+```{r}
+apr_WEL <- fallback_v_spilldays_reformat(movement_data = UCW_ASC, 
+                                         spill_data = apr_spill_days, 
+                                         spill_month_numeric = 4, 
+                                         origins = c("Wenatchee_River", "Entiat_River"), 
+                                         overshoot_state = "mainstem, upstream of WEL", 
+                                         fallback_state = "mainstem, RRE to WEL", 
+                                         dam_abbrev = "WEL")
+
+# Function 2: Generate the plot
+fallback_v_spilldays_plot(apr_WEL, month_name = "April", dam_name = "Wells Dam")
+```
+
+```{r}
+# explore for Wells Dam, how many fish are getting each predictor
+dplyr::rename(dplyr::select(jan_WEL, tag_code, spill_month_overlap), January = spill_month_overlap) %>% 
+full_join(dplyr::rename(dplyr::select(feb_WEL, tag_code, spill_month_overlap), February = spill_month_overlap), by = "tag_code") %>% 
+full_join(dplyr::rename(dplyr::select(mar_WEL, tag_code, spill_month_overlap), March = spill_month_overlap), by = "tag_code") %>% 
+  full_join(dplyr::rename(dplyr::select(apr_WEL, tag_code, spill_month_overlap), April = spill_month_overlap)) %>% 
+  replace(is.na(.), 0) -> WEL_spill_month_predictors
+  
+WEL_spill_month_predictors %>% 
+  mutate(months = paste0(ifelse(January == 1, "Jan", ""), 
+                         ifelse(February == 1, ", Feb", ""), 
+                         ifelse(March == 1, ", Mar", ""), 
+                         ifelse(April == 1, ", Apr", ""))) %>% 
+  mutate(months = ifelse(months == ", Apr", "Apr", months)) -> WEL_spill_month_predictors 
+  
+table(WEL_spill_month_predictors$months)
+```
 
