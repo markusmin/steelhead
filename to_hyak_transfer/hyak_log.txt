@@ -2827,6 +2827,113 @@ Even faster! Why though
 # from within the rear_temp_spill directory:
 scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
 
+### 2023-07-26 ###
+Fixed another small typo, re-ran the model.
+Chain 1 Iteration: 390 / 400 [ 97%]  (Sampling)
+Chain 1 Iteration: 400 / 400 [100%]  (Sampling)
+Chain 1 finished in 18499.3 seconds.
+
+# Pull it:
+# from within the rear_temp_spill directory:
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
+
+# Results look very similar. I want to see what this looks like with four chains, esp wrt 
+# computation time.
+
+# bumped the requested time on STF up to 48 hours, changed the R script to run four chains (7 threads per chain)
+# Upload and run:
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/
+
+# Making a new model folder, with April dropped.
+rear_temp_spill_noapr
+
+# This has four chains and 100 iter per chain, upload and run
+# from within /rear_temp_spill_noapr/
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spillnoapr_models/
+
+# What would the structure of a wrapper script be if we wanted to run four chains, each on a separate node?
+The wrapper script would just be a bash script, that submits four jobs to stf
+The more elegant way to do this would be to have one script that just creates an .rda file
+that has all of the data needed to run the stan model, then have a separate R script that
+submits the stan run. This would actually be quite easy to implement, because right before
+we submit the stan model, we store all of the data in a list. Just save this, then import it in the 
+R scripts that run each of the chains
+
+# executing this:
+1) Made an R script stan_data_prep_UCW_temp_spillnoapr.R
+	- this R script ends with saving the data file as an .RDA file. This can be run locally,
+	prior to uploading the folder to mox
+2) Made four R scripts to run one chain each, with a different seed
+3) Made a bash script (submit_chains.sh) to submit these four R scripts
+
+
+# upload and test
+# from within /rear_temp_spill_noapr/
+scp -r ./upper_columbia/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spillnoapr_models/
+
+# submit the bash script to test - I'm currently running the four chain (on one node) at the same time,
+so we can compare these results. I'm curious to see for the other run (on one node), if the
+chains all look the same (because init = 0 for that)
+Update: The chains all look different. They start at zero but then diverge due to the randomness
+of accepting draws
+
+# on mox:
+[mmin@mox1 upper_columbia]$ bash submit_chains.sh
+Submitted batch job 4721879
+Submitted batch job 4721880
+Submitted batch job 4721881
+Submitted batch job 4721882
+[mmin@mox1 upper_columbia]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4721870       stf     UC_W     mmin PD       0:00      1 (Priority)
+           4721815       stf     UC_W     mmin PD       0:00      1 (Resources)
+           4721882       stf   UC_W_4     mmin PD       0:00      1 (Priority)
+           4721881       stf   UC_W_3     mmin PD       0:00      1 (Priority)
+           4721880       stf   UC_W_2     mmin PD       0:00      1 (Priority)
+           4721879       stf   UC_W_1     mmin PD       0:00      1 (Priority)
+[mmin@mox1 upper_columbia]$ 
+
+# Looks great!
+
+### 2023-07-27 ###
+
+The submitting 4 chains separately thing had some typos that I fixed - confirmed it's running now.
+
+How long did the 4 chains on one node run take?
+
+Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1 finished in 26627.5 seconds.
+Chain 2 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 2 finished in 26775.8 seconds.
+Chain 4 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 4 finished in 27398.5 seconds.
+Chain 3 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 3 finished in 27750.1 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 27138.0 seconds.
+Total execution time: 27754.2 seconds.
+
+So yeah, definitely longer - actually almost exactly four times longer than running one chain.
+So that's good to know.
+
+Let's pull the noapr four chain, and yesapr four chain, and look
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_models/upper_columbia/ ./
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spillnoapr_models/upper_columbia/ ./
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
