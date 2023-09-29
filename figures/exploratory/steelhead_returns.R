@@ -29,8 +29,11 @@ BON_passage_counts %>%
   mutate(value = ifelse(value == 0, NA, value)) %>% 
   filter(Year <= 2022) -> BON_salmonid_counts
 
-ggplot(BON_salmonid_counts, aes(x = Year, y = value, color = name)) +
-  geom_line()
+BON_returns <- ggplot(BON_salmonid_counts, aes(x = Year, y = value, color = name)) +
+  geom_line() +
+  ylab("Annual counts at Bonneville Dam")
+
+ggsave(filename = here::here("figures", "BON_dam_returns.png"), plot = BON_returns, height = 6, width = 8)
 
 # Sockeye are doing really well - 2022 was the all time high.
 # Chinook and Coho are also doing well - above the long term average.
