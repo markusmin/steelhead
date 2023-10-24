@@ -3199,3 +3199,71 @@ effective sample size can be larger than the number of iterations. In this latte
 better than independent sampling for some estimation problems. Hamiltonian Monte Carlo, including the 
 no-U-turn sampler used by default in Stan, can produce anticorrelated draws if the posterior is close 
 to Gaussian with little posterior correlation.
+
+### 2023-10-19 ###
+
+# Submit UCW, with 1000 iter (1000 burnin and 1000 sampling)
+# Also here changing to max_treedepth = 15; this is 32 times bigger (2^5) than default of 10
+
+# Created four new R scripts to run 4 chains, 1000 iter, max_treedepth = 15
+
+# Wrote a new script: UCW_submit_chains_1000iter.sh
+
+# Create four new slurm scripts to run 1000iter, with 480 hours requested; hopefully that's okay?
+# It is not! 240 hours is allowed so I submitted those chains
+
+# Move that all to hyak:
+
+scp -r ./upper_columbia_wild/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/
+
+# submitted the runs at 11:30 am on 10/19/23; let's see how long this takes!
+
+Find the maximum difference in successive dates
+Find the row index of this biggest gap
+Display rows of tripData immediately before (three rows) and after (three rows) the biggest gap
+
+### 2023-10-20 ###
+
+Checking in on runs at 11:30 am on 10/20/23
+- we are only at 20 iter of 2000. This is not going to finish in ten days; perhaps tree depth was increased too much.
+	- solution: cancel all of the runs, change max_treedepth to 12 (15 seems too much)
+
+### 2023-10-23 ###
+
+Checkin in on runs at 3:30 PM on 10/23/23
+           4954294       stf   UC_W_1     mmin  R 3-03:50:22      1 n2277
+Chain 1 Iteration:  380 / 2000 [ 19%]  (Warmup)
+Chain 1 Iteration:  390 / 2000 [ 19%]  (Warmup)
+
+So, it's been 3 days, and we're only through 400 iter. This is currently on pace to finish in 15 days. So it won't
+finish in time.
+A 500iter/500warmup run would finish in 10 days.
+I'm going to let this keep running, but submit a 500iter run.
+
+Made new UCH_submit_chains_500iter.sh; job_stf_500iter runs; seed101_500iter  runs
+
+# Move that all to hyak:
+
+scp -r ./upper_columbia_wild/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/
+
+Submitted the chains; note that it apparently killed the other runs?
+Chain 1 Iteration:  400 / 2000 [ 20%]  (Warmup)
+Warning: Chain 1 finished unexpectedly!
+
+Warning message:
+No chains finished successfully. Unable to retrieve the fit.
+Error: No chains finished successfully. Unable to retrieve the draws.
+Execution halted
+
+### 2023-10-24 ###
+
+Checking in on runs at 8:30 am on 10/24/23
+           4958688       stf   UC_W_3     mmin  R   16:34:25      1 n2312
+Chain 1
+Chain 1 Iteration:  10 / 1000 [  1%]  (Warmup)
+Chain 1 Iteration:  20 / 1000 [  2%]  (Warmup)
+Chain 1 Iteration:  30 / 1000 [  3%]  (Warmup)
+
+So a bit slower than I was hoping... If we can get through 50 iter every 24 hours though, this will finish
+
+
