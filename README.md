@@ -21,10 +21,10 @@ This also notes whether detections at fish ladders are in fact, non-ascents. Dia
 
 For computational reasons, the full dataset was split into four, with the same script (except for the files imported and exported) used on each of the four subsets.
 
-`from_hyak_transfer/2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R`
-`from_hyak_transfer/2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R`
-`from_hyak_transfer/2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R`
-`from_hyak_transfer/2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R`
+* `from_hyak_transfer/2022-07-27_det_hist/CTH1-4/CTH1-4_02_hyak_detection_histories_v2.R`
+* `from_hyak_transfer/2022-07-27_det_hist/CTH5-8/CTH5-8_02_hyak_detection_histories_v2.R`
+* `from_hyak_transfer/2022-07-27_det_hist/CTH9-11/CTH9-11_02_hyak_detection_histories_v2.R`
+* `from_hyak_transfer/2022-07-27_det_hist/CTH12-14/CTH12-14_02_hyak_detection_histories_v2.R`
 
 Once the above four scripts were run, this script was run to join them and export a single file that could then be fed into the next step:
 `from_hyak_transfer/2022-07-27_det_hist/02.5_join_det_hist.R`. Note that this script also makes a few fixes to the files, and then exports them here: `from_hyak_transfer/2022-07-27_det_hist/complete_det_hist_postprocessed.csv`.
@@ -34,10 +34,10 @@ This script takes the `complete_det_hist_postprocessed.csv` file that was export
 
 For computational reasons, the full dataset was once again split into four, with the same script (except for the files imported and exported) used on each of the four subsets.
 
-`from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part1.R`
-`from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part2.R`
-`from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part3.R`
-`from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part4.R`
+* `from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part1.R`
+* `from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part2.R`
+* `from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part3.R`
+* `from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part4.R`
 
 Each of these files exports one CSV (`states_complete_part1.csv`, `states_complete_part2.csv`, `states_complete_part3.csv`, and `states_complete_part4.csv`) of the state occupancy history of each fish as defined by our model states.
 
