@@ -3,12 +3,11 @@ Steelhead overshoot and fallback in the Columbia and Snake River Basins
 
 Note: The data files are very large and therefore are not uploaded to GitHub. If you would like access to the data files, please contact me directly.
 
-
-## Overview
-
 To reproduce this analysis, you must run the following scripts **sequentially**:
 
 **Note**: Once the model has been finalized, these scripts will be re-organized such that all of the final versions of each script (i.e., the ones needed to reproduce the results) are together in a single folder. 
+
+## Part 1: Prepare the fish movement data for inclusion in the model
 
 #### Step 1: Query from PTAGIS
 
@@ -44,5 +43,22 @@ Each of these files exports one CSV (`states_complete_part1.csv`, `states_comple
 #### Step 4: Clean up the state occupancy
 
 The script `R/03.5_stepwise_states_cleaning.R` takes as inputs the four CSVs from step 3 and cleans them up to remove any juvenile movements, identify kelt movements, and identify repeat spawners. This script then exports the full state histories for all fish in `stan_actual/adults_states_complete.csv`, and also exports the state histories for the different DPSs (Snake, Upper Columbia, and Middle Columbia) to the `stan_actual/` folder in a few of the sub-folders for models (eventually, this will be moved to a different location).
+
+## Part 2: Prepare the covariate data for inclusion in the model
+
+### Temperature
+
+#### Step 1: Filter out outlier temperatures
+The script `R/22_temperature_for_modeling.Rmd` filters out outlier temperatures manually (based on a visual inspection of temperature data), based on interannual averages (data points >4 degrees from the average value for that day of year are removed), and based on a moving average (data points >2 degrees from the 7-day moving average are removed).
+
+#### Step 2: Fit MARSS model to estimate temperature
+The script `R/23_temperature_MAR_model.R` uses as inputs the forebay and tailrace temperatures from the previous step and uses them to fit a MARSS model to estimate temperature (this addresses the missing data). 
+
+#### Step 3: Estimate temperatures within windows
+The script `R/24_model_based_temperature_windows.Rmd` uses as inputs the MARSS-estimated temperatures from the previous steps, calculates the median residence time for in each state, and then uses that median residence time to calculate the mean temperature using a window for each date (defined as the window of time from the date plus the median residence time in that state).
+
+### Spill
+
+## Part 3: Fit the model 
 
 
