@@ -55,9 +55,11 @@ The script `R/22_temperature_for_modeling.Rmd` filters out outlier temperatures 
 The script `R/23_temperature_MAR_model.R` uses as inputs the forebay and tailrace temperatures from the previous step and uses them to fit a MARSS model to estimate temperature (this addresses the missing data). 
 
 #### Step 3: Estimate temperatures within windows
-The script `R/24_model_based_temperature_windows.Rmd` uses as inputs the MARSS-estimated temperatures from the previous steps, calculates the median residence time for in each state, and then uses that median residence time to calculate the mean temperature using a window for each date (defined as the window of time from the date plus the median residence time in that state).
+The script `R/24_model_based_temperature_windows.Rmd` uses as inputs the MARSS-estimated temperatures from the previous steps, calculates the median residence time for in each state, and then uses that median residence time to calculate the mean temperature using a window for each date (defined as the window of time from the date plus the median residence time in that state). These window temperatures are exported in `/covariate_data/for_model/window_temps_for_stan.csv`.
 
 ### Spill
+
+The script `R/25_spill_data_prep.Rmd` takes the daily average spill at each dam and processes it in two ways: by calculating a window of the volume of spill around a date (the same approach as is used for temperature) and by calculating the total number of days of spill per year in the winter months (January, February, and March). The spill window data is exported in `/covariate_data/for_model/window_spill_for_stan.csv`. and the spill days data is exported in `/covariate_data/for_model/january_spill_df_for_stan.csv`, `/covariate_data/for_model/february_spill_df_for_stan.csv`, and `/covariate_data/for_model/march_spill_df_for_stan.csv`. Note that although the spill days data is exported separately for each of the winter months, it is later combined into a single value for the total number of days with any amount of spill across all months.
 
 ## Part 3: Fit the model 
 
