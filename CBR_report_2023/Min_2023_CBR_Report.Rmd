@@ -15,6 +15,8 @@ linestretch: 1.1
 fontsize: 12pt
 header-includes:
   - \usepackage{lineno}
+  - \usepackage{amsmath}
+  - \usepackage{mathtools}
   - \linenumbers
 urlcolor: blue
 bibliography: Steelhead.bib
@@ -27,6 +29,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = ">"
 )
+
+options(scipen=999)
 ```
 
 ```{r load_functions_libraries, echo = FALSE, warning = FALSE, message = FALSE}
@@ -165,11 +169,11 @@ Columbia River Steelhead, who spend more time as adults in freshwater than any o
 
 <br>
 
-Here, we present a progress update on a new modeling framework that is capable of modeling the entire adult migration of Steelhead, including upstream movements, downstream movements, and movements into tributaries. This modeling framework translates the Columbia River Basin into a series of interconnected states, each representing a reach of the mainstem Columbia or Snake River between hydroelectric dams or a tributary that flows into them. We converted detections of over 60,000 Steelhead over 17 years from each of the hundreds of PIT tag detection sites in the Columbia River Basin into a sequence of state visits for each fish, and fit a Bayesian multistate model to these data using the Stan programming language. This model also uses the network of PIT tag antennas in each tributary to correct for detection efficiency in each of these tributaries. From this model, we generate movement probabilities for fish from each of 17 different natal origins (tributaries), including probabilities of homing, fallback, and overshoot.
+Here, we present a progress update on a new modeling framework that is capable of modeling the entire adult migration of Steelhead, including upstream movements, downstream movements, and movements into tributaries. Furthermore, this model includes parameters to estimate the effects of various covariates that are hypothesized to influence movement decisions (e.g., temperature, spill, and rear type). This modeling framework translates the Columbia River Basin into a series of interconnected states, each representing a reach of the mainstem Columbia or Snake River between hydroelectric dams or a tributary that flows into them. We converted detections of over 55,000 Steelhead over 17 years from each of the hundreds of PIT tag detection sites in the Columbia River Basin into a sequence of state visits for each fish, and fit a Bayesian multistate model to these data using the Stan programming language. This model also uses the network of PIT tag antennas in each tributary to correct for detection efficiency in each of these tributaries.
 
 <br>
 
-Work on this model is ongoing. A previous progress update on this model presented results for a model without any covariates (Min et al. 2022). At this time, the model code has been written and is set up to run with key covariates included (rear type, origin, spill, temperature, and year), but final results are not yet available due to the long run time of the model (on the order of weeks) and the difficulty of securing the computational resources required to run this model. Final model results should be available in early 2024.
+Work on this model is ongoing. A previous progress update on this model presented results for a model without any covariates [@Min2022]. At this time, the model code has been written and is set up to run with key covariates included (rear type, origin, spill, temperature, and year), but final results are not yet available due to the long run time of the model (on the order of weeks) and the difficulty of securing the computational resources required to run this model. Final model results should be available in early 2024.
 
 
 
@@ -191,7 +195,7 @@ The decreased migration success associated with overshoot and fallback may be du
 
 <br>
 
-Because of the association between overshoot and fallback and decreased migration success, previous studies have investigated the influence of various factors on the incidence of these behaviors. Rates of overshoot have been observed to vary considerably among populations, with some studies finding a positive relationship with increasing mainstem water temperature and hatchery rearing upstream of the natal tributary [@Richins2018]. In spring-summer Chinook, @Boggs2004 observed a positive relationship between fallback rates and river discharge. However, these previous studies have looked at these various factors only in isolation and for specific movements, which complicates the modeling of emergent properties and interactions between behaviors, environmental conditions, and populations, and can be challenging in the face of sparse data in some settings. In this progress report, we present a multistate model that is capable of modeling the entire adult Steelhead migration, from first detection at Bonneville Dam to arrival in natal tributaries. This model, which does not constrain movement to only be upstream, allows the complex, multidirectional movement of adult Steelhead to be modeled in full and allows many movements of interest, including fallback, overshoot, and homing, to be estimated in a single framework. The data used in this model were passive integrated transponder (PIT) tag detection histories. This modeling framework is capable of accommodating the effect of multiple categorical and continuous covariates on movement probabilities at each step within the migration. By examining how Steelhead movement probabilities, particularly those of conservation concern, such as overshoot, fallback, homing, and straying, vary by population and are influenced by various factors, this modeling framework will improve our understanding of how both environmental and anthropogenically influenced conditions affect how Steelhead move within the Columbia River and its tributaries.
+Because of the association between overshoot and fallback and decreased migration success, previous studies have investigated the influence of various factors on the incidence of these behaviors. Rates of overshoot have been observed to vary considerably among populations, with some studies finding a positive relationship with increasing mainstem water temperature and hatchery rearing upstream of the natal tributary [@Richins2018]. In spring-summer Chinook, @Boggs2004 observed a positive relationship between fallback rates and river discharge. However, these previous studies have looked at these various factors only in isolation and for specific movements, which complicates the modeling of emergent properties and interactions between behaviors, environmental conditions, and populations, and can be challenging in the face of sparse data in some settings. In this progress report, we present a multistate model that is capable of modeling the entire adult Steelhead migration, from first detection at Bonneville Dam to arrival in natal tributaries. This model, which does not constrain movement to only be upstream, allows the complex, multidirectional movement of adult Steelhead to be modeled in full and allows many movements of interest, including fallback, overshoot, and homing, to be estimated in a single framework. The data used in this model were passive integrated transponder (PIT) tag detection histories. This modeling framework is capable of accommodating the effect of multiple categorical and continuous covariates on movement probabilities at each step within the migration, and estimates the effects of natal origin, rear type, temperature, spill, and year on certain movement probabilities. By examining how Steelhead movement probabilities, particularly those of conservation concern, such as overshoot, fallback, homing, and straying, vary by population and are influenced by various factors, this modeling framework will improve our understanding of how both environmental and anthropogenically influenced conditions affect how Steelhead move within the Columbia River and its tributaries.
 
 
 
@@ -203,7 +207,7 @@ Because of the association between overshoot and fallback and decreased migratio
 ## Modeling overview
 ![Figure 2. The model schematic. There were 29 states in our model: 9 mainstem states (outlined in blue), 19 tributary states (outlined in green), and the absorbing "loss" state (not pictured).](.//figures/full_model_diagram.jpg){width=100%}
 
-In our model, the Columbia River and its tributaries are modeled as a series of connected states, with states defined as either reaches of the mainstem Columbia or Snake River between dams with PIT tag detection capabilities in the adult ladders or tributaries with PIT tag detectors. Fig. 2 shows all of the states in our model; movements over some dams (e.g., The Dalles Dam, John Day Dam, Lower Monumental Dam, or Lower Goose Dam) were not explicitly modeled due to these dams not having PIT tag detection capabilities for the duration of our study period. Future iterations of the model could be configured to include these dams for part of the time series by creating more model states. For example, to use the Dalles and John Day Dams to delineate additional states, state 2 in Fig. 2 (mainstem, Bonneville Dam to McNary Dam) would be split into three states: (1) mainstem, Bonneville Dam to The Dalles Dam; (2) mainstem, The Dalles Dam to John Day Dam; and (3) mainstem, John Day Dam to McNary Dam. This would allow the estimation of fallback and overshoot at The Dalles Dam and John Day Dam (which would be of particular interest to populations near these dams, such as the Deschutes River or Fifteenmile Creek), but would require a temporally-varying state configuration. 
+In our model, the Columbia River and its tributaries are modeled as a series of connected states, with states defined as either reaches of the mainstem Columbia or Snake River between dams with PIT tag detection capabilities in the adult ladders, or tributaries with PIT tag detectors. Fig. 2 shows all of the states in our model; movements over some dams (e.g., The Dalles Dam, John Day Dam, Lower Monumental Dam, or Lower Goose Dam) were not explicitly modeled due to these dams not having PIT tag detection capabilities for the duration of our study period.
 
 <br>
 
@@ -213,7 +217,7 @@ An additional state in our model not shown in the schematic, but which can be re
 
 ### Accessing PIT tag data
 
-PIT tag data were obtained from the Columbia Basin PIT Tag Information System (PTAGIS). Only known-origin individuals (based on known release sites) were included in this dataset. To ensure that only individuals marked as juveniles were retained in the dataset, all individuals that were greater than 350 mm at time of marking were removed. To select returning adults, only individuals that were seen in the adult fishways at Bonneville Dam were selected. To ensure that there were enough data for each population included in this dataset, only populations (defined as tributaries in which PIT-tagged juveniles were released) that had at least 250 individuals distributed across 8 run years were retained. Additionally, only populations with instream PIT tag detections sites in their natal tributaries were retained; if sufficient instream detection sites only became available during the later part of our study period, only individuals from those years were retained. Run years were separated by June 1 of each year, and run year 2005/2006 (beginning on June 1, 2005) was selected as the first year in our dataset. In total, populations from 17 natal tributaries met these criteria: 11 tributaries of the Columbia (Deschutes River, John Day River, Hood River, Fifteenmile Creek, Umatilla River, Yakima River, Walla Walla River, Wenatchee River, Entiat River, Okanogan River, and Methow River) and six tributaries of the Snake (Tucannon River, Asotin Creek, Clearwater River, Salmon River, Grande Ronde River, and Imnaha River). Once the tag codes were identified for each of these tributary populations, a complete tag history report was run in PTAGIS for all of the tag codes in our dataset.
+PIT tag data were obtained from the Columbia Basin PIT Tag Information System (PTAGIS). Only known-origin individuals (based on known release sites) were included in this dataset. To ensure that only individuals marked as juveniles were retained in the dataset, all individuals that were greater than 350 mm at time of marking were removed. To select returning adults, only individuals that were seen in the adult fishways at Bonneville Dam were selected. To ensure that there were enough data for each population included in this dataset, only populations (defined as the combination of natal tributary and rear type) that had at least 350 individuals distributed across 8 run years were retained. Additionally, only populations with instream PIT tag detections sites in their natal tributaries were retained; if sufficient instream detection sites only became available during the later part of our study period, only individuals from those years were retained. Run years were separated by June 1 of each year, and run year 2005/2006 (beginning on June 1, 2005) was selected as the first year in our dataset. In total, 27 populations from 17 different tributaries met these criteria: Hood River (hatchery and wild), Fifteenmile Creek (wild), Deschutes River (wild), John Day River (wild), Umatilla River (hatchery and wild), Walla Walla River (hatchery and wild), Yakima River (wild), Wenathee River (hatchery and wild), Entiat River (wild), Methow River (hatchery and wild), Okanogan River (hatchery), Tucannon River (hatchery and wild), Clearwater River (hatchery and wild), Asotin Creek (wild), Grande Ronde River (hatchery and wild), Salmon River (hatchery and wild), and Imnaha River (hatchery and wild). Once the tag codes were identified for each of these populations, a complete tag history report was run in PTAGIS for all of the tag codes in our dataset.
 
 ### Processing PIT tag data into detections at various sites
 
@@ -250,16 +254,22 @@ Once we determined a history of movement between states, we then subset this mov
 ## Model covariates
 
 ### Temperature data
-Temperature was included as a covariate for fish movement. Daily average forebay and tailrace temperatures were queried from the Columbia Basin Conditions portal from the DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Due to the noise and gaps inherent to the temperature data, a series of steps were performed to clean this data. To address outliers in the temperature data, two steps were taken. First, plots of temperature were manually inspected and sequential runs of temperature points that were outside of the range of possible values for that time of year were removed. Next, a filtering algorithm was applied to remove any temperature values that were more than four degrees outside of the interannual average temperature value for that day of the year, as well as any values that were more than two degrees outside of the 7-day moving average. To address the incomplete temporal resolution for temperature at each dam in our modeling framework, a state-space model was fit using the MARSS package (Holmes et al. 2014). This model took as inputs the cleaned temperature data at the forebay and tailrace for the eight dams (a total of 16 temperature time series). The model was structured with only a single process (the basin-scale temperature) and 16 observations of that process. Each dam had a different offset/bias term (8 total). Model-estimated temperatures on each day for each dam were then exported by using the estimate of the basin-scale temperature plus the dam-specific offset.
+Daily average forebay and tailrace temperatures were queried from the Columbia Basin Conditions portal from the DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Due to the noise and gaps inherent to the temperature data, a series of steps were performed to clean this data. To address outliers in the temperature data, two steps were taken. First, plots of temperature were manually inspected and sequential runs of temperature points that were outside of the range of possible values for that time of year were removed. Next, a filtering algorithm was applied to remove any temperature values that were more than four degrees outside of the interannual average temperature value for that day of the year, as well as any values that were more than two degrees outside of the 7-day moving average. To address the incomplete temporal resolution for temperature at each dam in our modeling framework, a state-space model was fit using the MARSS package [@Holmes2012a]. This model took as inputs the cleaned temperature data at the forebay and tailrace for the eight dams (a total of 16 temperature time series). The model was structured with only a single process (the basin-scale temperature) and 16 observations of that process. Each dam had a different offset/bias term (8 total). Model-estimated temperatures on each day for each dam (the estimate of the basin-scale temperature plus the dam-specific offset) were z-scored prior to inclusion in the model.
 
-To estimate the temperatures experienced by fish, the median residence time in each state in our model was first calculated. This was done by calculating the amount of time spent in each state by each fish in our dataset (the difference between date on which a fish was observed exiting a state and the date on which a fish was observed entering a state) and then taking the state-specific median across all fish. To estimate the mean temperature experienced by the fish while in a state, the mean temperature across a window of time (defined as the date a fish was observed entering a state plus the median residence time for all fish in that state) was taken. 
+<br>
+
+To estimate the temperatures experienced by fish, it was first necessary to calculate the median residence time in each state in our model. This was done by calculating the amount of time spent in each state by each fish in our dataset (the difference between date on which a fish was observed entering a state and the date on which a fish was observed exiting a state) and then taking the median time spent in each state across all fish. To estimate the mean temperature experienced by the fish while in a state, the mean temperature across a window of time (defined as the date a fish was observed entering a state plus the median residence time for all fish in that state) was taken. The downstream dam for a state was used as the source of temperature data for that state.
 
 ### Spill data
-Daily average spill (in thousands of cubic feet per second) were queried from the Columbia Basin Conditions portal from the DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Spill data was processed in two different ways to facilitate the inclusion of two hypothesized relationships between spill and fish fallback over dams. Fallback over dams can be divided into two distinct types of fallback: en-route fallback, which occurs when fish fall back prior to reaching their natal tributaries, and post-overshoot fallback, which occurs when fish fall back after overshooting natal tributaries (having ascended the dam directly upstream of their natal tributary). 
+Daily average spill (in thousands of cubic feet per second) were queried from the Columbia Basin Conditions portal from the CBR DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Spill data was processed in two different ways to facilitate the inclusion of two hypothesized relationships between spill and fish fallback over dams. Fallback over dams can be divided into two distinct types of fallback: en-route fallback, which occurs when fish fall back prior to reaching their natal tributaries, and post-overshoot fallback, which occurs when fish fall back after overshooting natal tributaries (having ascended the dam directly upstream of their natal tributary). 
 
-En-route fallback goes against the desired direction of movement for all fish, as their goal is to continue traveling upstream. Our hypothesis surrounding en-route fallback is that it is involuntary; i.e., that it occurs as a result of river conditions (spill, flow) and/or individual condition. As such, our hypothesis for the relationship between spill and en-route fallback is that it is related to the volume of spill, as this would serve to push fish back downstream over a dam via the spillway (or alternatively, serves as a proxy for flow conditions in the river). The approach that we used for this spill covariate is the same as was used for temperature, i.e., the use of windows and taking the average spill during that window.
+<br>
 
-In contrast, post-overshoot fallback is a desirable outcome for all fish, as this movement helps them get closer to their natal tributary. Our hypothesis surrounding post-overshoot fallback is that it is voluntary; i.e., that it occurs when fish make the decision to want to go back downstream and towards their natal tributaries. As such, our hypothesis for the relationship between spill and post-overshoot fallback is that it is related to the presence of spill, as the presence of spill allows fish to find a safe route back downstream. This is based in large part on the work of Richins & Skalski (2018) and Wertheimer (2007), who found that even small amounts of surface flow were effective for routing steelhead kelts away from turbines, indicating that the availability of surface passage options may be more important than the volume of flow. The approach we used for this covariate was to find the total number of days with any amount of spill in the months of January, February, and March, which is when post-overshoot fallback is predicted to occur (after overwintering).
+En-route fallback goes against the desired direction of movement for all fish, as their goal is to continue traveling upstream. Our hypothesis concerning en-route fallback is that it is involuntary; i.e., that it occurs as a result of river conditions (spill, flow) and/or individual condition. As such, our hypothesis for the relationship between spill and en-route fallback is that it is related to the volume of spill, as this would serve to push fish back downstream over a dam via the spillway (or alternatively, serves as a proxy for flow conditions in the river). The approach that we used for this spill covariate is the same as was used for temperature, i.e., the use of windows and taking the average spill during that window. However, spill data was not z-scored, as the zeros in the data are informative.
+
+<br>
+
+In contrast, post-overshoot fallback is a desirable outcome for all fish, as this movement helps them get closer to their natal tributary. Our hypothesis concerning post-overshoot fallback is that it is voluntary; i.e., that it occurs when fish make the decision to go back downstream and towards their natal tributaries. As such, our hypothesis for the relationship between spill and post-overshoot fallback is that it is related to the presence of spill, as the presence of spill allows fish to find a safe route back downstream. This is supported by the work of Richins & Skalski (2018) and Wertheimer (2007), who found that even small amounts of surface flow were effective for routing steelhead kelts away from turbines, indicating that the availability of surface passage options may be more important than the volume of flow. The approach we used for this covariate was to find the total number of days with any amount of spill in the months of January, February, and March, which is when post-overshoot fallback is predicted to occur (after overwintering).
 
 
 
@@ -319,7 +329,7 @@ trib_cat <- data.frame(Tributary = c("Hood River", "Fifteenmile Creek", "Deschut
 
 flextable(trib_cat) %>% 
   align(part = "all") %>% # left align
-  set_caption(caption = "Tributary PIT tag antenna configurations used in detection efficiency estimation. Site refers to the PIT tag detection site chosen for the detection efficiency estimation, based on its location close to the mouth of the tributary. Configuration refers to the configuration of antennas at the site, where Initial is the name given to the antenna configuration at the site at the start of the time series, and any subsequent changes from the initial configuration at the site are noted in this column.") %>% 
+  set_caption(caption = "Tributary PIT tag antenna configurations used in detection efficiency estimation. Site refers to the PIT tag detection site chosen for the detection efficiency estimation, based on its location close to the mouth of the tributary. Configuration refers to the configuration of antennas at the site, where Initial is the name given to the antenna configuration at the site at the start of the time series, and any subsequent changes from the initial configuration at the site are noted in this column.", autonum = officer::run_autonum()) %>% 
   font(fontname = "Times New Roman (Body)", part = "all") %>% 
   fontsize(size = 10, part = "body") %>% 
   theme_booktabs() %>% # default theme
@@ -331,7 +341,6 @@ flextable(trib_cat) %>%
 <br>
 
 Detection efficiency was then estimated using a logistic regression, with detection a function of an intercept for the categorical covariate of site configuration, and a slope term (unique to each tributary) multiplied by the mean discharge in that run year.
-\usepackage{amsmath}
 <br>
 
 $$
@@ -354,21 +363,72 @@ A Stan [@Carpenter2017] model was used to estimate detection probability in each
 
 ### Movement model
 
-The history of state transitions for each individual PIT-tagged fish, as well as the information on that fish's natal origin, were the inputs for the current configuration of the multistate model. The multistate model was implemented in a Bayesian framework using the Stan programming language [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Fig. 2). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current state, or into the absorbing loss category, which a fish enters once the detection history ends. Each of these probabilities was evaluated through a categorical logit model, with an intercept term (a grand mean, for all fish in the dataset) as well as a term for the origin of the fish. The loss probability was calculated as 1 - the sum of the other probabilities, enforcing a constraint that all movement probabilities have to sum to 1.
+#### Overview
+The history of state transitions for each individual PIT-tagged fish, the information on that fish's natal origin, and the previously described covariates were the inputs for the multistate model. The multistate model was implemented in a Bayesian framework using the Stan programming language [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Fig. 2). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current state, or into the absorbing loss category, which a fish enters once the detection history ends. Each of these probabilities was evaluated through a categorical logit model, with an intercept term (a grand mean, for all fish in the dataset) as well as terms for each of the covariates in our model (origin, year, spill, and temperature). The loss probability was calculated as 1 - the sum of the other probabilities, enforcing a constraint that all movement probabilities have to sum to 1.
 
 <br>
 
-Due to the computational requirements of evaluating the detection histories of over 60,000 individual fish, the model was fit to three different datasets, corresponding to the three Steelhead DPSs found exclusively upstream of Bonneville Dam: the Middle Columbia DPS, the Upper Columbia DPS, and the Snake River Basin DPS. Within the datasets for each of the three DPSs, all individuals were pooled across years when fitting the model, generating movement probability estimates that did not vary annually. To reduce the number of parameters in the model, an effect of natal origin was only included for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed different natal origins to differentiate as they neared natal tributaries. Each of the DPS models was run for 200 warmup and 200 sampling iterations; future model runs will use longer chain lengths, but shorter chain lengths were used for the model runs in this report because of the long run times of these models. Despite the relatively short chain lengths, the modeling results in this progress report are reliable, as diagnostic checks such as effective sample sizes, autocorrelation, and r hat values were all satisfied. All code is available at https://github.com/markusmin/steelhead.
+Due to the computational requirements of evaluating the detection histories of over 55,000 individual fish, the model will be fit to six different datasets, corresponding to the hatchery or wild fish from the three Steelhead DPSs found exclusively upstream of Bonneville Dam: the Middle Columbia DPS, the Upper Columbia DPS, and the Snake River Basin DPS. This modeling framework has the additional benefit of estimating different movement probabilities (and covariate effects) for hatchery and wild fish, facilitating comparisons between the two. Each of the DPS models will be run for 1000 warmup and 1000 sampling iterations. At this moment in time, full length model runs have not yet run to completion, but we are in the process of setting up the modeling framework on high-performance computational resources at the UW. All code is available at https://github.com/markusmin/steelhead.
 
 <br>
+
+#### Covariate inclusion
+
+In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explictly included via parameters in the model: origin, temperature, spill, and year.
+
+
+##### Origin
+
+To reduce the number of parameters in the model, an effect of natal origin was only included for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed different natal origins to differentiate as they neared natal tributaries.
+
+
+##### Temperature
+
+Two separate temperature effects were estimated in our modeling framework, to account for the temporal aspect of temperature. Since temperature is strongly correlated with day of year, which has been previously noted to influence Steelhead migration patterns [@Siegel2021], we divided the effect of temperature into a winter/spring effect (January 1 - May 31) and a summer/fall effect (June 1 - December 31). Depending on the day of year of each movement, the temperature in the window was either multiplied by the winter/spring temperature parameter or the summer/fall temperature parameter. Approximately 96% of all movements occurred in the summer/fall period.
+
+The temperature effects were structured to allow a temperature effect only for movements from a mainstem state to the mainstem state upstream of that state, or from a mainstem state into a tributary. Furthermore, temperature effects were structured to allow different natal origins to have a different response to temperature within the DPS boundaries. As such, the same origin structure was used as was used for the origin effects - temperature effects were shared outside of a DPS, but within a DPS each natal origin had a separately estimated parameter for the effect of temperature on each movement.
+
+
+##### Spill
+
+For the effect of the volume of spill within a window of time, every downstream movement over a dam (fallback) included an effect for the volume of spill. For the effect of the number of days in the winter with some volume of spill, this covariate was only included for origins for which this was a post-overshoot fallback movement. This parameter was shared between all origins for which the movement was a post-overshoot fallback movement.
+
+##### Year
+
+Within the datasets for each of the six populations (3 DPSs x 2 rear types), all individuals were pooled across years when fitting the model, but a random effect of year for certain movements was included to allow the movement probabilities to vary interannually and account for year specific differences that weren't captured by the covariates included in the model.. The setup for the inclusion of year effects was the same as that for origin effects - a random effect for each year was only included for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). One reason for this modeling choice was the computational necessity of restricting the number of movements that receive a random effect for each of the 17 years in our dataset, as well as needing enough data for each movement to estimate a separate effect for each origin for each year. A second, ecological reason for this choice was based on our a priori hypothesis that interannual differences would mostly emerge when fish were nearing natal tributaries. Downstream of the DPS, individuals are expected to behave similarly regardless of the year, as all fish have natal tributaries that are upstream.
+
+
+#### Statistical implementation and detection efficiency correction
 
 For each transition of a fish out of a state, there are $n$ possible non-loss transitions out of the current state, which correspond to the number of arrows out of the state as seen in Fig. 2. The true probability ($p_{actual}$) of moving to state $m$ ($m$ = 1, ..., n) from the current state is given as follows:
 
 <br> 
 
+
+
 $$
-p_{actual, m} = \frac{exp(b_{0,m} + b_{origin,m})}{1 + exp(b_{0,1} + b_{origin,1}) + exp(b_{0,2} + b_{origin,2}) + ... exp(b_{0,n} + b_{origin,n})}
+\begin{aligned}
+p_{actual, m} = \frac{exp(b_{0,m} + [covariate\:effects]_{m})}{1 + exp(b_{0,1} + [covariate\:effects]_{1}) + 
+... exp(b_{0,n} + [covariate\:effects]_{n})}
+\end{aligned}
 $$
+<br>
+
+$b_0$ is the intercept (the grand mean for all fish in the DPS). The term $[covariate\:effects]$ is a placeholder for the different covariates that are included in this model, as the covariate effects included vary depending on the type of movement and its relation to the fish's natal origin. For example, for the probability of a Wenatchee River fish falling back over Rocky Reach Dam, the covariate effects term in the numerator would be as follows:
+
+$$
+b_{origin,1} + b_{spillwindow,1} * spillvolume +  b_{spilldays,1} * spilldays + b_{year,1}
+$$
+
+<br> 
+
+This is because the movement is:
+
+* inside the Upper Columbia DPS boundaries, so there is an effect of origin
+* a fallback movement over a dam, so there is an effect of the volume of spill
+* a post-overshoot fallback movement over a dam (because Rocky Reach Dam is upstream of the Wenatchee River), so there is an effect of the days of spill during the winter months
+* not an upstream movement, so there is no effect of temperature
+
 <br>
 
 The loss term is given by the following equation:
@@ -424,16 +484,6 @@ In these equations, $p_{detection}$ is the probability of detection, $p_{actual}
 - $k$ is the site configuration (a categorical variable)
 - $t$ is the run year
 
-### Derived model probabilities
-
-#### Final population distribution (final fates)
-
-From the movement probabilities estimated by the model, we estimated the probability of fish ending in each state in the model. This was done via a simulation approach, where for each natal origin, one million fish of that origin started in the state directly upstream of Bonneville Dam. The simulation then ran forward in time, selecting the next state of each fish based on the model-derived probabilities of movement, until each fish entered the loss state. The state directly prior to the loss state was recorded as the "final fate" of the fish, and the proportion of fish that ended in each state was calculated. Credible intervals were generated for these final fates by re-running the simulation with each of the MCMC draws for each parameter, with the 2.5th and 97.5th quantiles of the final fates presented.
-
-#### Homing probabilities, conditional on overshoot
-
-To assess the effect of overshooting on eventual homing success, as defined by the final fate of a fish being its natal tributary, the simulation approach outlined above was similarly implemented, but with a different starting state. The probability of homing was compared for fish which started in the state that connected to the home tributary and for fish which started in the first overshoot state. These two probabilities were compared by computing the ratio of the probability of homing for overshooting and non-overshooting fish and then calculating the 95% credibility interval around this ratio.
-
 # Results
 
 ## Summary statistics
@@ -442,23 +492,29 @@ To assess the effect of overshooting on eventual homing success, as defined by t
 ### Sample sizes
 
 ```{r fish_table_load, echo = FALSE, message = FALSE, warning = FALSE}
-read.csv(here::here("CBR_report", "CBR_report_final", "tables", "fish_year_origin_table.csv"), row.names = 1) -> fish_year_origin_table
+read.csv(here::here("CBR_report_2023", "tables", "population_table.csv"), row.names = 1) -> fish_year_origin_table
 
-fish_year_origin_table[match(natal_origin_order, fish_year_origin_table$natal_origin),] -> fish_year_origin_table
+# fish_year_origin_table[match(natal_origin_order, fish_year_origin_table$natal_origin),] -> fish_year_origin_table
+
+fish_year_origin_table %>% 
+  arrange(factor(natal_origin, levels = natal_origin_order)) -> fish_year_origin_table
 
 fish_year_origin_table %>% 
   mutate(natal_origin = gsub("_", " ", natal_origin)) -> fish_year_origin_table
 
-colnames(fish_year_origin_table) <- c("Natal Origin", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22")
+fish_year_origin_table %>% 
+  dplyr::select(-c(natal_origin, rear_type_code)) -> fish_year_origin_table
+
+colnames(fish_year_origin_table) <- c("Population", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "Total")
 ```
 
-A total of 61,220 PIT-tagged fish were in our dataset, distributed across `r ncol(fish_year_origin_table) - 1` run years. The three natal origins with the most fish were the Salmon River, the Methow River, and the Grande Ronde River.
+A total of `r sum(fish_year_origin_table$Total)` PIT-tagged fish were in our dataset, distributed across `r ncol(fish_year_origin_table) - 2` run years. The three populations with the most fish were the Salmon River (hatchery), the Grande Ronder River (hatchery), and the Clearwater River (hatchery).
 
 <br>
 ```{r fish_table_print, echo = FALSE, message = FALSE, warning = FALSE}
 flextable(fish_year_origin_table) %>% 
   align(part = "all") %>% # left align
-  set_caption(caption = "Number of tagged fish in our dataset, by natal origin and run year.") %>% 
+  set_caption(caption = "Number of tagged fish in our dataset, by population (combination of natal origin and rear type) and run year.") %>% 
   font(fontname = "Times New Roman (Body)", part = "all") %>% 
   fontsize(size = 9, part = "body") %>% 
   fontsize(size = 8, part = "header") %>% 
@@ -468,580 +524,10 @@ flextable(fish_year_origin_table) %>%
 
 <br>
 
-
-### Out-of-DPS movement
-
-Snake River Basin Steelhead were seen in the Upper Columbia (upstream of Priest Rapids Dam) much more often than Upper Columbia Steelhead were seen in the Snake River (upstream of Ice Harbor Dam) (Table 3). The Upper Columbia natal origin which was most often seen in the Snake River was the Methow River, but only 5 individuals (comprising 0.06% of the 7,996 tagged individuals from this natal origin) were seen in the Snake River. In contrast, 3.37% of Asotin Creek Steelhead (19 of 564 tagged individuals) and 2.09% of Imnaha River Steelhead (106 of 5,060 tagged individuals) were seen upstream of Priest Rapids Dam. Middle Columbia Steelhead, especially Walla Walla River Steelhead, were seen in either the Snake River or the Upper Columbia very frequently; these fish were individuals that overshot their home tributary. 
-
-<br>
-
-```{r out_of_DPS, echo = FALSE, message = FALSE, warning = FALSE}
-read.csv(here::here("CBR_report", "CBR_report_final", "tables", "out_of_ESU_counts_table.csv"), row.names = 1) -> out_of_ESU_counts_table
-
-out_of_ESU_counts_table[match(natal_origin_order, out_of_ESU_counts_table$natal_origin),] -> out_of_ESU_counts_table
-
-out_of_ESU_counts_table %>% 
-  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
-  dplyr::rename("Natal Origin" = natal_origin, "Sample Size" = total, "Number observed outside of DPS" = n, "Percent" = percent) -> out_of_ESU_counts_table
-
-# Let's remove the Hood River for now, since it's in the Lower Columbia DPS
-out_of_ESU_counts_table <- subset(out_of_ESU_counts_table, `Natal Origin` != "Hood River")
-
-
-flextable(out_of_ESU_counts_table) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Number and percent of tagged individuals seen in reaches of the Columbia or Snake outside of the DPS boundaries that are not necessary for homing. For Middle Columbia Steelhead, this is defined as reaches upstream of Priest Rapids Dam on the Columbia River or upstream of Ice Harbor Dam on the Snake River; for Upper Columbia Steelhead, this is defined as reaches upstream of Ice Harbor Dam on the Snake River, and for Snake River Basin Steelhead, this is defined as reaches upstream of Priest Rapids Dam on the Columbia River.")  %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  FitFlextableToPage()
-```
-
-
-### Overshoot by dam
-
-Overshooting was most frequently observed in John Day River Steelhead (55% of tagged individuals overshot McNary Dam), Umatilla River Steelhead (40% of tagged individuals overshot McNary Dam), Wenatchee River Steelhead (47% of tagged individuals overshot Rocky Reach Dam), Entiat River Steelhead (35% of tagged individuals overshot Wells Dam), and Walla Walla River Steelhead (52% of tagged individuals overshot Ice Harbor Dam). Two populations were observed to overshoot at least two dams at a frequency higher than 20%: Walla Walla River Steelhead (Ice Harbor Dam and Lower Granite Dam) and Wenatchee River Steelhead (Rocky Reach Dam and Wells Dam). Middle Columbia Steelhead tended to overshoot at Ice Harbor Dam more frequently than at Priest Rapids Dam, with the exception of Yakima River Steelhead, which can be explained by the Yakima River confluence with the Columbia River being upstream of the confluence of the Columbia and Snake Rivers. 
-
-<br> 
-
-```{r overshoot_table, echo = FALSE, message = FALSE, warning = FALSE}
-read.csv(here::here("CBR_report", "CBR_report_final", "tables", "overshoot_dam_origin_table.csv"), row.names = 1) -> overshoot_dam_origin_table
-
-# overshoot_dam_origin_table[is.na(overshoot_dam_origin_table)] <- "NA"
-
-overshoot_dam_origin_table[match(natal_origin_order, overshoot_dam_origin_table$natal_origin),] -> overshoot_dam_origin_table
-
-overshoot_dam_origin_table %>% 
-  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
-  dplyr::rename("Natal Origin" = natal_origin) -> overshoot_dam_origin_table
-
-
-flextable(overshoot_dam_origin_table) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Percent of tagged individuals observed overshooting each dam, number of tagged individuals observed overshooting each dam, and total number of tagged individuals from each natal origin. Blank cells indicate dams that are not overshoot dams for that natal origin, as they are downstream of the confluence of the natal tributary and the mainstem Columbia or Snake River.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  FitFlextableToPage()
-```
-
-
-### Fallback by dam
-
-Fallback at dams was not observed directly, but rather was inferred by the remainder of the detection history. Due to detection efficiency in fallback routes being less than one, but also not estimable, the estimates presented in Table 5 are lower bound estimates of fallback. Many natal origins had high proportions of individuals falling back over at least one dam. More than 20% of PIT-tagged John Day River Steelhead, Umatilla River Steelhead, and Entiat River Steelhead had at least one known fallback event, the majority of which were post-overshoot fallback events. By dam, McNary Dam had the highest number of fish observed to fall back over it (2,480), followed by Lower Granite Dam (1,440), Ice Harbor Dam (1,184), and Bonneville Dam (1,148).
-
-<br>
-
-```{r fallback_table, echo = FALSE, message = FALSE, warning = FALSE}
-read.csv(here::here("CBR_report", "CBR_report_final", "tables", "fallback_dam_origin_table.csv"), row.names = 1) -> fallback_dam_origin_table
-
-fallback_dam_origin_table[is.na(fallback_dam_origin_table)] <- "NA"
-
-fallback_dam_origin_table[match(natal_origin_order, fallback_dam_origin_table$natal_origin),] -> fallback_dam_origin_table
-
-fallback_dam_origin_table %>% 
-  mutate(natal_origin = gsub("_", " ", natal_origin)) %>% 
-  dplyr::rename("Natal Origin" = natal_origin) -> fallback_dam_origin_table
-
-
-flextable(fallback_dam_origin_table) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Proportion and number of tagged individuals observed falling back at each dam. Highlighted cells are post-overshoot fallback, whereas non-highlighted cells are en-route fallback. NA values indicate a dam that no fish of that natal origin ascended.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  # highlight the post-overshoot fallback
-  # style(i = 2, j = 3:4, 
-  #       pr_t = fp_text_default(
-  #         shading.color = "yellow")) %>% 
-  highlight(i = ~`Natal Origin` == "Hood River", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ WEL, color = "wheat") %>%
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Hood River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ MCN, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ MCN, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Entiat River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ LGR, color = "wheat") %>%
-  highlight(i = ~`Natal Origin` == "Methow River", j = ~ ICH, color = "wheat") %>%
-  highlight(i = ~`Natal Origin` == "Methow River", j = ~ LGR, color = "wheat") %>%
-  highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Salmon River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ WEL, color = "wheat") %>% 
-      highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ WEL, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-
-## Final population distribution probability
-
-The final population distribution was extracted from model output for migrants from each natal origin, conditional on passing Bonneville Dam as an adult. The final population distribution probabilities are adjusted for detection efficiency to the extent that detection efficiency could be estimated; inadequate detection opportunities in the Clearwater River, Salmon River, and Grande Ronde Rivers resulted in negative bias of unknown size on distribution probabilities for those tributaries. Results are presented below categorized by DPS.
-
-<br>
-
-### Middle Columbia River Steelhead
-
-Yakima River, Umatilla River, and Deschutes River Steelhead each had median homing probabilities of over 0.5, with Yakima River Steelhead having the highest homing probability of any of the six Middle Columbia Steelhead tributaries, with a homing probability of 0.77 (0.71 - 0.82). On the contrary, Fifteenmile Creek, John Day River, and Walla Walla River Steelhead all had median homing probabilities below 0.4. Each of these populations had varying final fate distributions. Fifteenmile Creek Steelhead had a 0.23 (0.19 - 0.3) probability of ending in the mainstem between Bonneville and McNary Dams (the mainstem state which connects to Fifteenmile Creek), but actually had a higher median probability of ending up in the Deschutes River (0.44, 95% CI 0.36 - 0.53) than in Fifteenmile Creek (0.27, 95% CI 0.22 - 0.34). John Day River and Walla Walla River Steelhead, which both had an overshoot frequency of over 50% (Table 4), had a final fate distribution where the probability was distributed over more states. John Day River Steelhead had a 0.36 (0.33 - 0.40) probability of homing to the John Day River, a 0.09 (0.07 - 0.12) probability of ending in the Deschutes River, a 0.25 (0.23 - 0.28) probability of ending in the mainstem between Bonneville and McNary Dams (the mainstem state which connects to the John Day River), and a 0.16 (0.14 - 0.17) probability of ending in the mainstem state directly upstream of McNary Dam, which represents an overshoot state for this population. Walla Walla River Steelhead had a 0.37 (0.29 - 0.39) probability of homing to the Walla Walla River, a 0.17 (0.15 - 0.18) probability of ending in the mainstem between Bonneville and McNary Dams (the mainstem state which connects to the Walla Walla River), a 0.19 (0.17 - 0.21) probability of ending in the mainstem state between Ice Harbor and Lower Granite Dams (the first overshoot state on the Snake River), a 0.14 (0.13 - 0.15) probability of ending in the mainstem upstream of Lower Granite Dam (the second overshoot state on the Snake River), and a 0.08 (0.07 - 0.09) probability of straying to the Tucannon River (which is upstream of Ice Harbor Dam).
-
-<br>
-
-![Figure 4. Fifteenmile Creek Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/fifteenmile_fates_plot.pdf){width=100%}
-
-![Figure 5. Deschutes River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/deschutes_fates_plot.pdf){width=100%}
-
-![Figure 6. John Day River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/john_day_fates_plot.pdf){width=100%}
-
-![Figure 7. Umatilla River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/umatilla_fates_plot.pdf){width=100%}
-
-![Figure 8. Walla Walla River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/walla_walla_fates_plot.pdf){width=100%}
-
-![Figure 9. Yakima River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/yakima_fates_plot.pdf){width=100%}
-
-### Upper Columbia River Steelhead
-
-Wenatchee River Steelhead only had a roughly 1/3 probability of homing successfully, whereas the other three origins (Entiat River, Methow River, and Okanogan River) had median homing probabilities between 0.4 and 0.6. Wenatchee River Steelhead had high probabilities of ending in overshoot mainstem states upstream of the Wenatchee, notably the reach upstream of Well's Dam (0.17, 95% CI 0.16-0.18) and the reach between Rocky Reach Dam and Well's Dam (0.09, 95% CI 0.08-0.09). Entiat River Steelhead had a less than 0.1 probability of ending in any of the mainstem states on the Upper Columbia, while Methow River and Okanogan River Steelhead had 0.19 (0.17 - 0.21) and 0.13 (0.09 - 0.16) probabilities, respectively, of ending in the reach upstream of Wells' Dam, which connects to both of their natal tributaries. While Methow River Steelhead had a 0.05 (0.04-0.06) probability of straying to the Okanogan River, the other three origins had a 0.03 - 0.04 median probability of straying to the Methow River. For all natal origins, the probability of straying to any other tributary was nearly zero, except for the Deschutes River, which had a probability 0.01 (0.01 - 0.02) for all natal origins.
-
-<br>
-
-All Upper Columbia Steelhead had an estimated 0.22 (0.22 - 0.23) probability of only making it to the reach between Bonneville Dam and McNary Dam; however, this final fate is most representative of Methow River and Wenatchee River Steelhead due to their larger sample sizes and the shared movement probabilities in this reach of the Columbia River for all natal origins within this DPS (see Discussion section 5.1.2 for detail on this limitation).
-
-<br>
-
-![Figure 10. Wenatchee River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/wenatchee_fates_plot.pdf){width=100%}
-
-![Figure 11. Entiat River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/entiat_fates_plot.pdf){width=100%}
-
-![Figure 12. Methow River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/methow_fates_plot.pdf){width=100%}
-
-![Figure 13. Okanogan River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/okanogan_fates_plot.pdf){width=100%}
-
-### Snake River Basin Steelhead
-
-Because three of the six Snake River tributaries could not be corrected for detection efficiency, homing probabilities for these three tributaries (the Clearwater River, Grande Ronde River, and Salmon River) are biased low by an known amount, as are straying probabilities of the other three origins into these three tributaries. Fish from these three natal origins each had a median probability of last being seen in the mainstem Snake River above Lower Granite Dam (the state which connects to these tributaries) of over 0.5; many of the fish which were last seen in this state likely reached natal tributaries but were not detected. The three tributaries for which detection efficiency could be estimated had varying homing probabilities: while the probability of homing for Asotin Creek individuals was 0.59 (0.53 - 0.64), the homing probability was lower for Imnaha River Steelhead at 0.44 (0.42 - 0.45), and lowest for Tucannon River Steelhead at 0.33 (0.31 - 0.36). Tucannon River Steelhead had high overshoot frequency at Lower Granite Dam (Table 4), and consequently these fish had a high probability of last being seen upstream of Lower Granite Dam, with a 0.25 (0.24 - 0.27) probability of ending in this state. Imnaha River Steelhead also had a high probability of last being seen upstream of Lower Granite Dam (0.27, 0.25 - 0.28). In both of these cases where final fate probabilities were high for the reach upstream of Lower Granite Dam, some of these fish may have strayed to tributaries of the Snake River either without PIT tag antennas or into the aforementioned tributaries that did not have the ability to correct for detection efficiency.
-
-<br>
-
-All Snake River Basin Steelhead had an estimated 0.20 (0.19 - 0.20) probability of only making it to the reach between Bonneville Dam and McNary Dam; however, this final fate is skewed towards natal origins in this DPS with large sample sizes (e.g., the Salmon River) due to the shared movement probabilities in this reach of the Snake River for all natal origins within this DPS (see Discussion section 5.1.2 for detail on this limitation).
-
-<br>
-
-![Figure 14. Tucannon River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/tucannon_fates_plot.pdf){width=100%}
-
-![Figure 15. Clearwater River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/clearwater_fates_plot.pdf){width=100%}
-
-![Figure 16. Asotin Creek Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/asotin_fates_plot.pdf){width=100%}
-
-![Figure 17. Grande Ronde River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/grande_ronde_fates_plot.pdf){width=100%}
-
-![Figure 18. Salmon River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/salmon_fates_plot.pdf){width=100%}
-
-![Figure 19. Imnaha River Final Fate Probabilities. Point estimates in both the figure and accompanying table show the median value, with the intervals showing the 95% credible interval.](.//figures/final_fates_plots/imnaha_fates_plot.pdf){width=100%}
-
-## Homing probabilities, conditional on overshoot
-
-Overshooting dams considerably reduced homing probability, with an average associated drop in homing probability of around 0.5 across the 9 natal origins for which overshoot could be estimated (Table 6). For some natal origins, this reduction was modest. For example, most Yakima River and Entiat River Steelhead that overshot still were most likely to make it home. For other natal origins, the effect of overshooting was dramatic: the probability of homing for Wenatchee River Steelhead that did not overshoot was nearly four times that of individuals that did (Table 6). Interestingly, for Yakima River and Walla Walla River Steelhead, which could overshoot at Priest Rapids Dam or Ice Harbor Dam, for both tributaries overshooting Ice Harbor Dam led to a lower probability of successfully homing than did overshooting Priest Rapids Dam.
-
-<br>
-
-```{r homing_probs, echo = FALSE, warning = FALSE, message = FALSE}
-read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "overshoot_homing_probabilities.csv"), row.names = 1) %>% 
-  dplyr::rename("Natal Origin" = natal_origin, "Non-overshoot" = non_overshoot, "Overshoot" = overshoot, "Ratio" = overshoot_ratio) -> overshooting_homing_probs
-
-flextable(overshooting_homing_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "A comparison of the probability of successfully homing, conditional on either (1) making it to the section of mainstem into which the home tributary flows (Non-overshoot), or (2) on overshooting the dam directly upstream of the home tributary (Overshoot), with the ratio of the probability of homing for  overshoot to non-overshoot (Ratio). Point estimates show the median value, with the intervals showing the 95% credible interval.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  FitFlextableToPage()
-```
-
-## Overshoot probability by dam and origin
-
-Overshoot probabilities were high for John Day River, Umatilla River, Wenatchee River, Entiat River, and Tucannon River Steelhead, reflecting the data presented in Table 4. Across all DPSs, a pattern emerges where for natal origins where the probability of overshoot of the first dam upstream of the natal tributary is low, the probability of overshooting subsequent dams is considerably higher. For example, although uncertainty is high, in Middle Columbia Steelhead (Table 7), natal origins outside of the Yakima River and Fifteenmile Creek have an overshoot probability at Priest Rapids Dam of 0.01-0.04; however, for subsequent dams upstream of Priest Rapids Dam, these probabilities are in the range of 0.3 - 0.5. A similar pattern is seen for Upper Columbia Steelhead at Ice Harbor and Lower Granite Dams on the Snake River (Table 8), and for Priest Rapids Dam and subsequent dams on the Upper Columbia for Snake River Basin Steelhead (Table 9).
-
-<br>
-  
-```{r overshoot_probs, echo = FALSE, warning = FALSE, message = FALSE}
-read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_overshoot_probs.csv"))  -> dam_specific_overshoot_probs
-
-dam_specific_overshoot_probs %>% 
-  mutate(origin = ifelse(origin == "Grande Ronde", "Grande Ronde River", origin)) %>% 
-  dplyr::rename("Natal Origin" = origin) -> dam_specific_overshoot_probs
-
-dam_specific_overshoot_probs[match(gsub("_", " ",natal_origin_order), dam_specific_overshoot_probs$`Natal Origin`),] -> dam_specific_overshoot_probs
-
-# For all dam + origin combinations where we never observed overshoot, change those to zeros
-dam_specific_overshoot_probs[1,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Fifteenmile Creek
-dam_specific_overshoot_probs[2,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Deschutes River
-dam_specific_overshoot_probs[8,c('ICH', 'LGR')] <- "NA" # Entiat River
-
-
-subset(dam_specific_overshoot_probs, `Natal Origin` %in% middle_columbia_origins) -> MC_dam_specific_overshoot_probs
-subset(dam_specific_overshoot_probs, `Natal Origin` %in% upper_columbia_origins) -> UC_dam_specific_overshoot_probs
-subset(dam_specific_overshoot_probs, `Natal Origin` %in% snake_origins) -> SN_dam_specific_overshoot_probs
-
-# Split into three tables: Middle Columbia, Upper Columbia, and Snake River Basin
-
-flextable(MC_dam_specific_overshoot_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of overshooting a dam, conditional on being in the state directly downstream of the dam, for Middle Columbia River Steelhead. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values are overshoot movements that were not observed for that specific natal origin. Blank cells are dam ascents that are not overshoot movements for that natal origin. Asterisks indicate overshoot probabilities that are shared across all natal origins within this DPS.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ MCN, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ PRA, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RIS, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RRE, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ MCN, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ PRA, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RIS, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RRE, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ RIS, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "John Day River", j = ~ RRE, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "John Day River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Yakima River", j = ~ LGR, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-<br>
-```{r upper_columbia_overshoot_table, echo = FALSE, message = FALSE, warning = FALSE}
-
-flextable(UC_dam_specific_overshoot_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of overshooting a dam, conditional on being in the state directly downstream of the dam, for Upper Columbia River Steelhead. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values are overshoot movements that were not observed for that specific natal origin. Blank cells are dam ascents that are not overshoot movements for that natal origin. Asterisks indicate overshoot probabilities that are shared across all natal origins within this DPS.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  # highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ WEL, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ WEL, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ ICH, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Methow River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Methow River", j = ~ LGR, color = "wheat") %>% 
-  # # highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ LGR, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-<br>
-```{r snake_river_basin_overshoot_table, echo = FALSE, message = FALSE, warning = FALSE}
-
-flextable(SN_dam_specific_overshoot_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of overshooting a dam, conditional on being in the state directly downstream of the dam, for Snake River Basin Steelhead. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values are overshoot movements that were not observed for that specific natal origin. Blank cells are dam ascents that are not overshoot movements for that natal origin. Asterisks indicate overshoot probabilities that are shared across all natal origins within this DPS.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  # highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Salmon River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Salmon River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ WEL, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-
-## Fallback probability by dam and origin
-
-Estimates of minimum fallback probabilities for en-route fallback were generally considerably lower than post-overshoot fallback probabilities (Table 7). Median en-route fallback probabilities at each dam were mostly between 0.01 and 0.05 and were highest at McNary Dam. Post-overshoot fallback probability estimates generally decreased as fish overshot additional dams. Origin-specific post-overshoot fallback estimates at the first overshoot dam across all natal origins ranged from 0.23 (0.21 - 0.24) at Rocky Reach Dam for Wenatchee River Steelhead to 0.62 (0.56 - 0.67) for Entiat River Steelhead at Wells' Dam (Table 11).
-
-<br>
-
-```{r fallback_probs, echo = FALSE, warning = FALSE, message = FALSE}
-read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "dam_specific_fallback_probs.csv"))  -> dam_specific_fallback_probs
-
-dam_specific_fallback_probs %>% 
-  mutate(origin = ifelse(origin == "Grande Ronde", "Grande Ronde River", origin)) %>% 
-  dplyr::rename("Natal Origin" = origin) -> dam_specific_fallback_probs
-
-# For all dam + origin combinations where we never observed fallback, change those to zeros
-dam_specific_fallback_probs[1,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Fifteenmile Creek
-dam_specific_fallback_probs[2,c('PRA', 'RIS', 'RRE', 'WEL')] <- "NA" # Deschutes River
-dam_specific_fallback_probs[3,c('RRE', 'WEL')] <- "NA" # John Day River
-dam_specific_fallback_probs[7,c('ICH')] <- "NA" # Wenatchee River
-dam_specific_fallback_probs[8,c('ICH', 'LGR')] <- "NA" # Entiat River
-dam_specific_fallback_probs[9,c('ICH')] <- "NA" # Okanogan
-
-dam_specific_fallback_probs[match(gsub("_", " ",natal_origin_order), dam_specific_fallback_probs$`Natal Origin`),] -> dam_specific_fallback_probs
-
-subset(dam_specific_fallback_probs, `Natal Origin` %in% middle_columbia_origins) -> MC_dam_specific_fallback_probs
-subset(dam_specific_fallback_probs, `Natal Origin` %in% upper_columbia_origins) -> UC_dam_specific_fallback_probs
-subset(dam_specific_fallback_probs, `Natal Origin` %in% snake_origins) -> SN_dam_specific_fallback_probs
-
-# Split into three tables: Middle Columbia, Upper Columbia, and Snake River Basin
-
-flextable(MC_dam_specific_fallback_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of falling back over a dam, conditional on being in the state directly upstream of the dam, for Middle Columbia River Steelhead. Highlighted cells are probabilities of post-overshoot fallback, whereas non-highlighted cells are probabilities of en-route fallback. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values indicate fallback movements that were not observed for that specific natal origin. Asterisks indicate fallback probabilities that are shared across all natal origins within this DPS. As fallback cannot be fully monitored using the current network of PIT tag antennas, probabilities presented should be interpreted as minimum probability estimates of fallback.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Fifteenmile Creek", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ MCN, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ PRA, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Deschutes River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ MCN, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ RIS, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ RRE, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "John Day River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "John Day River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ MCN, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Umatilla River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Walla Walla River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Yakima River", j = ~ LGR, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-<br>
-```{r upper_columbia_fallback_table, echo = FALSE, message = FALSE, warning = FALSE}
-
-flextable(UC_dam_specific_fallback_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of falling back over a dam, conditional on being in the state directly upstream of the dam, for Upper Columbia River Steelhead. Highlighted cells are probabilities of post-overshoot fallback, whereas non-highlighted cells are probabilities of en-route fallback. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values indicate fallback movements that were not observed for that specific natal origin. Asterisks indicate fallback probabilities that are shared across all natal origins within this DPS. As fallback cannot be fully monitored using the current network of PIT tag antennas, probabilities presented should be interpreted as minimum probability estimates of fallback.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-    highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Wenatchee River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Entiat River", j = ~ WEL, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ ICH, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Entiat River", j = ~ LGR, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Methow River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Methow River", j = ~ LGR, color = "wheat") %>% 
-  # highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ ICH, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Okanogan River", j = ~ LGR, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-<br>
-```{r snake_river_basin_fallback_table, echo = FALSE, message = FALSE, warning = FALSE}
-
-flextable(SN_dam_specific_fallback_probs) %>% 
-  align(part = "all") %>% # left align
-  set_caption(caption = "Probability of falling back over a dam, conditional on being in the state directly upstream of the dam, for Snake River Basin Steelhead. Highlighted cells are probabilities of post-overshoot fallback, whereas non-highlighted cells are probabilities of en-route fallback. Point estimates show the median value, with the intervals showing the 95% credible interval. NA values indicate fallback movements that were not observed for that specific natal origin. Asterisks indicate movement probabilities that are shared across all natal origins within this DPS. As fallback cannot be fully monitored using the current network of PIT tag antennas, probabilities presented should be interpreted as minimum probability estimates of fallback.") %>% 
-  font(fontname = "Times New Roman (Body)", part = "all") %>% 
-  fontsize(size = 10, part = "body") %>% 
-  theme_booktabs() %>% # default theme
-    highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ WEL, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Tucannon River", j = ~ LGR, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Clearwater River", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Asotin Creek", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Grande Ronde River", j = ~ WEL, color = "wheat") %>% 
-    highlight(i = ~`Natal Origin` == "Salmon River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Salmon River", j = ~ WEL, color = "wheat") %>% 
-      highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ PRA, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RIS, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ RRE, color = "wheat") %>% 
-  highlight(i = ~`Natal Origin` == "Imnaha River", j = ~ WEL, color = "wheat") %>% 
-  FitFlextableToPage()
-```
-
-
-
 # Discussion
 
-### Annual variability
-Although our model does not explicitly account for the effect of run year on movement probabilities, annual variability in Steelhead movement patterns, particularly overshoot and fallback rates, has been documented among Steelhead [@Richins2018; @Keefer2008]. For example, @Richins2018 found that John Day River Steelhead that overshot McNary Dam had annual probabilities of fallback ranging from 25% to 75%. As covariates are added in future iterations of the model, we expect that this interannual variability will be partially explained by covariate values that describe the conditions experienced by fish in different run years, including spill, flow, and temperature. A random effect of year may also be included to capture interannual variability that is poorly described by the fixed effects in our model.
-
-### Consequences of model structure
-To reduce the computational requirements of modeling our large dataset, as well as to estimate movement probabilities for transitions for which there was little available data, we only estimated origin-specific movement probabilities for states that were within or connected to the boundaries of the DPS of a fish, and estimated common movement probabilities for all fish of a DPS when they were outside of DPS boundaries. This allowed us to reduce the number of parameters that our model needed to estimate (thereby reducing computational requirements), and also allowed us to achieve estimates of certain infrequently seen movement probabilities by pooling data to inform movement probabilities of fish outside of their DPS, where they typically were seen less. The probabilities of overshoot and fallback presented in Tables 7-12 as well as the movement probabilities seen in Appendix 2 that are marked with an asterisk all were estimated jointly for all fish from a single DPS. This had three primary consequences: (1) natal origins within a DPS with the most tagged fish in our dataset were the most influential for DPS-wide movement probabilities, (2) any origin-specific variability in movement probabilities outside of DPS boundaries was ignored, and (3) movement probabilities were estimated for transitions never seen for some origins.
-
-<br> 
-
-The issue of varying sample size can be seen in Table 2, with the natal origin with the most fish (the Salmon River, with over 11,000 tagged Steelhead) having nearly 20 times the number of individuals as Asotin Creek (564), which is within the same DPS. Since all of these individual fish are weighted equally when calculating movement probabilities outside of the DPS, these movement probabilities are heavily skewed towards natal origins with many tagged fish. As such, the probabilities for movements that occur outside of DPS boundaries that are presented in Appendix 2, Tables 7-12, and in Figures 4-19, should be interpreted with this limitation in mind. For each DPS, these probabilities are not representative of natal origins with less than 1,000 fish (Asotin Creek, Entiat River, Fifteenmile Creek, and the Yakima River) and are highly reflective of the movement probabilities of origins with over 5,000 fish (Clearwater River, Grande Ronde River, Imnaha River, Methow River, and Salmon River). While there may be some benefit of using data from data-rich stocks to inform the movement probabilities of data-poor stocks that are believed to be similar, as in the "Robin Hood" approach [@Punt2011], sample sizes play a large role in determining estimates of certain movement probabilities in our current model configuration. Future model configurations could be modified to allow differentiation between natal origins for movement probabilities that have plenty of data for all natal origins, such as movements in the Middle Columbia.
-
-<br>
-
-Even for natal origins that are well represented in the dataset, this simplification has obscured any variability between fish of natal origins when outside of DPS boundaries, which is likely most consequential for estimates of movement of Upper Columbia and Snake River Basin Steelhead when in the Middle Columbia River (downstream of McNary Dam). Previous studies have found important variability between natal origins for movements in this region. For example, @Hess2016 found that out-of-basin Steelhead seen in the Deschutes River were disproportionately from the Salmon River and Grande Ronde River. As such, cautious interpretation is necessary for our estimates of movement probabilities for Snake River Basin and Upper Columbia River Steelhead downstream of McNary Dam, as these differences between natal origins are not reflected in these estimates of movement.
-
-<br>
-
-Finally, movement probabilities are presented in Appendix 2 for some movements that were never observed for fish of a natal origin, and should be interpreted with great caution. These movement probabilities were removed in the tables in the main text. These can be best thought of as our best guess for the probability of movements, should a fish of that natal origin make it to that reach of the Columbia River Basin, as informed by movements of other fish from the same DPS but different natal origins.
-
-### Detection probabilities in downstream passage routes
-Steelhead fallback is difficult to monitor using PIT tags because of the lack of detection capabilities in the primary downstream passage routes for Steelhead, which include spillways, the Juvenile Bypass System (JBS), navigation locks, ice/trash sluiceways, and turbines. While some passage routes, such as the JBS, the corner collector at Bonneville Dam, and as of 2020, the spillway at Lower Granite Dam, have PIT tag detection capability, the majority of downstream movements are only detected by examining the rest of the detection history. For example, @Boggs2004 used consecutive detections in the same adult fish ladder to monitor rates of fallback, whereas @Richins2018 calculated fallback to home following overshoot as detections in tributaries following detections in the adult fish ladder at a dam upstream of the tributary. Our modeling framework includes both of these ways of detecting fallback, but this is still an underestimate of total fallback. Fallback that leads to mortality cannot be detected using PIT tags, and any time a fish is not seen after fallback (i.e., either due to a fish entering a tributary with PIT tag arrays but not being detected, entering a tributary without PIT tag arrays, spawning in the mainstem, or mortality following fallback), the fallback event will not be observed. As such, the current network of PIT tag arrays is incapable of monitoring all fallback and estimates of the probability of fallback from this model should be interpreted as lower bound estimates. However, the current modeling framework gives us the closest estimate of fallback possible using PIT tag data.
-
-Our ability to estimate fallback at Lower Granite Dam likely improved with the 2020 installation of PIT tag antennas in the spillway; future analyses will evaluate the impact of this recent installation by comparing estimates of fallback at Lower Granite Dam before and after the 2020 installation. Given the small sample size of only two years since the PIT antenna installation in the spillway, these results would have to be interpreted cautiously, given the environmental and operational factors that are likely to have impacted fallback at Lower Granite Dam during this same time period. Nonetheless, this analysis will provide insight into how our ability to detect fallback is affected by spillway detectors, and may also indicate what degree of fallback is being missed at other dams without spillway PIT tag antennas.
-
 ## Next steps
-
-### Adding additional covariates
-The model structure and the use of the categorical logit to evaluate movement probabilities allows for the inclusion of both categorical and continuous covariates in the model. The next covariates that we plan to include in future iterations of the model are rear type (hatchery or wild), temperature (mainstem temperatures from dam tailraces), flow, and spill. We are also considering the addition of covariates related to juvenile experiences (barged vs. not barged, acclimated vs. not acclimated hatchery releases). Some of these covariates, especially rear type, have been found to be a major predictor of homing success [@Richins2018], and as such the reader should be aware that these differences are not being captured in the current iteration of the model. The inclusion of these continuous covariates will further our understanding of what environmental conditions (e.g., temperature or flow conditions) lead to increased probability of Steelhead choosing more dangerous migration pathways to natal tributaries, such as overshooting natal tributaries. The inclusion of covariates that can be influenced by hydropower managers (e.g., spill or flow) or fishery managers (e.g., hatchery practices or assisted juvenile migration) would help inform how we can help Steelhead return safely to natal tributaries. Given the increased interest in assisting downstream adult Steelhead passage, such as via increased spill outside of the usual juvenile outmigration period [@Ham2021], the inclusion of these covariates would be highly pertinent to these management efforts.
-
-### Increasing model state complexity
-As mentioned previously, the current iteration of the model does not use the PIT tag antennas at The Dalles Dam, John Day Dam, Lower Monumental Dam, or Lower Goose Dam to separate states, and therefore the probability of fallback and overshoot at these dams is not being estimated. However, future model iterations could include these dams either by creating a new model that only uses years of data where these dams had PIT tag detectors in the adult fishways, or by modifying the existing model to turn on or off these states, depending on the run year (similar to the current approach with tributary detection efficiency). This would help achieve a better estimate of the true burden of overshoot and fallback throughout the Columbia River Basin, and would be of particular interest for tributaries close to these dams (e.g., Fifteenmile Creek, Deschutes River, John Day River, and Tucannon River Steelhead). 
-
-# Management implications
-The ability of this modeling framework to incorporate various covariates of interest will allow us to answer a number of pressing management questions surrounding Steelhead overshoot and fallback. For example, winter spill could be included, either as a continuous variable (e.g., amount of spill), a categorical variable (spill or no spill), or an ordinal variable (days of spill). This would allow us to determine what amount of spill is increasing the homing probability, either by decreasing the probability of overshoot or increasing the probability of post-overshoot fallback. Incorporating winter spill with flow and mainstem water temperature would also inform in what environmental conditions spill is most beneficial, as increased overshooting has been linked to low flow, high temperature years [@Richins2018]. Including the seasonality of flow and spill as covariates could also be used to shed light on how they are helping or hindering (e.g., by increasing en-route fallback or decreasing the probability of upstream movement) migration, depending on how they line up with the timing of overshoot (which typically occurs in late summer/early fall) and post-overshoot fallback (which typically occurs in the winter/early spring).
-
-<br>
-
-This model can also shed light on where new PIT tag antenna installations would be most beneficial, as well as assess how recent PIT tag antenna installations (i.e., in the Lower Granite Dam spillway) are helping with monitoring adult movement. Based on our analysis, tributary arrays in the mainstem Salmon, Clearwater, and Grande Ronde Rivers near the mouth would be very helpful, as this would allow us both to monitor tributary entry and to estimate detection efficiency in these tributaries and therefore vastly improve our estimates of homing. Furthermore, repairing arrays that have recently been damaged and been decommissioned, most notably the Deschutes River Mouth Array, would also be very useful. The Deschutes River is of particular importance because our analysis indicates that fish of all origins have a relatively high estimated probability of entering this tributary, likely due to its documented use as a cold water refuge [@Hess2016; @Snyder2022]; the probability of movement into the Deschutes River for Upper Columbia Steelhead was 0.08 (0.07 - 0.09), for Snake River Basin Steelhead 0.12 (0.11 - 0.13), and for Middle Columbia Steelhead ranged from 0.13-0.51 (Appendix 2). Therefore, recommissioning this site would be highly beneficial for monitoring its continued use as a cold-water refuge for PIT-tagged Steelhead and other salmonids.
-
-<br> 
-
-This model could also easily handle other datasets of PIT tag detection histories, such as those from other salmonids in the basin.
-
-# Conclusions
-
-We developed a comprehensive adult migration model for adult Steelhead using 17 years of PIT-tag data from dams and tributaries, and have used the model to estimate probabilities of dam overshoot, fallback, and effects on final homing probabilities. The model will continue to be developed as additional covariates of management interest, such as flow, spill, and rearing practices are integrated into the existing modeling framework, which is highly flexible and can accommodate various covariates. In its present configuration, the model provides insight on the key differences between populations in the Columbia River Basin, such as their final distributions and the effects of movements such as overshoot. This model, with its ability to simultaneously incorporate multiple covariates of interest, will be a valuable asset to managers, allowing us to understand the environmental conditions that contribute to detrimental movement choices and the effectiveness of available management options for helping Steelhead get home safely.
+The model described above will be run on UW's HYAK high performance compute clusters. Based on model performance and diagnostic testing, it will likely take around 3-4 weeks to run each of the six models; however, these can be run at the same time on different computing nodes, which should reduce the total time required. We anticipate being able to share modeling results in early 2024.
 
 
 # References
@@ -1051,334 +537,4 @@ We developed a comprehensive adult migration model for adult Steelhead using 17 
 
 
 # Appendix 1: Detection probabilities
-![Figure 20. Modeled detection probability by tributary and timeframe as a function of discharge and PIT tag antenna configuration.](.//figures/DE_plots.pdf){width=100%}
-
-
-# Appendix 2: Individual movement probabilities
-
-## Middle Columbia River Steelhead
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-# Upper Columbia
-
-middle_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_DPS_probs.csv"), row.names = 1)
-
-# Put an asterisk next to all of these, since they're shared across all origins
-# middle_columbia_DPS_probs %>% 
-#   mutate(probability= paste0(probability, "*")) -> middle_columbia_DPS_probs
-
-# middle_columbia_DPS_probs %>% 
-#   mutate(mean = round(mean, 3),
-#          q5 = round(q5, 3),
-#          q95 = round(q95, 3)) -> middle_columbia_DPS_probs
-
-middle_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "middle_columbia_DE_origin_probs.csv"), row.names = 1)
-middle_columbia_origin_probs %>% 
-  # mutate(mean = round(mean, 3),
-  #        q5 = round(q5, 3),
-  #        q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
-  mutate(origin = gsub("_", " ", origin)) -> middle_columbia_origin_probs
-
-# kable(middle_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-# kable(middle_columbia_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
-#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-
-# testing:
-# flextable(middle_columbia_DPS_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Middle Columbia Steelhead, outside of the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-
-# 
-# regulartable(middle_columbia_origin_probs)
-```
-
-
-```{r middle_columbia_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
-subset(middle_columbia_origin_probs, origin == "Fifteenmile Creek") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Fifteenmile Creek")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(middle_columbia_origin_probs, origin == "Deschutes River") %>% 
-  dplyr::select(-origin) -> deschutes_origin_probs
-deschutes_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> deschutes_probs
-
-prob_flextable(prob_table = deschutes_probs, trib_name = "Deschutes River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(middle_columbia_origin_probs, origin == "John Day River") %>% 
-  dplyr::select(-origin) -> john_day_origin_probs
-john_day_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> john_day_probs
-
-prob_flextable(prob_table = john_day_probs, trib_name = "John Day River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(middle_columbia_origin_probs, origin == "Umatilla River") %>% 
-  dplyr::select(-origin) -> umatilla_origin_probs
-umatilla_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> umatilla_probs
-
-prob_flextable(prob_table = umatilla_probs, trib_name = "Umatilla River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(middle_columbia_origin_probs, origin == "Walla Walla River") %>% 
-  dplyr::select(-origin) -> walla_walla_origin_probs
-walla_walla_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> walla_walla_probs
-
-prob_flextable(prob_table = walla_walla_probs, trib_name = "Walla Walla River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(middle_columbia_origin_probs, origin == "Yakima River") %>% 
-  dplyr::select(-origin) -> yakima_origin_probs
-yakima_origin_probs %>% 
-  bind_rows(., middle_columbia_DPS_probs) -> yakima_probs
-
-prob_flextable(prob_table = yakima_probs, trib_name = "Yakima River")
-```
-
-
-
-<br>
-<br>  
-<br>
-  
-```{r middle_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-# flextable(middle_columbia_origin_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-```
-
-## Upper Columbia River Steelhead
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-# Upper Columbia
-
-upper_columbia_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_DPS_probs.csv"), row.names = 1)
-
-# Put an asterisk next to all of these, since they're shared across all origins
-# upper_columbia_DPS_probs %>% 
-#   mutate(probability= paste0(probability, "*")) -> upper_columbia_DPS_probs
-# upper_columbia_DPS_probs %>% 
-#   mutate(mean = round(mean, 3),
-#          q5 = round(q5, 3),
-#          q95 = round(q95, 3)) -> upper_columbia_DPS_probs
-
-upper_columbia_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "upper_columbia_DE_origin_probs.csv"), row.names = 1)
-upper_columbia_origin_probs %>% 
-  # mutate(mean = round(mean, 3),
-  #        q5 = round(q5, 3),
-  #        q95 = round(q95, 3)) %>% 
-  relocate(origin) %>%
-  mutate(origin = gsub("_", " ", origin)) -> upper_columbia_origin_probs
-
-# kable(upper_columbia_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-# kable(upper_columbia_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
-#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-
-# testing:
-# flextable(upper_columbia_DPS_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-
-# 
-# regulartable(upper_columbia_origin_probs)
-```
-
-
-```{r upper_columbia_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
-subset(upper_columbia_origin_probs, origin == "Wenatchee River") %>% 
-  dplyr::select(-origin) -> wenatchee_origin_probs
-wenatchee_origin_probs %>% 
-  bind_rows(., upper_columbia_DPS_probs) -> wenatchee_probs
-
-prob_flextable(prob_table = wenatchee_probs, trib_name = "Wenatchee River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-
-subset(upper_columbia_origin_probs, origin == "Entiat River") %>% 
-  dplyr::select(-origin) -> entiat_origin_probs
-entiat_origin_probs %>% 
-  bind_rows(., upper_columbia_DPS_probs) -> entiat_probs
-
-prob_flextable(prob_table = entiat_probs, trib_name = "Entiat River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(upper_columbia_origin_probs, origin == "Methow River") %>% 
-  dplyr::select(-origin) -> methow_origin_probs
-methow_origin_probs %>% 
-  bind_rows(., upper_columbia_DPS_probs) -> methow_probs
-
-prob_flextable(prob_table = methow_probs, trib_name = "Methow River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(upper_columbia_origin_probs, origin == "Okanogan River") %>% 
-  dplyr::select(-origin) -> okanogan_origin_probs
-okanogan_origin_probs %>% 
-  bind_rows(., upper_columbia_DPS_probs) -> okanogan_probs
-
-prob_flextable(prob_table = okanogan_probs, trib_name = "Okanogan River")
-```
-
-<br>
-<br>
-<br>
-
-```{r upper_columbia_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-# flextable(upper_columbia_origin_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-```
-
-## Snake River Basin Steelhead
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-# Snake River
-
-snake_DPS_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_DPS_probs.csv"), row.names = 1)
-
-# Put an asterisk next to all of these, since they're shared across all origins
-# snake_DPS_probs %>% 
-#   mutate(probability= paste0(probability, "*")) -> snake_DPS_probs
-
-# snake_DPS_probs %>% 
-#   mutate(mean = round(mean, 3),
-#          q5 = round(q5, 3),
-#          q95 = round(q95, 3)) -> snake_DPS_probs
-
-snake_origin_probs <- read.csv(here::here("stan_actual", "deteff_ESU_models", "output_tables", "snake_DE_origin_probs.csv"), row.names = 1)
-snake_origin_probs %>% 
-  # mutate(mean = round(mean, 3),
-  #        q5 = round(q5, 3),
-  #        q95 = round(q95, 3)) %>% 
-  relocate(origin) %>% 
-  mutate(origin = gsub("_", " ", origin)) -> snake_origin_probs
-
-# kable(snake_DPS_probs, longtable = TRUE, booktabs = T, linesep = "",
-#       caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-# kable(snake_origin_probs, booktabs = T, linesep = c("", "", "",  '\\addlinespace'),
-#       longtable = TRUE, caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>%
-#   kable_styling(latex_options = c("repeat_header"))
-
-# testing:
-# flextable(snake_DPS_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead, outside of the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-
-# 
-# regulartable(snake_origin_probs)
-```
-
-```{r snake_individual_origins, echo = FALSE, warning = FALSE, message = FALSE}
-subset(snake_origin_probs, origin == "Tucannon River") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Tucannon River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(snake_origin_probs, origin == "Clearwater River") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Clearwater River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(snake_origin_probs, origin == "Asotin Creek") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Asotin Creek")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(snake_origin_probs, origin == "Grande Ronde River") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Grande Ronde River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(snake_origin_probs, origin == "Salmon River") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Salmon River")
-```
-<br>
-```{r echo = FALSE, message = FALSE, warning = FALSE}
-subset(snake_origin_probs, origin == "Imnaha River") %>% 
-  dplyr::select(-origin) -> fifteenmile_origin_probs
-fifteenmile_origin_probs %>% 
-  bind_rows(., snake_DPS_probs) -> fifteenmile_probs
-
-prob_flextable(prob_table = fifteenmile_probs, trib_name = "Imnaha River")
-
-
-```
-
-<br>
-  <br>
-  <br>
-  
-```{r snake_table_2, echo = FALSE, message = FALSE, warning = FALSE}
-# flextable(snake_origin_probs) %>% 
-#   align(part = "all") %>% # left align
-#   set_caption(caption = "Movement probabilities for Upper Columbia Steelhead by natal origin, inside the DPS boundaries.") %>% 
-#   font(fontname = "Times New Roman (Body)", part = "all") %>% 
-#   fontsize(size = 10, part = "body") %>% 
-#   theme_booktabs() %>% # default theme
-#   FitFlextableToPage()
-```
-
-
-\setlength{\parindent}{-0.375in}
-\setlength{\leftskip}{0.375in}
-\setlength{\parskip}{8pt}
-\noindent
+![Figure 4. Modeled detection probability by tributary and timeframe as a function of discharge and PIT tag antenna configuration.](.//figures/DE_plots.pdf){width=100%}
