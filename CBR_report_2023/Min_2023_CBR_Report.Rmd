@@ -39,6 +39,7 @@ library(kableExtra)
 library(tidyverse)
 library(flextable)
 library(officer)
+library(janitor)
 
 # Make a function to actually fit the flextable
 FitFlextableToPage <- function(ft, pgwidth = 8){
@@ -169,7 +170,7 @@ Columbia River Steelhead, who spend more time as adults in freshwater than any o
 
 <br>
 
-Here, we present a progress update on a new modeling framework that is capable of modeling the entire adult migration of Steelhead, including upstream movements, downstream movements, and movements into tributaries. Furthermore, this model includes parameters to estimate the effects of various covariates that are hypothesized to influence movement decisions (e.g., temperature, spill, and rear type). This modeling framework translates the Columbia River Basin into a series of interconnected states, each representing a reach of the mainstem Columbia or Snake River between hydroelectric dams or a tributary that flows into them. We converted detections of over 55,000 Steelhead over 17 years from each of the hundreds of PIT tag detection sites in the Columbia River Basin into a sequence of state visits for each fish, and fit a Bayesian multistate model to these data using the Stan programming language. This model also uses the network of PIT tag antennas in each tributary to correct for detection efficiency in each of these tributaries.
+Here, we present a progress update on a new modeling framework that is capable of modeling the entire adult migration of Steelhead, including upstream movements, downstream movements, and movements into tributaries. Furthermore, this model includes parameters to estimate the effects of various covariates that are hypothesized to influence movement decisions (e.g., temperature, spill, and rear type). This modeling framework translates the Columbia River Basin into a series of interconnected states, each representing a reach of the mainstem Columbia or Snake River between hydroelectric dams or a tributary of the Columbia or Snake. We converted detections of over 55,000 Steelhead over 17 years from each of the hundreds of PIT tag detection sites in the Columbia River Basin into a sequence of state visits for each fish, and fit a Bayesian multistate model to these data using the Stan programming language. This model also uses the network of PIT tag antennas in each tributary to correct for detection efficiency in each of these tributaries.
 
 <br>
 
@@ -183,19 +184,31 @@ Steelhead (anadromous *Oncorhynchus mykiss*) in the Columbia River Basin, includ
 
 <br>
 
-One element of the life history of Columbia River Basin Steelhead that may make them more vulnerable to anthropogenic modifications of the Columbia River is their adult migration. Relative to other salmonids, Steelhead from the Columbia River Basin spend longer in freshwater as adults. Essentially all populations of Steelhead in the Columbia River Basin are stream-maturing [@Busby1996], meaning that these fish enter freshwater in a sexually immature state and then spend up to a year in freshwater prior to spawning. Also known as summer Steelhead, these fish enter freshwater between May and October and spawn the following spring, typically between March and May [@Busby1996]. Between their entry into freshwater and arrival at spawning grounds, Columbia River Steelhead exhibit considerable variability in their migration patterns. Virtually all interior Columbia River Steelhead overwinter in freshwater; the majority of individuals are known to overwinter in tributaries, but up to 20% of individuals in a given year have been observed to overwinter in the hydrosystem, which comprises the mainstem habitat between the hydroelectric dams in the federal Columbia River power system [@Keefer2008]. Additionally, as individuals migrate upstream toward natal tributaries, the majority of individuals have been observed to temporarily stage in nonnatal tributaries downstream of their natal tributary [@High2006]. This behavior increases with increasing mainstem river temperature, indicating the use of these colder waters as coldwater refugia [@High2006]. These highly variable movement patterns and increased duration in freshwater make Steelhead more vulnerable to the hazards faced in freshwater.
+One element of the life history of Columbia River Basin Steelhead that may make them more vulnerable to anthropogenic modifications of the Columbia River is their pre-spawn adult migration. Relative to other salmonids, Steelhead from the Columbia River Basin spend longer in freshwater as adults. Essentially all populations of Steelhead in the Columbia River Basin are stream-maturing [@Busby1996], meaning that these fish enter freshwater in a sexually immature state and then spend up to a year in freshwater prior to spawning. Also known as summer Steelhead, these fish enter freshwater between May and October and spawn the following spring, typically between March and May [@Busby1996]. Between their entry into freshwater and arrival at spawning grounds, Columbia River Steelhead exhibit considerable variability in their migration patterns. Virtually all interior Columbia River Steelhead overwinter in freshwater; the majority of individuals are known to overwinter in tributaries, but up to 20% of individuals in a given year have been observed to overwinter in the hydrosystem, which comprises the mainstem habitat between the hydroelectric dams in the federal Columbia River power system [@Keefer2008]. Additionally, as individuals migrate upstream toward natal tributaries, the majority of individuals have been observed to temporarily stage in nonnatal tributaries downstream of their natal tributary [@High2006]. This behavior increases with increasing mainstem river temperature, indicating the use of these colder waters as coldwater refugia [@High2006]. These highly variable movement patterns and increased duration in freshwater make Steelhead more vulnerable to the hazards faced in freshwater.
 
 <br>
 
-Descending dams, also known as fallback [@Boggs2004], is another common behavior observed in adult Steelhead, with about 20% of Steelhead observed to fall back over at at least one mainstem dam [@Boggs2004]. This behavior can occur as individuals are migrating upstream to natal tributaries, which we refer to as "en-route fallback", but can also occur once individuals have ascended mainstem dams upstream of natal tributaries (a behavior known as overshoot). We refer to fallback that has occurred after Steelhead have overshot natal tributaries as "post-overshoot fallback", and in this case fallback is necessary for individuals to return to natal tributaries. Overshoot and fallback can affect the ability of individuals to successfully home to spawning grounds, and therefore are consequential for the persistence of ESA-listed populations. Individuals that fall back during their upstream migration (prior to reaching or overshooting their natal tributary) are less likely to return to their natal tributaries or hatcheries [@Bjornn2000; @Keefer2005]. Furthermore, migration success to natal tributaries decreases with increased overshooting [@Richins2018], and many overshooting fish are observed to stray to tributaries upstream of the overshoot dam.
+Descending dams, also known as fallback [@Boggs2004], is another common behavior observed in pre-spawn adult Steelhead, with about 20% of Steelhead observed to fall back over at at least one mainstem dam [@Boggs2004]. This behavior can occur as individuals are migrating upstream to natal tributaries, which we refer to as "en-route fallback", but can also occur once individuals have ascended mainstem dams upstream of natal tributaries (a behavior known as overshoot). We refer to fallback that has occurred after Steelhead have overshot natal tributaries as "post-overshoot fallback", and in this case fallback is necessary for individuals to return to natal tributaries. Overshoot and fallback can affect the ability of individuals to successfully home to spawning grounds, and therefore are consequential for the persistence of ESA-listed populations. Individuals that fall back during their upstream migration (prior to reaching or overshooting their natal tributary) are less likely to return to their natal tributaries or hatcheries [@Bjornn2000; @Keefer2005]. Furthermore, migration success to natal tributaries decreases with increased overshooting [@Richins2018], and many overshooting fish are observed to stray to tributaries upstream of the overshoot dam.
 
 <br>
 
-The decreased migration success associated with overshoot and fallback may be due to the hazardous nature of downstream passage for adults, which is often limited to the powerhouse during the primary months that Steelhead are overwintering [@Khan2013]. The incidence of mortality for adult Steelhead passing downstream at dams is highly variable, but recent estimates of 48-hour survival at McNary Dam indicate around 90% survival for individuals passing through turbines and 97% survival for individuals passing through the spillway [@Associates2014]. Mortality in downstream passage routes is implicated by low survival of Steelhead kelts, which decrease with increasing number of dams that must be navigated as they move downstream to the ocean, with mortality of 84-96% for kelts released at Lower Granite Dam, 38-40% at McNary Dam, and 20-37% at John Day Dam [@Wertheimer2005].
+The decreased migration success associated with overshoot and fallback may be due to the hazardous nature of downstream dam passage for adults, which is often limited to the powerhouse during the primary months that Steelhead are overwintering [@Khan2013]. The incidence of mortality for adult Steelhead passing downstream at dams is highly variable, but recent estimates of 48-hour survival at McNary Dam indicate around 90% survival for individuals passing through turbines and 97% survival for individuals passing through the spillway [@Associates2014]. Mortality in downstream dam passage routes is implicated by low survival of Steelhead kelts, which decrease with increasing number of dams that must be navigated as they move downstream to the ocean, with mortality of 84-96% for kelts released at Lower Granite Dam, 38-40% at McNary Dam, and 20-37% at John Day Dam [@Wertheimer2005].
 
 <br>
 
-Because of the association between overshoot and fallback and decreased migration success, previous studies have investigated the influence of various factors on the incidence of these behaviors. Rates of overshoot have been observed to vary considerably among populations, with some studies finding a positive relationship with increasing mainstem water temperature and hatchery rearing upstream of the natal tributary [@Richins2018]. In spring-summer Chinook, @Boggs2004 observed a positive relationship between fallback rates and river discharge. However, these previous studies have looked at these various factors only in isolation and for specific movements, which complicates the modeling of emergent properties and interactions between behaviors, environmental conditions, and populations, and can be challenging in the face of sparse data in some settings. In this progress report, we present a multistate model that is capable of modeling the entire adult Steelhead migration, from first detection at Bonneville Dam to arrival in natal tributaries. This model, which does not constrain movement to only be upstream, allows the complex, multidirectional movement of adult Steelhead to be modeled in full and allows many movements of interest, including fallback, overshoot, and homing, to be estimated in a single framework. The data used in this model were passive integrated transponder (PIT) tag detection histories. This modeling framework is capable of accommodating the effect of multiple categorical and continuous covariates on movement probabilities at each step within the migration, and estimates the effects of natal origin, rear type, temperature, spill, and year on certain movement probabilities. By examining how Steelhead movement probabilities, particularly those of conservation concern, such as overshoot, fallback, homing, and straying, vary by population and are influenced by various factors, this modeling framework will improve our understanding of how both environmental and anthropogenically influenced conditions affect how Steelhead move within the Columbia River and its tributaries.
+Because of the association between overshoot and fallback and decreased migration success, previous studies have investigated the influence of various factors on the incidence of these behaviors. Rates of overshoot have been observed to vary considerably among populations, with some studies finding a positive relationship with increasing mainstem water temperature and hatchery rearing upstream of the natal tributary [@Richins2018]. In spring-summer Chinook, @Boggs2004 observed a positive relationship between fallback rates and river discharge. However, these previous studies have looked at these various factors only in isolation and for specific movements, which complicates the modeling of emergent properties and interactions between behaviors, environmental conditions, and populations, and can be challenging in the face of sparse data in some settings. 
+
+<br>
+
+In this progress report, we present a multistate model that is capable of modeling the entire adult Steelhead migration, from first detection at Bonneville Dam to arrival in natal tributaries. This model, which does not constrain movement to only be upstream, allows the complex, multidirectional movement of adult Steelhead to be modeled in full and allows many movements of interest, including fallback, overshoot, and homing, to be estimated in a single framework. The data used in this model were passive integrated transponder (PIT) tag detection histories. This modeling framework is capable of accommodating the effect of multiple categorical and continuous covariates on movement probabilities at each step within the migration, and estimates the effects of natal origin, rear type, temperature, spill, and year on certain movement probabilities. 
+
+<br>
+
+The covariate effects were structured in the model to test specific hypotheses about the effects of these factors on movements of interest. Fish from different DPSs and and of different rear types were modeled separately, facilitating the comparison of movement probabilities along these axes. Within a DPS/rear type combination, covariates were added for the effect of natal origin for any movements within DPS boundaries, ensuring that fish of different natal origins had different movement probabilities as they neared their natal tributaries. Temperature effects were included only for movements that were either upstream or into tributaries, as previous studies have indicated that Steelhead respond to temperature by seeking out colder refugia, either in tributaries [@High2006] or in upstream mainstem reaches [@Richins2018]. In contrast, spill effects were only included for downstream (fallback) movements, but with different structures based on whether a movement was post-overshoot fallback or en-route fallback. Post-overshoot fallback modeled as a function of days of winter (January, February, and March) spill, as the presence of a spillway passage route has previously been shown to be more important than the volume of spill for facilitating downstream passage of adults at dams [@Wertheimer2005]. In contrast, en-route fallback was modeled as a function of the volume of spill, as this type of fallback is assumed to be an involuntary movement caused by hydrosystem conditions. Finally, a random effect of year was included for movements within a fish's DPS to account for interannual variation that was not explicitly accounted for by the other covariates. A random effect of year was not included for movements outside of a fish's DPS, as outside of the DPS, we expected individuals to behave similarly regardless of the year.
+
+<br>
+
+By examining how Steelhead movement probabilities, particularly those of conservation concern, such as overshoot, fallback, homing, and straying, vary by population and are influenced by various factors, this modeling framework will improve our understanding of how both environmental and anthropogenically influenced conditions affect how Steelhead move within the Columbia River and its tributaries.
 
 
 
@@ -207,7 +220,7 @@ Because of the association between overshoot and fallback and decreased migratio
 ## Modeling overview
 ![Figure 2. The model schematic. There were 29 states in our model: 9 mainstem states (outlined in blue), 19 tributary states (outlined in green), and the absorbing "loss" state (not pictured).](.//figures/full_model_diagram.jpg){width=100%}
 
-In our model, the Columbia River and its tributaries are modeled as a series of connected states, with states defined as either reaches of the mainstem Columbia or Snake River between dams with PIT tag detection capabilities in the adult ladders, or tributaries with PIT tag detectors. Fig. 2 shows all of the states in our model; movements over some dams (e.g., The Dalles Dam, John Day Dam, Lower Monumental Dam, or Lower Goose Dam) were not explicitly modeled due to these dams not having PIT tag detection capabilities for the duration of our study period.
+In our model, the Columbia River and its tributaries are modeled as a series of connected states, with states defined as either reaches of the mainstem Columbia or Snake River between dams with PIT tag detection capabilities in the adult ladders, or tributaries with PIT tag detectors. Fig. 2 shows all of the states in our model; movements over some dams (e.g., The Dalles Dam, John Day Dam, Lower Monumental Dam, or Lower Goose Dam) were not explicitly modeled due to these dams not having adult PIT tag detection capabilities for the duration of our study period.
 
 <br>
 
@@ -217,7 +230,7 @@ An additional state in our model not shown in the schematic, but which can be re
 
 ### Accessing PIT tag data
 
-PIT tag data were obtained from the Columbia Basin PIT Tag Information System (PTAGIS). Only known-origin individuals (based on known release sites) were included in this dataset. To ensure that only individuals marked as juveniles were retained in the dataset, all individuals that were greater than 350 mm at time of marking were removed. To select returning adults, only individuals that were seen in the adult fishways at Bonneville Dam were selected. To ensure that there were enough data for each population included in this dataset, only populations (defined as the combination of natal tributary and rear type) that had at least 350 individuals distributed across 8 run years were retained. Additionally, only populations with instream PIT tag detections sites in their natal tributaries were retained; if sufficient instream detection sites only became available during the later part of our study period, only individuals from those years were retained. Run years were separated by June 1 of each year, and run year 2005/2006 (beginning on June 1, 2005) was selected as the first year in our dataset. In total, 27 populations from 17 different tributaries met these criteria: Hood River (hatchery and wild), Fifteenmile Creek (wild), Deschutes River (wild), John Day River (wild), Umatilla River (hatchery and wild), Walla Walla River (hatchery and wild), Yakima River (wild), Wenathee River (hatchery and wild), Entiat River (wild), Methow River (hatchery and wild), Okanogan River (hatchery), Tucannon River (hatchery and wild), Clearwater River (hatchery and wild), Asotin Creek (wild), Grande Ronde River (hatchery and wild), Salmon River (hatchery and wild), and Imnaha River (hatchery and wild). Once the tag codes were identified for each of these populations, a complete tag history report was run in PTAGIS for all of the tag codes in our dataset.
+PIT tag data were obtained from the Columbia Basin PIT Tag Information System (PTAGIS). Only known-origin individuals (based on known release sites) were included in this dataset. To ensure that only individuals marked as juveniles were retained in the dataset, all individuals that were greater than 350 mm at time of marking were removed. To select returning adults, only individuals that were seen in the adult fishways at Bonneville Dam were selected. To ensure that there were enough data for each population included in this dataset, only populations (defined as the combination of natal tributary and rear type) that had at least 350 individuals distributed across 8 run years were retained. Additionally, only populations with instream PIT tag detection sites in their natal tributaries were retained; if sufficient instream detection sites only became available during the later part of our study period, only individuals from those years were retained. Run years were separated by June 1 of each year, and run year 2005/2006 (beginning on June 1, 2005) was selected as the first year in our dataset. In total, 27 populations from 17 different tributaries met these criteria: Hood River (hatchery and wild), Fifteenmile Creek (wild), Deschutes River (wild), John Day River (wild), Umatilla River (hatchery and wild), Walla Walla River (hatchery and wild), Yakima River (wild), Wenathee River (hatchery and wild), Entiat River (wild), Methow River (hatchery and wild), Okanogan River (hatchery), Tucannon River (hatchery and wild), Clearwater River (hatchery and wild), Asotin Creek (wild), Grande Ronde River (hatchery and wild), Salmon River (hatchery and wild), and Imnaha River (hatchery and wild). Once the tag codes were identified for each of these populations, a complete tag history report was run in PTAGIS for all of the tag codes in our dataset.
 
 ### Processing PIT tag data into detections at various sites
 
@@ -254,22 +267,40 @@ Once we determined a history of movement between states, we then subset this mov
 ## Model covariates
 
 ### Temperature data
-Daily average forebay and tailrace temperatures were queried from the Columbia Basin Conditions portal from the DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Due to the noise and gaps inherent to the temperature data, a series of steps were performed to clean this data. To address outliers in the temperature data, two steps were taken. First, plots of temperature were manually inspected and sequential runs of temperature points that were outside of the range of possible values for that time of year were removed. Next, a filtering algorithm was applied to remove any temperature values that were more than four degrees outside of the interannual average temperature value for that day of the year, as well as any values that were more than two degrees outside of the 7-day moving average. To address the incomplete temporal resolution for temperature at each dam in our modeling framework, a state-space model was fit using the MARSS package [@Holmes2012a]. This model took as inputs the cleaned temperature data at the forebay and tailrace for the eight dams (a total of 16 temperature time series). The model was structured with only a single process (the basin-scale temperature) and 16 observations of that process. Each dam had a different offset/bias term (8 total). Model-estimated temperatures on each day for each dam (the estimate of the basin-scale temperature plus the dam-specific offset) were z-scored prior to inclusion in the model.
+Daily average forebay and tailrace temperatures were queried from the Columbia Basin Conditions portal from the CBR DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Due to the noise and gaps inherent to the temperature data, a series of steps were performed to clean this data. To address outliers in the temperature data, two steps were taken. First, plots of temperature were manually inspected and sequential runs of temperature points that were outside of the range of possible values for that time of year were removed. Next, a filtering algorithm was applied to remove any temperature values that were more than four degrees outside of the interannual average temperature value for that day of the year, as well as any values that were more than two degrees outside of the 7-day moving average. To address the incomplete temporal resolution for temperature at each dam in our modeling framework, a state-space model was fit using the MARSS package [@Holmes2012a]. This model took as inputs the cleaned temperature data at the forebay and tailrace for the eight dams (a total of 16 temperature time series). The model was structured with only a single process (the basin-scale temperature) and 16 observations of that process. Each dam (both the forebay and tailrace temperature observations) had a different offset/bias term (8 total). Model-estimated temperatures on each day for each dam (the estimate of the basin-scale temperature plus the dam-specific offset) were z-scored prior to inclusion in the model.
+
+The model is structured as follows:
+$$
+x_t = x_{t-1} + w_t
+$$
+$$
+\mathbf{y}_t = \mathbf{Z}x_t + \mathbf{a}_t + \mathbf{v}_t
+$$
+
+The terms have the following definitions:
+
+* $x$ is the temperature of the Columbia River Basin
+* $w$ is the process error, where $w_t \sim \text{normal}(0, Q)$ and where $Q$ is an estimated parameter
+* $\mathbf{y}$ is a 16x1 column vector that contains 16 observations of the temperature: 8 dams x 2 observations at each dam (forebay and tailrace)
+* $\mathbf{Z}$ is a 16x1 column vector containing only 1s that maps the process (the basin temperature) to the observations (forebay and tailrace temperatures at each dam)
+* $\mathbf{a}$ is a 16x1 column vector that contains 8 different offset terms each repeated twice (for the forebay and tailrace temperatures at each dam)
+* $\mathbf{v}$ is a 16x1 column vector of the observation errors, where $v_t \sim \text{MVN}(0, R)$ and where $R$ is an estimated parameter
+
 
 <br>
 
-To estimate the temperatures experienced by fish, it was first necessary to calculate the median residence time in each state in our model. This was done by calculating the amount of time spent in each state by each fish in our dataset (the difference between date on which a fish was observed entering a state and the date on which a fish was observed exiting a state) and then taking the median time spent in each state across all fish. To estimate the mean temperature experienced by the fish while in a state, the mean temperature across a window of time (defined as the date a fish was observed entering a state plus the median residence time for all fish in that state) was taken. The downstream dam for a state was used as the source of temperature data for that state.
+Our hypothesis concerning the effect of temperature was that the temperature experienced by a fish while they were in a state influenced their decision to seek cooler refuge (either in an upstream mainstem reach or in a tributary). To estimate the temperatures experienced by fish, it was first necessary to calculate the median residence time in each state in our model. This was done by calculating the amount of time spent in each state by each fish in our dataset (the difference between date on which a fish was observed entering a state and the date on which a fish was observed exiting a state) and then taking the median time spent in each state across all fish. To estimate the mean temperature experienced by the fish while in a state, the mean temperature across a window of time (defined as the date a fish was observed entering a state plus the median residence time for all fish in that state) was taken. The downstream dam for a state was used as the source of temperature data for that state.
 
 ### Spill data
-Daily average spill (in thousands of cubic feet per second) were queried from the Columbia Basin Conditions portal from the CBR DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Spill data was processed in two different ways to facilitate the inclusion of two hypothesized relationships between spill and fish fallback over dams. Fallback over dams can be divided into two distinct types of fallback: en-route fallback, which occurs when fish fall back prior to reaching their natal tributaries, and post-overshoot fallback, which occurs when fish fall back after overshooting natal tributaries (having ascended the dam directly upstream of their natal tributary). 
+Daily average spill (in thousands of cubic feet per second) were queried from the Columbia Basin Conditions portal from the CBR DART page for the eight dams for which movement was explicitly modeled (BON, MCN, PRA, RIS, RRE, WEL, ICH, and LGR). Spill data were processed in two different ways to facilitate the inclusion of the two hypothesized relationships between spill and fish fallback over dams.
 
 <br>
 
-En-route fallback goes against the desired direction of movement for all fish, as their goal is to continue traveling upstream. Our hypothesis concerning en-route fallback is that it is involuntary; i.e., that it occurs as a result of river conditions (spill, flow) and/or individual condition. As such, our hypothesis for the relationship between spill and en-route fallback is that it is related to the volume of spill, as this would serve to push fish back downstream over a dam via the spillway (or alternatively, serves as a proxy for flow conditions in the river). The approach that we used for this spill covariate is the same as was used for temperature, i.e., the use of windows and taking the average spill during that window. However, spill data was not z-scored, as the zeros in the data are informative.
+En-route fallback goes against the desired direction of movement for all fish, as their goal is to continue traveling upstream. Our hypothesis concerning en-route fallback is that it is involuntary; i.e., it occurs as a result of river conditions (spill, flow) and/or individual condition. As such, our hypothesis for the relationship between spill and en-route fallback is that it is related to the volume of spill, as this would serve to push fish back downstream over a dam via the spillway (or alternatively, serves as a proxy for flow conditions in the river). The approach that we used for this spill covariate is the same as was used for temperature, i.e., the use of windows and taking the average spill during that window. However, spill data was not z-scored, as the zeros in the data are informative.
 
 <br>
 
-In contrast, post-overshoot fallback is a desirable outcome for all fish, as this movement helps them get closer to their natal tributary. Our hypothesis concerning post-overshoot fallback is that it is voluntary; i.e., that it occurs when fish make the decision to go back downstream and towards their natal tributaries. As such, our hypothesis for the relationship between spill and post-overshoot fallback is that it is related to the presence of spill, as the presence of spill allows fish to find a safe route back downstream. This is supported by the work of Richins & Skalski (2018) and Wertheimer (2007), who found that even small amounts of surface flow were effective for routing steelhead kelts away from turbines, indicating that the availability of surface passage options may be more important than the volume of flow. The approach we used for this covariate was to find the total number of days with any amount of spill in the months of January, February, and March, which is when post-overshoot fallback is predicted to occur (after overwintering).
+In contrast, post-overshoot fallback is a desirable outcome for all fish, as this movement helps them get closer to their natal tributary. Our hypothesis concerning post-overshoot fallback is that it is voluntary; i.e., it occurs when fish make the decision to go back downstream and towards their natal tributaries. As such, our hypothesis for the relationship between spill and post-overshoot fallback is that it is related to the presence of spill, as the presence of spill allows fish to find a safe route back downstream. This is supported by the work of @Richins2018 and @Wertheimer2005, who found that even small amounts of surface flow were effective for routing steelhead kelts away from turbines, indicating that the availability of surface passage options may be more important than the volume of flow. The approach we used for this covariate was to find the total number of days with any amount of spill in the months of January, February, and March, which is when post-overshoot fallback is predicted to occur (after overwintering).
 
 
 
@@ -281,11 +312,11 @@ Over the course of our study period, the network of PIT tag detection arrays in 
 
 <br>
 
-To address this, we estimated detection efficiency in tributaries by calculating the detection efficiency at the PIT tag detection site closest to the river mouth (i.e., the confluence of the tributary with either the Columbia or Snake River). We estimated detection efficiency by taking the individuals that were seen at detection sites upstream of the river mouth site and calculating what proportion were seen at the river mouth site. For 14 of the 17 tributaries in our model (Table 1), we identified a PIT tag detection site on the mainstem tributary suitable for calculating detection efficiency; three tributaries (the Clearwater River, Salmon River, and Grande Ronde River) lacked a suitable site and therefore detection efficiency was not calculated for these tributaries.
+To address this, we estimated detection efficiency in tributaries by calculating the detection efficiency at the PIT tag detection site closest to the river mouth (i.e., the confluence of the tributary with either the Columbia or Snake River). We estimated detection efficiency by taking the individuals that were seen at detection sites upstream of the river mouth site and calculating what proportion were seen at the river mouth site. For 14 of the 17 tributaries in our model (Table 1), we identified a PIT tag detection site on the mainstem tributary suitable for calculating detection efficiency; three tributaries (the Clearwater River, Salmon River, and Grande Ronde River) lacked a suitable site and therefore detection efficiency was not calculated for these tributaries. As such, estimates of movement probability into these tributaries will be biased low (and conversely, the loss probability will be biased high), as detection efficiency was assumed to be 100%.
 
 <br>
 
-In our estimation of detection efficiency, we included two covariates: (1) a categorical covariate representing different antenna configurations, and (2) a covariate for the effect of discharge. Different categorical covariates were chosen based on the operational history of each interrogation site. We identified major changes in site configuration which were likely to have affected the detection efficiency at these sites, such as the installation of new antennas, arrays being moved, or components being upgraded. The years in which these changes occurred were then used to inform which categorical covariate for antenna configuration was used. We chose to include discharge as a covariate for detection efficiency as well because of the relationship between discharge and river stage, which affects the volume of the river covered by the range of the antennas (see Fig. 3 for an example). Discharge data were queried from USGS by finding the station on the interactive USGS dashboard (https://dashboard.waterdata.usgs.gov) closest the river mouth array and navigating to the data page for the specific site. Discharge data were available for all tributaries except Fifteenmile Creek and the Imnaha River; these tributaries therefore had detection efficiency estimated only via the categorical covariate (intercept) for antenna configuration.
+In our estimation of detection efficiency, we included two covariates: (1) a categorical covariate representing different antenna configurations, and (2) a covariate for the effect of discharge. Different categorical covariates were chosen based on the operational history of each interrogation site (Table 1). We identified major changes in site configuration which were likely to have affected the detection efficiency at these sites, such as the installation of new antennas, arrays being moved, or components being upgraded. The years in which these changes occurred were then used to inform which categorical covariate for antenna configuration was used. We chose to include discharge as a covariate for detection efficiency as well because of the relationship between discharge and river stage, which affects the volume of the river covered by the range of the antennas (see Fig. 3 for an example). Discharge data were queried from USGS by finding the station on the interactive USGS dashboard (https://dashboard.waterdata.usgs.gov) closest the river mouth array and navigating to the data page for the specific site. Discharge data were available for all tributaries except Fifteenmile Creek and the Imnaha River; these tributaries therefore had detection efficiency estimated only via the categorical covariate (intercept) for antenna configuration.
 
 <br>
 
@@ -295,7 +326,8 @@ In our estimation of detection efficiency, we included two covariates: (1) a cat
 <br>  
 <br>
 
-```{r det_eff_cat_changes, echo = FALSE, warning = FALSE, message = FALSE}
+```{r det_eff_cat_changes, echo = FALSE, warning = FALSE, message = FALSE, tab.cap.pre = "Table 1"}
+
 tributaries <- gsub("_", " ", natal_origin_order)
 
 trib_cat <- data.frame(Tributary = c("Hood River", "Fifteenmile Creek", "Deschutes River",
@@ -323,24 +355,26 @@ trib_cat <- data.frame(Tributary = c("Hood River", "Fifteenmile Creek", "Deschut
                                          "Initial", "Initial", "Antenna installation at entrance to adult ladder",
                                          "Initial", "Initial", "Initial",
                                          "Initial", "Initial", "Initial",
-                                         "Initial", "Site was moved 5 km upstream and tranceivers replaced", "Initial",
+                                         "Initial", "Site was moved 5 km upstream and transceivers replaced", "Initial",
                                          "Initial", "All antennas replaced, additional antenna installed", "Initial",
                                          "All components replaced and upgraded", "Initial"))
 
 flextable(trib_cat) %>% 
   align(part = "all") %>% # left align
-  set_caption(caption = "Tributary PIT tag antenna configurations used in detection efficiency estimation. Site refers to the PIT tag detection site chosen for the detection efficiency estimation, based on its location close to the mouth of the tributary. Configuration refers to the configuration of antennas at the site, where Initial is the name given to the antenna configuration at the site at the start of the time series, and any subsequent changes from the initial configuration at the site are noted in this column.", autonum = officer::run_autonum()) %>% 
+  set_caption(caption = "Tributary PIT tag antenna configurations used in detection efficiency estimation. Site refers to the PIT tag detection site chosen for the detection efficiency estimation, based on its location close to the mouth of the tributary. Configuration refers to the configuration of antennas at the site, where Initial is the name given to the antenna configuration at the site at the start of the time series, and any subsequent changes from the initial configuration at the site are noted in this column.") %>% 
   font(fontname = "Times New Roman (Body)", part = "all") %>% 
   fontsize(size = 10, part = "body") %>% 
   theme_booktabs() %>% # default theme
-  FitFlextableToPage()
+  FitFlextableToPage(pgwidth = 6)
+  # fit_to_width(max_width = 14)
 ```
 
 <br>
 <br>  
 <br>
 
-Detection efficiency was then estimated using a logistic regression, with detection a function of an intercept for the categorical covariate of site configuration, and a slope term (unique to each tributary) multiplied by the mean discharge in that run year.
+Detection efficiency at the tributary mouth site was then estimated using a logistic regression, with detection a function of an intercept for the categorical covariate of site configuration, and a slope term (unique to each tributary) multiplied by the mean discharge in that run year. Only fish that were detected at an upstream site in the same tributary were included in the detection efficiency estimation.
+
 <br>
 
 $$
@@ -361,10 +395,15 @@ The indices represent the following:
 
 A Stan [@Carpenter2017] model was used to estimate detection probability in each tributary. Discharge values were Z-scored prior to the model being fit. The posteriors from this model for each of the $\alpha$ (site configuration covariates) and $\beta$ (effect of discharge) terms were used as priors in the primary Stan model that was used to estimate movement. The fit for detection efficiency for each tributary can be found in Appendix 1.
 
+<br>
+
+Movements from mainstem states into tributaries were the only movements for which detection efficiency was estimated. For the other two types of movements (upstream movements between mainstem states and downstream movements between mainstem states), detection efficiency was assumed to be 100%. This assumption for upstream movements via fish ladders is supported by estimates of detection efficiency at these ladders, which are near 100% [@Richins2018]. However, this assumption does not hold for fallback movements, which in reality have very low detection probabilities. By interpolating fallback movements based on the sequence of state visits, we are able to model the probability of apparent fallback, but we are not able to capture fallback events where fish are not subsequently detected. The consequence of this is that unobserved fallback movements will instead appear as movements into the loss state, leading to estimates of loss from a state being too high, and estimates of fallback being too low. Therefore, all fallback movement probabilities should be interpreted as lower bound estimates of fallback.
+
+
 ### Movement model
 
 #### Overview
-The history of state transitions for each individual PIT-tagged fish, the information on that fish's natal origin, and the previously described covariates were the inputs for the multistate model. The multistate model was implemented in a Bayesian framework using the Stan programming language [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Fig. 2). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current state, or into the absorbing loss category, which a fish enters once the detection history ends. Each of these probabilities was evaluated through a categorical logit model, with an intercept term (a grand mean, for all fish in the dataset) as well as terms for each of the covariates in our model (origin, year, spill, and temperature). The loss probability was calculated as 1 - the sum of the other probabilities, enforcing a constraint that all movement probabilities have to sum to 1.
+The history of state transitions for each individual PIT-tagged fish, the information on that fish's natal origin, and the previously described covariates were the inputs for the multistate model. The multistate model was implemented in a Bayesian framework using the Stan programming language [@Carpenter2017]. The multistate model is constructed as a series of states, defined as either reaches of the mainstem Columbia or Snake Rivers between dams with active PIT tag antennas for the duration of our study period or tributaries that flow into the Columbia or Snake Rivers (Fig. 2). All fish in our model begin when they are first detected as adults in the fish ladders at Bonneville Dam. At each state in our model, each fish is assigned a probability of moving to any of the states connected to the current state, or into the absorbing loss category, which a fish enters once the detection history ends. Each of these probabilities will be evaluated through a categorical logit model, with an intercept term (a grand mean, for all fish in the dataset) as well as terms for each of the covariates in our model (origin, year, spill, and temperature). The loss probability was calculated as 1 - the sum of the other probabilities, enforcing a constraint that all movement probabilities have to sum to 1.
 
 <br>
 
@@ -374,28 +413,28 @@ Due to the computational requirements of evaluating the detection histories of o
 
 #### Covariate inclusion
 
-In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explictly included via parameters in the model: origin, temperature, spill, and year.
+In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explicitly included via parameters in the model: origin, temperature, spill, and year.
 
 
 ##### Origin
 
-To reduce the number of parameters in the model, an effect of natal origin was only included for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed different natal origins to differentiate as they neared natal tributaries.
+To reduce the number of parameters in the model, a fixed effect of natal origin was included only for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed the effect of unique natal origins to differentiate as they neared natal tributaries. Natal origin was modeled as a fixed effect.
 
 
 ##### Temperature
 
-Two separate temperature effects were estimated in our modeling framework, to account for the temporal aspect of temperature. Since temperature is strongly correlated with day of year, which has been previously noted to influence Steelhead migration patterns [@Siegel2021], we divided the effect of temperature into a winter/spring effect (January 1 - May 31) and a summer/fall effect (June 1 - December 31). Depending on the day of year of each movement, the temperature in the window was either multiplied by the winter/spring temperature parameter or the summer/fall temperature parameter. Approximately 96% of all movements occurred in the summer/fall period.
+Two separate temperature effects were estimated in our modeling framework, to account for the temporal aspect of temperature. Because temperature is strongly correlated with day of year, which has been previously noted to influence Steelhead migration patterns [@Siegel2021], we divided the effect of temperature into a winter/spring effect (January 1 - May 31) and a summer/fall effect (June 1 - December 31). Depending on the day of year of each movement, the temperature in the window was either multiplied by the winter/spring temperature parameter or the summer/fall temperature parameter. Approximately 96% of all movements occurred in the summer/fall period.
 
-The temperature effects were structured to allow a temperature effect only for movements from a mainstem state to the mainstem state upstream of that state, or from a mainstem state into a tributary. Furthermore, temperature effects were structured to allow different natal origins to have a different response to temperature within the DPS boundaries. As such, the same origin structure was used as was used for the origin effects - temperature effects were shared outside of a DPS, but within a DPS each natal origin had a separately estimated parameter for the effect of temperature on each movement.
+The temperature effects were structured to allow a temperature effect only for movements from a mainstem state to the mainstem state upstream of that state, or from a mainstem state into a tributary. Furthermore, temperature effects were structured to allow different natal origins to have a different response to temperature within the DPS boundaries. As such, the same origin structure was used as was used for the origin effects - temperature effects were shared outside of a DPS, but within a DPS each natal origin had a separately estimated parameter for the effect of temperature on each movement. Temperature was modeled as a fixed effect.
 
 
 ##### Spill
 
-For the effect of the volume of spill within a window of time, every downstream movement over a dam (fallback) included an effect for the volume of spill. For the effect of the number of days in the winter with some volume of spill, this covariate was only included for origins for which this was a post-overshoot fallback movement. This parameter was shared between all origins for which the movement was a post-overshoot fallback movement.
+For the effect of the volume of spill within a window of time, only en-route fallback movements included an effect for the volume of spill. This parameter was shared between all origins. For the effect of the number of days in the winter with some volume of spill, only post-overshoot fallback movements included an effect for the number of days of spill during the winter months. This parameter was shared between all origins for which the movement was a post-overshoot fallback movement. Therefore, for any fallback movement, either the effect of the volume of spill or the number of days of winter spill was included, depending on the relation of that dam to the fish's natal origin. Spill was modeled as a fixed effect.
 
 ##### Year
 
-Within the datasets for each of the six populations (3 DPSs x 2 rear types), all individuals were pooled across years when fitting the model, but a random effect of year for certain movements was included to allow the movement probabilities to vary interannually and account for year specific differences that weren't captured by the covariates included in the model.. The setup for the inclusion of year effects was the same as that for origin effects - a random effect for each year was only included for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). One reason for this modeling choice was the computational necessity of restricting the number of movements that receive a random effect for each of the 17 years in our dataset, as well as needing enough data for each movement to estimate a separate effect for each origin for each year. A second, ecological reason for this choice was based on our a priori hypothesis that interannual differences would mostly emerge when fish were nearing natal tributaries. Downstream of the DPS, individuals are expected to behave similarly regardless of the year, as all fish have natal tributaries that are upstream.
+Within the datasets for each of the six populations (3 DPSs x 2 rear types), all individuals were pooled across years when fitting the model, but a random effect of year for certain movements was included to allow the movement probabilities to vary interannually and account for year specific differences that weren't captured by the covariates included in the model. The setup for the inclusion of year effects was the same as that for origin effects - a random effect for each year was included only for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). One reason for this modeling choice was the computational necessity of restricting the number of movements that receive a random effect for each of the 17 years in our dataset, as well as needing enough data for each movement to estimate a separate effect for each origin for each year. A second, ecological reason for this choice was based on our a priori hypothesis that interannual differences would mostly emerge when fish were nearing natal tributaries. Downstream of the DPS, individuals are expected to behave similarly regardless of the year, as all fish have natal tributaries that are upstream. Year was modeled as a random effect.
 
 
 #### Statistical implementation and detection efficiency correction
@@ -412,12 +451,30 @@ p_{actual, m} = \frac{exp(b_{0,m} + [covariate\:effects]_{m})}{1 + exp(b_{0,1} +
 ... exp(b_{0,n} + [covariate\:effects]_{n})}
 \end{aligned}
 $$
+
 <br>
 
-$b_0$ is the intercept (the grand mean for all fish in the DPS). The term $[covariate\:effects]$ is a placeholder for the different covariates that are included in this model, as the covariate effects included vary depending on the type of movement and its relation to the fish's natal origin. For example, for the probability of a Wenatchee River fish falling back over Rocky Reach Dam, the covariate effects term in the numerator would be as follows:
+In this equation, the parameter $b_0$ is the intercept (the grand mean for all fish in the DPS), and the term $[covariate\:effects]$ is a placeholder for the different covariates that are included in this model. Specifically, the covariates are estimated as follows:
+
+* $b_0$ is a fixed effect for the grand mean of all fish in the model (i.e., the grand mean for all fish of one rear type from one DPS)
+* $b_{origin}$ is a fixed effect for the natal origin
+* $b_{spill-window}$ is a fixed effect for the volume of spill
+* $b_{spilldays}$ is a fixed effect for the days of winter spill
+* $b_{tempearly}$ is a fixed effect for temperature when a movement occurs during the winter and spring months (1 Jan - 31 May) for movements outside of a fish's DPS
+* $b_{template}$ is a fixed effect for temperature when a movement occurs during the summer and fall months (1 June - 31 December) for movements outside of a fish's DPS
+* $b_{origin,tempearly}$ is a fixed effect for temperature for that specific origin when a movement occurs during the winter and spring months (1 Jan - 31 May) for movements inside a fish's DPS
+* $b_{origin,template}$ is a fixed effect for temperature for that specific origin when a movement occurs during the summer and fall months (1 June - 31 December) for movements inside a fish's DPS
+* $b_{origin,year}$ is a random effect of year for that specific origin. Random effects were assumed to be distributed normally, with a mean of zero and a standard deviation estimated in the model
+
+All fixed effects were estimated using a diffuse normal prior with a mean of 0 and a standard deviation of 10, and random effects were estimated using a diffuse cauchy prior (location of 0 and scale of 1) on the standard deviation.
+
+
+As stated earlier, the covariate effects included vary depending on the type of movement and its relation to the fish's natal origin. To provide an example of the variable nature of which covariates to include, for the probability of a Wenatchee River fish falling back over Rocky Reach Dam, the covariate effects term in the numerator would be as follows:
+
+<br> 
 
 $$
-b_{origin,1} + b_{spillwindow,1} * spillvolume +  b_{spilldays,1} * spilldays + b_{year,1}
+b_{origin,1} + b_{spillwindow,1} * spillvolume +  b_{spilldays,1} * spilldays + b_{origin,year,1}
 $$
 
 <br> 
@@ -427,26 +484,27 @@ This is because the movement is:
 * inside the Upper Columbia DPS boundaries, so there is an effect of origin
 * a fallback movement over a dam, so there is an effect of the volume of spill
 * a post-overshoot fallback movement over a dam (because Rocky Reach Dam is upstream of the Wenatchee River), so there is an effect of the days of spill during the winter months
+* inside the Upper Columbia DPS boundaries, so there is an effect of year
 * not an upstream movement, so there is no effect of temperature
 
 <br>
 
-The loss term is given by the following equation:
+Once the probabilities of entering any non-loss states have been estimated, the loss term is given by the following equation:
 $$
 p_{actual,loss} = 1 - \sum_{m=1}^{n} p_{actual,m}
 $$
 
 <br> 
 
-This generates a vector of probabilities, corresponding to the true movement probability from the current state to each of the connecting states. However, because perceived movement is a product of both the true movement and the detection probability of various PIT tag arrays, we must correct for this detection probability to separate our process of interest (the true movement probabilities, $p_{actual}$) from the observation process (the detection probability, $p_{detection}$). The product of $p_{actual}$ and $p_{detection}$ is $p_{observed}$, which is used to evaluate the likelihood of the observed PIT tag data. We only estimate $p_{detection}$ for tributaries in our model; $p_{detection}$ in adult fish ladders is assumed to be one, with any known missed detections interpolated (see section 3.3.3), and there is no way to estimate $p_{detection}$ in downstream mainstem passage routes.
+This generates a vector of probabilities, corresponding to the true movement probability from the current state to each of the connecting states. However, because perceived movement is a product of both the true movement and the detection probability of various PIT tag arrays, we must correct for this detection probability to separate our process of interest (the true movement probabilities, $p_{actual}$) from the observation process (the detection probability, $p_{detection}$). The product of $p_{actual}$ and $p_{detection}$ is $p_{observed}$, which is used to evaluate the likelihood of the observed PIT tag data. We only estimate $p_{detection}$ for tributaries in our model; $p_{detection}$ in adult fish ladders is assumed to be one, with any known missed detections interpolated (see section 3.3.3), and there is no way to estimate $p_{detection}$ in downstream mainstem passage routes. The consequence of an inability to estimate $p_{detection}$ in downstream mainstem passage routes is that this is assumed to be 100%. The consequence of this is that if there is a missed detection and that fish is not later seen (therefore, the missed detection cannot be interpolated), the downstream movement probability will be biased low, and the loss probability will be biased high.
 
 <br> 
 
-Once we have estimated $p_{actual}$, the detection efficiency correction is implemented for all transitions for which we can calculate a detection efficiency, to generate $p_{observed}$. Given that for almost every tributary, detection efficiency could not be calculated for every year, the first step was to identify which connecting states had the ability to estimate detection efficiency in the year in which the transition occurred. For each of the transitions for which a detection efficiency could then be estimated, the following correction was made: 
+Once we have estimated $p_{actual}$, the detection efficiency correction is implemented for all transitions for which we can calculate a detection efficiency, to generate $p_{observed}$. Given that for almost every tributary, detection efficiency could not be calculated for every year, the first step was to identify which tributaries that connect to a mainstem state had the ability to estimate detection efficiency in the year in which the transition occurred. For each of the transitions for which a detection efficiency could then be estimated, the following correction was made: 
 
 <br>
 
-First, the detection efficiency of that tributary in that year ($t$), with that year's mean discharge, was estimated:
+First, the detection efficiency of that tributary in that year ($t$) with that year's mean discharge was modeled, using the parameter values that were estimated in the model described in 3.5.1 as priors for the same parameters in this model:
 
 $$
 p_{detection,j,t} = exp(\alpha_{j, k}  +  \beta_{j}  discharge_{j,t})/(1 + exp(\alpha_{j, k}  +  \beta_{j}  discharge_{j,t}))
@@ -456,7 +514,7 @@ $$
 
 Next, the probability of the corresponding transition in the vector of observed transitions was adjusted:
 $$
-p_{observed,j} = p_{actual,j} * p_{detection,j,t}
+p_{observed,j,t} = p_{actual,j} * p_{detection,j,t}
 $$
 
 <br>
@@ -469,13 +527,24 @@ $$
 <br>
 
 With the vector of observed transition probabilities generated, the likelihood of observing the next movement ($x$) of fish $z_i$ was defined as follows:
+
+<br>
+
 $$
-z_{i,x} \sim \text{categorical}(p_{observed,1}, p_{observed,2}, p_{observed,3} ... p_{observed, n}, p_{observed, loss})
+z_{i,x} \sim \text{categorical}(p_{observed,i,1}, p_{observed,i,2}, p_{observed,i,3} ... p_{observed,i,n}, p_{observed,i,loss})
 $$
 
 <br>
 
-In these equations, $p_{detection}$ is the probability of detection, $p_{actual}$ is the vector which contains the true movement probabilities, $p_{observed}$ is the vector which contains the observed movement probabilities, $\alpha$ is the categorical covariate for site configuration, $\beta$ is the slope for the effect of discharge on the probability of detection efficiency, and $z_{i,x}$ is the next observation of the fish. The indices represent the following:
+Formally, the likelihood is evaluated as follows:
+$$
+f(x | \mathbf{p}) = \prod_{m=1}^{n} p_{m}^{x_m}
+$$
+In this likelihood, $\mathbf{p}$ is the vector of observed probabilities and $n$ is the possible movements out of that state.
+
+<br>
+
+In these equations, $p_{detection}$ is the conditional probability of detection, $p_{actual}$ is the vector which contains the true movement probabilities, $p_{observed}$ is the vector which contains the observed movement probabilities, $\alpha$ is the categorical covariate for site configuration, $\beta$ is the slope for the effect of discharge on the probability of detection efficiency, and $z_{i,x}$ is the next observation of the fish. The indices represent the following:
 
 - $i$ is the fish
 - $x$ is the observation of fish $i$
@@ -508,10 +577,10 @@ fish_year_origin_table %>%
 colnames(fish_year_origin_table) <- c("Population", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "Total")
 ```
 
-A total of `r sum(fish_year_origin_table$Total)` PIT-tagged fish were in our dataset, distributed across `r ncol(fish_year_origin_table) - 2` run years. The three populations with the most fish were the Salmon River (hatchery), the Grande Ronder River (hatchery), and the Clearwater River (hatchery).
+A total of `r sum(fish_year_origin_table$Total)` PIT-tagged fish were in our dataset, distributed across `r ncol(fish_year_origin_table) - 2` run years. The three populations with the most fish were the Salmon River (hatchery), the Grande Ronde River (hatchery), and the Clearwater River (hatchery).
 
 <br>
-```{r fish_table_print, echo = FALSE, message = FALSE, warning = FALSE}
+```{r fish_table_print, echo = FALSE, message = FALSE, warning = FALSE, tab.cap.pre = "Table 2"}
 flextable(fish_year_origin_table) %>% 
   align(part = "all") %>% # left align
   set_caption(caption = "Number of tagged fish in our dataset, by population (combination of natal origin and rear type) and run year.") %>% 
@@ -519,7 +588,12 @@ flextable(fish_year_origin_table) %>%
   fontsize(size = 9, part = "body") %>% 
   fontsize(size = 8, part = "header") %>% 
   theme_booktabs() %>% # default theme
-  FitFlextableToPage()
+  FitFlextableToPage(pgwidth = 7)
+
+as.data.frame(t(fish_year_origin_table)) %>% 
+  row_to_names(1) %>% 
+  rownames_to_column("Year") -> fish_year_origin_table_2
+
 ```
 
 <br>
