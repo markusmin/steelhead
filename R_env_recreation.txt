@@ -1,0 +1,5 @@
+### Packages I installed on gscratch/scrubbed/mmin
+install.packages("lubridate")
+install.packages("tidyverse")
+install.packages("cmdstanr")
+install.packages("posterior")
