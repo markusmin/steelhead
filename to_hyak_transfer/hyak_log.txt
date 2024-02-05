@@ -319,10 +319,6 @@ make && make install
 # Then create a module file using these instructions: https://wiki.cac.washington.edu/display/hyakusers/Hyak_modules
 /sw/contrib/stf-src/xz-5.2.5
 
-# This worked: Just with some odd file paths
-# Now to run R:
-module load contrib/R-4.2.0/4.2.0
-
 
 ##### Installing JAGS on Hyak
 # From this website: http://levlafayette.com/node/498
@@ -3264,6 +3260,2177 @@ Chain 1 Iteration:  10 / 1000 [  1%]  (Warmup)
 Chain 1 Iteration:  20 / 1000 [  2%]  (Warmup)
 Chain 1 Iteration:  30 / 1000 [  3%]  (Warmup)
 
-So a bit slower than I was hoping... If we can get through 50 iter every 24 hours though, this will finish
+So a bit slower than I was hoping... If we can get through 100 iter every 24 hours though, this will finish
+
+What if a big problem is that we have covariate correlation? Like with temperature? Or is that being
+taken care of via indexing...?
+
+### 2023-10-25 ###
+
+Checking in on runs at 9:15 am on 10/25/23
+[mmin@mox1 ~]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4958689       stf   UC_W_4     mmin  R 1-13:14:22      1 n2305
+           4958686       stf   UC_W_1     mmin  R 1-17:16:31      1 n2309
+           4958687       stf   UC_W_2     mmin  R 1-17:16:31      1 n2311
+           4958688       stf   UC_W_3     mmin  R 1-17:16:31      1 n2312
+Chain 1
+Chain 1 Iteration:  10 / 1000 [  1%]  (Warmup)
+Chain 1 Iteration:  20 / 1000 [  2%]  (Warmup)
+Chain 1 Iteration:  30 / 1000 [  3%]  (Warmup)
+Chain 1 Iteration:  40 / 1000 [  4%]  (Warmup)
+Chain 1 Iteration:  50 / 1000 [  5%]  (Warmup)
+Chain 1 Iteration:  60 / 1000 [  6%]  (Warmup)
+Chain 1 Iteration:  70 / 1000 [  7%]  (Warmup)
+
+Not even at 10% completed nearly two days in. These runs are not finishing in 10 days. At this pace,
+we are only getting through 1.7 iterations per hour. So in 240 hours, we could only finish about 400 iter.
+I don't honestly understand why these runs are suddenly slower than the runs that we checked in on 
+on 10/23/23, which were approximately 3 times faster
+
+Where to go from here?
+Let's control for just max_treedepth and run that again, back with 100iter.
+# Modified the seed101_100iter R scripts to run with max_treedepth = 12; saved these as new scripts
+
+# Wrote a new script: UCW_submit_chains_100iter_mtd12.sh
+
+# Create four new slurm scripts to run 100iter_mtd12, with 240 hours requested
+# Move that all to hyak:
+
+scp -r ./upper_columbia_wild/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/
+
+# started running at 9:35 am on 10/25/23
+
+### 2023-10-26 ###
+
+Checking in on runs at 9:30 am on 10/26/23
+
+[mmin@mox1 upper_columbia_wild]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4962855       stf   UC_W_1     mmin  R   23:56:09      1 n2305
+           4962856       stf   UC_W_2     mmin  R   23:56:09      1 n2309
+           4962857       stf   UC_W_3     mmin  R   23:56:09      1 n2311
+           4962858       stf   UC_W_4     mmin  R   23:56:09      1 n2312
+[mmin@mox1 upper_columbia_wild]$ nano slurm-4962858.out 
+
+Chain 1
+Chain 1 Iteration:  10 / 200 [  5%]  (Warmup)
+Chain 1 Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1 Iteration:  30 / 200 [ 15%]  (Warmup)
+Chain 1 Iteration:  40 / 200 [ 20%]  (Warmup)
+
+Well, they'll definitely finish. But 40 iter every 24 hours? Pretty rough, but at the same pace as earlier
+
+### 2023-10-27 ###
+
+Checking in on runs at 11:00 am on 10/27/23
+[mmin@mox1 ~]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4962855       stf   UC_W_1     mmin  R 2-01:25:18      1 n2305
+           4962856       stf   UC_W_2     mmin  R 2-01:25:18      1 n2309
+           4962857       stf   UC_W_3     mmin  R 2-01:25:18      1 n2311
+           4962858       stf   UC_W_4     mmin  R 2-01:25:18      1 n2312
+[mmin@mox1 upper_columbia_wild]$ nano slurm-4962858.out 
+Chain 1
+Chain 1 Iteration:  10 / 200 [  5%]  (Warmup)
+Chain 1 Iteration:  20 / 200 [ 10%]  (Warmup)
+Chain 1 Iteration:  30 / 200 [ 15%]  (Warmup)
+Chain 1 Iteration:  40 / 200 [ 20%]  (Warmup)
+Chain 1 Iteration:  50 / 200 [ 25%]  (Warmup)
+Chain 1 Iteration:  60 / 200 [ 30%]  (Warmup)
+Chain 1 Iteration:  70 / 200 [ 35%]  (Warmup)
+Chain 1 Iteration:  80 / 200 [ 40%]  (Warmup)
+
+Yup, same 40 iter/24 hour pace. Should finish by Monday afternoon (?)
+
+### 2023-10-30 ###
+
+Checkin in on runs at 4:10 pm on 10/30/23
+
+[mmin@mox1 ~]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4962858       stf   UC_W_4     mmin  R 5-06:35:22      1 n2312
+Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1 finished in 451799.0 seconds.
+
+All chains finished, this run is just still saving to memory
+
+### 2023-10-31 ###
+
+# Pull runs off hyak:
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/upper_columbia_wild/ ./
+
+# So, these runs aren't running into the treedepth warning. Old runs looked like this:
+
+Chain 1 Iteration: 190 / 200 [ 95%]  (Sampling)
+Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1 finished in 55805.9 seconds.
+Warning: 100 of 100 (100.0%) transitions hit the maximum treedepth limit of 10.
+See https://mc-stan.org/misc/warnings for details.
+
+# Last run looks like this:
+
+Chain 1 Iteration: 190 / 200 [ 95%]  (Sampling)
+Chain 1 Iteration: 200 / 200 [100%]  (Sampling)
+Chain 1 finished in 451799.0 seconds.
+
+# It is RIDICULOUSLY slow (almost 10x slower) but not hitting that warning at least
+
+Okay, so there are these massive (2.5 GB) core.(number) - e.g., core.8022 files that are 
+being produced along with our outputs. Is this what is causing the horrible performance?
+
+It's a core dump file - https://en.wikipedia.org/wiki/Core_dump
+Running $ file core
+(base) markusmin@Markuss-MBP-2 rear_temp_spill_winterdays_year % file upper_columbia_wild/core.20615 
+upper_columbia_wild/core.20615: ELF 64-bit LSB core file, x86-64, version 1 (SYSV), SVR4-style, from './parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_winterdays_', real uid: 1089588, effective uid: 1089588, real gid: 20725, effective gid: 20725
+
+
+There are eight of them. A multiple of 4, which to me indicates that perhaps it's related to these runs?
+-rw------- 1 mmin hyak-stf 2358505472 Oct 23 15:44 core.12513
+-rw------- 1 mmin hyak-stf 2495987712 Oct 25 09:34 core.13878
+-rw------- 1 mmin hyak-stf 2365718528 Oct 25 09:34 core.20615
+-rw------- 1 mmin hyak-stf 3901366272 Oct 25 09:34 core.20636
+-rw------- 1 mmin hyak-stf 2812739584 Oct 25 09:34 core.23709
+-rw------- 1 mmin hyak-stf 2670714880 Oct 23 15:44 core.3991
+-rw------- 1 mmin hyak-stf 2598658048 Oct 23 15:44 core.5603
+-rw------- 1 mmin hyak-stf 4090806272 Oct 23 15:44 core.8022
+
+those times coincide with the times that I started some new runs. And at least one
+of those runs killed the previous run; is that related?
+
+The date (10/23) on the oldest of these core objects aligns with the first run that was
+killed, and also coincides with a massive decrease in performance.
+
+For now: Remove those core. objects, pull the run, inspect
+
+So now, we don't actually know if the bad performance is due to a treedepth change, or due
+to those horrendous core. objects
+
+On max_treedepth: 
+We do not generally recommend increasing max treedepth. In practice, the max treedepth 
+limit being reached can be a sign of model misspecification, and to increase max treedepth 
+can then result in just taking longer to fit a model that you don’t want to be fitting.
+
+Okay, so model is probably misspecified. I think we knew that.
+
+Let's look into differences in treedepth and see if that makes a difference.
+
+### 2023-11-01 ###
+
+The treedepth did help. We now don't have those warnings, and the rhat values are down
+across the board. But not enough - all it did was make reduce the magnitude of those values,
+but many are still above 1.2 or so; Thinning might help
+
+Let's see if we can get a longer mtd = 12 run to go; try 250 iter
+
+# Created seed101_250iter R scripts to run with max_treedepth = 12; saved these as new scripts
+
+# Wrote a new script: UCW_submit_chains_250iter_mtd12.sh
+
+# Create four new slurm scripts to run 250iter_mtd12, with 240 hours requested
+# Move that all to hyak:
+scp -r ./upper_columbia_wild/ mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/
+
+# submitted 250iter runs at 9:35 am on 11/1
+
+# checkin on run 11/1/23 at 3:38 pm
+[mmin@mox1 ~]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4971943       stf   UC_W_4     mmin  R    5:31:40      1 n2264
+           4971942       stf   UC_W_3     mmin  R    5:31:50      1 n2274
+           4971940       stf   UC_W_1     mmin  R    5:57:56      1 n2276
+           4971941       stf   UC_W_2     mmin  R    5:57:56      1 n2277
+Chain 1
+Chain 1 Iteration:  10 / 500 [  2%]  (Warmup)
+Chain 1 Iteration:  20 / 500 [  4%]  (Warmup)
+
+
+It looks like we're getting back to our original performance before the core dump issue;
+still not very fast, but more like 4-5 iter per hour instead of 1.7
+
+
+
+# what is our plan for understanding model misspecification?
+
+Overarching: Peel back layers, build model back up iteratively, figure out at what layer
+the misspecification occurs
+
+
+# The current model has these parameters:
+> table(upper_columbia_wild_fit_draws_summary_mtd10_sub$param_type)
+
+            b0       borigin1       borigin2   bspillwindow         btemp0 btemp0xorigin1 
+            68             22             22              7             28             13 
+btemp0xorigin2 btemp0xorigin3         btemp1 btemp1xorigin1 btemp1xorigin2 btemp1xorigin3 
+            13             13             28             13             13             13 
+  bwinterspill  byearxorigin1  byearxorigin2  byearxorigin3          sigma 
+             2            306            306            306             51 
+             
+Standardized diagnostics script
+1. Intercept + origin
+2. Intercept + origin + spill (days and window)
+3. Intercept + origin + spill + temp0 + temp1 
+4. Intercept + origin + spill + temp0 + temp1 + temp0xorigin + temp1xorigin
+5. Intercept + origin + spill + temp0 + temp1 + temp0xorigin + temp1xorigin + year model
+
+
+### 2023-11-02 ###
+
+Checking on runs at 8:50 am
+[mmin@mox1 ~]$ squeue -u mmin
+c             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+           4971943       stf   UC_W_4     mmin  R   22:44:54      1 n2264
+           4971942       stf   UC_W_3     mmin  R   22:45:04      1 n2274
+           4971940       stf   UC_W_1     mmin  R   23:11:10      1 n2276
+           4971941       stf   UC_W_2     mmin  R   23:11:10      1 n2277
+
+Chain 1
+Chain 1 Iteration:  10 / 500 [  2%]  (Warmup)
+Chain 1 Iteration:  20 / 500 [  4%]  (Warmup)
+Chain 1 Iteration:  30 / 500 [  6%]  (Warmup)
+Chain 1 Iteration:  40 / 500 [  8%]  (Warmup)
+Chain 1 Iteration:  50 / 500 [ 10%]  (Warmup)
+
+at least 50 iter in 24 hours; perhaps not the best performance, but good enough
+to finish 500 iter in 10 days
+
+### 2023-11-07 ###
+
+All runs finished!
+Chain 1 Iteration: 490 / 500 [ 98%]  (Sampling)
+Chain 1 Iteration: 500 / 500 [100%]  (Sampling)
+Chain 1 finished in 266084.0 seconds.
+
+Finished in 74 hours. Where did the efficiency jump come from? Almost 7 iter
+per hour, at that rate I could have finished double the iter in ten days.
+
+Pull the runs and inspect
+
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_year_models/upper_columbia_wild/ ./
+
+# Inspecting diagnostics - things suddenly look so much better!!
+# I think that this model might be usable.
+
+
+# Okay - some thoughts on efficiency
+Currently, we are tracking upwards of 450k parameters, when we really only care about 1250.
+The reason for this is how we set up indexing; we just use a ton of big arrays, that are mostly
+just empty, but we are still tracking the emptiness
+The purpose of the arrays is to index [from, to]
+BUT - what if we changed it so that our parameters were in a vector instead
+And then the arrays were coded outside of the model - so you don't have to track the
+full array of parameters, but instead have an array which is just input,
+and each element of the array (which is [from, to]) is a number, which gives you the index
+number of the vector. So like from = 1, to = 1 would be the first element of the vector
+from = 1, to = 2 would be the second element of the vector.
+The vector for each type of parameter would only have to be the length of the possible movements, aka 61.
+Currently the array for each type of parameter is 43 x 43 = 1849.
+So in theory we could cut down the number of things we have to track by 30.
+There are some parameters (like spill) that only have a handful of places that even get a parameter.
+Those could in theory be only the same length as the number of parameters, but I think that keeping
+them all length 61 would be much better for indexing/convenience.
+
+
+### MOX to KLONE migration ###
+
+# Can I just copy everything over?
+# From within mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/
+scp -r mmin@mox.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/ ./
+
+# Yep! That worked
+
+# Let's try submitting some jobs
+
+# Edits that need to be made
+1) stf is not a partition on klone. It's called compute
+[mmin@klone-login01 upper_columbia_wild]$ hyakalloc
+         Account resources available to user: mmin          
+╭─────────┬─────────────────┬──────┬────────┬──────┬───────╮
+│ Account │       Partition │ CPUs │ Memory │ GPUs │       │
+├─────────┼─────────────────┼──────┼────────┼──────┼───────┤
+│     stf │         compute │  640 │  2800G │    0 │ TOTAL │
+│         │                 │  559 │  2685G │    0 │ USED  │
+│         │                 │   81 │   115G │    0 │ FREE  │
+├─────────┼─────────────────┼──────┼────────┼──────┼───────┤
+│     stf │      gpu-2080ti │   40 │   363G │    8 │ TOTAL │
+│         │                 │   22 │   268G │    6 │ USED  │
+│         │                 │   18 │    95G │    2 │ FREE  │
+├─────────┼─────────────────┼──────┼────────┼──────┼───────┤
+│     stf │ compute-hugemem │  120 │  2226G │    0 │ TOTAL │
+│         │                 │    0 │     0G │    0 │ USED  │
+│         │                 │  120 │  2226G │    0 │ FREE  │
+├─────────┼─────────────────┼──────┼────────┼──────┼───────┤
+│     stf │     interactive │   40 │   175G │    0 │ TOTAL │
+│         │                 │    0 │     0G │    0 │ USED  │
+│         │                 │   40 │   175G │    0 │ FREE  │
+╰─────────┴─────────────────┴──────┴────────┴──────┴───────╯
+
+2) For account:
+ [mmin@klone-login01 upper_columbia_wild]$ groups
+all stf test
+
+For testing - editing the following job
+job_stf_UC_W_T_Swinterdays_Y_chain1_250iter_mtd12.slurm
+
+All I did was change from "-p stf" to "-p compute"
+
+[mmin@klone-login01 upper_columbia_wild]$ sbatch job_stf_UC_W_T_Swinterdays_Y_chain1_250iter_mtd12.slurm
+Submitted batch job 15283322
+[mmin@klone-login01 upper_columbia_wild]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          15283322   compute   UC_W_1     mmin PD       0:00      1 (QOSGrpMemLimit)
+          
+          
+Worked? But what does that reason mean?
+
+Okay so back on 06-01-22, I tried reinstalling everything on KLONE, but gave up. I thought
+I needed more memory, but I solved my problem by using stan and so I stayed on MOX. Now
+I need to go through and actually set up my full computing environment on KLONE.
+
+# On hyak I'm going to create a test script just to figure out modules and dependencies
+mv job_stf_UC_W_T_Swinterdays_Y_chain1_250iter_mtd12.slurm 01_testjob_klone.slurm
+
+I need two modules - on mox they were:
+module load contrib/gcc/6.2.0 
+module load contrib/R-4.2.0/4.2.0
+
+Trying to figure out if the same software exists on KLONE:
+[mmin@n3319 upper_columbia_wild]$ module avail
+
+GCC looks like there are multiple versions:
+/sw/klone/gcc/13.2.0
+- this can be loaded with this command:
+[mmin@n3319 upper_columbia_wild]$ module load gcc/13.2.0
+
+For R - it seems that I tried to install it in June 2022, but I'm not sure that I ever was
+able to load it as a module?
+
+How do I create personal LMOD modules on KLONE?#
+
+This advanced user documentation page from the LMOD developers walks you through this [link]. 
+You need to compile your code separately first. In short, you provide a command directing it 
+to the folder with your collection of module files:
+
+So - I think I need to compile R
+And I don't think that I ever achieved that?
+
+Going to try and work with the R installation that I was working on and configure it
+
+./configure \
+    --prefix=/sw/contrib/stf-src/R-4.2.0 \
+    --enable-R-shlib \
+    --enable-memory-profiling
+
+A bunch of output, and then:
+configure: error: --with-readline=yes (default) and headers/libs are not available
+
+Trying to follow advice found here: https://github.com/tinyheero/tinyheero.github.io/blob/master/_drafts/installing-R-from-source.md#
+
+Looks like readline is perhaps already installed - load it:
+[mmin@n3319 R-4.2.0]$ module load cesg/readline/8.1
+# try configuring again after loading module
+[mmin@n3319 R-4.2.0]$ ./configure     --prefix=/sw/contrib/stf-src     --enable-R-shlib     --enable-memory-profiling
+
+# slightly different error:
+configure: error: --with-x=yes (default) and X11 headers/libs are not available
+
+
+
+
+Things that I tried but didn't work:
+[mmin@n3319 upper_columbia_wild]$ module load contrib/stf-src/R-4.2.0
+Lmod has detected the following error: The following module(s) are unknown: "contrib/stf-src/R-4.2.0"
+
+[mmin@n3319 upper_columbia_wild]$ module load stf-src/R-4.2.0
+Lmod has detected the following error: The following module(s) are unknown: "stf-src/R-4.2.0"
+
+[mmin@n3319 upper_columbia_wild]$ module load sw/contrib/stf-src/R-4.2.0
+Lmod has detected the following error: The following module(s) are unknown: "sw/contrib/stf-src/R-4.2.0"
+
+So it looks like back in the day I installed R, but never actually was able to turn it into
+a usable module.
+
+These modules are available for use:
+[mmin@klone-login01 stf]$ ls
+abyss   autoconf  bedtools  cellranger  hdf5      jellyfish  links       minimap  netcdf  paraview_catalyst  purge_dups  seqtk       texinfo
+arcs    automake  bwa       cgreene3    help2man  julia      longstitch  mpich    ntlink  petsc              samblaster  sparsehash  tigmint
+aspera  bamtools  canu      gdb         hisat     libdb      masurca     mummer   orca    pigz               samtools    sratoolkit  xz
+
+And here's where I installed R:
+[mmin@klone-login01 stf-src]$ ls
+abyss     automake  bwa         hdf5      jellyfish    links       mpich   orca               purge_dups  seqtk       texinfo
+arcs      bamtools  canu        help2man  julia-1.9.0  longstitch  mummer  paraview_catalyst  R-4.2.0     share       tigmint
+aspera    bedtools  cellranger  hisat     lib          masurca     netcdf  petsc              samblaster  sparsehash  xz-5.2.5
+autoconf  bin       gdb         include   libdb        minimap     ntlink  pigz               samtools    sratoolkit  xz-5.2.5.tar.gz
+
+So it looks like most other files are in both folders
+
+Following the instructions from here: https://uwrc.github.io/docs/tools/modules/
+And here: https://lmod.readthedocs.io/en/latest/100_modulefile_examples.html
+
+Let's use the orca example
+
+[mmin@klone-login01]$ nano /sw/contrib/modulefiles/stf/orca/4.2.1
+#%Module4.2.1
+
+module-whatis "Short description goes here"
+
+proc ModulesHelp { } {
+puts stderr "Longer description goes here"
+}
+
+prepend-path PATH "/sw/contrib/stf-src/orca/4.2.1"
+
+### Here's another example:
+[mmin@klone-login01]$ nano /sw/contrib/modulefiles/stf/samtools/1.13
+#%Module1.0
+
+module-whatis "Tools (written in C using htslib) for manipulating next-generation sequencing data."
+
+proc ModulesHelp { } {
+puts stderr "Tools (written in C using htslib) for manipulating next-generation sequencing data."
+}
+
+module load "cesg/ncurses/6.2"
+
+prepend-path PATH "/sw/contrib/stf-src/samtools/1.13"
+
+### Here's another example:
+[mmin@klone-login01]$ nano /sw/contrib/modulefiles/stf/julia/1.9.0
+
+#%Module1.0
+
+module-whatis "High performance scientific computing"
+
+prepend-path PATH "/sw/contrib/stf-src/julia-1.9.0/bin"
+
+### Here's another example - I made this 1.5 years ago
+[mmin@klone-login01]$ nano /sw/contrib/modulefiles/stf/xz/5.2.5
+
+#%Module1.0####################################################################
+##
+proc ModulesHelp { } {
+        puts stderr "\tAdds xz 5.2.5 to the PATH."
+}
+
+module-whatis "Adds xz 5.2.5 to the PATH."
+
+prepend-path    PATH            "/sw/contrib/stf-src/xz-5.2.5"
+
+
+
+
+#### Here's what I changed the R modulefile to:
+#%Module4.2.0
+
+module-whatis "R version 4.2.0"
+
+proc ModulesHelp { } {
+puts stderr "R version 4.2.0"
+}
+
+prepend-path PATH "/sw/contrib/stf-src/R-4.2.0"
+
+### 2023-11-10 ###
+
+Going to keep working on getting R installed and running on Klone.
+The problem isn't the modulefile, it's that I don't have a version of R that's compiled
+on Klone.
+I'm going to work on reinstalling R from scratch, rather than trying to use the existing 
+files where installation isn't working.
+
+# I'm going to try again with the strategy that worked on mox the first time.
+Second option from first response at this link: https://stackoverflow.com/questions/46343044/install-r-in-linux-server
+
+# What's the typical file organization for a module on stf?
+- Making a folder called R at /sw/contrib/stf-src/R
+- This is where I'm going to try reinstalling R-4.2.0
+
+# First, let's get into an interactive node
+salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+
+# Now, let's try to follow the instructions from stackoverflow:
+# Taking some elements from https://docs.posit.co/resources/install-r-source/#specify-r-version as well
+
+````
+wget https://cran.rstudio.com/src/base/R-4/R-4.2.0.tar.gz
+tar xvf R-4.2.0.tar.gz
+cd R-4.2.0
+./configure
+make && make install
+````
+
+# So - it breaks at ./configure with the usual error:
+configure: error: --with-readline=yes (default) and headers/libs are not available
+
+# Okay, it's recommended that I configure with readline, and the stackoverflow link
+is telling me that I can force the dependency path into the config file. So let's try that
+
+# There is a working installation of readline at cesg/readline/8.1
+# I believe that this is the full path: /sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+
+# Run this line:
+./configure --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+# Same error message
+
+# Tried loading readline library with
+[mmin@n3319 R-4.2.0]$ module load cesg/readline/8.1
+# Then ran above again
+
+# Now getting different error:
+configure: error: "liblzma library and headers are required"
+
+# we've gotten this error before
+
+# adding this flag that we added with our installation of R on Mox:
+--with-pcre1
+# Same error!
+
+# So based on our troubleshooting back in 2022, we tried this approach: https://stackoverflow.com/questions/42170752/building-package-using-configure-how-to-rope-in-updated-versions-of-libs-heade
+
+# which had us install another dependency at
+/sw/contrib/stf-src/xz-5.2.5
+
+# So now, let's try loading that module and adding that dependency to the configure call
+[mmin@n3319 R-4.2.0]$ module load stf/xz/5.2.5
+
+# Run this line:
+./configure --with-x=no --with-xz=sw/contrib/stf-src/xz-5.2.5 --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+
+# It doesn't recognize the --with-xz flag.
+
+# Okay, maybe I just need to install the liblzma library.
+# So it's my understanding that liblzma and xz utils are the same thing? Based on these links:
+- https://github.com/kobolabs/liblzma/blob/master/INSTALL
+- https://tukaani.org/xz/
+"XZ Utils consist of several components:
+
+liblzma is a compression library with an API similar to that of zlib.
+xz is a command line tool with syntax similar to that of gzip.
+xzdec is a decompression-only tool smaller than the full-featured xz tool.
+A set of shell scripts (xzgrep, xzdiff, etc.) have been adapted from gzip to ease viewing, grepping, and comparing compressed files.
+Emulation of command line tools of LZMA Utils eases transition from LZMA Utils to XZ Utils."
+
+# Will it recognize --with-liblzma?
+# Run this line:
+[mmin@n3226 R-4.2.0]$ ./configure --with-x=no  --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: WARNING: unrecognized options: --with-liblzma
+
+Same error
+
+# Maybe it's a FLAGS issue? https://groups.google.com/g/r-sig-mac/c/4smMULZWKPc
+
+[mmin@n3226 R-4.2.0]$ ./configure --with-x=no LDFLAGS="-Lsw/contrib/stf-src/xz-5.2.5" --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+
+This didn't return any "unrecognized options" warnings but returned the exact same error:
+configure: error: "liblzma library and headers are required"
+
+Alright, I'm giving up. Let's turn off readline despite the warnings I've seen
+
+[mmin@n3226 R-4.2.0]$ ./configure --with-readline=no --with-x=no
+hahahahaha same error
+configure: error: "liblzma library and headers are required"
+
+Well at least we know that readline isn't the issue.
+
+# Alright, a new solution to try to implement: https://stackoverflow.com/questions/74821884/liblzma-library-and-headers-are-required-when-installing-r-4-2-2-and-dependenc
+
+[mmin@n3226 R-4.2.0]$ ./configure --with-x=no --with-lzma=sw/contrib/stf-src/xz-5.2.5 --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+liars!!!!
+configure: WARNING: unrecognized options: --with-lzma
+
+[mmin@n3226 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+# Maybe it's just a prefix flag issue?
+Nope.
+configure: error: "liblzma library and headers are required"
+
+# xz-devel instead of just xz?
+https://stackoverflow.com/questions/38091418/installation-of-r-3-3-1-in-red-hat-lzma-version-5-0-3-required
+
+unloaded xz, tried running above line again; same error.
+
+# It looks like another lab has a working installation of R?
+ module load pedslab/R/4.2.3
+# But if I try to load it...
+[mmin@n3226 R-4.2.0]$ R
+FATAL:   While checking container encryption: could not open image /mmfs1/gscratch/pedslabs/Resources/containers/R/R-4.2.3.sif: failed to retrieve path for /mmfs1/gscratch/pedslabs/Resources/containers/R/R-4.2.3.sif: lstat /mmfs1/gscratch/pedslabs/Resources: permission denied
+
+Yeah, so all of the existing R installations have permission denied issues. But clearly
+R can be installed with the existing packages on hyak.
+
+pedslabs apparently uses apptainer to do this
+
+# Maybe I should just try to reinstall xz utils? because according to the page (https://tukaani.org/xz/)
+# one component of it is liblzma library. The 5.2.5 version of xz is what I have on klone;
+we're up to 5.4.5 now
+
+# alright, let's reinstall xz
+https://github.com/tukaani-project/xz/releases/download/v5.4.5/xz-5.4.5.tar.gz
+xz-5.4.5.tar.gz
+
+First, navigate to /sw/contrib/stf-src/xz/
+wget https://tukaani.org/xz/xz-5.4.5.tar.gz
+tar xzvf xz-5.4.5.tar.gz
+cd xz-5.4.5
+./configure --prefix=/sw/contrib/stf-src
+# make -j3
+# make install
+make && make install
+
+# Then create a module file using these instructions: https://wiki.cac.washington.edu/display/hyakusers/Hyak_modules
+# module file lives here:
+/sw/contrib/modulefiles/stf/xz/5.4.5
+
+# to load:
+module load stf/xz/5.4.5
+
+# Let's try to configure R again
+
+module load cesg/readline/8.1
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: "liblzma library and headers are required"
+
+So, I guess that didn't fix it
+
+Back to this post: https://stackoverflow.com/questions/74821884/liblzma-library-and-headers-are-required-when-installing-r-4-2-2-and-dependenc
+
+It seems to indicate that while I have liblzma installed (should be with xz utils), R
+is not finding it. The environment variable PKG_CONFIG_PATH might help. From configure --help:
+PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+              
+So perhaps if I add the directory for xz, I could get it to search correctly
+
+# Check current PKG_CONFIG_PATH:
+[mmin@n3319 R-4.2.0]$ echo $PKG_CONFIG_PATH
+/mmfs1/sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/lib/pkgconfig
+
+# Woah, so it's just looking there? or it's additionally looking there? I think it's adding that:
+From https://askubuntu.com/questions/210210/pkg-config-path-environment-variable:
+PKG_CONFIG_PATH is a environment variable that specifies additional paths in which pkg-config 
+will search for its .pc files.
+
+This variable is used to augment pkg-config's default search path.
+
+Can we add to it? Or will it just overwrite?
+export PKG_CONFIG_PATH=/sw/contrib/stf-src/xz/xz-5.4.5
+
+# Just overwrites. Well, let's see what happens when we try to configure now
+
+./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: "liblzma library and headers are required"
+[mmin@n3319 R-4.2.0]$ echo $PKG_CONFIG_PATH
+/sw/contrib/stf-src/xz/xz-5.4.5
+
+So it's changed it now, but still not finding the right libraries?
+
+.pc files are package configuration files
+
+There is a liblzma.pc in /sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma
+# Let's try this:
+export PKG_CONFIG_PATH=/sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma/
+
+[mmin@n3319 R-4.2.0]$ 
+module load stf/xz/5.4.5
+module load cesg/readline/8.1
+./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: "liblzma library and headers are required"
+
+Tried export PKG_CONFIG_PATH=/sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma/
+(so added a backslash) - same configure error
+
+### 2023-12-08 ###
+
+Let's get a build node again
+salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+Lol, no nodes available. Let's write then
+
+### 2023-11-13 ###
+
+Got a build node. Let's see if we can figure this out
+
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: --with-readline=yes (default) and headers/libs are not available
+
+# try loading some modules
+[mmin@n3319 R-4.2.0]$ module load cesg/readline/8.1
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: "liblzma library and headers are required"
+# So we got readline working, but now we're back to that old error
+
+# Trying to follow instructions at this link:
+https://stackoverflow.com/questions/74821884/liblzma-library-and-headers-are-required-when-installing-r-4-2-2-and-dependenc
+
+[mmin@n3396 R-4.2.0]$ echo $PKG_CONFIG_PATH
+/mmfs1/sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/lib/pkgconfig
+
+# So it looks like because we loaded the module for readline, we're in this bizarre pkg config path?
+# If we cd that path, we find just this:
+[mmin@klone-login03 /]$ cd /mmfs1/sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/lib/pkgconfig
+[mmin@klone-login03 pkgconfig]$ ls
+readline.pc
+
+# So okay, the .pc file is there. Can we add that for liblzma library?
+
+# It sounds like we can separate paths using a colon. So let's try and add some others
+
+# first load the right module
+[mmin@n3396 R-4.2.0]$ module load stf/xz/5.4.5
+
+# okay, that didn't change the pkg config path at all; let's add to it
+
+[mmin@n3396 R-4.2.0]$ export PKG_CONFIG_PATH=/sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma
+
+# For now, that just overwrote the old path
+
+# Try config
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+
+configure: error: "liblzma library and headers are required"
+
+# Ok, what if we combine our configure paths?
+
+# What if I forgot the mmfs1 prefix for liblzma?
+
+[mmin@n3319 R-4.2.0]$ export PKG_CONFIG_PATH=/mmfs1/sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma:/mmfs1/sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/lib/pkgconfig
+[mmin@n3319 R-4.2.0]$ export PKG_CONFIG_PATH=/mmfs1/sw/contrib/stf-src/xz/xz-5.4.5/src/liblzma
+
+configure: error: "liblzma library and headers are required"
+
+# Alright, I'm stumped. Let's go directly into the configure file and start messing with that (bad idea? probably)
+
+# Let's go back to the top and start trying stuff that worked before
+
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R-4.2.0 --with-pcre1
+
+configure: error: --with-x=yes (default) and X11 headers/libs are not available
+
+Well I mean that's a different error, so maybe that's progress?
+
+# Let's try following the advice from here: https://unix.stackexchange.com/questions/215728/with-x-yes-default-and-x11-headers-libs-are-not-available
+# That link leads to this link: https://forums.centos.org/viewtopic.php?t=5933
+
+[mmin@n3396 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R-4.2.0 --with-x=no
+configure: error: "liblzma library and headers are required"
+
+hahahaha ok well then that's settled, back to that problem
+
+Well I found a different path to liblzma:
+/mmfs1/sw/contrib/stf-src/lib/pkgconfig
+
+change the config path to that?
+
+[mmin@n3396 R-4.2.0]$ export PKG_CONFIG_PATH=/mmfs1/sw/contrib/stf-src/lib/pkgconfig
+[mmin@n3396 R-4.2.0]$ echo $PKG_CONFIG_PATH
+
+[mmin@n3319 R-4.2.0]$ ./configure --prefix=/sw/contrib/stf-src/R/R-4.2.0 --with-x=no --with-readline=sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/bin
+configure: error: "liblzma library and headers are required"
+
+[mmin@n3396 R-4.2.0]$ export PKG_CONFIG_PATH=/mmfs1/sw/contrib/stf-src/lib/pkgconfig:/mmfs1/sw/contrib/cesg-src/spack/opt/spack/linux-centos8-cascadelake/gcc-10.2.0/readline-8.1-utocvvei345jaiunes7cvd7t4ci5f4e5/lib/pkgconfig
+
+Alright, let's actually try messing with the ./configure script
+
+From: /Users/markusmin/Documents/CBR/steelhead
+
+scp -r mmin@klone.hyak.uw.edu:/sw/contrib/stf-src/R-4.2.0/configure ./
+
+I cannot figure out how to install from source. Let's start back at the beginning:
+https://hyak.uw.edu/docs/tools/r/
+
+# navigate to /gscratch/stf/mmin
+# Now, let's use the latest version of R from Docker hub
+
+[mmin@n3207 mmin]$ apptainer pull docker://r-base:4.3.2
+
+# Looks like it created the SIF file
+
+Can we run this?
+
+[mmin@n3207 mmin]$ apptainer run r-base_4.3.2.sif R
+
+[mmin@n3207 mmin]$ apptainer pull docker://r-base:4.3.2
+INFO:    Converting OCI blobs to SIF format
+INFO:    Starting build...
+Getting image source signatures
+Copying blob 82bb7b5b9130 done  
+Copying blob c3a3551a86bb done  
+Copying blob a5588a4c2d5f done  
+Copying blob 1936a419ec91 done  
+Copying blob 8abf5944b508 done  
+Copying blob 786c9ee75a8d done  
+Copying config c3d29bbf5c done  
+Writing manifest to image destination
+Storing signatures
+2023/12/13 11:45:39  info unpack layer: sha256:786c9ee75a8d6bb4c357dfb6a4cff0b70faa3dd8a36a5024897ebb5c8c6cbba9
+2023/12/13 11:45:41  info unpack layer: sha256:8abf5944b5083a0c580671271699cab00c74f246317e31ec85f267f886f5304d
+2023/12/13 11:45:41  info unpack layer: sha256:1936a419ec91c802ef8611dd485e7008a355a2522a910bb9ec6341e580b45f5e
+2023/12/13 11:45:41  info unpack layer: sha256:a5588a4c2d5f4c9e0e082001f0b9879811afe304b5027bf09166e26111640523
+2023/12/13 11:45:41  info unpack layer: sha256:c3a3551a86bba8722ce6bcec6b17a41c8ffebde92618af58fe6ae01c44bd0056
+2023/12/13 11:45:41  info unpack layer: sha256:82bb7b5b91304066c1d3399a85ed026abf276474590098710f0670d6ac6e79e7
+INFO:    Creating SIF file...
+[mmin@n3207 mmin]$ ls
+JAGS_runs  r-base_4.3.2.sif  stan_runs
+[mmin@n3207 mmin]$ apptainer run r-base_4.3.2.sif R
+
+R version 4.3.2 (2023-10-31) -- "Eye Holes"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+
+
+Wow. Well this would have saved me about 10 hours of frustration. 
+But at least we now seem to have a working R version on Klone.
+
+Let's see if we can reproduce our full R environment on Klone
+
+# We need the following packages (at least) - also stan
+install.packages("cmdstanr")
+install.packages("posterior")
+install.packages("lubridate")
+
+> install.packages("tidyverse"")
+Lots of messages like this:
+Warning in dir.create(lockdir, recursive = TRUE) :
+  cannot create dir '/usr/local/lib/R/site-library/00LOCK-fastmap', reason 'Read-only file system'
+ERROR: failed to create lock directory ‘/usr/local/lib/R/site-library/00LOCK-fastmap’
+
+> library(tidyverse)
+Error in library(tidyverse) : there is no package called ‘tidyverse’
+
+Installation failed. So yeah, I think I need to deal with where packages are installed,
+since it's trying to write to places that I'm not allowed to
+
+Trying to resolve this R library issue with apptainer
+
+Note that all of this is occuring in /mmfs1/home/mmin, which is where you start by
+default when you log in to Klone
+
+[mmin@n3319 ~]$ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+[mmin@n3319 ~]$ module load apptainer
+[mmin@n3319 ~]$ cat ~/.Renviron
+R_LIBS="/gscratch/stf/mmin/R"
+
+# Okay, so that file I made earlier is showing up. That's good! What's weird
+though is that when I run ls I don't see that file. So I guess the tilde is putting
+me back in my home directory, and then it's looking there for the file?
+# Either way, let's see now if I'm able to deal with the packages
+
+[mmin@n3319 ~]$ apptainer run r-base_4.3.2.sif R
+FATAL:   While checking container encryption: could not open image /mmfs1/home/mmin/r-base_4.3.2.sif: failed to retrieve path for /mmfs1/home/mmin/r-base_4.3.2.sif: lstat /mmfs1/home/mmin/r-base_4.3.2.sif: no such file or directory
+
+# Okay, so now let's move over to gscratch where my apptainer is
+> install.packages("lubridate")
+Installing package into ‘/usr/local/lib/R/site-library’
+(as ‘lib’ is unspecified)
+
+- this didn't work again
+
+Well, the interesting thing is that no matter what directory I run cat ~/.Renviron from, 
+it now is able to find that file. TBH I still don't fully know where that is though or
+how I created it
+
+Let's try following the instructions here and see if I can install packages:
+https://stackoverflow.com/questions/14382209/r-install-packages-returns-failed-to-create-lock-directory
+[mmin@n3319 ~]$ apptainer run r-base_4.3.2.sif R
+> install.packages("lubridate", INSTALL_opts = '--no-lock')
+ERROR: unable to create ‘/usr/local/lib/R/site-library/cpp11’
+ERROR: unable to create ‘/usr/local/lib/R/site-library/generics’
+ERROR: unable to create ‘/usr/local/lib/R/site-library/timechange’
+ERROR: unable to create ‘/usr/local/lib/R/site-library/lubridate’
+
+So yeah, that didn't work
+
+
+Let's try and get RStudio working
+[mmin@n3319 mmin]$ apptainer pull docker://rocker/rstudio:4.1.0
+INFO:    Creating SIF file...
+FATAL:   While making image from oci registry: error copying image out of cache: could not copy file: write ./tmp-copy-2413335: disk quota exceeded
+
+https://unix.stackexchange.com/questions/67890/disk-quota-exceeded-problem
+I might be out of inodes? 
+I'm going to try running installing instead from my home directory and see if that makes a difference
+
+INFO:    Creating SIF file...
+[mmin@n3278 ~]$ ls
+rstudio_4.1.0.sif
+
+Hey look, that worked!
+[mmin@n3278 ~]$ wget https://hyak.uw.edu/files/rstudio-server.job
+[mmin@n3278 ~]$ nano rstudio-server.job
+``
+RSTUDIO_CWD="/gscratch/stf/mmin/" # update this line
+RSTUDIO_SIF="rstudio_4.1.0.sif" # update this line
+
+export R_LIBS_USER="/gscratch/stf/mmin/R/"
+``
+
+Okay, so that actually worked! I now have RStudio working. I just
+have to run sbatch rstudio-server.job from where my RStudio .SIF file is
+However, we now have this problem when we try to install packages:
+
+* installing *binary* package ‘Rcpp’ ...
+cp: error writing '/gscratch/stf/mmin/R/Rcpp/./announce/ANNOUNCE-0.11.0.txt': Disk quota exceeded
+
+I wonder if this is a gscratch thing? I guess we can try for now moving everything to 
+a new folder on gscratch/scrubbed/R, with the knowledge that I'll have to reinstall packages
+(not the end of the world)
+
+
+code I ran:
+``
+mkdir /gscratch/scrubbed/mmin
+
+# change a bunch of paths
+[mmin@n3319 mmin]$ cat ~/.Renviron
+R_LIBS="/gscratch/scrubbed/mmin"
+
+[mmin@n3278 ~]$ nano rstudio-server.job
+RSTUDIO_CWD="/gscratch/scrubbed/mmin/"
+RSTUDIO_SIF="../../../mmfs1/home/mmin/rstudio_4.1.0.sif"
+
+export R_LIBS_USER="/gscratch/scrubbed/mmin/"
+
+
+# Try installing packages again
+> install.packages("lubridate")
+Installing package into ‘/gscratch/scrubbed/mmin’
+(as ‘lib’ is unspecified)
+also installing the dependencies ‘generics’, ‘Rcpp’
+
+trying URL 'https://packagemanager.posit.co/cran/__linux__/focal/2021-08-09/src/contrib/generics_0.1.0.tar.gz'
+Content type 'binary/octet-stream' length 68868 bytes (67 KB)
+==================================================
+downloaded 67 KB
+
+trying URL 'https://packagemanager.posit.co/cran/__linux__/focal/2021-08-09/src/contrib/Rcpp_1.0.7.tar.gz'
+Content type 'binary/octet-stream' length 4155309 bytes (4.0 MB)
+==================================================
+downloaded 4.0 MB
+
+trying URL 'https://packagemanager.posit.co/cran/__linux__/focal/2021-08-09/src/contrib/lubridate_1.7.10.tar.gz'
+Content type 'binary/octet-stream' length 2025845 bytes (1.9 MB)
+==================================================
+downloaded 1.9 MB
+
+* installing *binary* package ‘generics’ ...
+* DONE (generics)
+* installing *binary* package ‘Rcpp’ ...
+* DONE (Rcpp)
+* installing *binary* package ‘lubridate’ ...
+* DONE (lubridate)
+
+The downloaded source packages are in
+	‘/tmp/RtmpNh8fWA/downloaded_packages’
+	
+``
+
+It worked!!!!! 
+But it's still not perfect. Namely, we now have gscratch/scrubbed mounted,
+which means I have to move my files over from gscratch/stf/mmin. But not the end of the world.
+
+# Let's see if we can get cmdstanr using docker
+
+Currently having issues with the version of R
+Error in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]) : 
+  namespace ‘posterior’ 1.0.1 is being loaded, but >= 1.4.1 is required
+  
+# Let's see if we can install a more recent version of RStudio
+
+$ apptainer pull docker://rocker/rstudio:4.3.2
+
+# ok, change the .SIF path
+
+# Holy smokes, this new RStudio has so many packages already installed, including
+posterior, tidyverse, lubridate
+
+# Skip right to installing cmdstanr
+This looks like it worked too? Let's see if we can run anything
+
+> setwd("/gscratch/stf/mmin")
+> getwd()
+[1] "/gscratch/stf/mmin"
+> temps <- read.csv("/gscratch/stf/mmin/stan_runs/rear_temp_spill_winterdays_models/upper_columbia_hatchery/window_temps_for_stan.csv")
+> View(temps)
+
+LFG that worked! Ok, let's try submitting a job...?
+
+Navigate and try to submit chains
+mmin@n3338:/gscratch/stf/mmin/stan_runs/rear_temp_spill_winterdays_models/upper_columbia_hatchery$ bash UCH_submit_chains.sh 
+
+UCH_submit_chains.sh: line 4: sbatch: command not found
+UCH_submit_chains.sh: line 5: sbatch: command not found
+UCH_submit_chains.sh: line 6: sbatch: command not found
+UCH_submit_chains.sh: line 7: sbatch: command not found
+
+So I have RStudio working, but that doesn't translate to being able to run jobs. Poop
+
+# Alright, let's go back to our R .SIF file
+[mmin@n3319 ~]$ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+[mmin@n3319 ~]$ module load apptainer
+[mmin@n3319 ~]$ apptainer run r-base_4.3.2.sif R
+
+# Install packages isn't working, what if we change the lib argument?
+> install.packages("lubridate", lib = "/gscratch/scrubbed/mmin")
+Warning in install.packages("lubridate", lib = "/gscratch/scrubbed/mmin") :
+  'lib = "/gscratch/scrubbed/mmin"' is not writable
+Would you like to use a personal library instead? (yes/No/cancel) install.packages("lubridate", lib = "/gscratch/scrubbed/mmin/")
+Error in askYesNo(gettext("Would you like to use a personal library instead?"),  : 
+  Unrecognized response “install.packages("lubridate", lib = "/gscratch/scrubbed/mmin/")”
+  
+# Alright so that's not it
+
+# So I don't actually think I need a custom apptainer, because I really just need to run cmdstan 
+on hyak - everything else doesn't take as long and therefore can be run locally.
+From here: https://github.com/storopoli/cmdstanr-docker/
+$ apptainer pull docker://jstoropoli/cmdstanr
+
+# File was created, let's try running it
+[mmin@n3319 ~]$ apptainer run cmdstanr_latest.sif R
+works!
+
+# Let's see if we can get a very simple job to run
+
+# Made a folder locally: /Users/markusmin/Documents/CBR/steelhead/stan_actual/klone_testing/
+
+# Navigate to /Users/markusmin/Documents/CBR/steelhead/stan_actual/
+
+# then run:
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./klone_testing/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+[mmin@klone-login03 klone_testing]$ sbatch job_klone_test.slurm 
+Submitted batch job 15673863
+
+### 2023-12-14 ###
+
+Having a hard time getting it to find the R script that's in the same directory...
+
+[mmin@n3396 klone_testing]$ apptainer exec ../../r-base_4.3.2.sif Rscript klone_test.R
+Fatal error: cannot open file 'klone_test.R': No such file or directory
+
+$ apptainer exec r-base_4.3.2.sif Rscript klone_test.R
+Fatal error: cannot open file 'klone_test.R': No such file or directory
+
+[mmin@n3396 klone_testing]$ apptainer exec ../../cmdstanr_latest.sif Rscript klone_test.R
+Fatal error: cannot open file 'klone_test.R': No such file or directory
+[mmin@n3396 klone_testing]$ apptainer run ../../cmdstanr_latest.sif Rscript klone_test.R
+/usr/local/bin/Rscript: /usr/local/bin/Rscript: cannot execute binary file
+
+So exec and run are different, give different errors
+# helpful for understanding apptainer commands: https://medium.com/@dcat52/more-ways-to-run-apptainer-containers-d6fc688c3f1a
+
+[mmin@n3396 klone_testing]$ apptainer shell ../../cmdstanr_latest.sif 
+Apptainer> ls
+Apptainer> pwd
+/gscratch/stf/mmin/stan_runs/klone_testing
+
+Why is there nothing here...?
+
+Maybe I have to move things into my container: https://stackoverflow.com/questions/22907231/how-to-copy-files-from-host-to-docker-container
+
+Maybe a persistent overlay is the answer?
+[mmin@n3396 mmin]$ apptainer overlay create --size 1024 cmdstanr_latest.sif 
+INFO:    Creating overlay image for use without fakeroot.
+INFO:    Consider re-running with --fakeroot option.
+
+Well, I have no idea what that did
+
+A helpful apptainer guide: https://hsf-training.github.io/hsf-training-singularity-webpage/07-file-sharing/
+
+Okay, so it sounds like my home directory should be accessible, and when I look there
+for files from within my apptainer I can actually see things (unlike other places)
+
+[mmin@n3396 stf]$ cd ../../../mmfs1/home/mmin
+[mmin@n3396 ~]$ pwd
+/mmfs1/home/mmin
+[mmin@n3396 ~]$ apptainer exec ../../../gscratch/stf/mmin/r-base_4.3.2.sif Rscript klone_test.R
+[mmin@n3396 ~]$ apptainer exec ../../../gscratch/stf/mmin/cmdstanr_latest.sif Rscript klone_test.R
+
+Ok, these both worked! That is very good. But let's see if we can get gscratch bound so we can access
+
+Let's try to bind gscratch/stf/mmin
+
+[mmin@n3396 ~]$ pwd
+/mmfs1/home/mmin
+[mmin@n3396 ~]$ apptainer shell --bind ../../../gscratch/stf/mmin/:/gscratch/stf/mmin ../../../gscratch/stf/mmin/cmdstanr_latest.sif
+
+Holy heck this worked!! Okay I have hope again, maybe I can try running some models tomorrow
+
+Okay, let's try to figure out how to structure these jobs now
+
+navigate to the folder where the models are
+/gscratch/stf/mmin/stan_runs/rear_temp_spill_winterdays_models/upper_columbia_hatchery
+
+the UCH_submit_chains.sh doesn't need to be changed
+the jobs themselves definitely do
+
+Modified job_stf_UC_H_T_Swinterdays_chain1.slurm 
+
+Fatal error: cannot open file 'seed101_100iter_chain1_UC_H_T_Swinterdays.R': No such file or directory
+
+Okay, maybe I need to bind gscratch every time I want to use it?
+
+section from job:
+##  Scripts to be executed here
+apptainer shell --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif
+apptainer exec ../../../cmdstanr_latest.sif Rscript seed101_100iter_chain1_UC_H_T_Swinterdays.R
+
+Fatal error: cannot open file 'seed101_100iter_chain1_UC_H_T_Swinterdays.R': No such file or directory
+
+Okay yes you need to bind, but you also need to bind it every time you run apptainer apparently
+
+apptainer shell --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif 
+Rscript seed101_100iter_chain1_UC_H_T_Swinterdays.R
+
+^ this works when you run it from cmd line, will it work when you put it in the job?
+Nope: /var/spool/slurmd/job15685926/slurm_script: line 26: Rscript: command not found
+
+apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif Rscript seed101_100iter_chain1_UC_H_T_Swinterdays.R
+
+### 2023-12-15 ###
+
+The model compiled, but then didn't run:
+
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 [n3363:32348] OPAL ERROR: Unreachable in file ext3x_client.c at line 112
+Chain 1 --------------------------------------------------------------------------
+Chain 1 The application appears to have been direct launched using "srun",
+Chain 1 but OMPI was not built with SLURM's PMI support and therefore cannot
+Chain 1 execute. There are several options for building PMI support under
+Chain 1 SLURM, depending upon the SLURM version you are using:
+Chain 1
+Chain 1   version 16.05 or later: you can use SLURM's PMIx support. This
+Chain 1   requires that you configure and build SLURM --with-pmix.
+Chain 1
+Chain 1   Versions earlier than 16.05: you must use either SLURM's PMI-1 or
+Chain 1   PMI-2 support. SLURM builds PMI-1 by default, or you can manually
+Chain 1   install PMI-2. You must then build Open MPI using --with-pmi pointing
+Chain 1   to the SLURM PMI library location.
+Chain 1
+Chain 1 Please configure as appropriate and try again.
+Chain 1 --------------------------------------------------------------------------
+Chain 1 *** An error occurred in MPI_Init
+Chain 1 *** on a NULL communicator
+Chain 1 *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+Chain 1 ***    and potentially your MPI job)
+Chain 1 [n3363:32348] Local abort before MPI_INIT completed completed successfully, but am not able to aggregate error messages, and not able to guarantee that all other processes wer$
+Warning: Chain 1 finished unexpectedly!
+
+Warning message:
+No chains finished successfully. Unable to retrieve the fit.
+Error: No chains finished successfully. Unable to retrieve the draws.
+Execution halted
+
+
+
+It appears related to how cmdstan was configured? Which to me indicates that perhaps 
+it is related to the docker container I pulled?
+
+I'm going to try pulling some other cmdstanr containers and see if those work
+Try this one: https://github.com/mattocci27/r-containers
+First removed old cmdstanr container (see like 4299 - just search "apptainer pull")
+$ apptainer pull docker://mattocci/cmdstanr
+[mmin@n3319 ~]$ apptainer run cmdstanr_latest.sif R
+Okay, this one works too. Let's try submitting the job with this new .sif file
+
+[mmin@n3396 upper_columbia_hatchery]$ sbatch job_stf_UC_H_T_Swinterdays_chain1.slurm 
+
+### 2024-01-03 ###
+
+Back in the saddle! Let's see how that run did that I submitted
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+Error: CmdStan path has not been set yet. See ?set_cmdstan_path.
+Execution halted
+
+So we got less far than last time.
+
+It also looks like that is actually the wrong job - we're running a model without year effects.
+So we should make sure that we actually set things up with the year model. But then again we 
+need to get cmdstan to work, so let's not wory about that for now.
+
+
+Try this cmdstanr container:
+https://github.com/JBris/stan-cmdstanr-docker
+
+[mmin@klone-login01 mmin] $ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+[mmin@n3319 ~]$ module load apptainer
+[mmin@n3319 ~]pwd
+/gscratch/stf/mmin
+[mmin@n3319 ~]$ apptainer pull docker://ghcr.io/jbris/stan-cmdstanr-docker:latest
+[mmin@n3319 ~]$ apptainer run stan-cmdstanr-docker_latest.sif R
+
+Works!
+
+Okay, let's modify job_stf_UC_H_T_Swinterdays_chain1.slurm to run this new container
+old: apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif Rscript seed101_100iter_chain1_UC_H_T_Swinterdays.R
+new: apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../stan-cmdstanr-docker_latest.sif Rscript seed101_100iter_chain1_UC_H_T_Swinterdays.R
+
+[mmin@klone-login01 upper_columbia_hatchery]$ nano job_stf_UC_H_T_Swinterdays_chain1.slurm 
+[mmin@klone-login01 upper_columbia_hatchery]$ sbatch job_stf_UC_H_T_Swinterdays_chain1.slurm
+
+### 2024-01-04 ###
+
+Checking run status
+
+[mmin@klone-login01 upper_columbia_hatchery]$ pwd
+/gscratch/stf/mmin/stan_runs/rear_temp_spill_winterdays_models/upper_columbia_hatchery
+[mmin@klone-login01 upper_columbia_hatchery]$ nano slurm-15926170.out 
+
+````
+[1] "Compiling model"
+[1] "model compiled at"
+[1] "2024-01-03 18:32:09 PST"
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 ./parallel_upper_columbia_03_stan_actual_int_origin_hatchery_temp_spill_winterdays_deteff: error while loading shared libraries: libboost_serialization.so.1.78.0: cannot open shared object file: No such file or directory
+Warning: Chain 1 finished unexpectedly!
+````
+
+Okay, so we once again were able to compile the model, but this time we had an error while loading shared libraries.
+
+
+# This other run got similarly far (i.e., compiled then broke)
+# Not sure which got further
+[mmin@klone-login01 upper_columbia_hatchery]$ nano slurm-15685941.out 
+
+Honestly I don't know what to do here. Let's try messing with the MPI stuff?
+From the klone documentation, maybe I need to load the intel software suite that includes MPI?
+https://hyak.uw.edu/blog/klone/
+"LMOD software modules:
+Intel has bundled their software suite (e.g., compiler, MPI) as oneCLI and we created this module (i.e., module load intel/oneCLI).""
+
+I am going to reinstall the storopoli version - this will overwrite the mattoci version
+
+$ apptainer pull docker://jstoropoli/cmdstanr
+[mmin@klone-login01 mmin] $ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+[mmin@n3319 ~]$ module load apptainer
+[mmin@n3319 ~]pwd
+/gscratch/stf/mmin
+[mmin@n3319 ~]$ apptainer pull docker://jstoropoli/cmdstanr
+[mmin@n3319 ~]$ apptainer run stan-cmdstanr-docker_latest.sif R
+
+Alright, let's modify the job to load the intel module
+
+[mmin@n3296 mmin]$ module load intel/oneCLI
+Lmod has detected the following error:  The following module(s) are unknown: "intel/oneCLI"
+
+Well, that didn't work. Let's check module list
+
+Okay, so by default we have this module loaded: ompi/4.1.4        (D)
+
+Do we have the wrong version of ompi in our docker compare to what's loaded by default? Could that be causing incompatibility?
+https://users.open-mpi.narkive.com/jbBefsgW/ompi-openmpi-pmix-slurm
+- this seems to indicate that perhaps this could be an issue
+
+On the storopoli dockerfile we have these lines for openMPI
+# install openMPI and MPI's mpicxx binary and libglpk for brms
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl libopenmpi-dev mpi-default-dev libglpk-dev
+
+- doesn't list a version number for openMPI
+
+What version of slurm do we have?
+[mmin@n3296 mmin]$ sinfo -V
+slurm 23.02.6
+
+Okay, so definitely later than version 16. From the error message:
+Chain 1 The application appears to have been direct launched using "srun",
+Chain 1 but OMPI was not built with SLURM's PMI support and therefore cannot
+Chain 1 execute. There are several options for building PMI support under
+Chain 1 SLURM, depending upon the SLURM version you are using:
+Chain 1
+Chain 1   version 16.05 or later: you can use SLURM's PMIx support. This
+Chain 1   requires that you configure and build SLURM --with-pmix.
+
+Configure and build SLURM again? Seems basically impossible
+
+What if we just add flags to the sbatch? Changed the .sif file back
+to the storopoli cmdstanr version, then trying this:
+[mmin@klone-login01 upper_columbia_hatchery]$ sbatch job_stf_UC_H_T_Swinterdays_chain1.slurm —mpi=pmix_v1
+Submitted batch job 15948124
+
+Holy shit it's running. Praise the maker!
+Confirmed that the max time is 240 hours on klone
+
+To-do:
+1. Let's add some information to our sbatch scripts (like email notifications)
+2. It also looks like that is actually the wrong job - we're running a model without year effects.
+So we should make sure that we actually set things up with the year model.
+3. Make sure that every model runs with mtd 12
+4. Modify the UCW_submit_chains.sh scripts to include necessary flags
+
+Okay, I did this. Let's move this folder to klone
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./rear_temp_spill_winterdays_year/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+There are way too much test scripts in the UCW folder. Will need to clean up soon.
+
+Naming of folders is different on klone and on local. That's uber confusing.
+
+The most recent model runs are in rear_temp_spill_winterdays_year, on both local and on hyak
+
+Alright, I submitted four chains each for UCH and UCW. We don't yet have a node available, but
+hopefully soon.
+
+### 2024-01-09 ###
+
+Two chains are successfully running, the other six failed due to typos. Going to correct and resubmit
+
+Ok, two of the UCW runs failed, and not because of a typo:
+
+````
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 ./parallel_upper_columbia_03_stan_actual_int_origin_wild_temp_spill_winterdays_year_deteff: error while loading shared libraries: libtbb.so.2: cannot open shared object file: No such file or directory
+Warning: Chain 1 finished unexpectedly!
+
+Warning message:
+No chains finished successfully. Unable to retrieve the fit.
+Error: No chains finished successfully. Unable to retrieve the draws.
+Execution halted
+````
+
+We've had that error before, but I'm not sure why we'd be getting that now - that seems
+to be a docker/apptainer issue
+
+Ah - I still had an old executable. Removed it, resubmitted, and now all runs are going!
+
+### 2024-01-10 ###
+
+Let's check on our runs! They need to be getting through 100 iter per hour in order for them to finish in the 240
+allotted hours.
+In 20 hours, UCH:
+Chain 1
+Chain 1 Iteration:   10 / 2000 [  0%]  (Warmup)
+Chain 1 Iteration:   20 / 2000 [  1%]  (Warmup)
+Chain 1 Iteration:   30 / 2000 [  1%]  (Warmup)
+Chain 1 Iteration:   40 / 2000 [  2%]  (Warmup)
+
+
+Yeah, so that's not going to finish. I might get 500 iter, which would presumably be good enough
+for inference, but I'd want to run it longer in the future. Or I could try to reparameterize
+to get better performance.
+
+UCW has about the same performance, which is surprising
+Chain 1 Iteration:   10 / 2000 [  0%]  (Warmup)
+Chain 1 Iteration:   20 / 2000 [  1%]  (Warmup)
+Chain 1 Iteration:   30 / 2000 [  1%]  (Warmup)
+Chain 1 Iteration:   40 / 2000 [  2%]  (Warmup)
+Chain 1 Iteration:   50 / 2000 [  2%]  (Warmup)
+
+These are not going to finish in time. I should probably resubmit them as 500 iter runs.
+Or work on reparameterization.
+
+### 2024-01-11 ###
+
+Checking on UCW runs, it looks like they're taking very different amounts of time to run. Some might finish, others definitely won't.
+No way the UCH runs will finish. About 30 iter per day, which is actually terrible. Like worse than before...? 
+But maybe that was just a different model
+
+### 2024-01-12 ###
+
+Looks like the UCW runs have caught up to each other. They're at 35%, with under three days of run time.
+They'll finish in ten days! Unless it takes forever to save...
+No way the UCH runs are finishing.
+
+Let's try improving efficiency. A note from 2023-11-07:
+````
+# Okay - some thoughts on efficiency
+Currently, we are tracking upwards of 450k parameters, when we really only care about 1250.
+The reason for this is how we set up indexing; we just use a ton of big arrays, that are mostly
+just empty, but we are still tracking the emptiness
+The purpose of the arrays is to index [from, to]
+BUT - what if we changed it so that our parameters were in a vector instead
+And then the arrays were coded outside of the model - so you don't have to track the
+full array of parameters, but instead have an array which is just input,
+and each element of the array (which is [from, to]) is a number, which gives you the index
+number of the vector. So like from = 1, to = 1 would be the first element of the vector
+from = 1, to = 2 would be the second element of the vector.
+The vector for each type of parameter would only have to be the length of the possible movements, aka 61.
+Currently the array for each type of parameter is 43 x 43 = 1849.
+So in theory we could cut down the number of things we have to track by 30.
+There are some parameters (like spill) that only have a handful of places that even get a parameter.
+Those could in theory be only the same length as the number of parameters, but I think that keeping
+them all length 61 would be much better for indexing/convenience.
+````
+
+Let's work on tracking less parameters, this in theory should be a relatively minor change.
+
+When I inspect the output of the model as it is right now, a 250iter chain
+is 15 MB. For UCW, we are tracking  467241 parameters. We only care about 1224 of those.
+A whole lot of zeros are being tracked.
+
+We should be able to remove one dimension of each array that contains parameters. So,
+the arrays that currently contain most parameters can be converted from matrices to vectors,
+and the arrays for year effects can be converted from arrays to matrices
+
+For example, to convert the container that contains b0 parameters from a matrix to array
+Current code: b0_matrix_DE[current, k]
+We basically need another matrix (that, crucially, is passed as data!) converts [current,k]
+into a single number that we can use to index 
+- we'll call this parameter_indices_matrix
+
+there are 43 states total, including an upstream and a downstream state for some
+tributaries and the loss state
+
+there are 61 possible non-loss movements which means that...
+
+We need a 61x1 vector for most parameters
+
+Need to figure out what the deal is with dropping states that no fish have ever visited.
+We currently drop them using a very roundabout, and very not reproducible, and very easy
+to mess up method. And I'm not sure it's even entirely necessary. I should update the
+workflow. But we can have a few blanks in that vector, and I think it should be fine
+
+In the old model we included parameters for movements that aren't observed in our data.
+
+The new parameterization makes the tracking of derived parameters way too complicated. I'm
+fairly confident we can do this afterwards with the chains, instead of tracking it in the model. Deleted
+that portion of the model
+
+Okay, I changed the organization for the b0 parameters into a vector from a matrix. Let's test.
+
+# move the reparameterization folder over to klone
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+
+# Get a build node on klone:
+
+[mmin@klone-login01 mmin] $ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+
+# try submitting chain 1
+
+[mmin@n3392 upper_columbia_wild]$ pwd
+/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild
+
+apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif Rscript seed101_1000iter_chain1_UCW_reparam.R
+
+After fixing a few typos, model is compiling. I think this approach will work. Time to do it to all of the parameters!
+
+### 2024-01-14 ###
+
+The UCW runs finished!
+
+Chain 1 Iteration: 1990 / 2000 [ 99%]  (Sampling)
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1 finished in 371747.0 seconds.
+Warning: 1 of 1000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+Diagnostics look good. It would appear that the iterations don't run at a consistent speed
+- they started off really slow, in the first 20 hours we got through about 50 iter
+- in the next 48 hours, we got through about 700 iter
+- then in the next 48 hours (maybe less), we got through 1300 iter and saving the run
+
+UCH:
+Chain 1 Iteration:  280 / 2000 [ 14%]  (Warmup)
+Chain 1 Iteration:  290 / 2000 [ 14%]  (Warmup)
+
+So, this one seems to be going faster too, but not at the same rate
+
+### 2024-01-16 ###
+
+Working on reparameterizing. Looks like I never actually wrote the R code to cat the
+stan code for all of the changes I made before. Working on fixing that in the
+stan_data_prep_UCW_reparam.R script.
+
+Some weird observations:
+-100000 values
+	- They should definitely be in there for the b0 parameters, but for everything else I don't
+believe that we want them (I'm not sure that it actually interferes with the model, but they don't serve a purpose)
+	- In the model they're currently found in the year parameters; in the script that uses cat to produce the model,
+it's found in the temp and the year section. Get rid of those! They should just be skipped, and
+left with zeros
+- Inconsistency - report says that origin and year setup are the same - they're not.
+Currently, year setup doesn't have an effect for movements back from tributaries into
+the mainstem, but origin does. Why? I mean this could be justified, but it currently isn't.
+Meeting notes from 7/19/23 mention stuff with tributaries and year effects; it would
+make sense to drop the year effect for tributaries back to mainstem, because presumably
+there's basically no data to estimate that effect. Also notes from 7/7/23 talking 
+about this same issue, where we just don't have enough data to include every effect.
+So it makes sense to drop it, it's just not documented well.
+
+Bigger question - do we need DE v NDE parameters for movements that aren't into tributaries, but
+presumably would be affected by that DE in the tributary, since it's a different option?
+- I think no, because the only term that would be biased by that is the loss term
+
+What's the deal with movements into upstream states?
+- in DE, they should be impossible. in NDE, they get all of the same parameters
+as a movement into the mouth state
+
+### 2024-01-17 ###
+
+In the last version of the model, there weren't origin effects for 
+all movements from upstream back to mainstem
+- In DE, these shouldn't be allowable, but in NDE they should just be given
+the same parameter as movements from river mouth to mainstem
+- but is this related to the states in which we observed fish?
+
+Old:
+borigin1_matrix_DE[parameter_indices_matrix[24,5] = borigin1_matrix_24_5;
+borigin1_matrix_NDE[parameter_indices_matrix[24,5] = borigin1_matrix_24_5;
+borigin1_matrix_DE[parameter_indices_matrix[26,6] = borigin1_matrix_26_6;
+borigin1_matrix_NDE[parameter_indices_matrix[26,6] = borigin1_matrix_26_6;
+
+New:
+borigin2_vector_DE[52] = borigin2_matrix_24_5;
+borigin2_vector_NDE[52] = borigin2_matrix_24_5;
+borigin2_vector_NDE[53] = borigin2_matrix_24_5;
+borigin2_vector_DE[54] = borigin2_matrix_26_6;
+borigin2_vector_NDE[54] = borigin2_matrix_26_6;
+borigin2_vector_NDE[55] = borigin2_matrix_26_6;
+
+Put them back for NDE. The old model also allowed movements from upstream back to mainstem
+in DE, which doesn't make sense...?
+
+It would appear that I was very inconsistent with how I did or didn't remove states -
+it looks like there were priors on parameters for movements that I removed from the model
+because no fish ever visited that state
+
+There are some minor discrepancies between the code to detect which states were never visited,
+and which are coded as such in the model. Code shows 23 states never visited, model previously
+had 21; differences are "Hood River Mouth"  and "Entiat River Upstream"
+
+Code has now been updated to cut those out. When I copy over the parameters and such there were probably be a lot
+of small changes
+- TOMORROW: Run through all of the code that generates stan code via cat, and copy it all over again
+- Ideally, it would be great if we could create an entire stan script from scratch from an R script...
+- Might be worth it if we need to keep recreating models!
+	- I don't think is actually practical, because the actual modeling portion (minus declaring parameters and priors etc.)
+	doesn't lend itself well to automation
+
+### 2024-01-18 ###
+
+Fixing some more stuff in the data:
+# elements of data affected by transition_matrix:
+x possible_movements
+x movements
+x not_movements
+x nmovements
+x parameter_indices_matrix (this isn't vital to update, but I think it would be more efficient if it were updated)
+x n_notmovements
+x transition_matrix
+
+this will have to be changed, but isn't affected by transition_matrix: sigma_year_indices = as.matrix(sigma_year_matrix_names[,1:2]),
+
+
+# Use the transition matrix to calculate the possible movements
+possible_movements <- rowSums(transition_matrix)
+
+# Get the indices that are 1s (except loss, since that's 1 minus the others)
+movements <- which(transition_matrix[,1:(nstates-1)] == 1, arr.ind = TRUE)
+nmovements <- dim(movements)[1]
+
+# Now get all of the movements which are fixed to zero
+not_movements <- which(transition_matrix[,1:(nstates-1)] == 0, arr.ind = TRUE)
+n_notmovements <- dim(not_movements)[1]
+
+### Now that I've cut out all of the states that aren't visited, let's revise the model
+
+# the number of possible transitions has gone WAY down - here's the old block vs. new block of intercept parameters:
+
+# OLD:
+real b0_matrix_1_2;
+real b0_matrix_2_1;
+real b0_matrix_2_3;
+real b0_matrix_2_10_DE;
+real b0_matrix_2_10_NDE;
+real b0_matrix_2_12_DE;
+real b0_matrix_2_12_NDE;
+real b0_matrix_2_14_DE;
+real b0_matrix_2_14_NDE;
+real b0_matrix_2_16_DE;
+real b0_matrix_2_16_NDE;
+real b0_matrix_2_18_DE;
+real b0_matrix_2_18_NDE;
+real b0_matrix_2_41;
+real b0_matrix_3_2;
+real b0_matrix_3_4;
+real b0_matrix_3_8;
+real b0_matrix_3_20_DE;
+real b0_matrix_3_20_NDE;
+real b0_matrix_3_22_DE;
+real b0_matrix_3_22_NDE;
+real b0_matrix_4_3;
+real b0_matrix_4_5;
+real b0_matrix_5_4;
+real b0_matrix_5_6;
+real b0_matrix_5_24_DE;
+real b0_matrix_5_24_NDE;
+real b0_matrix_6_5;
+real b0_matrix_6_7;
+real b0_matrix_6_26_DE;
+real b0_matrix_6_26_NDE;
+real b0_matrix_7_6;
+real b0_matrix_7_28_DE;
+real b0_matrix_7_28_NDE;
+real b0_matrix_7_30_DE;
+real b0_matrix_7_30_NDE;
+real b0_matrix_7_42;
+real b0_matrix_8_3;
+real b0_matrix_8_9;
+real b0_matrix_8_32_DE;
+real b0_matrix_8_32_NDE;
+real b0_matrix_9_8;
+real b0_matrix_9_34_DE;
+real b0_matrix_9_34_NDE;
+real b0_matrix_9_36;
+real b0_matrix_9_37;
+real b0_matrix_9_38;
+real b0_matrix_9_39_DE;
+real b0_matrix_9_39_NDE;
+real b0_matrix_10_2;
+real b0_matrix_12_2;
+real b0_matrix_14_2;
+real b0_matrix_16_2;
+real b0_matrix_18_2;
+real b0_matrix_20_3;
+real b0_matrix_22_3;
+real b0_matrix_24_5;
+real b0_matrix_26_6;
+real b0_matrix_28_7;
+real b0_matrix_30_7;
+real b0_matrix_32_8;
+real b0_matrix_34_9;
+real b0_matrix_36_9;
+real b0_matrix_37_9;
+real b0_matrix_38_9;
+real b0_matrix_39_9;
+real b0_matrix_41_2;
+real b0_matrix_42_7;
+
+
+# NEW:
+real b0_matrix_1_2;
+real b0_matrix_2_1;
+real b0_matrix_2_3;
+real b0_matrix_2_10_DE;
+real b0_matrix_2_10_NDE;
+real b0_matrix_3_2;
+real b0_matrix_3_4;
+real b0_matrix_3_8;
+real b0_matrix_4_3;
+real b0_matrix_4_5;
+real b0_matrix_5_4;
+real b0_matrix_5_6;
+real b0_matrix_5_24_DE;
+real b0_matrix_5_24_NDE;
+real b0_matrix_6_5;
+real b0_matrix_6_7;
+real b0_matrix_6_26_DE;
+real b0_matrix_6_26_NDE;
+real b0_matrix_7_6;
+real b0_matrix_7_28_DE;
+real b0_matrix_7_28_NDE;
+real b0_matrix_7_30_DE;
+real b0_matrix_7_30_NDE;
+real b0_matrix_7_42;
+real b0_matrix_8_3;
+real b0_matrix_8_9;
+real b0_matrix_9_8;
+real b0_matrix_9_36;
+real b0_matrix_10_2;
+real b0_matrix_24_5;
+real b0_matrix_26_6;
+real b0_matrix_28_7;
+real b0_matrix_30_7;
+real b0_matrix_36_9;
+real b0_matrix_42_7;
+
+# What happened:
+- we cut out a ton of tributary states!
+	- With the setup we have, we now have an issue with how the parameter_indices_matrix is set up
+	- We need those states to get zeros, but the indexing is weird
+	- Solution: Put a single spot in the vector that contains each type of parameter, and
+	populate that with either a -100000 (for b0) or 0 (for all covariates)
+		- Every spot in the transition matrix that isn't allowable (is a zero) will get this
+		
+		
+Also, removed this from data, because it wasn't being referenced in the script:
+ sigma_year_indices = as.matrix(sigma_year_matrix_names[,1:2]),
+
+Next step: Try compiling! Locally first
+
+# Resolved a bunch of errors, but now getting an odd compilation error when running locally:
+> print("Compiling model")
+[1] "Compiling model"
+> mod$compile(cpp_options = list(stan_threads = TRUE))
+Compiling Stan program...
+error: PCH file uses an older PCH format that is no longer supported
+
+1 error generated.
+
+make: *** [/var/folders/8c/vz24vqzd2nzfvknzmfcybj0m0000gn/T/RtmpacV70I/model-65ab874ae9] Error 1
+
+Error: An error occured during compilation! See the message above for more information.
+In addition: Warning messages:
+1: In readLines(hpp_path) :
+  incomplete final line found on '/var/folders/8c/vz24vqzd2nzfvknzmfcybj0m0000gn/T//RtmpacV70I/model-65ab874ae9.hpp'
+2: CmdStan's precompiled header (PCH) files may need to be rebuilt.
+If your model failed to compile please run rebuild_cmdstan().
+If the issue persists please open a bug report. 
+
+
+# Let's try moving to klone and running there
+
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+# Get a build node to try compiling
+
+[mmin@klone-login03 upper_columbia_wild]$ pwd
+/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild
+[mmin@klone-login03 upper_columbia_wild]$ salloc -p compute -A stf -N 1 -c 1 --time=1:00:00 --mem=10G
+[mmin@n3263 upper_columbia_wild]$  apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif Rscript seed101_1000iter_chain1_UCW_reparam.R
+
+# This failed with the familiar OMPI error, so I resubmitted using a job and the —mpi=pmix_v1 flag
+[mmin@n3263 upper_columbia_wild]$ sbatch job_stf_UCW_reparam_chain1.slurm —mpi=pmix_v1
+Submitted batch job 16151272
+
+### 2024-01-19 ###
+Job is taking forever to start, can we run this using a build node + the flag?
+[mmin@n3263 upper_columbia_wild]$ apptainer exec --bind ../../../:/gscratch/stf/mmin ../../../cmdstanr_latest.sif Rscript seed101_1000iter_chain1_UCW_reparam.R —mpi=pmix_v1
+Didn't work, same error as before. Maybe if I ask for a build node with that flag?
+[mmin@klone-login03 ~]$ salloc -p compute -A stf -N 1 -c 1 --time=1:00:00 --mem=10G —mpi=pmix_v1
+salloc: Pending job allocation 16156223
+salloc: job 16156223 queued and waiting for resources
+salloc: job 16156223 has been allocated resources
+salloc: Granted job allocation 16156223
+salloc: Nodes n3263 are ready for job
+salloc: error: _fork_command: Unable to find command "—mpi=pmix_v1"
+
+Nope!! Yeah I don't know how to do this then... Let's set up test runs using ckpt instead so we don't have to wait for stf
+- It's running! And it looks to be running quite quickly. 40 iter in 23 minutes total run time
+- Cancelled the ckpt run
+
+submitted 4 stf runs at 9 am on 1/19
+
+UCH runs got through 60% in 10 days, so will certainly require a different solution for that model
+
+### 2024-01-23 ###
+
+
+Chain 1 Iteration: 1980 / 2000 [ 99%]  (Sampling)
+Chain 1 Iteration: 1990 / 2000 [ 99%]  (Sampling)
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1 finished in 14154.4 seconds.
+Warning: 5 of 1000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+
+UCW reparam chains finished in just four hours!!
+For comparison, the old model took over 100 hours to run. This is a 25x improvement in performance. Wild
+
+
+# Pull these runs, also pull the other runs pre-reparam for comparison
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+
+(base) markusmin@Markuss-MacBook-Pro-2 rear_temp_spill_winterdays_year % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp_spill_winterdays_year
+(base) markusmin@Markuss-MacBook-Pro-2 rear_temp_spill_winterdays_year % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/rear_temp_spill_winterdays_year/upper_columbia_wild ./
+
+# Okay, I made a typo in the job names and accidentally ran chain 1 four times. Most unfortunate.
+# I dropped the time requested from 240 to 24 hours, move it back and resubmit:
+
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+[mmin@klone-login03 upper_columbia_wild]$ bash UCW_reparam_submit_chains.sh 
+
+# Running into an issue trying to work with the files from the old parameterization - going to try this approach to deal with it:
+https://stackoverflow.com/questions/51295402/r-on-macos-error-vector-memory-exhausted-limit-reached
+
+````
+Step 1: Open terminal,
+
+Step 2:
+
+cd ~
+touch .Renviron
+open .Renviron
+Step 3: Save the following as the first line of .Renviron:
+
+R_MAX_VSIZE=100Gb 
+````
+
+Ok, this fixed it!
+
+Ok, this still takes forever to compare model outputs though. Why don't we run it directly on klone?
+
+### 2024-01-24 ###
+
+Let's get an interactive RStudio window on Klone
+- I created a new job to run RStudio on ckpt, so that hopefully I don't have to wait in the queue as long
+- I renamed the other job to explicitly say it's running RStudio on stf
+
+[mmin@klone-login03 ~]$ pwd
+/mmfs1/home/mmin
+[mmin@klone-login03 ~]$ sbatch rstudio-server-ckpt.job 
+Submitted batch job 16247807
+
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          16247807      ckpt rstudio-     mmin PD       0:00      1 (AssocGrpJobsLimit)
+
+
+### 2024-01-25 ###
+
+Comparing model outputs and they look very similar - there are just a few transitions/states that are issues
+across multiple parameters for the same movement, that weren't an issue in the old model
+7 -> 30 and 7 -> 6 are common issues
+6 = mainstem, RRE to WEL
+7 = mainstem, upstream of WEL
+30 = Methow River Mouth
+
+7 -> 30 seems to only be an issue for DE, not NDE
+
+
+# what to investigate?
+- model outputs
+	- check on the chains
+- model code
+	- the indexing looks fine, in terms of the parameter_indices_matrix, and how it's being indexed to in the stan model
+- data itself (but this doesn't seem like a good hypothesis, since the data is the same between the two models)
+
+Okay, so those two are very correlated for a portion of the chain - they wander together
+
+Let's download the latest runs and then see how that looks
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+
+Same issue as before, but it only happens in some chains
+- when you go to four chains, it's 7_30 and 7_6 for intercept, both origin terms
+- 7_28 seems to have some issues as well but less
+
+Okay I get that those parameters would be correlated given how it's set up with a categorical logit.
+But why is it only happening for movements out of state 7? That part doesn't make sense
+- given that the model code doesn't seem to be wrong, let's check the data
+- but why would it be the data?? it was fine last time
+	- update: it was not as bad last time, but it was not fine. Similar issues of correlations between parameters,
+	just to a lesser degree
+
+>   table(state_transitions$transition_numeric)
+ 1 - 2 10 - 2  2 - 1 2 - 10  2 - 3 24 - 5 26 - 6 28 - 7  3 - 2  3 - 4  3 - 8 30 - 7  4 - 3  4 - 5 5 - 24 5 - 25  5 - 4  5 - 6 6 - 26 
+    31     37     21     44   1026      4     10      1      9   1029      3     32     18   1011    126     96     13    731    301 
+6 - 43  6 - 5  6 - 7 7 - 28 7 - 29 7 - 30 7 - 31 7 - 42  7 - 6  8 - 9 9 - 36 
+     7     40    518     12      2    220      8      1    169      3      1 
+
+So those are reasonable, those state transitions...
+Note that the two dominant transitions out of state 7 (7 - 30 and 7-6) are the ones that have that issue
+- but note that this is pretty similar to the counts of transitions out of state 6, but that state doesn't have the same issues
+- My guess is that it's the proportion of transitions that fall into just two states that's the main thing
+	- If you look, all of the movements to states that aren't 30 or 6 have max 12 observations, whereas those each have a lot more...
+	the distributions are just more skewed
+- But also, it might be related to the origin issue - because those are negatively correlated with the intercept,
+which brings the overall probability back closer to zero
+
+# Mark says to try to constrain the parameter values by reducing the SD in the prior
+- Okay, I changed all of the parameters that used to have normal(0,10) priors to 
+instead be normal(0,5) priors
+
+# Move this to hyak and try running again
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+[mmin@klone-login03 upper_columbia_wild]$ rm UCW_reparam
+[mmin@klone-login03 upper_columbia_wild]$ bash UCW_reparam_submit_chains.sh 
+
+
+### 2024-01-26 ###
+
+Runs with tighter priors finished faster.
+With normal(0,10) priors: run time 4:06, 4:01, 3:53, 4:28
+With normal(0,5) priors: run time 2:36, 3:13, 2:33, 2:32
+
+# Pull the tighter prior runs, re-run comparison analysis
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+
+
+# Looks way better, rhat and ESS values are great. But some chains still have some annoying pathologies
+
+Mark's suggestion is to run longer and start thinning.
+
+Let's resubmit the UCW chains, now with longer chains and thinning
+10000 iter, thin = 10 should be good, and should finish in <48 hours easily
+
+Updated the existing R scripts to be 10000 iter warmup, sampling, refresh = 100, thin = 10
+
+Move to hyak and run:
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+# 10000 iter thin 10 chain finished in 15-16 hours
+
+### 2024-01-29 ###
+
+Chains seemed to run with 10000 iter, so let's download and examine
+
+# Pull the tighter prior runs, re-run comparison analysis
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+
+Turns out I messed up some of the file naming conventions for the .rds files but that's okay
+
+Diagnostics look great, except that thin = 10 led to anticorrelated chains. So now let's 
+resubmit the runs, but instead don't thin at all and just save the full 10000 iter
+
+Edit the seed101 rscripts to not thin and save with corrected names
+
+Move to hyak and run:
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+### 2024-01-31 ###
+
+Runs finished in about the same time as before. Let's pull them - hopefully the files aren't massive
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+
+Each chain is 290 MB - so yeah, 10x larger than the old ones with thin = 10
+
+
+### 2024-02-01 ###
+
+The thinning comparison seems to indicate that thin = 2 is optimal for UCW. But that may not
+be the case for the other datasets, so let's get those up and running.
+
+Working on UCH today, with the reparam. Starting from UCW reparam files for everything.
+
+Asking for one week (144 hours) on stf to try running 2000 warmup/2000 iter for UCH
+
+Making the names of files like the R scripts that we are running on hyak shorter
+chain1_UCH_reparam.R instead of seed101_1000iter_chain1_UCW_reparam
+- different seeds are implicit, number of iter might change
+
+I need to organize files a bit better to keep track of them; the best practice might
+be to have subfolders within each of the dataset runs
+
+Okay, I think UCH run is ready. Let's move to hyak and test on ckpt
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+Model successfully compiled and is running. STF chains submitted at 10:33 am on 2/1
+There's a typo in the R script where the output is incorrectly named "UCW" - need to change that once they download
+
+### Let's work on Middle Columbia models next
+
+# Start with MCH
+Duplicated UCH as a starting point
+
+# Needed to move the states complete file to the new folder.
+Based on the 3.5 R script, I copied this file over:
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/deteff_ESU_models/middle_columbia/middle_columbia_adults_states_complete.csv
+
+# What origins for MCH?
+> midcol_hatchery_origin_table
+       natal_origin    n
+1   Deschutes_River   17
+2    John_Day_River   46
+3    Umatilla_River  591
+4 Walla_Walla_River 2272
+5      Yakima_River    1
+
+So... just Umatilla River and Walla Walla River for hatchery.
+Most Middle Columbia steelhead are wild
+
+> midcol_wild_origin_table
+       natal_origin    n
+1   Deschutes_River 1031
+2 Fifteenmile_Creek  485
+3    John_Day_River 2802
+4    Umatilla_River 1210
+5 Walla_Walla_River  731
+6      Yakima_River  670
+
+> model_states
+ [1] "mainstem, mouth to BON"         "mainstem, BON to MCN"           "mainstem, MCN to ICH or PRA"    "mainstem, PRA to RIS"           "mainstem, RIS to RRE"          
+ [6] "mainstem, RRE to WEL"           "mainstem, upstream of WEL"      "mainstem, ICH to LGR"           "mainstem, upstream of LGR"      "Deschutes River Mouth"         
+[11] "Deschutes River Upstream"       "John Day River Mouth"           "John Day River Upstream"        "Hood River Mouth"               "Hood River Upstream"           
+[16] "Fifteenmile Creek Mouth"        "Fifteenmile Creek Upstream"     "Umatilla River Mouth"           "Umatilla River Upstream"        "Yakima River Mouth"            
+[21] "Yakima River Upstream"          "Walla Walla River Mouth"        "Walla Walla River Upstream"     "Wenatchee River Mouth"          "Wenatchee River Upstream"      
+[26] "Entiat River Mouth"             "Entiat River Upstream"          "Okanogan River Mouth"           "Okanogan River Upstream"        "Methow River Mouth"            
+[31] "Methow River Upstream"          "Tucannon River Mouth"           "Tucannon River Upstream"        "Asotin Creek Mouth"             "Asotin Creek Upstream"         
+[36] "Clearwater River"               "Salmon River"                   "Grande Ronde River"             "Imnaha River Mouth"             "Imnaha River Upstream"         
+[41] "BON to MCN other tributaries"   "Upstream WEL other tributaries" "loss" 
+
+# Made the necessary changes. One thing that would be good: for the portions of the script
+that generate the lines of stan code, we should replace the 1:3 (if there are three origins)
+in a loop with instead 1:norigins; would make things a lot easier
+
+# Let's try running this with ckpt
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+[mmin@klone-login03 middle_columbia_hatchery]$ sbatch job_ckpt_MCH_reparam_chain1.slurm —mpi=pmix_v1
+
+MCH successfully compiled and is running on ckpt! Let's submit the chains on stf
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+[mmin@klone-login03 middle_columbia_hatchery]$ bash MCH_reparam_submit_chains.sh 
+Submitted batch job 16346095
+Submitted batch job 16346096
+Submitted batch job 16346097
+Submitted batch job 16346098
+
+# I think I'm going to hold off and wait to see how these runs go before running all of the other models as well.
+
+### 2024-02-02 ###
+
+Checking in on runs
+
+MCH finished in 4-5 hours per chain
+
+UCH is still running; at 20 hours, we are at 10-15% (400-600 iter)
+- This should be fine to complete in 144 hours given past performance
+
+# move MCH back to local
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_hatchery ./
+
+# MCH - Some observations:
+Some of the detection efficiency parameters are really anticorrelated. Not really sure why that would be. But
+the estimates are basically just the 
+
+Some parameters that I don't think should be the same are the same...?
+34 byearxorigin1_raw_parameters_matrix_DE[4,8]    -0.00481  -0.00135  0.988 0.980 -1.61   1.64    1.00   19743.    5698.
+ 35 byearxorigin2_raw_parameters_matrix_DE[4,8]    -0.00481  -0.00135  0.988 0.980 -1.61   1.64    1.00   19743.    5698.
+ 
+- This is a typo in the model code. This typo is also in the UCW and UCH scripts. Frick!!!
+ 
+ # some other weird parameters:
+    variable                 mean     median    sd   mad        q5        q95   rhat ess_bulk ess_tail
+   <chr>                   <num>      <num> <num> <num>     <num>      <num>  <num>    <num>    <num>
+ 1 b0_vector_DE[25]   -100000    -100000     0     0    -100000   -100000    NA          NA       NA 
+ 2 b0_vector_DE[41]   -100000    -100000     0     0    -100000   -100000    NA          NA       NA 
+ 3 b0_vector_NDE[41]  -100000    -100000     0     0    -100000   -100000    NA          NA       NA 
+
+Oh, those are fixed at those values. But... why? b0_vector_DE[41] and b0_vector_NDE[41] probably 
+shouldn't both be -100000, I think
+No no, that's right. That is the last spot in the vector, and it should get -100000, because
+that's how we're making sure the other movements are impossible (this last value in the 
+vector is getting indexed by parameter_indices_matrix)
+- b0_vector_DE[25] also makes sense to be -100000, that's upstream LGR to Asotin Creek Upstream, which isn't
+allowed for DE, but it's also one of the few upstream states that was actually visited by a fish
+
+### Let's fix those typos
+First, cancel all runs in progress
+# Get rid of old executables
+[mmin@klone-login03 middle_columbia_hatchery]$ rm MCH_reparam
+[mmin@klone-login03 upper_columbia_hatchery]$ rm UCH_reparam
+[mmin@klone-login03 upper_columbia_wild]$ rm UCW_reparam
+
+# Fix typos in stan_data_prep scripts, change in the stan script, move to hyak
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+# Re-submit runs
+[mmin@klone-login03 middle_columbia_hatchery]$ bash MCH_reparam_submit_chains.sh
+[mmin@klone-login03 upper_columbia_hatchery]$ bash UCH_reparam_submit_chains.sh
+[mmin@klone-login03 upper_columbia_wild]$ bash UCW_reparam_submit_chains.sh
+
+
+
+## Develop MCW
+In this script, we are going to have norigins as a global variable to make the part of the 
+script where we cat the lines of stan code less typo-prone (and more generalizable) 
+
+# Move to hyak, try on ckpt
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+[mmin@klone-login03 middle_columbia_wild]$ sbatch job_ckpt_MCW_reparam_chain1.slurm —mpi=pmix_v1
+
+Random runs keep strangely failing due to compilation errors:
+[1] "Compiling model"
+[1] "model compiled at"
+[1] "2024-02-02 10:36:21 PST"
+Error: Model not compiled. Try running the compile() method first.
+Execution halted
+
+- I believe that this is happening when we don't already have an executable, because 
+running the submit chains shell script asks the model to compile four times, and then if they
+are all in sync sometimes that can confuse the compiling
+
+# Need to resubmit specific runs
+[mmin@klone-login03 upper_columbia_wild]$ sbatch job_stf_UCW_reparam_chain1.slurm —mpi=pmix_v1
+[mmin@klone-login03 upper_columbia_wild]$ sbatch job_stf_UCW_reparam_chain4.slurm —mpi=pmix_v1
+[mmin@klone-login03 upper_columbia_hatchery]$ sbatch job_stf_UCH_reparam_chain2.slurm —mpi=pmix_v1
+[mmin@klone-login03 upper_columbia_hatchery]$ sbatch job_stf_UCH_reparam_chain3.slurm —mpi=pmix_v1
+
+
+# MCW ckpt:
+[1] "Compiling model"
+[1] "model compiled at"
+[1] "2024-02-02 13:47:29 PST"
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 Rejecting initial value:
+Chain 1   Gradient evaluated at the initial value is not finite.
+Chain 1   Stan can't start sampling from this initial value.
+Chain 1 Initialization between (-1, 1) failed after 100 attempts.
+Chain 1  Try specifying initial values, reducing ranges of constrained values, or reparameterizing the model.
+Chain 1 Initialization failed.
+Warning: Chain 1 finished unexpectedly!
+
+Alright, so there's almost certainly a typo somewhere in here!
+This is likely happening because it's evaluating the probability of something that is possible as zero, 
+or we're getting a negative infinity or something there.
+One approach would be to reintroduce the statement where we print the logits for each step
+
+the movements which are currently getting a -100000 for DE are 2-11, 2-17, 2-19
+thats (BON to MCN) to Deschutes River Upstream, Fifteenmile Creek Upstream, and Umatilla River Upstream
+Makes sense, those should have that. Checked on the data itself and it also looks fine...?
+
+Well, I found a typo in all of the other models. Currently NDE is not getting a universal 
+temperature effect, just origin temperature effects (DE is getting a universal temperature effect)
+
+# Cancel all the jobs currently running
+[mmin@klone-login03 upper_columbia_wild]$ scancel --user=mmin
+
+# Move the model files to hyak
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_hatchery/MCH_reparam.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_hatchery/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_hatchery/UCH_reparam.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_hatchery/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_wild/UCW_reparam.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild/
+
+# remove the existing executable
+# submit the jobs
+done!
+
+
+### 2024-02-05 ###
+
+MCH and UCW runs all completed, some UCH runs completed
+
+MCH: around 5 hours
+UCW: 15-22 hours (these are still 10000 iter no thin runs, whoops)
+UCH: 2 days 14 hours
+
+# Let's fix UCW to be 2000 iter and re-submit
+- Deleted all of the old .rds model output files (1.4 GB total!)
+- Created new R scripts with names "chainX_UCW_reparam.R" to match names in other folders
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+[mmin@klone-login03 upper_columbia_wild]$ bash UCW_reparam_submit_chains.sh 
+
+# Still not sure why MCW is not running. Perhaps we should try having it print logits and actual and then checking
+# Added some print statements. Re-run on ckpt:
+[mmin@klone-login03 middle_columbia_wild]$ sbatch job_ckpt_MCW_reparam_chain1.slurm —mpi=pmix_v1
+
+
+
+
 
 
