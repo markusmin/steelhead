@@ -5413,11 +5413,11 @@ done!
 
 ### 2024-02-05 ###
 
-MCH and UCW runs all completed, some UCH runs completed
+MCH/UCW/UCH runs completed
 
 MCH: around 5 hours
 UCW: 15-22 hours (these are still 10000 iter no thin runs, whoops)
-UCH: 2 days 14 hours
+UCH: 2 days 14 hours - 2 days 17 hours
 
 # Let's fix UCW to be 2000 iter and re-submit
 - Deleted all of the old .rds model output files (1.4 GB total!)
@@ -5428,6 +5428,403 @@ UCH: 2 days 14 hours
 # Still not sure why MCW is not running. Perhaps we should try having it print logits and actual and then checking
 # Added some print statements. Re-run on ckpt:
 [mmin@klone-login03 middle_columbia_wild]$ sbatch job_ckpt_MCW_reparam_chain1.slurm —mpi=pmix_v1
+
+# okay, it printed a lot of stuff. Pull it:
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_wild/slurm-16388379.out ./middle_columbia_wild/
+
+Some of the probabilities of possible movements are ridiculously low, but not from logits that are -100000
+- most logits are close to zero (good, since those should be informed by priors), but some are very large (in absolute magnitude)
+	- the priors seem to be correct, so that doesn't explain it
+
+Chain 1 current state: 4
+Chain 1 logits: [-100000,-100000,19.8682,-100000,-0.771814,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,-100000,0]
+Chain 1 p_vec_observed: [5.55553e-309,5.55553e-309,1,5.55553e-309,1.08685e-09,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,5.55553e-309,2.35161e-09]
+Chain 1 next state: 3; prob of next state = 1
+
+It's rounding up, but basically we have an issue frequently where in logit space values look
+reasonable, but then once we look at them in real space they're basically zero or 1
+
+What has changed from MCH to MCW?
+Is it related to the fact that we have so many origins?
+- With the last origin, it gets -1 * the other five origins
+	- Based on a histogram of what happens when you sum five rnorms together, this is entirely possible
+- This could be fixed via initialization? Starting the parameters at zero would in theory make it
+so that we don't get ridiculous origin parameters
+- But the error message said that initialization failed between -1 and 1, but it didn't start at 0
+- The other option could be to constrain the origin parameters, if we believe that's the issue
+
+Let's change the origin parameter priors to normal(0,1) and see if that lets the model run
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_wild/MCW_reparam.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_wild/
+[mmin@klone-login03 middle_columbia_wild]$ sbatch job_ckpt_MCW_reparam_chain1.slurm —mpi=pmix_v1
+
+This didn't work, which is probably actually good news, because had that been the issue we would
+have had to reconsider some major things.
+
+It seems like the crazy logits are always for specific movements, namely 3 -> 2, 
+2 -> 1, 9 -> 8; these can go either way (large positive or large negative)
+- Is this something with fallback? Could be related to spill...?
+- Yes, quite sure it's a spill problem.
+- Spill is not z-scored (because zeros are significant, both for windows and for days)
+- Spill tends to be much higher at dams lower on the Columbia than higher, which leads to these
+params getting out of hand.
+	- Seems like it would be justified to drop the priors on these, given it's the only covariate
+	that's not z-scored
+
+Okay, changed those priors to normal(0,1), resubmitted to ckpt
+- this still didn't work. Commenting out spill in the logits, attempting to resubmit
+	- Ok, that still didn't work either. Commented out all other covariates as well.
+	- Okay, with an intercept only model, I still get the gradient issue. So it looks 
+	to be a data problem, which to be honest I don't really understand
+	- So it is a data problem, but it's probably not good that we are getting parameters
+	exploring space that is totally unreasonable...
+	
+Let's check the transition summaries to see if there are any glaring issues
+BON to MCN other tributaries - Fifteenmile Creek Upstream       
+                                                        1 
+Everything else looks fine.
+3D9.1C2D34706F
+
+In states_complete:
+13070	3D9.1C2D34706F	mainstem, BON to MCN	8/13/11 13:48	BON (adult)	Adult	3D9.1C2D34706F
+13071	3D9.1C2D34706F	BON to MCN other tributaries	8/27/11 10:16	BON_MCN_other_trib_sites	Adult	3D9.1C2D34706F
+13072	3D9.1C2D34706F	Fifteenmile Creek Upstream	3/28/12 17:06	FIF_upstream	Adult	3D9.1C2D34706F
+13073	3D9.1C2D34706F	Fifteenmile Creek Mouth	4/23/12 2:26	FIF_RM	Adult	3D9.1C2D34706F
+
+So this isn't an issue with this script, it's an issue with an earlier script. UGH
+
+# Issue is occurring at this step - there's a detection at LFF on the Klickitat followed by
+a Fifteenmile Creek detection, and this script isn't picking it up.
+- This seems like a good opportunity to try to clean up my workflow... And to check
+and make sure there aren't any other weird transitions
+from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/03_hyak_complete_detection_histories_v4_part1.R
+
+### 2024-02-06 ###
+
+Creating a new version of complete det hist in analysis/03-complete-det-hist/
+
+The starting point for this was to copy from_hyak_transfer/2022-11-02-complete_det_hist_ckpt/
+
+Going to add a line to the end of this script to count transitions and compare
+to the allowable ones
+- this is now being exported as "state_transitions_table.csv" - make sure to check and make sure nothing
+that isn't allowable is happening
+
+so the problem is on line 1340(ish) of the script
+- it has contingency for if the fish is moving upstream, or if it's moving downstream,
+but not if it's moving between tributaries that connect to the same mainstem state... which
+is honestly pretty common, no?
+- Fixed this
+
+# Okay, made a folder on klone called /gscratch/stf/mmin/processing
+
+# moving the new analysis scripts there
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./03-complete-det-hist/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/processing/
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part1.slurm 
+Submitted batch job 16414412
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part2.slurm 
+Submitted batch job 16414413
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part3.slurm 
+Submitted batch job 16414414
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part4.slurm 
+Submitted batch job 16414415
+
+
+# copied 03.5_stepwise_states_cleaning.R to analysis/04-stepwise-states-cleaning.R, changed input files
+
+### 2024-02-07 ###
+
+So, it looks like the runs completed but they errored out
+[1] "Run complete - no more fish"
+[1] "Row #100944"
+[1] "Run complete - no more fish"
+Error in `mutate()`:
+ℹ In argument: `run_year = `$`(...)`.
+ℹ In group 6099: `tag_code = "3D9.1BF17D8FEA"`.
+Caused by error:
+! `run_year` must be size 1, not 0.
+Backtrace:
+     ▆
+  1. ├─... %>% dplyr::select(tag_code, run_year)
+  2. ├─dplyr::select(., tag_code, run_year)
+  3. ├─dplyr::mutate(...)
+  4. ├─dplyr:::mutate.data.frame(...)
+  5. │ └─dplyr:::mutate_cols(.data, dplyr_quosures(...), by)
+  6. │   ├─base::withCallingHandlers(...)
+  7. │   └─dplyr:::mutate_col(dots[[i]], data, mask, new_columns)
+  8. │     └─mask$eval_all_mutate(quo)
+  9. │       └─dplyr (local) eval()
+ 10. ├─dplyr:::dplyr_internal_error(...)
+ 11. │ └─rlang::abort(class = c(class, "dplyr:::internal_error"), dplyr_error_data = data)
+ 12. │   └─rlang:::signal_abort(cnd, .file)
+ 13. │     └─base::signalCondition(cnd)
+ 14. └─dplyr (local) `<fn>`(`<dpl:::__>`)
+ 15.   └─rlang::abort(message, class = error_class, parent = parent, call = error_call)
+Execution halted
+
+I think what happened here is that the run actually completed, but this is when I'm trying
+to merge with a dataframe that contains the run year, that the other dataframe is for the
+full dataset and our output is only for 1/4 of the dataset.
+
+I am going to change the setup for this. I'm going to have one script that's the for loop,
+saved as a function. Then, each of my individual scripts will source that function, then
+run it for the one dataset
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./03-complete-det-hist/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/processing/
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part1.slurm 
+Submitted batch job 16414412
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part2.slurm 
+Submitted batch job 16414413
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part3.slurm 
+Submitted batch job 16414414
+[mmin@klone-login03 03-complete-det-hist]$ sbatch job_complete_det_hist_ckpt_part4.slurm 
+Submitted batch job 16414415
+
+# The function is working, but it's not exporting the right final file still. Let's download and inspect
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/processing/03-complete-det-hist/ ./
+
+# Okay, it's now working! Pull all of it
+- Ran through 04 (previously 3.5) script, which exports the adults_only_states_complete files,
+which are now stored in model_files/stan_inputs
+- Copied these into reparameterization files
+- Let's move to hyak and try resubmitting MCW
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp ./upper_columbia_wild/upper_columbia_adults_states_complete.csv mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_hatchery/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp ./middle_columbia_wild/middle_columbia_adults_states_complete.csv mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_hatchery/    
+
+^ that didn't work because of course it didn't, I need to run the script locally first
+to export it as part of model_data.rda
+
+# fixed it, re-ran it, pull it
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/processing/03-complete-det-hist/ ./
+
+# ran stan data prep script to export updated model_data.rda file for MCW
+
+# move MCW files to hyak
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+# test run on ckpt
+[mmin@klone-login03 middle_columbia_wild]$ sbatch job_ckpt_MCW_reparam_chain1.slurm —mpi=pmix_v1
+
+Okay great, it's working now. Let's update the model to include covariates again and try
+running on stf
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp ./middle_columbia_wild/MCW_reparam.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_wild/
+scp ./middle_columbia_wild/MCW_reparam_submit_chains.sh mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_wild/
+
+
+# move all of the stuff over for MCW
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+### 2024-02-09 ###
+
+STF compute seems pretty busy right now, we haven't had the runs I submitted >24 hours ago start yet.
+
+Today: Develop SRH and SRW
+- Starting point: MCW
+
+> SR_wild_origin_table
+        natal_origin    n
+1       Asotin_Creek  552
+2   Clearwater_River 1646
+3 Grande_Ronde_River  748
+4       Imnaha_River 1337
+5       Salmon_River 1095
+6     Tucannon_River  588
+
+This is very convenient, given that MCW and SRW both have the same number of origins
+
+> origin_numeric
+         natal_origin natal_origin_numeric
+1        Asotin_Creek                    1
+2    Clearwater_River                    2
+3     Deschutes_River                    3
+4        Entiat_River                    4
+5   Fifteenmile_Creek                    5
+6  Grande_Ronde_River                    6
+7          Hood_River                    7
+8        Imnaha_River                    8
+9      John_Day_River                    9
+10       Methow_River                   10
+11     Okanogan_River                   11
+12       Salmon_River                   12
+13     Tucannon_River                   13
+14     Umatilla_River                   14
+15  Walla_Walla_River                   15
+16    Wenatchee_River                   16
+17       Yakima_River                   17
+
+# Modeling decision: Should we get model post-overshoot fallback as a function of spill
+for the dams on the other river? For example, fallback over SR dams for UC fish and vice versa?
+Yeah, I probably should. Need to fix that in UC script
+- this has been fixed in the data prep script, but i need to change it in the .stan files when I re-run
+Okay, a mistake in all of the models - we don't have a spillwindow parameter for 8_3
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./snake_river_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+[mmin@klone-login03 snake_river_wild]$ sbatch job_ckpt_SRW_reparam_chain1.slurm —mpi=pmix_v1
+
+ok, ckpt model for SRW is working. Submit the four full chains, then let's work on SRH
+
+Start from SRW for SRH
+        natal_origin    n
+1       Asotin_Creek   15
+2   Clearwater_River 4984
+3 Grande_Ronde_River 6168
+4       Imnaha_River 3726
+5       Salmon_River 9956
+6     Tucannon_River 2946
+
+So all of the same origins, except drop Asotin Creek
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./snake_river_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+[mmin@klone-login03 snake_river_hatchery]$ sbatch job_ckpt_SRH_reparam_chain1.slurm —mpi=pmix_v1
+- compiled, nice
+
+
+
+# Okay, let's submit all six models, with the changes from above (fixing spill)
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./snake_river_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./snake_river_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./upper_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/
+
+Okay, all six models are running! Hopefully they actually run fairly soon...
+
+
+### 2024-02-14 ###
+So, models are mostly running now! Except MCW, chain 1 is running but the other three chains failed, not sure why
+Ok, just some silly typos. Let's correct that and resubmit
+
+### 2024-02-18 ###
+
+All models finished, except for SRH. At 4 days, 9 hours, we're at:
+Chain 1 Iteration: 1400 / 4000 [ 35%]  (Warmup)
+Chain 1 Iteration: 1500 / 4000 [ 37%]  (Warmup)
+
+Some jobs that are a little farther (4 days 20 hours) along are up to 45%. So 
+I think we might just be able to squeak in under 10 days, but let's see if
+this will run to completion, given that progress doesn't seem to be linear
+
+So, not going to finish in the week that we gave the job (most likely) - so I should 
+resubmit with the max (10 days)
+
+
+### 2024-02-19 ###
+
+Chain 1 Iteration: 2300 / 4000 [ 57%]  (Sampling)
+Chain 1 Iteration: 2400 / 4000 [ 60%]  (Sampling)
+slurmstepd: error: *** JOB 16489955 ON n3331 CANCELLED AT 2024-02-19T16:26:26 DUE TO TIME LIMIT ***
+
+
+6 days got us 60% of the way. Let's submit ten days and cross our fingers.
+
+
+### 2024-02-26 ###
+
+SRH runs are almost at 7 days, and they're near 70%. So I think that we should be okay to finish in ten days
+
+# Let's pull everything else from hyak
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_hatchery ./
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/middle_columbia_wild ./
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_hatchery ./
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/upper_columbia_wild ./
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/snake_river_wild ./
+
+# Reorganizing some files in the analysis/ folder
+# created a folder called 05-stan-runs; this is currently empty but it will eventually house all
+of the code to run the stan models
+# created a file called 06-model-diagnostics.R
+- This file will import all of the models, and run them through diagnostic checks
+
+
+# so when I am loading in all six model runs, I start getting into trouble where my MacBook
+Tells me "Your system has run out of application memory"
+
+Let's run this on virtual RStudio via Klone...
+[mmin@klone-login03 ~]$ pwd
+/mmfs1/home/mmin
+[mmin@klone-login03 ~]$ sbatch rstudio-server-ckpt.job 
+
+# This creates a new file called rstudio-server.job.[job #] that you then need to open and follow instructions
+
+In RStudio, I have gscratch/scrubbed/mmin mounted. That means I need to move the files that I want
+to work with there before running anything. But keep in mind that this is not a permanent
+storage location, so I need to always keep a copy of code or data in another location
+
+# create directories on gscratch/scrubbed/mmin to store scripts and analysis
+[mmin@klone-login03 mmin]$ mkdir data
+[mmin@klone-login03 mmin]$ mkdir analysis
+
+# Move the important stuff over - from reparameterization
+
+[mmin@klone-login03 mmin]$ cp -r /gscratch/stf/mmin/stan_runs/reparameterization/ ./stan_actual/
+- This runs, but takes a long time
+
+# Make an R script called analysis/06-model-diagnostics-hyak.R folder that is the same as 06-model-diagnostics.R that's on local
+
+On the hyak version of Rstudio, it's having issues with some packages, where the description
+says "Failed to read package metadata" and when you try to load it it says that there is no such package
+
+# Diagnostics in the 06 script:
+- rhat + (all below 1.006)
+- ess_bulk + (770-4015)
+- ess_tail + (882-3948)
+- parameter correlations
+	- we should look across all of the parameters that govern movement out of certain states
+	- The origin and temp1 parameters are super strongly negatively correlated - I wonder if this is a 
+	movement timing thing because temp1 is summer/fall temp?
+
+# To pull outputs generated from interactive rstudio on hyak:
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output ./
+
+### 2024-02-28 ###
+
+SRH chains completed! 8 days 7 hours to 8 days 13 hours
+Pull them!
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/snake_river_hatchery ./
+
+# Let's make pairs plots and diagnostics for all six populations; let's not save them as a PDF though, those get massive. Plus with ggsave we can
+make these plots look much nicer
+
+# To pull and inspect plots:
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output ./
+
+
+
+# move the snake river data over to scrubbed/
+[mmin@klone-login03 mmin]$ cp -r /gscratch/stf/mmin/stan_runs/reparameterization/snake_river_hatchery/ ./stan_actual/reparameterization/
+
+
+# Let's also look at arrival date at BON as a predictor for ascending dams
+
+### 2024-02-29 ###
+
+Making a github.io page for updates
+- the _config.yml doesn't actually do anything right now, the layout is being controlled by _site.yml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
