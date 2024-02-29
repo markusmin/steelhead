@@ -1,0 +1,10 @@
+---
+title: "Model Results"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Description
+
+This page contains information on the model results for the version of the model described in the model structure section.

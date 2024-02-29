@@ -1,0 +1,43 @@
+---
+title: "Model Structure"
+author: "Markus Min"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+### Model states
+![States in the model](site_figures/full_model_diagram.png)
+<br>
+
+### Covariate structure description 
+
+The covariate effects were structured in the model to test specific hypotheses about the effects of these factors on movements of interest:
+
+1.	Hatchery and wild origin fish have different movement patterns.
+2.	The natal origin of a fish influences its movement decisions after it has entered the boundaries of its DPS.
+3.	The temperature experienced by a fish while in a reach of the mainstem Columbia or Snake River influences its decision to seek cooler refuge (either in an upstream mainstem reach or in a tributary). Fish of different natal origins respond differently to temperature while inside the boundaries of their DPS.
+4.	En-route fallback is an involuntary action that is caused by river conditions or individual condition. Higher volumes of spill lead to higher risk of en-route fallback.
+5.	Post-overshoot fallback is a voluntary action. Post-overshoot fallback is facilitated by the presence of spill, which provides fish a safer, surface passage route.
+6.	In addition to the river condition variables explicitly modeled (temperature and spill), internanual variation in other river conditions influences movement choices.
+
+To test these hypotheses in the modeling framework, fish from different DPSs and of different rear types were modeled separately, facilitating the comparison of movement probabilities along these axes. Within a DPS/rear type combination, covariates were added for the effect of natal origin for any movements within DPS boundaries, ensuring that fish of different natal origins had different movement probabilities as they neared their natal tributaries. Temperature effects were included only for movements that were either upstream or into tributaries, as previous studies have indicated that Steelhead respond to temperature by seeking out colder refugia, either in tributaries (High et al. 2006) or in upstream mainstem reaches (Richins and Skalski 2018). In contrast, spill effects were only included for downstream (fallback) movements, but with different structures based on whether a movement was post-overshoot fallback or en-route fallback. Post-overshoot fallback modeled as a function of days of winter (January, February, and March) spill, as the presence of a spillway passage route has previously been shown to be more important than the volume of spill for facilitating downstream passage of adults at dams (Wertheimer and Evans 2005). In contrast, en-route fallback was modeled as a function of the volume of spill, as this type of fallback is assumed to be an involuntary movement caused by hydrosystem conditions. Finally, a random effect of year was included for movements within a fish’s DPS to account for interannual variation that was not explicitly accounted for by the other covariates. A random effect of year was not included for movements outside of a fish’s DPS, as outside of the DPS, we expected individuals to behave similarly regardless of the year.
+
+<br>
+
+### How covariates are coded in the model
+
+In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explicitly included via parameters in the model: origin, temperature, spill, and year.
+
+#### Natal Origin
+To reduce the number of parameters in the model, a fixed effect of natal origin was included only for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed the effect of unique natal origins to differentiate as they neared natal tributaries. Natal origin was modeled as a fixed effect.
+
+#### Temperature
+Two separate temperature effects were estimated in our modeling framework, to account for the temporal aspect of temperature. Because temperature is strongly correlated with day of year, which has been previously noted to influence Steelhead migration patterns (Siegel et al. 2021), we divided the effect of temperature into a winter/spring effect (January 1 - May 31) and a summer/fall effect (June 1 - December 31). Depending on the day of year of each movement, the temperature in the window was either multiplied by the winter/spring temperature parameter or the summer/fall temperature parameter. Approximately 96% of all movements occurred in the summer/fall period.
+
+The temperature effects were structured to allow a temperature effect only for movements from a mainstem state to the mainstem state upstream of that state, or from a mainstem state into a tributary. Furthermore, temperature effects were structured to allow different natal origins to have a different response to temperature within the DPS boundaries. As such, the same origin structure was used as was used for the origin effects - temperature effects were shared outside of a DPS, but within a DPS each natal origin had a separately estimated parameter for the effect of temperature on each movement. Temperature was modeled as a fixed effect.
+
+#### Spill
+For the effect of the volume of spill within a window of time, only en-route fallback movements included an effect for the volume of spill. This parameter was shared between all origins. For the effect of the number of days in the winter with some volume of spill, only post-overshoot fallback movements included an effect for the number of days of spill during the winter months. This parameter was shared between all origins for which the movement was a post-overshoot fallback movement. Therefore, for any fallback movement, either the effect of the volume of spill or the number of days of winter spill was included, depending on the relation of that dam to the fish’s natal origin. Spill was modeled as a fixed effect.
+
+#### Year
+Within the datasets for each of the six populations (3 DPSs x 2 rear types), all individuals were pooled across years when fitting the model, but a random effect of year for certain movements was included to allow the movement probabilities to vary interannually and account for year specific differences that weren’t captured by the covariates included in the model. The setup for the inclusion of year effects was the same as that for origin effects - a random effect for each year was included only for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). One reason for this modeling choice was the computational necessity of restricting the number of movements that receive a random effect for each of the 17 years in our dataset, as well as needing enough data for each movement to estimate a separate effect for each origin for each year. A second, ecological reason for this choice was based on our a priori hypothesis that interannual differences would mostly emerge when fish were nearing natal tributaries. Downstream of the DPS, individuals are expected to behave similarly regardless of the year, as all fish have natal tributaries that are upstream. Year was modeled as a random effect.

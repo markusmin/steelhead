@@ -1,16 +1,16 @@
 name: "Steelhead Movement"
 output_dir: "."
 navbar:
-  title: "Model diagnostics"
+  title: "Steelhead Movement"
   left:
     - text: "Home"
       href: index.html
-    - text: "Convergence and efficiency"
-      href: biology.html      
-    - text: "Traceplots"
-      href: traceplots.html
-    - text: "Pairs plots"
-      href: pairs_plots.html
+    - text: "Structure"
+      href: structure.html    
+    - text: "Diagnostics"
+      href: diagnostics.html      
+    - text: "Results"
+      href: results.html    
 output:
   html_document:
     theme: flatly
