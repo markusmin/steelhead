@@ -5,11 +5,14 @@ date: '`r Sys.Date()`'
 output: html_document
 ---
 
-### Model states
 ![States in the model](site_figures/full_model_diagram.png)
+
 <br>
 
-### Covariate structure description 
+# Covariates
+<br>
+
+## Description
 
 The covariate effects were structured in the model to test specific hypotheses about the effects of these factors on movements of interest:
 
@@ -24,7 +27,7 @@ To test these hypotheses in the modeling framework, fish from different DPSs and
 
 <br>
 
-### How covariates are coded in the model
+## How covariates are coded in the model
 
 In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explicitly included via parameters in the model: origin, temperature, spill, and year.
 
@@ -41,3 +44,15 @@ For the effect of the volume of spill within a window of time, only en-route fal
 
 #### Year
 Within the datasets for each of the six populations (3 DPSs x 2 rear types), all individuals were pooled across years when fitting the model, but a random effect of year for certain movements was included to allow the movement probabilities to vary interannually and account for year specific differences that weren’t captured by the covariates included in the model. The setup for the inclusion of year effects was the same as that for origin effects - a random effect for each year was included only for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). One reason for this modeling choice was the computational necessity of restricting the number of movements that receive a random effect for each of the 17 years in our dataset, as well as needing enough data for each movement to estimate a separate effect for each origin for each year. A second, ecological reason for this choice was based on our a priori hypothesis that interannual differences would mostly emerge when fish were nearing natal tributaries. Downstream of the DPS, individuals are expected to behave similarly regardless of the year, as all fish have natal tributaries that are upstream. Year was modeled as a random effect.
+
+<br>
+
+# Stan
+
+Each of the six populations (Upper Columbia Wild, Upper Columbia Hatchery, Middle Columbia Wild, Middle Columbia Hatchery, Snake River Wild, and Snake River Hatchery) were run on KLONE, UW's HYAK supercomputer. The models were run with the following specifications:
+
+- 4 chains
+- 2000 warmup iterations
+- 2000 sampling iterations
+- thin = 2 (every other sample was selected, as this improved model efficiency when exploring the posterior)
+

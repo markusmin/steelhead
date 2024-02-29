@@ -275,14 +275,17 @@ $(document).ready(function () {
 </div>
 
 
-<div id="model-states" class="section level3">
-<h3>Model states</h3>
-<!-- ![States in the model](/Users/markusmin/Documents/CBR/steelhead/figures/full_model_diagram.png) -->
-<p><img src="site_figures/full_model_diagram.png"
-alt="States in the model" /> <br></p>
+<div class="float">
+<img src="site_figures/full_model_diagram.png"
+alt="States in the model" />
+<div class="figcaption">States in the model</div>
 </div>
-<div id="covariate-structure-description" class="section level3">
-<h3>Covariate structure description</h3>
+<p><br></p>
+<div id="covariates" class="section level1">
+<h1>Covariates</h1>
+<p><br></p>
+<div id="description" class="section level2">
+<h2>Description</h2>
 <p>The covariate effects were structured in the model to test specific
 hypotheses about the effects of these factors on movements of
 interest:</p>
@@ -333,8 +336,8 @@ fish’s DPS, as outside of the DPS, we expected individuals to behave
 similarly regardless of the year.</p>
 <p><br></p>
 </div>
-<div id="how-covariates-are-coded-in-the-model" class="section level3">
-<h3>How covariates are coded in the model</h3>
+<div id="how-covariates-are-coded-in-the-model" class="section level2">
+<h2>How covariates are coded in the model</h2>
 <p>In addition to the effects of DPS and rear type that are estimated
 via the separate estimation of model parameters for hatchery and wild
 fish from each DPS, four covariates were explicitly included via
@@ -407,7 +410,24 @@ would mostly emerge when fish were nearing natal tributaries. Downstream
 of the DPS, individuals are expected to behave similarly regardless of
 the year, as all fish have natal tributaries that are upstream. Year was
 modeled as a random effect.</p>
+<p><br></p>
 </div>
+</div>
+</div>
+<div id="stan" class="section level1">
+<h1>Stan</h1>
+<p>Each of the six populations (Upper Columbia Wild, Upper Columbia
+Hatchery, Middle Columbia Wild, Middle Columbia Hatchery, Snake River
+Wild, and Snake River Hatchery) were run on KLONE, UW’s HYAK
+supercomputer. The models were run with the following
+specifications:</p>
+<ul>
+<li>4 chains</li>
+<li>2000 warmup iterations</li>
+<li>2000 sampling iterations</li>
+<li>thin = 2 (every other sample was selected, as this improved model
+efficiency when exploring the posterior)</li>
+</ul>
 </div>
 
 

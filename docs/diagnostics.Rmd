@@ -7,12 +7,93 @@ output: html_document
 
 ## Convergence and efficiency
 
+From the [Stan documentation on convergence and efficiency diagnostics for Markov Chains](https://mc-stan.org/rstan/reference/Rhat.html):
+
+> The **Rhat** function produces R-hat convergence diagnostic, which compares the between- and within-chain estimates for model parameters and other univariate quantities of interest. If chains have not mixed well (ie, the between- and within-chain estimates don't agree), R-hat is larger than 1. We recommend running at least four chains by default and only using the sample if R-hat is less than 1.05. Stan reports R-hat which is the maximum of rank normalized split-R-hat and rank normalized folded-split-R-hat, which works for thick tailed distributions and is sensitive also to differences in scale.
+
+> The **ess_bulk** function produces an estimated Bulk Effective Sample Size (bulk-ESS) using rank normalized draws. Bulk-ESS is useful measure for sampling efficiency in the bulk of the distribution (related e.g. to efficiency of mean and median estimates), and is well defined even if the chains do not have finite mean or variance.
+
+> The **ess_tail** function produces an estimated Tail Effective Sample Size (tail-ESS) by computing the minimum of effective sample sizes for 5% and 95% quantiles. Tail-ESS is useful measure for sampling efficiency in the tails of the distribution (related e.g. to efficiency of variance and tail quantile estimates).
+
+> Both bulk-ESS and tail-ESS should be at least 100 (approximately) per Markov Chain in order to be reliable and indicate that estimates of respective posterior quantiles are reliable.
+
+In the plots below, I will show these three diagnostics for the models run for each of our six populations.
+
+<br>
+
+![R-hat statistics. R-hat values should be less than 1.05, and all parameters here have an R-hat of less than 1.01.](site_figures/conv_eff/rhat_comb_plots.png)
+
+<br> 
+
+![Bulk Effective Sample Size (bulk-ESS). bulk-ESS should be at least 100 in order for posteriors to be reliable, but a bulk-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. bulk-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit autocorrelation (bulk-ESS > 4,000).](site_figures/conv_eff/ess_bulk_comb_plots.png)
+
+<br> 
+
+![Tail Effective Sample Size (tail-ESS). tail-ESS should be at least 100 in order for posteriors to be reliable, but a tail-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. tail-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit autocorrelation (tail-ESS > 4,000). ](site_figures/conv_eff/ess_tail_comb_plots.png)
+
+
+<br> 
 
 ## Traceplots
 
+Given that each model is estimating hundreds of parameters, traceplots for all parameters will not be shown here. Instead, traceplots for a few parameters from each model will be shown here.
+
+![Upper Columbia Wild traceplots.](site_figures/traceplots/UCW_traceplots.png)
+
+<br> 
+
+![Upper Columbia Hatchery traceplots.](site_figures/traceplots/UCH_traceplots.png)
+
+<br> 
+
+![Middle Columbia Wild traceplots.](site_figures/traceplots/MCW_traceplots.png)
+
+<br> 
+
+![Middle Columbia Hatchery traceplots.](site_figures/traceplots/MCH_traceplots.png)
+
+<br> 
+
+![Snake River Wild traceplots.](site_figures/traceplots/SRW_traceplots.png)
+
+<br> 
+
+![Snake River Hatchery traceplots.](site_figures/traceplots/SRH_traceplots.png)
+
+<br>
 
 ## Pairs plots
 
+Pairs plots show univariate histograms and bivariate scatter plots for selected parameters, and is especially useful in identifying collinearity between variables (which manifests as narrow bivariate plots) as well as the presence of multiplicative non-identifiabilities (banana-like shapes).
+
+For these pairs plots, I am showing all of the different parameters that exist for a single movement (e.g., the intercept, origin, and temperature parameters that govern the probability of a single movement, such as ascending a specific dam). Again, there are too many movements across the six models to show all of these plots, but I will show examples of potential issues related to collinearity in our predictors. A description of collinearity of predictors in regressions can be found in the [Stan User Guide](https://mc-stan.org/docs/stan-users-guide/collinearity.html).
+
+### Temperature and intercept collinearity
+
+![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/_2_3_pairs_plot.png){width=100%, height=400%}
+
+![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/_2_3_pairs_plot.png){width=100%, height=400%}
+
+For ascents of dams, particularly those that are downstream of natal tributaries, the intercept parameter (*b0*) and the temperature parameter (*btemp1*) that estimates the effect of river temperature during summer/fall (Jun 1 - Dec 31) are highly correlated. Shown above are two pairs plots for the parameters that govern the probability of ascending McNary Dam for Upper Columbia Wild Steelhead and Snake River Hatchery Steelhead. As seen in the plots, *b0* and *btemp1* are strongly negatively correlated, while *b0* and *btemp0* (the effect of river temperature during winter/spring, Jan 1 - May 1) are also negatively correlated. With this negative correlation, 
+
+My understanding of why this is happening is that this upstream movement is the dominant movement out of this state (as all reaching natal tributaries for fish from these DPSs requires ascending McNary Dam), and this upstream movement is also happening when temperatures are highest (in alignment with migration in the late summer/early fall). The negative collinearity arises from the pattern that when the intercept (*b0*) draw is low, the temperature (*btemp1*) draw must be high to explain the high probability of that movement, and vice versa.
+
+Of course, temperature and day of year are also highly correlated, as seen by these plots showing ascents of McNary Dam by day of year and temperature, for Snake River and Upper Columbia Steelhead:
+![Upper Columbia River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/UC_MCN_temp_v_date.png)
+
+![Snake River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/SR_MCN_temp_v_date.png)
 
 
+
+
+
+### Intercept and origin collinearity
+
+
+
+### Intercept and origin collinearity
+
+
+
+The correlation between parameters emphasizes that parameter estimates cannot be interpreted in isolation. Instead, posterior predictive estimates of movements are necessary to interpret the meaning of parameters.
 
