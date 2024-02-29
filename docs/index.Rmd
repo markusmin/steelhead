@@ -1,5 +1,5 @@
 ---
-title: "index"
+title: "Steelhead Movement"
 author: "Markus Min"
 date: "`r Sys.Date()`"
 output: html_document
