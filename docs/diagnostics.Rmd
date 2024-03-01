@@ -74,11 +74,12 @@ For these pairs plots, I am showing all of the different parameters that exist f
 
 ![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/_2_3_pairs_plot.png)
 
-For ascents of dams, particularly those that are downstream of natal tributaries, the intercept parameter (*b0*) and the temperature parameter (*btemp1*) that estimates the effect of river temperature during summer/fall (Jun 1 - Dec 31) are highly correlated. Shown above are two pairs plots for the parameters that govern the probability of ascending McNary Dam for Upper Columbia Wild Steelhead and Snake River Hatchery Steelhead. As seen in the plots, *b0* and *btemp1* are strongly negatively correlated, while *b0* and *btemp0* (the effect of river temperature during winter/spring, Jan 1 - May 1) are also negatively correlated. With this negative correlation, 
+For ascents of dams, particularly those that are downstream of natal tributaries, the intercept parameter (*b0*) and the temperature parameter (*btemp1*) that estimates the effect of river temperature during summer/fall (Jun 1 - Dec 31) are highly correlated. Shown above are two pairs plots for the parameters that govern the probability of ascending McNary Dam for Upper Columbia Wild Steelhead and Snake River Hatchery Steelhead. As seen in the plots, *b0* and *btemp1* are strongly negatively correlated, while *b0* and *btemp0* (the effect of river temperature during winter/spring, Jan 1 - May 1) are also negatively correlated.
 
 My understanding of why this is happening is that this upstream movement is the dominant movement out of this state (as all reaching natal tributaries for fish from these DPSs requires ascending McNary Dam), and this upstream movement is also happening when temperatures are highest (in alignment with migration in the late summer/early fall). The negative collinearity arises from the pattern that when the intercept (*b0*) draw is low, the temperature (*btemp1*) draw must be high to explain the high probability of that movement, and vice versa.
 
 Of course, temperature and day of year are also highly correlated, as seen by these plots showing ascents of McNary Dam by day of year and temperature, for Snake River and Upper Columbia Steelhead:
+
 ![Upper Columbia River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/UC_MCN_temp_v_date.png)
 
 <br>
@@ -112,6 +113,17 @@ I propose that we get rid of the intercept term, and instead have only origin te
 
 ### Intercept and spill collinearity
 
+![Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON).](site_figures/pairs_plots/UCW/_2_1_pairs_plot.png)
+
+<br>
+
+For fallback movements, especially for fallback over BON, the intercept (*b0_matrix_2_1*) and spill window (*bspillwindow_matrix_2_1*) parameters are negatively correlated, with a similar pattern as that seen for the relationship between the *btemp* and *b0* parameters shown above. Note that the estimate of the spill parameter is small, but this is due to the fact that spill is not z-scored like temperature is, because zero values for spill are meaningful - so the actual covariate values are about 100 times larger than the z-scored temperature value. 
+
+
+The same pattern is observed for spill as is observed for temperature: fallback events occur primarily at high spill levels, but also with distinct seasonality (these en-route fallback events are happening primarily when fish have just ascended Bonneville Dam in late summer). The negative collinearity arises from the pattern that when the intercept (*b0*) draw is low, the spill (*bspillwindow*) draw must be high to explain the observed movements, and vice versa.
+
+
+![Upper Columbia River Steelhead fallback events at Bonneville Dam by day of year and spill volume.](site_figures/covariate_plots/BON_spill_transition_plot.png)
 
 
 The correlation between parameters emphasizes that parameter estimates cannot be interpreted in isolation. Instead, posterior predictive estimates of movements are necessary to interpret the meaning of parameters.
