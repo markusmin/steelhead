@@ -70,9 +70,9 @@ For these pairs plots, I am showing all of the different parameters that exist f
 
 ### Temperature and intercept collinearity
 
-![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/_2_3_pairs_plot.png){width=100%, height=400%}
+![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/_2_3_pairs_plot.png)
 
-![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/_2_3_pairs_plot.png){width=100%, height=400%}
+![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/_2_3_pairs_plot.png)
 
 For ascents of dams, particularly those that are downstream of natal tributaries, the intercept parameter (*b0*) and the temperature parameter (*btemp1*) that estimates the effect of river temperature during summer/fall (Jun 1 - Dec 31) are highly correlated. Shown above are two pairs plots for the parameters that govern the probability of ascending McNary Dam for Upper Columbia Wild Steelhead and Snake River Hatchery Steelhead. As seen in the plots, *b0* and *btemp1* are strongly negatively correlated, while *b0* and *btemp0* (the effect of river temperature during winter/spring, Jan 1 - May 1) are also negatively correlated. With this negative correlation, 
 
@@ -81,17 +81,36 @@ My understanding of why this is happening is that this upstream movement is the 
 Of course, temperature and day of year are also highly correlated, as seen by these plots showing ascents of McNary Dam by day of year and temperature, for Snake River and Upper Columbia Steelhead:
 ![Upper Columbia River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/UC_MCN_temp_v_date.png)
 
+<br>
+
 ![Snake River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/SR_MCN_temp_v_date.png)
 
-
-
-
-
-### Intercept and origin collinearity
-
+Interestingly, the parameter estimates for the effect of temperature on ascending McNary Dam (a necessary movement for these fish to reach their natal tributaries) indicate that warmer temperatures actually decrease the probability of making this ascent, therefore making other movements (such as movements into tribuatries like the Deschutes, or into the loss state) more likely in warmer conditions.
 
 
 ### Intercept and origin collinearity
+
+For some movements there is a strong correlation between draws for the intercept term and draws for the origin term. This collinearity actually makes me want to restructure how we incorporate origin effects. To explain, let's look at this pairs plot for Upper Columbia Wild Steelhead (UCW), with the probability of descending Rocky Reach Dam (this is moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE).
+
+![Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE).](site_figures/pairs_plots/UCW/_6_5_pairs_plot.png)
+<br>
+
+For UCW, we have three origins: Wenatchee, Entiat, and Methow. For Wenatchee Steelhead, this movement is beneficial (it represents post-overshoot fallback); for Entiat and Methow, which have origins above RRE, this movement is not desirable. To interpret these origin parameters, I'll remind you of how these are included in the model:
+- Every fish gets an intercept term (this is *b0_matrix_6_5*)
+- Wenatchee fish are origin 1, which means they get *borigin1_matrix_6_5* in addition to the intercept
+- Entiat fish are origin 2, which means they get *borigin2_matrix_6_5* in addition to the intercept
+- Methow fish receive -1 * (*borigin1_matrix_6_5* + *borigin2_matrix_6_5*)
+
+According to where their natal tributaries are, *borigin2_matrix_6_5* should be **negative** for Entiat fish (they don't want to fall back), but should be **positive** for Methow fish (because they also don't want to fall back, but are affected by -1 * *borigin2_matrix_6_5*). This leads to the biologically nonsensical positive estimate for *borigin2_matrix_6_5* seen in the pairs plot as well as the negative correlation between this parameter and *b0_matrix_6_5*, as higher positive values of *borigin2_matrix_6_5* require a more negative value of *b0_matrix_6_5* in order to fit the observed pattern of Entiat River fish not falling back.
+
+I propose that we get rid of the intercept term, and instead have only origin term for each of these natal tributaries, when within DPS boundaries. This would help fix those strange patterns. The new structure would be as such:
+- No intercept term (*b0_matrix_6_5* is eliminated)
+- Wenatchee fish are origin 1, which means they get *borigin1_matrix_6_5*
+- Entiat fish are origin 2, which means they get *borigin2_matrix_6_5*
+- Methow fish are origin 3, which means they get *borigin3_matrix_6_5* (a new parameter)
+
+
+### Intercept and spill collinearity
 
 
 
