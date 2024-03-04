@@ -135,12 +135,12 @@ the following:
 
 ### Temperature and intercept collinearity
 
-![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/_2_3_pairs_plot.png)
+![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/2_3_pairs_plot.png)
 
 <br>
 <br>
 
-![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/_2_3_pairs_plot.png)
+![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/2_3_pairs_plot.png)
 
 <br> 
 <br>
@@ -195,7 +195,7 @@ explain, let's look at this pairs plot for Upper Columbia Wild Steelhead
 moving from state 6, which is RRE to WEL, to state 5, which is RIS to
 RRE).
 
-![Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE).](site_figures/pairs_plots/UCW/_6_5_pairs_plot.png) 
+![Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE).](site_figures/pairs_plots/UCW/6_5_pairs_plot.png) 
 
 <br>
 
