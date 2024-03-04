@@ -538,17 +538,21 @@ as the negative correlation between this parameter and
 River fish not falling back.</p>
 <p>I propose that we get rid of the intercept term, and instead have
 only origin term when within DPS boundaries. This would help fix those
-strange patterns. The new structure would be as such: - No intercept
-term (<em>b0_matrix_6_5</em> is eliminated) - Wenatchee fish are origin
-1, which means they get <em>borigin1_matrix_6_5</em> - Entiat fish are
-origin 2, which means they get <em>borigin2_matrix_6_5</em> - Methow
-fish are origin 3, which means they get <em>borigin3_matrix_6_5</em> (a
-new parameter)</p>
+strange patterns. The new structure would be as such:</p>
+<ul>
+<li>No intercept term (<em>b0_matrix_6_5</em> is eliminated)</li>
+<li>Wenatchee fish are origin 1, which means they get
+<em>borigin1_matrix_6_5</em></li>
+<li>Entiat fish are origin 2, which means they get
+<em>borigin2_matrix_6_5</em></li>
+<li>Methow fish are origin 3, which means they get
+<em>borigin3_matrix_6_5</em> (a new parameter)</li>
+</ul>
 </div>
 <div id="intercept-and-spill-collinearity" class="section level3">
 <h3>Intercept and spill collinearity</h3>
 <div class="float">
-<img src="site_figures/pairs_plots/UCW/_2_1_pairs_plot.png"
+<img src="site_figures/pairs_plots/UCW/2_1_pairs_plot.png"
 alt="Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON)." />
 <div class="figcaption">Upper Columbia Wild Steelhead, falling back over
 Bonneville Dam (moving from state 2, which is BON to MCN, to state 1,

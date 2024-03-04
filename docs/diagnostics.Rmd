@@ -226,6 +226,7 @@ I propose that we get rid of the intercept term, and instead have only
 origin term when within DPS
 boundaries. This would help fix those strange patterns. The new
 structure would be as such: 
+
 - No intercept term (*b0_matrix_6_5* is eliminated) 
 - Wenatchee fish are origin 1, which means they get *borigin1_matrix_6_5* 
 - Entiat fish are origin 2, which means they get *borigin2_matrix_6_5* 
@@ -233,7 +234,7 @@ structure would be as such:
 
 ### Intercept and spill collinearity
 
-![Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON).](site_figures/pairs_plots/UCW/_2_1_pairs_plot.png)
+![Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON).](site_figures/pairs_plots/UCW/2_1_pairs_plot.png)
 
 <br>
 
