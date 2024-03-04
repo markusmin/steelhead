@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-02-29" />
+<meta name="date" content="2024-03-04" />
 
 <title>Model Structure</title>
 
@@ -270,7 +270,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Model Structure</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-02-29</h4>
+<h4 class="date">2024-03-04</h4>
 
 </div>
 
@@ -413,6 +413,201 @@ modeled as a random effect.</p>
 <p><br></p>
 </div>
 </div>
+</div>
+<div id="model-equation" class="section level1">
+<h1>Model equation</h1>
+<p>For each transition of a fish out of a state, there are <span
+class="math inline">\(n\)</span> possible non-loss transitions out of
+the current state, which correspond to the number of arrows out of the
+state as seen in the model structure diagram seen above. The true
+probability (<span class="math inline">\(p_{actual}\)</span>) of moving
+to state <span class="math inline">\(m\)</span> (<span
+class="math inline">\(m\)</span> = 1, …, n) from the current state is
+given as follows:</p>
+<p><br></p>
+<p><span class="math display">\[
+\begin{aligned}
+p_{actual, m} = \frac{exp(b_{0,m} + [covariate\:effects]_{m})}{1 +
+exp(b_{0,1} + [covariate\:effects]_{1}) +
+... exp(b_{0,n} + [covariate\:effects]_{n})}
+\end{aligned}
+\]</span></p>
+<p><br></p>
+<p>In this equation, the parameter <span
+class="math inline">\(b_0\)</span> is the intercept (the grand mean for
+all fish in the DPS), and the term <span
+class="math inline">\([covariate\:effects]\)</span> is a placeholder for
+the different covariates that are included in this model. Specifically,
+the covariates are estimated as follows:</p>
+<p><br></p>
+<ul>
+<li><span class="math inline">\(b_0\)</span> is a fixed effect for the
+grand mean of all fish in the model (i.e., the grand mean for all fish
+of one rear type from one DPS)</li>
+<li><span class="math inline">\(b_{origin}\)</span> is a fixed effect
+for the natal origin</li>
+<li><span class="math inline">\(b_{spill-window}\)</span> is a fixed
+effect for the volume of spill</li>
+<li><span class="math inline">\(b_{spill-days}\)</span> is a fixed
+effect for the days of winter spill</li>
+<li><span class="math inline">\(b_{temp-early}\)</span> is a fixed
+effect for temperature when a movement occurs during the winter and
+spring months (1 Jan - 31 May) for movements outside of a fish’s
+DPS</li>
+<li><span class="math inline">\(b_{temp-late}\)</span> is a fixed effect
+for temperature when a movement occurs during the summer and fall months
+(1 June - 31 December) for movements outside of a fish’s DPS</li>
+<li><span class="math inline">\(b_{origin,temp-early}\)</span> is a
+fixed effect for temperature for that specific origin when a movement
+occurs during the winter and spring months (1 Jan - 31 May) for
+movements inside a fish’s DPS</li>
+<li><span class="math inline">\(b_{origin,temp-late}\)</span> is a fixed
+effect for temperature for that specific origin when a movement occurs
+during the summer and fall months (1 June - 31 December) for movements
+inside a fish’s DPS</li>
+<li><span class="math inline">\(b_{origin,year}\)</span> is a random
+effect of year for that specific origin. Random effects were assumed to
+be distributed normally, with a mean of zero and a standard deviation
+estimated in the model</li>
+</ul>
+<p>All fixed effects were estimated using a diffuse normal prior with a
+mean of 0 and a standard deviation of 5, and random effects were
+estimated using a diffuse Cauchy prior (location of 0 and scale of 1) on
+the standard deviation.</p>
+<p>As stated earlier, the covariate effects included vary depending on
+the type of movement and its relation to the fish’s natal origin. To
+provide an example of the variable nature of which covariates to
+include, for the probability of a Wenatchee River fish falling back over
+Rocky Reach Dam, the covariate effects term in the numerator would be as
+follows:</p>
+<p><br></p>
+<p><span class="math display">\[
+b_{origin,1} + b_{spill-window,1} * spillvolume +  b_{spill-days,1} *
+spilldays + b_{origin,year,1}
+\]</span></p>
+<p><br></p>
+<p>This is because the movement is:</p>
+<ul>
+<li>inside the Upper Columbia DPS boundaries, so there is an effect of
+origin</li>
+<li>a fallback movement over a dam, so there is an effect of the volume
+of spill</li>
+<li>a post-overshoot fallback movement over a dam (because Rocky Reach
+Dam is upstream of the Wenatchee River), so there is an effect of the
+days of spill during the winter months</li>
+<li>inside the Upper Columbia DPS boundaries, so there is an effect of
+year</li>
+<li>not an upstream movement, so there is no effect of temperature</li>
+</ul>
+<p><br></p>
+<p>Once the probabilities of entering any non-loss states have been
+estimated, the loss term is given by the following equation: <span
+class="math display">\[
+p_{actual,loss} = 1 - \sum_{m=1}^{n} p_{actual,m}
+\]</span></p>
+<p><br></p>
+<p>This generates a vector of probabilities, corresponding to the true
+movement probability from the current state to each of the connecting
+states. However, because perceived movement is a product of both the
+true movement and the detection probability of various PIT tag arrays,
+we must correct for this detection probability to separate our process
+of interest (the true movement probabilities, <span
+class="math inline">\(p_{actual}\)</span>) from the observation process
+(the detection probability, <span
+class="math inline">\(p_{detection}\)</span>). The product of <span
+class="math inline">\(p_{actual}\)</span> and <span
+class="math inline">\(p_{detection}\)</span> is <span
+class="math inline">\(p_{observed}\)</span>, which is used to evaluate
+the likelihood of the observed PIT tag data. We only estimate <span
+class="math inline">\(p_{detection}\)</span> for tributaries in our
+model; <span class="math inline">\(p_{detection}\)</span> in adult fish
+ladders is assumed to be one, with any known missed detections
+interpolated (see section 3.3.3), and there is no way to estimate <span
+class="math inline">\(p_{detection}\)</span> in downstream mainstem
+passage routes. The consequence of an inability to estimate <span
+class="math inline">\(p_{detection}\)</span> in downstream mainstem
+passage routes is that this is assumed to be 100%. The consequence of
+this is that if there is a missed detection and that fish is not later
+seen (therefore, the missed detection cannot be interpolated), the
+downstream movement probability will be biased low, and the loss
+probability will be biased high.</p>
+<p><br></p>
+<p>Once we have estimated <span
+class="math inline">\(p_{actual}\)</span>, the detection efficiency
+correction is implemented for all transitions for which we can calculate
+a detection efficiency, to generate <span
+class="math inline">\(p_{observed}\)</span>. Given that for almost every
+tributary, detection efficiency could not be calculated for every year,
+the first step was to identify which tributaries that connect to a
+mainstem state had the ability to estimate detection efficiency in the
+year in which the transition occurred. For each of the transitions for
+which a detection efficiency could then be estimated, the following
+correction was made:</p>
+<p><br></p>
+<p>First, the detection efficiency of that tributary in that year (<span
+class="math inline">\(t\)</span>) with that year’s mean discharge was
+modeled, using the parameter values that were estimated in the model
+described in 3.5.1 as priors for the same parameters in this model:</p>
+<p><br></p>
+<p><span class="math display">\[
+p_{detection,j,t} = exp(\alpha_{j, k}  +  \beta_{j}  discharge_{j,t})/(1
++ exp(\alpha_{j, k}  +  \beta_{j}  discharge_{j,t}))
+\]</span></p>
+<p><br></p>
+<p>Next, the probability of the corresponding transition in the vector
+of observed transitions was adjusted: <span class="math display">\[
+p_{observed,j,t} = p_{actual,j} * p_{detection,j,t}
+\]</span></p>
+<p><br></p>
+<p>Since any transitions that were unobserved but occurred would appear
+as fish moving to the absorbing loss state, this movement probability
+was also adjusted accordingly for each of the <span
+class="math inline">\(n\)</span> tributaries that connect to that
+mainstem state: <span class="math display">\[
+p_{observed,loss} = p_{actual, loss} + \sum_{j=1}^{n} p_{actual,j} * (1
+- p_{detection,j,t})
+\]</span></p>
+<p><br></p>
+<p>With the vector of observed transition probabilities generated, the
+likelihood of observing the next movement (<span
+class="math inline">\(x\)</span>) of fish <span
+class="math inline">\(z_i\)</span> was defined as follows:</p>
+<p><br></p>
+<p><span class="math display">\[
+z_{i,x} \sim \text{categorical}(p_{observed,i,1}, p_{observed,i,2},
+p_{observed,i,3} ... p_{observed,i,n}, p_{observed,i,loss})
+\]</span></p>
+<p><br></p>
+<p>Formally, the likelihood is evaluated as follows: <span
+class="math display">\[
+f(x | \mathbf{p}) = \prod_{m=1}^{n} p_{m}^{x_m}
+\]</span> In this likelihood, <span
+class="math inline">\(\mathbf{p}\)</span> is the vector of observed
+probabilities and <span class="math inline">\(n\)</span> is the possible
+movements out of that state.</p>
+<p><br></p>
+<p>In these equations, <span
+class="math inline">\(p_{detection}\)</span> is the conditional
+probability of detection, <span
+class="math inline">\(p_{actual}\)</span> is the vector which contains
+the true movement probabilities, <span
+class="math inline">\(p_{observed}\)</span> is the vector which contains
+the observed movement probabilities, <span
+class="math inline">\(\alpha\)</span> is the categorical covariate for
+site configuration, <span class="math inline">\(\beta\)</span> is the
+slope for the effect of discharge on the probability of detection
+efficiency, and <span class="math inline">\(z_{i,x}\)</span> is the next
+observation of the fish. The indices represent the following:</p>
+<ul>
+<li><span class="math inline">\(i\)</span> is the fish</li>
+<li><span class="math inline">\(x\)</span> is the observation of fish
+<span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(m\)</span> is the state</li>
+<li><span class="math inline">\(j\)</span> is the tributary</li>
+<li><span class="math inline">\(k\)</span> is the site configuration (a
+categorical variable)</li>
+<li><span class="math inline">\(t\)</span> is the run year</li>
+</ul>
 </div>
 <div id="stan" class="section level1">
 <h1>Stan</h1>

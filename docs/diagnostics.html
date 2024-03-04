@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-03-01" />
+<meta name="date" content="2024-03-04" />
 
 <title>Diagnostics</title>
 
@@ -270,11 +270,15 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Diagnostics</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-03-01</h4>
+<h4 class="date">2024-03-04</h4>
 
 </div>
 
 
+<p>Here I show three diagnostics: <a
+href="#convergence-and-efficiency">Convergence and efficiency</a>, <a
+href="#traceplots">Traceplots</a>, and <a href="#pairs-plots">Pairs
+plots</a>.</p>
 <div id="convergence-and-efficiency" class="section level2">
 <h2>Convergence and efficiency</h2>
 <p>From the <a href="https://mc-stan.org/rstan/reference/Rhat.html">Stan
@@ -324,26 +328,28 @@ than 1.05, and all parameters here have an R-hat of less than
 <p><br></p>
 <div class="float">
 <img src="site_figures/conv_eff/ess_bulk_comb_plots.png"
-alt="Bulk Effective Sample Size (bulk-ESS). bulk-ESS should be at least 100 in order for posteriors to be reliable, but a bulk-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. bulk-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit autocorrelation (bulk-ESS &gt; 4,000)." />
+alt="Bulk Effective Sample Size (bulk-ESS). bulk-ESS should be at least 100 in order for posteriors to be reliable, but a bulk-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. bulk-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit a slight degree of anticorrelation (bulk-ESS &gt; 4,000)." />
 <div class="figcaption">Bulk Effective Sample Size (bulk-ESS). bulk-ESS
 should be at least 100 in order for posteriors to be reliable, but a
 bulk-ESS greater than the number of draws (which in this case is 4
 chains x 1000 iter) indicates anticorrelation between draws, which
 reduces the reliability of the variance estimate. bulk-ESS indicates
 that all parameters have a sufficient sample size, but a handful of
-parameters exhibit autocorrelation (bulk-ESS &gt; 4,000).</div>
+parameters exhibit a slight degree of anticorrelation (bulk-ESS &gt;
+4,000).</div>
 </div>
 <p><br></p>
 <div class="float">
 <img src="site_figures/conv_eff/ess_tail_comb_plots.png"
-alt="Tail Effective Sample Size (tail-ESS). tail-ESS should be at least 100 in order for posteriors to be reliable, but a tail-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. tail-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit autocorrelation (tail-ESS &gt; 4,000)." />
+alt="Tail Effective Sample Size (tail-ESS). tail-ESS should be at least 100 in order for posteriors to be reliable, but a tail-ESS greater than the number of draws (which in this case is 4 chains x 1000 iter) indicates anticorrelation between draws, which reduces the reliability of the variance estimate. tail-ESS indicates that all parameters have a sufficient sample size, but a handful of parameters exhibit a slight degree of anticorrelation (tail-ESS &gt; 4,000)." />
 <div class="figcaption">Tail Effective Sample Size (tail-ESS). tail-ESS
 should be at least 100 in order for posteriors to be reliable, but a
 tail-ESS greater than the number of draws (which in this case is 4
 chains x 1000 iter) indicates anticorrelation between draws, which
 reduces the reliability of the variance estimate. tail-ESS indicates
 that all parameters have a sufficient sample size, but a handful of
-parameters exhibit autocorrelation (tail-ESS &gt; 4,000).</div>
+parameters exhibit a slight degree of anticorrelation (tail-ESS &gt;
+4,000).</div>
 </div>
 <p><br></p>
 </div>
@@ -392,7 +398,7 @@ alt="Snake River Hatchery traceplots." />
 <div id="pairs-plots" class="section level2">
 <h2>Pairs plots</h2>
 <p>Pairs plots show univariate histograms and bivariate scatter plots
-for selected parameters, and is especially useful in identifying
+for selected parameters, and are especially useful for identifying
 collinearity between variables (which manifests as narrow bivariate
 plots) as well as the presence of multiplicative non-identifiabilities
 (banana-like shapes).</p>
@@ -406,6 +412,21 @@ A description of collinearity of predictors in regressions can be found
 in the <a
 href="https://mc-stan.org/docs/stan-users-guide/collinearity.html">Stan
 User Guide</a>.</p>
+<p>The three potential issues that I observe related to collinearity are
+the following:</p>
+<ol style="list-style-type: decimal">
+<li>Collinearity between temperature and intercept parameters, for
+ascending mainstem dams: <a
+href="#temperature-and-intercept-collinearity">Temperature and intercept
+collinearity</a></li>
+<li>Collinearity between intercept and origin parameters: <a
+href="#intercept-and-origin-collinearity">Intercept and origin
+collinearity</a></li>
+<li>Collinearity between intercept and spill parameters, for en-route
+fallback:<a href="#intercept-and-spill-collinearity">Intercept and spill
+collinearity</a></li>
+</ol>
+<p><br></p>
 <div id="temperature-and-intercept-collinearity" class="section level3">
 <h3>Temperature and intercept collinearity</h3>
 <div class="float">
@@ -415,6 +436,7 @@ alt="Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, B
 Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or
 ICH).</div>
 </div>
+<p><br> <br></p>
 <div class="float">
 <img src="site_figures/pairs_plots/SRH/_2_3_pairs_plot.png"
 alt="Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH)." />
@@ -422,30 +444,38 @@ alt="Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, 
 Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or
 ICH).</div>
 </div>
+<p><br> <br></p>
 <p>For ascents of dams, particularly those that are downstream of natal
 tributaries, the intercept parameter (<em>b0</em>) and the temperature
 parameter (<em>btemp1</em>) that estimates the effect of river
-temperature during summer/fall (Jun 1 - Dec 31) are highly correlated.
-Shown above are two pairs plots for the parameters that govern the
-probability of ascending McNary Dam for Upper Columbia Wild Steelhead
-and Snake River Hatchery Steelhead. As seen in the plots, <em>b0</em>
-and <em>btemp1</em> are strongly negatively correlated, while
-<em>b0</em> and <em>btemp0</em> (the effect of river temperature during
-winter/spring, Jan 1 - May 1) are also negatively correlated.</p>
+temperature during summer/fall (Jun 1 - Dec 31) are highly negatively
+correlated. Shown above are two pairs plots for the parameters that
+govern the probability of ascending McNary Dam for Upper Columbia Wild
+Steelhead and Snake River Hatchery Steelhead. As seen in the plots,
+<em>b0</em> and <em>btemp1</em> are strongly negatively correlated,
+while <em>b0</em> and <em>btemp0</em> (the effect of river temperature
+during winter/spring, Jan 1 - May 1) are also negatively correlated.</p>
 <p>My understanding of why this is happening is that this upstream
-movement is the dominant movement out of this state (as all reaching
-natal tributaries for fish from these DPSs requires ascending McNary
-Dam), and this upstream movement is also happening when temperatures are
+movement is the dominant movement out of this state (as reaching natal
+tributaries for all fish from these DPSs requires ascending McNary Dam),
+and this upstream movement is also happening when temperatures are
 highest (in alignment with migration in the late summer/early fall). The
 negative collinearity arises from the pattern that when the intercept
 (<em>b0</em>) draw is low, the temperature (<em>btemp1</em>) draw must
 be high to explain the high probability of that movement, and vice
 versa.</p>
-<p>Of course, temperature and day of year are also highly correlated, as
-seen by these plots showing ascents of McNary Dam by day of year and
-temperature, for Snake River and Upper Columbia Steelhead:</p>
+<p>Interestingly, the parameter estimates for the effect of temperature
+on ascending McNary Dam (a necessary movement for these fish to reach
+their natal tributaries) indicate that warmer temperatures actually
+decrease the probability of making this ascent, therefore making other
+movements (such as movements into tribuatries like the Deschutes, or
+into the loss state) more likely in warmer conditions.</p>
+<p>Of course, temperature and day of year are strongly linked, as seen
+by these plots showing counts of ascents of McNary Dam by day of year
+and temperature, for Upper Columbia and Snake River Steelhead:</p>
 <div class="float">
 <img src="site_figures/covariate_plots/UC_MCN_temp_v_date.png"
+style="width:50.0%"
 alt="Upper Columbia River Steelhead ascents at McNary Dam by day of year and temperature." />
 <div class="figcaption">Upper Columbia River Steelhead ascents at McNary
 Dam by day of year and temperature.</div>
@@ -453,16 +483,12 @@ Dam by day of year and temperature.</div>
 <p><br></p>
 <div class="float">
 <img src="site_figures/covariate_plots/SR_MCN_temp_v_date.png"
+style="width:50.0%"
 alt="Snake River Steelhead ascents at McNary Dam by day of year and temperature." />
 <div class="figcaption">Snake River Steelhead ascents at McNary Dam by
 day of year and temperature.</div>
 </div>
-<p>Interestingly, the parameter estimates for the effect of temperature
-on ascending McNary Dam (a necessary movement for these fish to reach
-their natal tributaries) indicate that warmer temperatures actually
-decrease the probability of making this ascent, therefore making other
-movements (such as movements into tribuatries like the Deschutes, or
-into the loss state) more likely in warmer conditions.</p>
+<p><br> <br></p>
 </div>
 <div id="intercept-and-origin-collinearity" class="section level3">
 <h3>Intercept and origin collinearity</h3>
@@ -477,35 +503,42 @@ RIS to RRE).</p>
 alt="Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE)." />
 <br></p>
 <p>For UCW, we have three origins: Wenatchee, Entiat, and Methow. For
-Wenatchee Steelhead, this movement is beneficial (it represents
-post-overshoot fallback); for Entiat and Methow, which have origins
-above RRE, this movement is not desirable. To interpret these origin
-parameters, I’ll remind you of how these are included in the model: -
-Every fish gets an intercept term (this is <em>b0_matrix_6_5</em>) -
-Wenatchee fish are origin 1, which means they get
-<em>borigin1_matrix_6_5</em> in addition to the intercept - Entiat fish
-are origin 2, which means they get <em>borigin2_matrix_6_5</em> in
-addition to the intercept - Methow fish receive -1 *
-(<em>borigin1_matrix_6_5</em> + <em>borigin2_matrix_6_5</em>)</p>
+Wenatchee Steelhead, this movement (falling back over Rocky Reach Dam)
+is beneficial (it represents post-overshoot fallback); for Entiat and
+Methow, which have origins above RRE, this movement is not desirable. To
+interpret these origin parameters, a reminder of how these are included
+in the model:</p>
+<ul>
+<li>Every fish gets an intercept term (this is
+<em>b0_matrix_6_5</em>)</li>
+<li>Wenatchee fish are origin 1, which means they get
+<em>borigin1_matrix_6_5</em> in addition to the intercept</li>
+<li>Entiat fish are origin 2, which means they get
+<em>borigin2_matrix_6_5</em> in addition to the intercept</li>
+<li>Methow fish receive -1 * (<em>borigin1_matrix_6_5</em> +
+<em>borigin2_matrix_6_5</em>)</li>
+</ul>
 <p>According to where their natal tributaries are,
 <em>borigin2_matrix_6_5</em> should be <strong>negative</strong> for
 Entiat fish (they don’t want to fall back), but should be
 <strong>positive</strong> for Methow fish (because they also don’t want
 to fall back, but are affected by -1 * <em>borigin2_matrix_6_5</em>).
 This leads to the biologically nonsensical positive estimate for
-<em>borigin2_matrix_6_5</em> seen in the pairs plot as well as the
-negative correlation between this parameter and <em>b0_matrix_6_5</em>,
-as higher positive values of <em>borigin2_matrix_6_5</em> require a more
-negative value of <em>b0_matrix_6_5</em> in order to fit the observed
-pattern of Entiat River fish not falling back.</p>
+<em>borigin2_matrix_6_5</em> that would imply that Entiat fish want to
+fall back over Rocky Reach (they dont’t) seen in the pairs plot as well
+as the negative correlation between this parameter and
+<em>b0_matrix_6_5</em>, as higher positive values of
+<em>borigin2_matrix_6_5</em> require a more negative value of
+<em>b0_matrix_6_5</em> in order to fit the observed pattern of Entiat
+River fish not falling back.</p>
 <p>I propose that we get rid of the intercept term, and instead have
-only origin term for each of these natal tributaries, when within DPS
-boundaries. This would help fix those strange patterns. The new
-structure would be as such: - No intercept term (<em>b0_matrix_6_5</em>
-is eliminated) - Wenatchee fish are origin 1, which means they get
-<em>borigin1_matrix_6_5</em> - Entiat fish are origin 2, which means
-they get <em>borigin2_matrix_6_5</em> - Methow fish are origin 3, which
-means they get <em>borigin3_matrix_6_5</em> (a new parameter)</p>
+only origin term when within DPS boundaries. This would help fix those
+strange patterns. The new structure would be as such: - No intercept
+term (<em>b0_matrix_6_5</em> is eliminated) - Wenatchee fish are origin
+1, which means they get <em>borigin1_matrix_6_5</em> - Entiat fish are
+origin 2, which means they get <em>borigin2_matrix_6_5</em> - Methow
+fish are origin 3, which means they get <em>borigin3_matrix_6_5</em> (a
+new parameter)</p>
 </div>
 <div id="intercept-and-spill-collinearity" class="section level3">
 <h3>Intercept and spill collinearity</h3>
@@ -524,8 +557,9 @@ with a similar pattern as that seen for the relationship between the
 <em>btemp</em> and <em>b0</em> parameters shown above. Note that the
 estimate of the spill parameter is small, but this is due to the fact
 that spill is not z-scored like temperature is, because zero values for
-spill are meaningful - so the actual covariate values are about 100
-times larger than the z-scored temperature value.</p>
+spill are meaningful - so the covariate values that are being multiplied
+by the <em>bspill</em> parameters are about 100 times larger than the
+z-scored temperature value.</p>
 <p>The same pattern is observed for spill as is observed for
 temperature: fallback events occur primarily at high spill levels, but
 also with distinct seasonality (these en-route fallback events are
@@ -535,14 +569,27 @@ intercept (<em>b0</em>) draw is low, the spill (<em>bspillwindow</em>)
 draw must be high to explain the observed movements, and vice versa.</p>
 <div class="float">
 <img src="site_figures/covariate_plots/BON_spill_transition_plot.png"
+style="width:50.0%"
 alt="Upper Columbia River Steelhead fallback events at Bonneville Dam by day of year and spill volume." />
 <div class="figcaption">Upper Columbia River Steelhead fallback events
 at Bonneville Dam by day of year and spill volume.</div>
 </div>
-<p>The correlation between parameters emphasizes that parameter
-estimates cannot be interpreted in isolation. Instead, posterior
-predictive estimates of movements are necessary to interpret the meaning
-of parameters.</p>
+<p><br> <br></p>
+<div id="pairs-plots-conclusions" class="section level5">
+<h5>Pairs plots conclusions</h5>
+<p>The correlation between temperature + intercept and spill + intercept
+don’t really concern me too much - the posteriors seem to be properly
+behaved. They just need to be interpreted as representing seasonality as
+much as they are representing the covariates themselves. The origin
+vs. intercept correlation and the estimates of some origin parameters
+indicates that the origin effects in the model should be restructured,
+as the parameter estimates don’t make sense according to the biology of
+the populations.</p>
+<p>Big picture: The correlation between parameters emphasizes that
+parameter estimates cannot be interpreted in isolation. Instead,
+posterior predictive estimates of movements are necessary to interpret
+the meaning of parameters.</p>
+</div>
 </div>
 </div>
 
