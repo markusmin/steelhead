@@ -8,3 +8,55 @@ output: html_document
 ## Description
 
 This page will contain information on the model results for the version of the model described in the model structure section.
+
+As of right now, all figures shown below are preliminary versions (or only descriptions) of possible figures for the paper.
+
+# Figures
+
+### Figure 1: Hatchery vs. wild (natural) origin movement probabilities for key movements, such as overshoot (intercept + origin)
+
+Comparing estimates for key parameters is one way to visualize this. However, comparing parameter estimates on their own is not the full picture, as seen by the collinearity between parameters that can be seen on the diagnostics tab. Here is an example:
+
+
+![Comparison of the intercept term for ascending Priest Rapids Dam for hatchery and wild Upper Columbia Steelhead. The width of the posteriors are governed by the different sample sizes, with there being far more hatchery than wild fish for this DPS.](site_figures/posterior_comparison_plots/b0_matrix_3_4_comp_plot.png)
+
+<br>
+
+### Figure 2: The effect of temperature (summer and winter)
+This might be a bit more tricky than spill because there are two temperature covariates, and there are origin-specific effects
+
+<br>
+
+### Figure 3: The effect of spill (volume)
+Note that spill is conveniently shared between DPSs
+
+<br>
+
+### Figure 4: The effect of spill (window)
+
+<br>
+
+# Supplementary materials
+
+<br>
+
+### Table S1: Tributary PIT tag antenna configurations
+
+<br>
+
+### Figure S1: Estimated PIT tag detection efficiency
+
+<br>
+
+
+### Table S2: Overshoot frequency
+
+<br>
+
+
+### Table S3: Fallback frequency
+
+<br>
+
+
+### Table S4: Combination of intercept + origin parameters for movement probabilities per origin; note that this table was 50 pages long in the CBR report
