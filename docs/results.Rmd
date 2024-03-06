@@ -2,7 +2,11 @@
 title: "Model Results"
 author: "Markus Min"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ## Description
@@ -17,8 +21,7 @@ As of right now, all figures shown below are preliminary versions (or only descr
 
 Comparing estimates for key parameters is one way to visualize this. However, comparing parameter estimates on their own is not the full picture, as seen by the collinearity between parameters that can be seen on the diagnostics tab. Here is an example:
 
-
-![Comparison of the intercept term for ascending Priest Rapids Dam for hatchery and wild Upper Columbia Steelhead. The width of the posteriors are governed by the different sample sizes, with there being far more hatchery than wild fish for this DPS.](site_figures/posterior_comparison_plots/b0_matrix_3_4_comp_plot.png)
+![Comparison of the intercept term for ascending Priest Rapids Dam for hatchery and wild Upper Columbia Steelhead. The width of the posteriors are governed by the different sample sizes, with there being far more hatchery than wild fish for this DPS.](site_figures/posterior_comparison_plots/b0_matrix_3_4_comp_plot.png){width=50%}
 
 <br>
 

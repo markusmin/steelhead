@@ -9,3 +9,12 @@ output: html_document
 
 This website contains the most up-to-date information on the model structure, diagnostics, and results for the movement model for the adult migration for Steelhead in the Columbia River Basin.
 
+
+### Design of this website
+
+The content of this website is currently divided into three sections:
+
+1. Structure: This tab contains information on how the model is set up, how covariates are included, the model equations, and how the model was implemented in Stan.
+2. Diagnostics: This tab contains various diagnostics, including r-hat and effective sample size statistics, traceplots, and pairs plots.
+3. Results: This contains preliminary results from the current version of the model.
+

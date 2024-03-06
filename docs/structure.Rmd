@@ -2,7 +2,11 @@
 title: "Model Structure"
 author: "Markus Min"
 date: '`r Sys.Date()`'
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ![States in the model](site_figures/full_model_diagram.png)
