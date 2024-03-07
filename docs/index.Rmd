@@ -2,12 +2,13 @@
 title: "Steelhead Movement"
 author: "Markus Min"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document
 ---
 
 ## Analysis updates for Columbia Basin Steelhead modeling project
 
-This website contains the most up-to-date information on the model structure, diagnostics, and results for the movement model for the adult migration for Steelhead in the Columbia River Basin.
+This website contains the most up-to-date information on the model structure, diagnostics, and results for the movement model for the adult migration of Steelhead in the Columbia River Basin.
 
 
 ### Design of this website
