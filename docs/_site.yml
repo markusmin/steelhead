@@ -11,6 +11,8 @@ navbar:
       href: diagnostics.html      
     - text: "Results"
       href: results.html    
+    - text: "New model"
+      href: restructured_origin_effects.html    
 output:
   html_document:
     theme: flatly

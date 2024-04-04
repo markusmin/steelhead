@@ -1,0 +1,20 @@
+---
+title: "Restructured origin effects"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+This page describes the version of the model that is currently in development. While the model code has been written, I have not yet been able to run the model for all populations due to maintenance with UW's Hyak supercomputer.
+
+As explained in the Diagnostics tab, I am currently restructuring how origin and intercept terms are handled in the model to try to resolve some of the nonsensical origin estimates, and code the model so that it more directly tests our hypothesis that fish of different natal origins have different movement probabilities as they near natal origin. The changes that are being made in this model are the following:
+
+1. Within DPS boundaries, the intercept term is eliminated. This makes it so that fish of one population (DPS x rear type) share movement probabilities when outside the boundaries of their DPS, but do not share common movement probabilities within their DPS.
+2. Within DPS boundaries, each natal origin receives an origin effect that functions as its intercept term.
+
+Thus far, I have only been able to view results for the Upper Columbia Wild population, so I will be presenting those below.
