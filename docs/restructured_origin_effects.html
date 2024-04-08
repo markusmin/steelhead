@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-04-06" />
+<meta name="date" content="2024-04-08" />
 
 <title>Restructured origin effects</title>
 
@@ -349,7 +349,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Restructured origin effects</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-04-06</h4>
+<h4 class="date">2024-04-08</h4>
 
 </div>
 
@@ -369,15 +369,16 @@ completed sometime mid-April.</p>
 origin and intercept terms are handled in the model to try to resolve
 some of the nonsensical origin estimates, and code the model so that it
 more directly tests our hypothesis that fish of different natal origins
-have different movement probabilities as they near natal origin. The
-changes that are being made in this model are the following:</p>
+have different movement probabilities as they near their natal origins.
+The changes that are being made in this model are the following:</p>
 <ol style="list-style-type: decimal">
-<li>Within DPS boundaries, the intercept term is eliminated. This makes
-it so that fish of one population (DPS x rear type) share movement
-probabilities when outside the boundaries of their DPS, but do not share
-common movement probabilities within their DPS.</li>
-<li>Within DPS boundaries, each natal origin receives an origin effect
-that functions as its intercept term.</li>
+<li>When a fish enters the boundaries of its DPS, the intercept term is
+eliminated. This makes it so that fish of one population (DPS x rear
+type) share movement probabilities when outside the boundaries of their
+DPS, but do not share common movement probabilities within their
+DPS.</li>
+<li>Within DPS boundaries, fish of each natal origin receive an origin
+effect that functions as an intercept term.</li>
 </ol>
 </div>
 <div id="upper-columbia-wild-diagnostic-statistics"
@@ -392,12 +393,13 @@ post-thin sampling iterations x 4 chains).</p>
 <div class="float">
 <img
 src="site_figures/restructured_origin_effects/conv_eff/UCW_restructured_rhat_plot.png"
-alt="R-hat statistics. R-hat values should be less than 1.05, and all parameters here have an R-hat of less than 1.015. This is slightly worse than the old model, but overall not cause for concern." />
+alt="R-hat statistics. R-hat values should be less than 1.05, and all parameters here have an R-hat of less than 1.015. This is slightly worse than the old model, but no cause for concern." />
 <div class="figcaption">R-hat statistics. R-hat values should be less
 than 1.05, and all parameters here have an R-hat of less than 1.015.
-This is slightly worse than the old model, but overall not cause for
+This is slightly worse than the old model, but no cause for
 concern.</div>
 </div>
+<p><br> <br></p>
 </div>
 <div id="effective-sample-size" class="section level4">
 <h4>Effective Sample Size</h4>
@@ -414,7 +416,7 @@ that all parameters have a sufficient sample size, but a handful of
 parameters exhibit a slight degree of anticorrelation (bulk-ESS &gt;
 2,000). This distribution is very similar to the old model.</div>
 </div>
-<p><br></p>
+<p><br> <br></p>
 <div class="float">
 <img
 src="site_figures/restructured_origin_effects/conv_eff/UCW_restructured_ess_tail_plot.png"
@@ -428,6 +430,7 @@ that all parameters have a sufficient sample size, and no parameters
 exhibit anticorrelation (tail-ESS &lt; 2,000 for all parameters). This
 distribution is again quite similar to the old model.</div>
 </div>
+<p><br> <br></p>
 </div>
 <div id="pairs-plots-intercept-and-origin-collinearity"
 class="section level4">
@@ -437,7 +440,7 @@ origin effects, I will present the same pairs plots as were shown for
 the last model.</p>
 <div class="float">
 <img
-src="site_figures/restructured_origin_effects/pairs_plots/UCW_v2/_6_5_v2_pairs_plot.png"
+src="site_figures/restructured_origin_effects/pairs_plots/UCW_v2/6_5_v2_pairs_plot.png"
 alt="Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE)." />
 <div class="figcaption">Upper Columbia Wild Steelhead, descending Rocky
 Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which
@@ -466,15 +469,87 @@ parameter is strongly negative, as Methow River fish need to ascend
 another dam, and therefore have a very low probability of falling back
 over RRE.</p>
 </div>
+<div id="pairs-plots-intercept-spill-intercept-temperature-collinearity"
+class="section level4">
+<h4>Pairs plots: Intercept + spill / Intercept + temperature
+collinearity</h4>
+<p>For the sake of consistency, below are the two pairs plots that I
+show on the Diagnostics tab (which has the old model results). These
+look basically exactly the same, which is to be expected given that
+these movements are occuring downstream of the DPS and therefore aren’t
+affected by the restructuring of origin effects.</p>
+<div class="float">
+<img
+src="site_figures/restructured_origin_effects/pairs_plots/UCW_v2/2_1_v2_pairs_plot.png"
+alt="Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON)." />
+<div class="figcaption">Upper Columbia Wild Steelhead, falling back over
+Bonneville Dam (moving from state 2, which is BON to MCN, to state 1,
+which is mouth to BON).</div>
 </div>
-<div id="upper-columbia-wild-summary-of-comparison-with-old-model"
-class="section level2">
-<h2>Upper Columbia Wild: Summary of comparison with old model</h2>
+<div class="float">
+<img
+src="site_figures/restructured_origin_effects/pairs_plots/UCW_v2/2_3_v2_pairs_plot.png"
+alt="Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH)." />
+<div class="figcaption">Upper Columbia Wild Steelhead, ascending McNary
+Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or
+ICH).</div>
+</div>
+<p><br> <br></p>
+</div>
+<div id="traceplots" class="section level4">
+<h4>Traceplots</h4>
+<p>Here I plotted traceplots for the two origin effects in the
+restructured model that had the worst ESS.</p>
+<div class="float">
+<img
+src="site_figures/restructured_origin_effects/traceplots/UCW_v2_traceplots.png"
+alt="Traceplots, for borigin2_matrix_4_5 and borigin1_matrix_5_6 in the restructured model." />
+<div class="figcaption">Traceplots, for borigin2_matrix_4_5 and
+borigin1_matrix_5_6 in the restructured model.</div>
+</div>
+<p><br> <br></p>
+<p>And here, the traceplots for those same two origin effects in the old
+model:</p>
+<p><img
+src="site_figures/restructured_origin_effects/traceplots/UCW_traceplots_forcomp.png"
+alt="Traceplots, for borigin2_matrix_4_5 and borigin1_matrix_5_6 in the old model." />
+<br> <br></p>
+<p>The new traceplots are a bit worse, with some autocorrelated runs,
+especially in chain 1. However, the longer chains in the old model are
+also making those traceplots look a bit better because they’re more
+squished.</p>
+<p><br></p>
+</div>
+<div id="other-thoughts" class="section level3">
+<h3>Other thoughts</h3>
+<p>As seen in the pairs plots above, we are now getting more
+biologically sensible (and easier to interpret) estimates of origin
+effects.</p>
+<p>One consequence of the new structure for for the
+performance/diagnostics of the model is that there are now less data
+points for each of the origin effects. Previously, each origin parameter
+was influenced by fish of two origins: origin1 was influenced by
+Wenatchee (+) and Methow (-), and origin2 was influenced by Entiat (+)
+and Methow (-). Now, origin1 is influenced by Wenatchee fish only,
+origin2 is influenced by Entiat fish only, and origin3 is influenced by
+Methow fish only. This has the consequence of basically cutting in half
+the number of data points for each of these terms. As a reminder, these
+are the sample sizes we have for these three populations:</p>
+<ul>
+<li>Wenatchee (Wild): 406</li>
+<li>Entiat (Wild): 499</li>
+<li>Methow (Wild): 358</li>
+</ul>
+<p>This may be one reason for the slightly worse diagnostics.</p>
+<p>Conclusions:</p>
 <ul>
 <li>More plausible origin effects</li>
 <li>Slightly worse diagnostic statistics, but nothing that compromises
 the reliability of model estimates</li>
+<li>Plan to move ahead with this version of the model, and run for all
+populations</li>
 </ul>
+</div>
 </div>
 
 
