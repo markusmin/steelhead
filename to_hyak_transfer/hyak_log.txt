@@ -5039,7 +5039,7 @@ See https://mc-stan.org/misc/warnings for details.
 
 
 UCW reparam chains finished in just four hours!!
-For comparison, the old model took over 100 hours to run. This is a 25x improvement in performance. Wild
+For comparison, the old model took over 100 hours to run. This is a 25x 00 in performance. Wild
 
 
 # Pull these runs, also pull the other runs pre-reparam for comparison
@@ -5812,18 +5812,357 @@ Making a github.io page for updates
 - the _config.yml doesn't actually do anything right now, the layout is being controlled by _site.yml
 
 
+# Pull the diagnostic summary figures
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis/output
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/conv_eff/ ./
+
+# Pull the traceplots figures
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/traceplots/ ./
+
+# Pull the pairs plots figures
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/pairs_plots/ ./
+
+TOMORROW: Pull the latest pairs plots, which should no longer have the wrong movements in there
+
+### 2024-03-01 ###
+
+Pull the pairs plots!
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/pairs_plots/ ./
+
+### 2024-03-04 ###
+
+Created new pairs plots, now with plotting intercept parameters for movements out of a state
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/pairs_plots_intercept/ ./
+
+- These indicate a small amount of positive correlation (to be expected), but nothing overly concerning
+
+### 2024-03-05 ###
+
+Need to make sure to pull all analysis scripts from scrubbed to make sure that nothing
+gets deleted while I'm gone...
+
+# Created posterior comparison plots. Pull them:
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/posterior_comparison_plots/ ./
+
+
+### 2024-03-06 ###
+
+Created a new folder called reparameterization_v2
+This folder will contain the code to run the models where the origin effects have been restructured
+
+things to make sure to do:
+- change the cat_x_mat (design matrix) to make sure that we are aligning the right origins
+	- dimensions of this won't have to change, but we'll have to line it up differently
+- update priors section, transformed parameters section, and parameter declaration - so basically, need to change b0_matrix_names and run again from data_prep script
+- in stan model:
+	- change declarations of vectors to store parameters
+	
+	
+- a note on b0 and -100000: I think this should be fine, because you're still going to index
+to a -100000 value if that movement isn't allowed...?
+	- Okay, I think this broke the code as it is currently written. Previously when there
+	was an intercept term for every movement, the only -100000 values that were left in the b0_vector
+	were for movements that were not allowed. Now they're still there for movements where we still have
+	an origin term, and it's making those movements get zero probability
+	- made this change on UCW, let's test
+- another note: The upper columbia models don't have the norigins automation in the parameter printing section,
+would be good to update that eventually
+
+Let's test UCW!
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/
+
+
+### 2024-03-11 ###
+It looks like UCW ran! Let's pull it and check.
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild/ ./
+
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 15503.1 seconds.
+Warning: 106 of 2000 (5.0%) transitions ended with a divergence.
+
+Weird, more divergent transitions now
+
+I should run this through the diagnostics... Let's get an RStudio window on Klone and check this out
+
+# move model outputs to scrubbed
+[mmin@klone-login03 reparameterization_v2]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2
+[mmin@klone-login03 reparameterization_v2]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild/ ./
+
+> range(UCW_chain1_v2_summary$ess_bulk, na.rm = T)
+[1]  113.5658 2727.6425
+> range(UCW_chain1_v2_summary$ess_tail, na.rm = T)
+[1]   32.98326 1778.77947
+> range(UCW_chain1_v2_summary$rhat, na.rm = T)
+[1] 0.9995012 1.0194401
+
+> range(UCW_chain1_v2_summary_thin2$ess_bulk, na.rm = T)
+[1]   90.65403 1103.37763
+> range(UCW_chain1_v2_summary_thin2$ess_tail, na.rm = T)
+[1]   35.22046 1025.74690
+> range(UCW_chain1_v2_summary_thin2$rhat, na.rm = T)
+[1] 0.9990008 1.0250930
+
+Not good...
+
+borigin2_matrix_4_5 for whatever reason isn't behaving well
+- traceplot shows it just wandering off at some point for some reason that I can't understand,
+but then coming back within 100 or so iter
+- I don't really believe that I'll have time to resolve these weird issues before leaving,
+so I'm not sure if it's worth running the full models. I mean I guess I could, that way I can fully
+troubleshoot when I  get back. Let's just do that
+
+Need to pull all my scripts off of hyak before I leave
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis/output
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/ ./
+
+#### 2024-03-12  ####
+
+I'm going to try running all the models on STF while I'm gone. There's a high chance that
+there are typos and they don't even fully run, but we'll try...
+
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % scp -r ./reparameterization_v2/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/
+
+Ok, it seems like Klone is down. Oh well, guess I can't run anything, but that's not the end of the world. They can be run
+when I get back!
+
+#### 2024-04-01 ####
+
+Let's try running those models on STF.
+
+Submitted all on STF and the single chains on ckpt to check as well
+Long line on STF, so we'll see.
+
+[mmin@klone-login03 snake_river_hatchery]$ squeue -u mmin
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          17469303      ckpt   SR_W_1     mmin  R       0:20      1 n3153
+          17469305      ckpt   SR_H_1     mmin  R       0:20      1 g3026
+          17469307      ckpt   MC_H_1     mmin  R       0:20      1 g3000
+          17469295      ckpt   MC_W_1     mmin  R       1:29      1 g3022
+          17469262      ckpt   UC_H_1     mmin  R       2:03      1 z3002
+          17469253   compute   UC_H_1     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469254   compute   UC_H_2     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469255   compute   UC_H_3     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469256   compute   UC_H_4     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469290   compute   MC_W_1     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469291   compute   MC_W_2     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469292   compute   MC_W_3     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469293   compute   MC_W_4     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469299   compute   SR_W_1     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469300   compute   SR_W_2     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469301   compute   SR_W_3     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469302   compute   SR_W_4     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469321   compute   SR_H_4     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469320   compute   SR_H_3     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469319   compute   SR_H_2     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469318   compute   SR_H_1     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469316   compute   MC_H_4     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469315   compute   MC_H_3     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469314   compute   MC_H_2     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+          17469313   compute   MC_H_1     mmin PD       0:00      1 (ReqNodeNotAvail, Reserved for maintenance)
+
+Middle Columbia Hatchery ckpt run failed due to gradient error, indicates a problem with model code or data prep
+Fixed it, reupload the stan script
+
+(base) markusmin@Markuss-MacBook-Pro-2 middle_columbia_hatchery % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2/middle_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 middle_columbia_hatchery % scp ./MCH_reparam_v2.stan mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/middle_columbia_hatchery/
 
 
 
 
+#### 2024-04-03 ####
+# trying to get a build node to do stuff for CoE hyak
+[mmin@klone-login01 mmin] $ salloc -p compute -A stf -N 1 -c 1 --time=2:00:00 --mem=10G
+salloc: Pending job allocation 17491035
+salloc: job 17491035 queued and waiting for resources
+
+Yeah so this isn't working because of the maintenance
+[mmin@klone-login01 mmin] $ salloc -p ckpt -A stf -N 1 -c 1 --time=0:30:00 --mem=10G
+
+
+#### 2024-04-04 ####
+Hyak maintenance is still going on, so no models will run. So let's work on the presentation
+for Monday, since I believe I at least have one population working. But I also
+can't get RStudio to even run on hyak, so that will limit my ability to analyze those results
+
+#### 2024-04-06 ####
+Hyak maintenance is paused for now, so I should be able to used ckpt to look at my UCW model run
+
+As expected, gscratch/scrubbed kept my folder structure, but deleted the files I had within
+those folders, so they need to be moved back.
+
+# Move the model results back:
+[mmin@klone-login03 reparameterization_v2]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2
+[mmin@klone-login03 reparameterization_v2]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild/ ./
+
+# Move the old model results back for comparison
+[mmin@klone-login03 stan_actual]$ pwd
+/gscratch/scrubbed/mmin/stan_actual
+[mmin@klone-login03 reparameterization_v2]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization/ ./
+
+# Move the analysis scripts back:
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis/output
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r ./ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/
+
+# Now, try running analysis on RStudio
+> library(cmdstanr)
+Error in library(cmdstanr) : there is no package called ‘cmdstanr’
+
+So, libraries are gone - makes sense because they were installed on gscratch/scrubbed, so they would have been deleted too
+I'm having a hard time finding the notes for how I installed packages, so I'm going to figure it
+out and add the code to the 06-model-diagnostics-hyak.R script
+
+# Inspecting new results
+# setup is such that origin1 = Wenatchee River, origin2 = Entiat River, Origin3 = Methow River
+
+
+- All diagnostics are worse
+- yearxorigin3 parameters are especially bad - this is the Methow
+
+
+# I'm realizing now that I only have one chain for UCW - let's shorten the chains (1000 iter and 1000 warmup)
+# and submit all four chains on ckpt. Made a few new scripts, let's move to klone
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % pwd               
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/
+
+# The four UCW chains finished - let's inspect
+
+# Chain 1
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1 finished in 9041.9 seconds.
+Warning: 43 of 1000 (4.0%) transitions ended with a divergence.
+
+# Chain 2
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1 finished in 9065.5 seconds.
+Warning: 40 of 1000 (4.0%) transitions ended with a divergence.
+
+# Chain 3
+Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1 finished in 8852.9 seconds.
+Warning: 9 of 1000 (1.0%) transitions ended with a divergence.
+
+# Chain 4
+Chain 1 finished in 9230.6 seconds.
+Warning: 9 of 1000 (1.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+Interesting - 1-4% divergent transitions. Less than the 4% we were getting before.
+Move them over to gscratch/scrubbed
+[mmin@klone-login03 reparameterization_v2]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2
+[mmin@klone-login03 reparameterization_v2]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild/ ./
+
+# Pull the updated plots
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2/
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/ ./
+
+#### 2024-04-08 ####
+
+# Pull a single traceplot figure from new model
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2/output
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/traceplots/ ./
+
+# Pull some more traceplots, this time from old model
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2/output
+(base) markusmin@Markuss-MacBook-Pro-2 output % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/traceplots/ ./
+
+
+# Ok, let's submit those full chain (2000 warmup/sampling) UCW chains as well to STF and just wait for them to get their turn.
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp -r upper_columbia_wild  mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/
+
+
+#### 2024-04-23 ####
+
+So it looks like all models successfully ran except for SRH - that is still in the queue, which is a bummer
+because it's also the model that will take the longest.
+
+#### 2024-04-29 ####
+
+SRH runs all failed at the same time at 10:12 AM, after running for 5 days. Why?
+- there's nothing in the slurm output file, but the emails say this:
+[klone-hyak] Slurm Job_id=17469320 Name=SR_H_3 Failed, Run time 5-16:31:19, FAILED, ExitCode 135
+- What this exit code means is difficult to find out
+Exit codes 129-255 represent jobs terminated by Unix signals.
+- I'm going to just try resubmitting the SRH job and see if it'll run to completion this time,
+it seems like somehow it was killed by something else
+
+#### 2024-05-01 ####
+
+SRH runs got requeued, then cancelled - not sure what's going on with klone right now...
+
+
+#### 2024-05-02 ####
+
+Let's look into the diagnostics on the five runs that did finish, I don't think SRH
+will really change the overall picture
+
+
+#### 2024-05-08 ####
+
+Three of four SRH runs complete in about seven days. The fourth failed with this message:
+[klone-hyak] Slurm Job_id=17972610 Name=SR_H_3 Failed, Run time 7-05:12:00, NODE_FAIL, ExitCode 0
+- Exit code 0 indicates that it didn't fail? Weird...?
+- Then it got requeued. Ugh!
+
+#### 2024-06-12 ####
+
+I'm back! SRH 3 did finally complete back on May 22, so it's time to look at all models in
+totality today.
+
+First task: Move all reparameterization_v2 runs over to gscratch to work on them
+There was only a folder for UCW on there but it was empty - I think it just got deleted because
+it's on gscratch/scrubbed
+
+[mmin@klone-login03 reparameterization_v2]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2
+[mmin@klone-login03 reparameterization_v2]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/ ./
+
+
+Second task: Move the analysis scripts back to gscratch/scrubbed so that I can work there
+Currently, the analysis scripts are all here locally:
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis/output
+
+That's not a good place for them - they should be moved to a central place eventually
+For now, moved them back to gscratch/scrubbed
+
+(base) markusmin@Markuss-MacBook-Pro-2 output % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization/analysis/output/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis
 
 
 
 
+Now, let's get an interactive RStudio window on ckpt
 
+[mmin@klone-login03 ~]$ pwd
+/mmfs1/home/mmin
+[mmin@klone-login03 ~]$ sbatch rstudio-server-ckpt.job 
 
+Well, there's currently a huge backlog of jobs on ckpt, probably because of the maintenance day yesterday
 
+So in the mean time, let's think about how to run the final fates calculation
 
+We should have two things:
+- Final fates, from the data themselves (this is just a data summary, which will have)
+the biases from the data (i.e., missed detections)
+- Final fates, with a simulation-based approach that allows you to use the model output
+under different conditions to simulate where fish end up. This will correct for detection efficiency
 
 
 
