@@ -6164,6 +6164,45 @@ the biases from the data (i.e., missed detections)
 - Final fates, with a simulation-based approach that allows you to use the model output
 under different conditions to simulate where fish end up. This will correct for detection efficiency
 
+Okay, we have our interactive node on Klone. Looks like we need to reinstall our packages
+
+So I was able to run the diagnostic plots, but then I lost my node when we got to the pairs plots.
+So let's inspect the other ones for now, need to pull them off of gscratch/scrubbed
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output ./ 
+
+Diagnostic summaries:
+
+rhat, ESS_bulk, ESS_tail all look great - ESS between 1000 and 4000. There are some weird bimodal patterns with ESS though
+The few traceplots that I did inspect look good
+
+Pairs plots:
+- previously, we had intercept/temperature and intercept/spill collinearity (not really too concerning),
+and intercept/origin collinearity (an issue). We have since removed some intercept terms
+and opted instead to have them described just by an intercept, and now we have origin/temp
+collinearity (same as old intercept/temp collinearity). In some cases it's very strong
+	-UCH 2/3 movement has intercept/temp collinearity, quite strong
+	- we're just definitely capturing a lot of run timing info here... temp is very seasonal
+- some spill/intercept have some weird patterns, like with spillwindow for 9_8 UCH
+
+
+### 2024-06-13 ###
+
+At the end of each day, make sure to pull scripts off of gscratch/scrubbed
+
+scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/ ./
+
+The final fates calculation is a pain in the butt.
+
+
+
+
+
+
+
+
 
 
 
