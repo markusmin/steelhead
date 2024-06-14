@@ -20,13 +20,18 @@ library(lubridate)
 library(car)
 library(ggthemes)
 library(viridis)
+library(mixtools)
 ```
 
 
 
 ```{r load_reformat_data}
 # Function 1: reformat covariate data
-cov_reformat <- function(input_data, variable_name){
+
+# Spill is in kcfs (1000 cu ft/s), but the scale of this is still too high. To get it approx
+# on the same scale as temp (which is z-scored), divide by 100. This means that the units
+# now are in 100s of kcfs
+spill_reformat <- function(input_data, variable_name){
   
   # need to deal with leap years
   leap_years <- seq(1960, 2024, by = 4)
@@ -36,6 +41,7 @@ cov_reformat <- function(input_data, variable_name){
     dplyr::rename(year = name,
                   !!quo_name(variable_name) := value) %>% 
     mutate(year = gsub("X","",year)) %>% 
+    mutate(spill = spill/100) %>% 
     mutate(year = as.numeric(year), day = as.numeric(day)) %>% 
     # drop day 366 in non-leap years
     dplyr::filter(!(day == 366 & !(year %in% leap_years))) %>%
@@ -50,51 +56,51 @@ cov_reformat <- function(input_data, variable_name){
 
 # BON
 BON_spill <- read.csv(here::here("covariate_data", "BON", "basin_spill_BON_allyears.csv"))[1:366,]
-BON_spill_long <- cov_reformat(input_data = BON_spill, variable_name = "spill")
+BON_spill_long <- spill_reformat(input_data = BON_spill, variable_name = "spill")
 
 # ICH
 ICH_spill <- read.csv(here::here("covariate_data", "ICH", "basin_spill_IHR_allyears.csv"))[1:366,]
-ICH_spill_long <- cov_reformat(input_data = ICH_spill, variable_name = "spill")
+ICH_spill_long <- spill_reformat(input_data = ICH_spill, variable_name = "spill")
 
 # JDA
 JDA_spill <- read.csv(here::here("covariate_data", "JDA", "basin_spill_JDA_allyears.csv"))[1:366,]
-JDA_spill_long <- cov_reformat(input_data = JDA_spill, variable_name = "spill")
+JDA_spill_long <- spill_reformat(input_data = JDA_spill, variable_name = "spill")
 
 # TDA
 TDA_spill <- read.csv(here::here("covariate_data", "TDA", "basin_spill_TDA_allyears.csv"))[1:366,]
-TDA_spill_long <- cov_reformat(input_data = TDA_spill, variable_name = "spill")
+TDA_spill_long <- spill_reformat(input_data = TDA_spill, variable_name = "spill")
 
 # LGR
 LGR_spill <- read.csv(here::here("covariate_data", "LGR", "basin_spill_LWG_allyears.csv"))[1:366,]
-LGR_spill_long <- cov_reformat(input_data = LGR_spill, variable_name = "spill")
+LGR_spill_long <- spill_reformat(input_data = LGR_spill, variable_name = "spill")
 
 # LMO
 LMO_spill <- read.csv(here::here("covariate_data", "LMO", "basin_spill_LMN_allyears.csv"))[1:366,]
-LMO_spill_long <- cov_reformat(input_data = LMO_spill, variable_name = "spill")
+LMO_spill_long <- spill_reformat(input_data = LMO_spill, variable_name = "spill")
 
 # LGO
 LGO_spill <- read.csv(here::here("covariate_data", "LGO", "basin_spill_LGS_allyears.csv"))[1:366,]
-LGO_spill_long <- cov_reformat(input_data = LGO_spill, variable_name = "spill")
+LGO_spill_long <- spill_reformat(input_data = LGO_spill, variable_name = "spill")
 
 # MCN
 MCN_spill <- read.csv(here::here("covariate_data", "MCN", "basin_spill_MCN_allyears.csv"))[1:366,]
-MCN_spill_long <- cov_reformat(input_data = MCN_spill, variable_name = "spill")
+MCN_spill_long <- spill_reformat(input_data = MCN_spill, variable_name = "spill")
 
 # PRA
 PRA_spill <- read.csv(here::here("covariate_data", "PRA", "basin_spill_PRD_allyears.csv"))[1:366,]
-PRA_spill_long <- cov_reformat(input_data = PRA_spill, variable_name = "spill")
+PRA_spill_long <- spill_reformat(input_data = PRA_spill, variable_name = "spill")
 
 # RIS
 RIS_spill <- read.csv(here::here("covariate_data", "RIS", "basin_spill_RIS_allyears.csv"))[1:366,]
-RIS_spill_long <- cov_reformat(input_data = RIS_spill, variable_name = "spill")
+RIS_spill_long <- spill_reformat(input_data = RIS_spill, variable_name = "spill")
 
 # RRE
 RRE_spill <- read.csv(here::here("covariate_data", "RRE", "basin_spill_RRH_allyears.csv"))[1:366,]
-RRE_spill_long <- cov_reformat(input_data = RRE_spill, variable_name = "spill")
+RRE_spill_long <- spill_reformat(input_data = RRE_spill, variable_name = "spill")
 
 # WEL
 WEL_spill <- read.csv(here::here("covariate_data", "WEL", "basin_spill_WEL_allyears.csv"))[1:366,]
-WEL_spill_long <- cov_reformat(input_data = WEL_spill, variable_name = "spill")
+WEL_spill_long <- spill_reformat(input_data = WEL_spill, variable_name = "spill")
 
 # so, some gaps in WEL spill data, on Jan 1 and 2 2020, and in December 2021.
 # I think it's safe to assume that these are zero, especially looking at typical spill during these months
@@ -257,7 +263,6 @@ for (i in 1:length(main_mainstem_states)) {
 }
 
 # quantiles isn't really going to work for upstream LGR and WEL, need a mixture model for those
-library(mixtools)
 
 # Upstream of Lower Granite
 LGR_residence_df <- residence_time(residence_state = "mainstem, upstream of LGR")
@@ -463,6 +468,8 @@ write.csv(window_spill, here::here("covariate_data", "for_model", "window_spill_
 
 ## Post-overshoot processing
 
+Here, we will also divide number of days by 100, to rescale
+
 ### Export January, February, March, and April days of spill as covariate
 ```{r}
 april_spill_days <- function(spill_data){
@@ -477,6 +484,7 @@ april_spill_days <- function(spill_data){
     dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
     subset(positive_spill == TRUE & month == 4) %>% 
     dplyr::rename(april_spill_days = n) %>% 
+    mutate(april_spill_days = april_spill_days/100) %>% 
     ungroup() %>% 
     complete(year = seq(2005,2022,1), fill = list(april_spill_days = 0)) %>% 
     dplyr::select(year, april_spill_days) -> april_spill_days
@@ -496,6 +504,7 @@ march_spill_days <- function(spill_data){
     dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
     subset(positive_spill == TRUE & month == 3) %>% 
     dplyr::rename(march_spill_days = n) %>% 
+    mutate(march_spill_days = march_spill_days/100) %>% 
     ungroup() %>% 
     complete(year = seq(2005,2022,1), fill = list(march_spill_days = 0)) %>% 
     dplyr::select(year, march_spill_days) -> march_spill_days
@@ -515,6 +524,7 @@ february_spill_days <- function(spill_data){
     dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
     subset(positive_spill == TRUE & month == 2) %>% 
     dplyr::rename(february_spill_days = n) %>% 
+    mutate(february_spill_days = february_spill_days/100) %>% 
     ungroup() %>% 
     complete(year = seq(2005,2022,1), fill = list(february_spill_days = 0)) %>% 
     dplyr::select(year, february_spill_days) -> february_spill_days
@@ -534,6 +544,7 @@ january_spill_days <- function(spill_data){
     dplyr::rename(positive_spill = `any_spill == "yes"`) %>% 
     subset(positive_spill == TRUE & month == 1) %>% 
     dplyr::rename(january_spill_days = n) %>% 
+    mutate(january_spill_days = january_spill_days/100) %>% 
     ungroup() %>% 
     complete(year = seq(2005,2022,1), fill = list(january_spill_days = 0)) %>% 
     dplyr::select(year, january_spill_days) -> january_spill_days
