@@ -6230,7 +6230,55 @@ Need to resubmit runs to fit to these spill values. Took the following steps:
 In the meantime, I commented out the winter spill portion of the final fates, and we can uncomment it later on
 
 
+# pull scripts from gscratch/scrubbed
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis %  scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/ ./
 
+#### 2024-06-17 ####
+
+Final fates:
+- most tributaries are fine, but some still get stuck in a forever loop
+- The intervals seem far too wide for all populations. Also, you'd expect there to be
+tighter intervals for populations with more data, but that isn't the case
+- I wonder if we are toggling too many different things at the same time?
+- Often, the median seems too skewed - example, Entiat Wild
+- Some don't pass the red face test - for example, Fifteenmile Creek fish all in the Deschutes? 
+	- Same story with JDR, Umatilla (hatchery and wild), WAWA (H and W), Yakima Something going on in the MC
+- Upper Columbia is pretty good!
+- Snake River is pretty reasonable, with the exception of TUC - wild fish are more likely to end up in Asotin Creek than TUC?
+	- This might be related to us currently excluding winter spill from the final fates calculation - wild TUC fish often overshoot,
+	but then they fall back. And winter spill seems to have an effect on fallback. But it's negative?? I'm very lost...
+
+For Middle Columbia:
+- it appears that most fish have a negative relationship between temperature in the mainstem and
+homing to natal tributaries. So, when the random temperature value is high, it leads to fish not homing
+- In contrast, all origins have a positive relationship between temperature in the mainstem and
+entering the Deschutes. So when the random temperature is high, it's a double whammy that leads
+to lots of fish entering the Deschutes
+
+Okay, I caught a grepl typo where it was basically doubling up the effect of tempxorigin parameters
+
+
+# Stan actual - re-run with rescaled spill values
+
+# all we need to do is move the model_data.rda files to hyak
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./middle_columbia_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/middle_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./middle_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/middle_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./upper_columbia_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./upper_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./snake_river_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/snake_river_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2 % scp ./snake_river_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/snake_river_wild
+
+# now, re-submit the jobs on hyak
+[mmin@klone-login03 upper_columbia_wild]$ pwd
+/gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild
+[mmin@klone-login03 upper_columbia_wild]$ bash UCW_reparam_v2_submit_chains.sh 
+
+# repeated for other five origins
+# all are now running
 
 
 
