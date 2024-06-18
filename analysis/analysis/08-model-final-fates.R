@@ -15,6 +15,7 @@ library(ggpubr)
 library(stringr)
 library(rlang)
 library(tibble)
+library(forcats)
 
 
 # get the model states into a df, to help with interpretation
@@ -225,7 +226,7 @@ SRH_fit_summary <- summarise_draws(SRH_fit)
 make_parameter_draws_array <- function(parameter_prefix, fit, fit_summary){
   # extract b0 as an array
   parameters <- fit_summary$variable
-  parameters[grepl(parameter_prefix, parameters)] -> param_subset
+  parameters[grepl(paste0(parameter_prefix, "_"), parameters)] -> param_subset
   param_subset[!(grepl("vector", param_subset))] -> param_subset
   # drop the NDE parameters
   param_subset <- param_subset[!(grepl("_NDE", param_subset))]
@@ -402,6 +403,17 @@ borigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin5", 
 # By default, the conditions (spill and temperature) will be taken from the data
 # itself, but note that new values of these conditions could be simulated in order
 
+# Note that another option here would be to use average (median) conditions experienced
+# in each state - and that would remove the variability associated with taking random 
+# conditions. But note that you'll have to decide what the data is that you're taking
+# the median of - is it the whole DPS? Just the population? Currently, we have it set up
+# to run by DPS, not population
+# Another option would be to make the number of fish per simulation smaller and
+# run it more times - that would give you a wider spread of covariate values
+# and therefore reduce the chance that a handful of outlier covariate values
+# lead to crazy distributions
+
+
 # Final states simulation
 # This function will have to be re-written for each DPS, because each DPS has different params
 # currently we are not including a random effect of year, but we could easily
@@ -410,7 +422,8 @@ borigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin5", 
 final_fates_simulation_UCW <- function(nsim,
                                    start_state = 2, states_dates,
                                    origin1 = 0, origin2 = 0, origin3 = 0,
-                                   temp_data, spillwindow_data, winterspill_data){
+                                   temp_data, spillwindow_data, winterspill_data,
+                                   condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -426,23 +439,46 @@ final_fates_simulation_UCW <- function(nsim,
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
   sample_year <- ceiling(sample_date/365.25)
-
+  
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+    
   }
-
+  
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
     
   
@@ -552,7 +588,8 @@ final_fates_simulation_UCW <- function(nsim,
 final_fates_simulation_UCH <- function(nsim,
                                        start_state = 2, states_dates,
                                        origin1 = 0, origin2 = 0, origin3 = 0,
-                                       temp_data, spillwindow_data, winterspill_data){
+                                       temp_data, spillwindow_data, winterspill_data,
+                                       condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -572,19 +609,42 @@ final_fates_simulation_UCH <- function(nsim,
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+    
   }
   
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   
@@ -694,7 +754,9 @@ final_fates_simulation_UCH <- function(nsim,
 final_fates_simulation_MCW <- function(nsim,
                                        start_state = 2, states_dates,
                                        origin1 = 0, origin2 = 0, origin3 = 0,
-                                       temp_data, spillwindow_data, winterspill_data){
+                                       origin4 = 0, origin5 = 0, origin6 = 0,
+                                       temp_data, spillwindow_data, winterspill_data,
+                                       condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -714,19 +776,42 @@ final_fates_simulation_MCW <- function(nsim,
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+
   }
   
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   
@@ -853,8 +938,9 @@ final_fates_simulation_MCW <- function(nsim,
 
 final_fates_simulation_MCH <- function(nsim,
                                        start_state = 2, states_dates,
-                                       origin1 = 0, origin2 = 0, origin3 = 0,
-                                       temp_data, spillwindow_data, winterspill_data){
+                                       origin1 = 0, origin2 = 0,
+                                       temp_data, spillwindow_data, winterspill_data,
+                                       condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -874,21 +960,43 @@ final_fates_simulation_MCH <- function(nsim,
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+    
   }
   
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
-  
   
   move_prob_matrix <- matrix(data = 0,
                              nrow = length(model_states),
@@ -991,7 +1099,9 @@ final_fates_simulation_MCH <- function(nsim,
 final_fates_simulation_SRW <- function(nsim,
                                        start_state = 2, states_dates,
                                        origin1 = 0, origin2 = 0, origin3 = 0,
-                                       temp_data, spillwindow_data, winterspill_data){
+                                       origin4 = 0, origin5 = 0, origin6 = 0,
+                                       temp_data, spillwindow_data, winterspill_data,
+                                       condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -1011,19 +1121,42 @@ final_fates_simulation_SRW <- function(nsim,
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+    
   }
   
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   
@@ -1151,7 +1284,9 @@ final_fates_simulation_SRW <- function(nsim,
 final_fates_simulation_SRH <- function(nsim,
                                        start_state = 2, states_dates,
                                        origin1 = 0, origin2 = 0, origin3 = 0,
-                                       temp_data, spillwindow_data, winterspill_data){
+                                       origin4 = 0, origin5 = 0,
+                                       temp_data, spillwindow_data, winterspill_data,
+                                       condition_jitter = FALSE){
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
@@ -1171,19 +1306,42 @@ final_fates_simulation_SRH <- function(nsim,
   
   winterspill <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    winterspill[i] <- winterspill_data[sample_year[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      winterspill[i] <- winterspill_data[sample_year[i],i] 
+    } else {
+      # approach 2: Take the median conditions for each state across all years
+      winterspill[i] <- median(winterspill_data[,i])
+    }
+    
+    
   }
   
   
   # get temp and spill window data
   temp <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    temp[i] <- temp_data[sample_date[i],i]
+    
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      temp[i] <- temp_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   spillwindow <- rep(0, length(model_states))
   for (i in 1:9){ #1:9 because 9 mainstem states
-    spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    if(condition_jitter == TRUE){
+      # approach 1: jitter conditions
+      spillwindow[i] <- spillwindow_data[sample_date[i],i]
+    } else {
+      # approach 2: Take the median conditions for each state
+      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+    }
+    
   }
   
   
@@ -1302,7 +1460,7 @@ final_fates_simulation_SRH <- function(nsim,
   
 }
 
-#### Run final fates simulation - H v W comparisons for UC ####
+#### Run final fates simulation - H v W comparisons ####
 
 
 # In order to simulate covariate values, we are going to determine the dates
@@ -1312,29 +1470,174 @@ UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
                                date = as.vector(UCW_envir$data$transition_dates))
 UCH_states_dates <- data.frame(state = as.vector(UCH_envir$data$y),
                                date = as.vector(UCH_envir$data$transition_dates))
+MCW_states_dates <- data.frame(state = as.vector(MCW_envir$data$y),
+                               date = as.vector(MCW_envir$data$transition_dates))
+MCH_states_dates <- data.frame(state = as.vector(MCH_envir$data$y),
+                               date = as.vector(MCH_envir$data$transition_dates))
+SRW_states_dates <- data.frame(state = as.vector(SRW_envir$data$y),
+                               date = as.vector(SRW_envir$data$transition_dates))
+SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
+                               date = as.vector(SRH_envir$data$transition_dates))
 
 
-# Create a function to compare hatchery and wild final fates for each tributary
-# select one origin to compare
-compare_final_fate_rear_type_UC <- function(niter, nsim,
-                                            origin1, origin2, origin3){
+# create a list that maps origin numbers (params) to what they actually are
+natal_origins <- gsub(" Mouth| Upstream", "", model_states)
+natal_origins <- natal_origins[!(duplicated(natal_origins))]
+natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(natal_origins == "loss")]
+
+origin_param_map <- data.frame(
+  natal_origin = natal_origins,
+  hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
+               1,NA,2,3, # UC
+               5,NA,1,4,2,3, # SR
+               NA, NA),
+  wild = c(1,3,NA,2,4,6,5, # MC
+           1,2,NA,3, # UC
+           6,1,2,5,3,4, # SR
+           NA, NA))
+
+
+compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
+                                            origin_select){
+  # First, determine if this origin has both a hatchery and a wild population
+  
+  # If hatchery is NA, run wild only
+  if (is.na(subset(origin_param_map, natal_origin == origin_select)$hatchery)){
+
+    
+    ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    wild_origin_params <- c(0,0,0)
+    
+    # index to the right origin param to turn it on
+    wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for wild
+      sim_wild <- final_fates_simulation_UCW(nsim = nsim,
+                                             start_state = 2, states_dates = UCW_states_dates,
+                                             origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                             temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, 
+                                             winterspill_data = UCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_wild %>% 
+        bind_cols(sim_wild[[2]]) -> ff_wild
+    }
+    
+    
+    # Reformat final fates simulation for wild
+    rownames(ff_wild) <- NULL
+    column_to_rownames(ff_wild, "state") -> ff_wild
+    colnames(ff_wild) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_wild, "state") -> ff_wild
+    
+    ff_wild %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_wild
+    
+    ff_wild %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_wild
+    
+    ff_wild %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_wild_long
+    
+    ff_wild_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "wild") -> ff_wild_quantiles
+    
+    ff_wild_quantiles -> ff_rear_quantiles
+  
+  }
+  
+  # If wild is NA, run hatchery only
+  else if (is.na(subset(origin_param_map, natal_origin == origin_select)$wild)){
+    
+    
+    ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    hatchery_origin_params <- c(0,0,0)
+    
+    # index to the right origin param to turn it on
+    hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for hatchery
+      sim_hatchery <- final_fates_simulation_UCH(nsim = nsim,
+                                                 start_state = 2, states_dates = UCH_states_dates,
+                                                 origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], origin3 = hatchery_origin_params[3],
+                                                 temp_data = UCH_envir$data$temperature_data, spillwindow_data = UCH_envir$data$spill_window_data, 
+                                                 winterspill_data = UCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_hatchery %>% 
+        bind_cols(sim_hatchery[[2]]) -> ff_hatchery
+    }
+    
+    
+    # Reformat final fates simulation for hatchery
+    rownames(ff_hatchery) <- NULL
+    column_to_rownames(ff_hatchery, "state") -> ff_hatchery
+    colnames(ff_hatchery) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_hatchery, "state") -> ff_hatchery
+    
+    ff_hatchery %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_hatchery
+    
+    ff_hatchery %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_hatchery
+    
+    ff_hatchery %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_hatchery_long
+    
+    ff_hatchery_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "hatchery") -> ff_hatchery_quantiles
+    
+    ff_hatchery_quantiles -> ff_rear_quantiles
+  } 
+  # else run both
+  else {
+  
+  
+  
   ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
   ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+  
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- c(0,0,0)
+  hatchery_origin_params <- c(0,0,0)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
   
   for(i in 1:niter) {
     # Run final fates simulation for wild
     sim_wild <- final_fates_simulation_UCW(nsim = nsim,
                                       start_state = 2, states_dates = UCW_states_dates,
-                                      origin1 = origin1, origin2 = origin2, origin3 = origin3,
-                                      temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, winterspill_data = UCW_envir$data$winter_spill_days_data)
+                                      origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                      temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, 
+                                      winterspill_data = UCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
     ff_wild %>% 
       bind_cols(sim_wild[[2]]) -> ff_wild
     
     # Run final fates simulation for hatchery
     sim_hatchery <- final_fates_simulation_UCH(nsim = nsim,
-                                      start_state = 2, states_dates = UCW_states_dates,
-                                      origin1 = origin1, origin2 = origin2, origin3 = origin3,
-                                      temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, winterspill_data = UCW_envir$data$winter_spill_days_data)
+                                      start_state = 2, states_dates = UCH_states_dates,
+                                      origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], origin3 = hatchery_origin_params[3],
+                                      temp_data = UCH_envir$data$temperature_data, spillwindow_data = UCH_envir$data$spill_window_data, 
+                                      winterspill_data = UCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
     ff_hatchery %>% 
       bind_cols(sim_hatchery[[2]]) -> ff_hatchery
   }
@@ -1392,12 +1695,460 @@ compare_final_fate_rear_type_UC <- function(niter, nsim,
   
   ff_wild_quantiles %>% 
     bind_rows(ff_hatchery_quantiles) -> ff_rear_quantiles
+  }
+  
   
   return(ff_rear_quantiles)
   
 }
 
+compare_final_fate_rear_type_MC <- function(niter, nsim, condition_jitter,
+                                            origin_select){
+  # First, determine if this origin has both a hatchery and a wild population
+  
+  # If hatchery is NA, run wild only
+  if (is.na(subset(origin_param_map, natal_origin == origin_select)$hatchery)){
+    
+    
+    ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    wild_origin_params <- rep(0,6)
+    
+    # index to the right origin param to turn it on
+    wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for wild
+      sim_wild <- final_fates_simulation_MCW(nsim = nsim,
+                                             start_state = 2, states_dates = MCW_states_dates,
+                                             origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                             origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
+                                             temp_data = MCW_envir$data$temperature_data, spillwindow_data = MCW_envir$data$spill_window_data, 
+                                             winterspill_data = MCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_wild %>% 
+        bind_cols(sim_wild[[2]]) -> ff_wild
+    }
+    
+    
+    # Reformat final fates simulation for wild
+    rownames(ff_wild) <- NULL
+    column_to_rownames(ff_wild, "state") -> ff_wild
+    colnames(ff_wild) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_wild, "state") -> ff_wild
+    
+    ff_wild %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_wild
+    
+    ff_wild %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_wild
+    
+    ff_wild %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_wild_long
+    
+    ff_wild_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "wild") -> ff_wild_quantiles
+    
+    ff_wild_quantiles -> ff_rear_quantiles
+    
+  }
+  
+  # If wild is NA, run hatchery only
+  else if (is.na(subset(origin_param_map, natal_origin == origin_select)$wild)){
+    
+    
+    ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    hatchery_origin_params <- c(0,0)
+    
+    # index to the right origin param to turn it on
+    hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for hatchery
+      sim_hatchery <- final_fates_simulation_MCH(nsim = nsim,
+                                                 start_state = 2, states_dates = MCH_states_dates,
+                                                 origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
+                                                 temp_data = MCH_envir$data$temperature_data, spillwindow_data = MCH_envir$data$spill_window_data, 
+                                                 winterspill_data = MCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_hatchery %>% 
+        bind_cols(sim_hatchery[[2]]) -> ff_hatchery
+    }
+    
+    
+    # Reformat final fates simulation for hatchery
+    rownames(ff_hatchery) <- NULL
+    column_to_rownames(ff_hatchery, "state") -> ff_hatchery
+    colnames(ff_hatchery) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_hatchery, "state") -> ff_hatchery
+    
+    ff_hatchery %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_hatchery
+    
+    ff_hatchery %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_hatchery
+    
+    ff_hatchery %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_hatchery_long
+    
+    ff_hatchery_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "hatchery") -> ff_hatchery_quantiles
+    
+    ff_hatchery_quantiles -> ff_rear_quantiles
+  } 
+  # else run both
+  else {
+    
+    
+    
+    ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
+    ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    wild_origin_params <- rep(0,6)
+    hatchery_origin_params <- c(0,0)
+    
+    # index to the right origin param to turn it on
+    hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+    wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for wild
+      sim_wild <- final_fates_simulation_MCW(nsim = nsim,
+                                             start_state = 2, states_dates = MCW_states_dates,
+                                             origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                             origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
+                                             temp_data = MCW_envir$data$temperature_data, spillwindow_data = MCW_envir$data$spill_window_data, 
+                                             winterspill_data = MCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_wild %>% 
+        bind_cols(sim_wild[[2]]) -> ff_wild
+      
+      # Run final fates simulation for hatchery
+      sim_hatchery <- final_fates_simulation_MCH(nsim = nsim,
+                                                 start_state = 2, states_dates = MCH_states_dates,
+                                                 origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2],
+                                                 temp_data = MCH_envir$data$temperature_data, spillwindow_data = MCH_envir$data$spill_window_data, 
+                                                 winterspill_data = MCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_hatchery %>% 
+        bind_cols(sim_hatchery[[2]]) -> ff_hatchery
+    }
+    
+    
+    # Reformat final fates simulation for wild
+    rownames(ff_wild) <- NULL
+    column_to_rownames(ff_wild, "state") -> ff_wild
+    colnames(ff_wild) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_wild, "state") -> ff_wild
+    
+    ff_wild %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_wild
+    
+    ff_wild %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_wild
+    
+    ff_wild %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_wild_long
+    
+    ff_wild_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "wild") -> ff_wild_quantiles
+    
+    # Reformat final fates simulation for hatchery
+    rownames(ff_hatchery) <- NULL
+    column_to_rownames(ff_hatchery, "state") -> ff_hatchery
+    colnames(ff_hatchery) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_hatchery, "state") -> ff_hatchery
+    
+    ff_hatchery %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_hatchery
+    
+    ff_hatchery %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_hatchery
+    
+    ff_hatchery %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_hatchery_long
+    
+    ff_hatchery_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "hatchery") -> ff_hatchery_quantiles
+    
+    ff_wild_quantiles %>% 
+      bind_rows(ff_hatchery_quantiles) -> ff_rear_quantiles
+  }
+  
+  
+  return(ff_rear_quantiles)
+  
+}
+
+compare_final_fate_rear_type_SR <- function(niter, nsim, condition_jitter,
+                                            origin_select){
+  # First, determine if this origin has both a hatchery and a wild population
+  
+  # If hatchery is NA, run wild only
+  if (is.na(subset(origin_param_map, natal_origin == origin_select)$hatchery)){
+    
+    
+    ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    wild_origin_params <- rep(0,6)
+    
+    # index to the right origin param to turn it on
+    wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for wild
+      sim_wild <- final_fates_simulation_SRW(nsim = nsim,
+                                             start_state = 2, states_dates = SRW_states_dates,
+                                             origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                             origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
+                                             temp_data = SRW_envir$data$temperature_data, spillwindow_data = SRW_envir$data$spill_window_data, 
+                                             winterspill_data = SRW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_wild %>% 
+        bind_cols(sim_wild[[2]]) -> ff_wild
+    }
+    
+    
+    # Reformat final fates simulation for wild
+    rownames(ff_wild) <- NULL
+    column_to_rownames(ff_wild, "state") -> ff_wild
+    colnames(ff_wild) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_wild, "state") -> ff_wild
+    
+    ff_wild %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_wild
+    
+    ff_wild %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_wild
+    
+    ff_wild %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_wild_long
+    
+    ff_wild_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "wild") -> ff_wild_quantiles
+    
+    ff_wild_quantiles -> ff_rear_quantiles
+    
+  }
+  
+  # If wild is NA, run hatchery only
+  else if (is.na(subset(origin_param_map, natal_origin == origin_select)$wild)){
+    
+    
+    ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    hatchery_origin_params <- rep(0,5)
+    
+    # index to the right origin param to turn it on
+    hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for hatchery
+      sim_hatchery <- final_fates_simulation_SRH(nsim = nsim,
+                                                 start_state = 2, states_dates = SRH_states_dates,
+                                                 origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
+                                                 origin3 = hatchery_origin_params[3], origin4 = hatchery_origin_params[4], 
+                                                 origin5 = hatchery_origin_params[5],
+                                                 temp_data = SRH_envir$data$temperature_data, spillwindow_data = SRH_envir$data$spill_window_data, 
+                                                 winterspill_data = SRH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_hatchery %>% 
+        bind_cols(sim_hatchery[[2]]) -> ff_hatchery
+    }
+    
+    
+    # Reformat final fates simulation for hatchery
+    rownames(ff_hatchery) <- NULL
+    column_to_rownames(ff_hatchery, "state") -> ff_hatchery
+    colnames(ff_hatchery) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_hatchery, "state") -> ff_hatchery
+    
+    ff_hatchery %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_hatchery
+    
+    ff_hatchery %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_hatchery
+    
+    ff_hatchery %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_hatchery_long
+    
+    ff_hatchery_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "hatchery") -> ff_hatchery_quantiles
+    
+    ff_hatchery_quantiles -> ff_rear_quantiles
+  } 
+  # else run both
+  else {
+    
+    
+    
+    ff_wild <- data.frame(state = model_states[1:(length(model_states)-1)])
+    ff_hatchery <- data.frame(state = model_states[1:(length(model_states)-1)])
+    
+    # set up vectors to control which origin parameters are turned on
+    wild_origin_params <- rep(0,6)
+    hatchery_origin_params <- rep(0,5)
+    
+    # index to the right origin param to turn it on
+    hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+    wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+    
+    for(i in 1:niter) {
+      # Run final fates simulation for wild
+      sim_wild <- final_fates_simulation_SRW(nsim = nsim,
+                                             start_state = 2, states_dates = SRW_states_dates,
+                                             origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
+                                             origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
+                                             temp_data = SRW_envir$data$temperature_data, spillwindow_data = SRW_envir$data$spill_window_data, 
+                                             winterspill_data = SRW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_wild %>% 
+        bind_cols(sim_wild[[2]]) -> ff_wild
+      
+      # Run final fates simulation for hatchery
+      sim_hatchery <- final_fates_simulation_SRH(nsim = nsim,
+                                                 start_state = 2, states_dates = SRH_states_dates,
+                                                 origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
+                                                 origin3 = hatchery_origin_params[3], origin4 = hatchery_origin_params[4], 
+                                                 origin5 = hatchery_origin_params[5],
+                                                 temp_data = SRH_envir$data$temperature_data, spillwindow_data = SRH_envir$data$spill_window_data, 
+                                                 winterspill_data = SRH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
+      ff_hatchery %>% 
+        bind_cols(sim_hatchery[[2]]) -> ff_hatchery
+    }
+    
+    
+    # Reformat final fates simulation for wild
+    rownames(ff_wild) <- NULL
+    column_to_rownames(ff_wild, "state") -> ff_wild
+    colnames(ff_wild) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_wild, "state") -> ff_wild
+    
+    ff_wild %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_wild
+    
+    ff_wild %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_wild
+    
+    ff_wild %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_wild_long
+    
+    ff_wild_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "wild") -> ff_wild_quantiles
+    
+    # Reformat final fates simulation for hatchery
+    rownames(ff_hatchery) <- NULL
+    column_to_rownames(ff_hatchery, "state") -> ff_hatchery
+    colnames(ff_hatchery) <- paste0("iter", 1:niter)
+    
+    rownames_to_column(ff_hatchery, "state") -> ff_hatchery
+    
+    ff_hatchery %>% 
+      mutate(state = gsub(" Upstream", "", state)) %>% 
+      mutate(state = gsub(" Mouth", "", state)) -> ff_hatchery
+    
+    ff_hatchery %>% 
+      group_by(state) %>% 
+      summarise(across(where(is.numeric), sum)) -> ff_hatchery
+    
+    ff_hatchery %>%
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "count") -> ff_hatchery_long
+    
+    ff_hatchery_long %>% 
+      mutate(prop = count/nsim) %>% 
+      group_by(state) %>%
+      summarise(prob = quantile(prop, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear_type = "hatchery") -> ff_hatchery_quantiles
+    
+    ff_wild_quantiles %>% 
+      bind_rows(ff_hatchery_quantiles) -> ff_rear_quantiles
+  }
+  
+  
+  return(ff_rear_quantiles)
+  
+}
+
+
+# ORDER THE STATES FOR PLOTTING
+states_order_for_plot <- gsub(" Mouth| Upstream", "", model_states)
+states_order_for_plot <- states_order_for_plot[!(duplicated(states_order_for_plot))]
+# Make a couple of changes to make them be in the order from most downstream to most upstream
+states_order_for_plot[10] <- "Hood River"
+states_order_for_plot[11] <- "Fifteenmile Creek"
+states_order_for_plot[12] <- "Deschutes River"
+states_order_for_plot[13] <- "John Day River"
+states_order_for_plot[15] <- "Walla Walla River"
+states_order_for_plot[16] <- "Yakima River"
+states_order_for_plot[19] <- "Methow River"
+states_order_for_plot[20] <- "Okanogan River"
+
+states_order_for_plot[16:29] <- states_order_for_plot[15:28]
+states_order_for_plot[15] <- "BON to MCN other tributaries"
+states_order_for_plot[23:29] <- states_order_for_plot[22:28]
+states_order_for_plot[22] <- "Upstream WEL other tributaries"
+states_order_for_plot[29] <- "loss"
+
+states_order_for_plot[24] <- "Clearwater River"
+states_order_for_plot[25] <- "Asotin Creek"
+states_order_for_plot[26] <- "Grande Ronde River"
+states_order_for_plot[27] <- "Salmon River"
+
+
 plot_final_fate_rear_type <- function(ff_comp, natal_origin){
+  rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+  
+  ff_comp$state <- fct_rev(factor(ff_comp$state, levels = states_order_for_plot))
+  
   ff_comp_plot <- ggplot(ff_comp, aes(x = state, y = `0.5`, ymin = `0.025`, ymax = `0.975`, color = rear_type)) +
     geom_point(size = 3.5, shape = 18, position=position_dodge(width=0.5)) +
     geom_linerange(position=position_dodge(width=0.5)) +
@@ -1407,6 +2158,7 @@ plot_final_fate_rear_type <- function(ff_comp, natal_origin){
     # ggtitle(" ") +
     # Create a scale common to all
     scale_y_continuous(lim = c(0, 1), breaks = seq(0, 1, 0.25)) +
+    scale_color_manual(values = rear_colors) +
     theme(plot.title = element_text(size = 12),
           # axis.text.y = element_text(color = rev(state_significance_colors)),
           axis.title = element_text(size = 14),
@@ -1417,22 +2169,99 @@ plot_final_fate_rear_type <- function(ff_comp, natal_origin){
   
 }
 
+
+ff_iter <- 1000
+ff_nsim <- 1000
+
+## Upper Columbia
+
 # Wenatchee comparison
-wen_ff_comp <- compare_final_fate_rear_type_UC(niter = 100, nsim = 100, origin1 = 1, origin2 = 0, origin3 = 0)
-plot_final_fate_rear_type(wen_ff_comp, natal_origin = "Wenatchee River")
+# wen_ff_comp_jitter <- compare_final_fate_rear_type_UC(niter = ff_iter, nsim = ff_nsim, origin_select = "Wenatchee River", condition_jitter = TRUE)
+# wen_ff_comp_jitter_plot <- plot_final_fate_rear_type(wen_ff_comp, natal_origin = "Wenatchee River")
+# ggsave(here::here("stan_actual", "output", "final_fates", "wen_ff_comp_jitter_plot.png"), wen_ff_comp_jitter_plot, height = 8, width = 8)
+wen_ff_comp_median <- compare_final_fate_rear_type_UC(niter = ff_iter, nsim = ff_nsim, origin_select = "Wenatchee River", condition_jitter = FALSE)
+wen_ff_comp_median_plot <- plot_final_fate_rear_type(wen_ff_comp_median, natal_origin = "Wenatchee River")
+ggsave(here::here("stan_actual", "output", "final_fates", "wen_ff_comp_median_plot.png"), wen_ff_comp_median_plot, height = 8, width = 8)
 
 # Entiat comparison
-ent_ff_comp <- compare_final_fate_rear_type_UC(niter = 100, nsim = 100, origin1 = 0, origin2 = 1, origin3 = 0)
-plot_final_fate_rear_type(ent_ff_comp, natal_origin = "Entiat River")
+ent_ff_comp_median <- compare_final_fate_rear_type_UC(niter = ff_iter, nsim = ff_nsim, origin_select = "Entiat River", condition_jitter = FALSE)
+ent_ff_comp_median_plot <- plot_final_fate_rear_type(ent_ff_comp_median, natal_origin = "Entiat River")
+ggsave(here::here("stan_actual", "output", "final_fates", "ent_ff_comp_median_plot.png"), ent_ff_comp_median_plot, height = 8, width = 8)
+
+# Okanogan comparison
+oka_ff_comp_median <- compare_final_fate_rear_type_UC(niter = ff_iter, nsim = ff_nsim, origin_select = "Okanogan River", condition_jitter = FALSE)
+oka_ff_comp_median_plot <- plot_final_fate_rear_type(oka_ff_comp_median, natal_origin = "Okanogan River")
+ggsave(here::here("stan_actual", "output", "final_fates", "oka_ff_comp_median_plot.png"), oka_ff_comp_median_plot, height = 8, width = 8)
 
 # Methow comparison
-met_ff_comp <- compare_final_fate_rear_type_UC(niter = 100, nsim = 100, origin1 = 0, origin2 = 0, origin3 = 3)
-plot_final_fate_rear_type(met_ff_comp, natal_origin = "Methow River")
+# this used to crash with jitter - let's see if it works now
+met_ff_comp_median <- compare_final_fate_rear_type_UC(niter = ff_iter, nsim = ff_nsim, origin_select = "Methow River", condition_jitter = FALSE)
+met_ff_comp_median_plot <- plot_final_fate_rear_type(met_ff_comp_median, natal_origin = "Methow River")
+ggsave(here::here("stan_actual", "output", "final_fates", "met_ff_comp_median_plot.png"), met_ff_comp_median_plot, height = 8, width = 8)
 
 
 
+## Middle Columbia
+# Deschutes comparison
+des_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Deschutes River", condition_jitter = FALSE)
+des_ff_comp_median_plot <- plot_final_fate_rear_type(des_ff_comp_median, natal_origin = "Deschutes River")
+ggsave(here::here("stan_actual", "output", "final_fates", "des_ff_comp_median_plot_median_conditions.png"), des_ff_comp_median_plot, height = 8, width = 8)
+
+# John Day comparison
+jdr_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "John Day River", condition_jitter = FALSE)
+jdr_ff_comp_median_plot <- plot_final_fate_rear_type(jdr_ff_comp_median, natal_origin = "John Day River")
+ggsave(here::here("stan_actual", "output", "final_fates", "jdr_ff_comp_median_plot_median_conditions_v2.png"), jdr_ff_comp_median_plot, height = 8, width = 8)
+
+# Fifteenmile Creek comparison
+fif_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Fifteenmile Creek", condition_jitter = FALSE)
+fif_ff_comp_median_plot <- plot_final_fate_rear_type(fif_ff_comp_median, natal_origin = "Fifteenmile Creek")
+ggsave(here::here("stan_actual", "output", "final_fates", "fif_ff_comp_median_plot_median_conditions.png"), fif_ff_comp_median_plot, height = 8, width = 8)
+
+# Umatilla comparison
+uma_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Umatilla River", condition_jitter = FALSE)
+uma_ff_comp_median_plot <- plot_final_fate_rear_type(uma_ff_comp_median, natal_origin = "Umatilla River")
+ggsave(here::here("stan_actual", "output", "final_fates", "uma_ff_comp_median_plot_median_conditions.png"), uma_ff_comp_median_plot, height = 8, width = 8)
+
+# Yakima comparison
+yak_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Yakima River", condition_jitter = FALSE)
+yak_ff_comp_median_plot <- plot_final_fate_rear_type(yak_ff_comp_median, natal_origin = "Yakima River")
+ggsave(here::here("stan_actual", "output", "final_fates", "yak_ff_comp_median_plot_median_conditions.png"), yak_ff_comp_median_plot, height = 8, width = 8)
+
+# Walla Walla comparison
+wawa_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Walla Walla River", condition_jitter = FALSE)
+wawa_ff_comp_median_plot <- plot_final_fate_rear_type(wawa_ff_comp_median, natal_origin = "Walla Walla River")
+ggsave(here::here("stan_actual", "output", "final_fates", "wawa_ff_comp_median_plot_median_conditions.png"), wawa_ff_comp_median_plot, height = 8, width = 8)
 
 
+## Snake River
+# Asotin Creek comparison
+aso_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Asotin Creek", condition_jitter = FALSE)
+aso_ff_comp_median_plot <- plot_final_fate_rear_type(aso_ff_comp_median, natal_origin = "Asotin Creek")
+ggsave(here::here("stan_actual", "output", "final_fates", "aso_ff_comp_median_plot.png"), aso_ff_comp_median_plot, height = 8, width = 8)
 
+# Clearwater comparison
+cle_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Clearwater River", condition_jitter = FALSE)
+cle_ff_comp_median_plot <- plot_final_fate_rear_type(cle_ff_comp_median, natal_origin = "Clearwater River")
+ggsave(here::here("stan_actual", "output", "final_fates", "cle_ff_comp_median_plot.png"), cle_ff_comp_median_plot, height = 8, width = 8)
+
+# Salmon comparison
+sal_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Salmon River", condition_jitter = FALSE)
+sal_ff_comp_median_plot <- plot_final_fate_rear_type(sal_ff_comp_median, natal_origin = "Salmon River")
+ggsave(here::here("stan_actual", "output", "final_fates", "sal_ff_comp_median_plot.png"), sal_ff_comp_median_plot, height = 8, width = 8)
+
+# Grande Ronde comparison
+gr_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Grande Ronde River", condition_jitter = FALSE)
+gr_ff_comp_median_plot <- plot_final_fate_rear_type(gr_ff_comp_median, natal_origin = "Grande Ronde River")
+ggsave(here::here("stan_actual", "output", "final_fates", "gr_ff_comp_median_plot.png"), gr_ff_comp_median_plot, height = 8, width = 8)
+
+# Imnaha comparison
+imn_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Imnaha River", condition_jitter = FALSE)
+imn_ff_comp_median_plot <- plot_final_fate_rear_type(imn_ff_comp_median, natal_origin = "Imnaha River")
+ggsave(here::here("stan_actual", "output", "final_fates", "imn_ff_comp_median_plot.png"), imn_ff_comp_median_plot, height = 8, width = 8)
+
+# Tucannon comparison
+tuc_ff_comp_median <- compare_final_fate_rear_type_SR(niter = ff_iter, nsim = ff_nsim, origin_select = "Tucannon River", condition_jitter = FALSE)
+tuc_ff_comp_median_plot <- plot_final_fate_rear_type(tuc_ff_comp_median, natal_origin = "Tucannon River")
+ggsave(here::here("stan_actual", "output", "final_fates", "tuc_ff_comp_median_plot.png"), tuc_ff_comp_median_plot, height = 8, width = 8)
 
 
