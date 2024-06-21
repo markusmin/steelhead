@@ -403,99 +403,854 @@ borigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin5", 
 # For example, overshoot, holding in Deschutes, straying
 # But we could plot all of them
 
-# Let's use Tucannon overshooting LGR as our test case
-# Tucannon is origin 6 for SRW and origin 5 for SRH
-
 # We have DPS-wide temperature effects and origin-specific ones, 
 # and we have a winter/spring and summer/fall param (temp0 or temp1)
-
-# movement is 8 -> 9, origin 6 for wild and origin 5 for hatchery
 
 # to capture posterior correlations, we'll need to select that same iteration
 # for all parameters that affect movement
 
-temp_predict <- seq(-2,2,length = 100)
 
-# get an array to store probabilities of movements at different temperatures
-temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+# create a list that maps origin numbers (params) to what they actually are
+natal_origins <- gsub(" Mouth| Upstream", "", model_states)
+natal_origins <- natal_origins[!(duplicated(natal_origins))]
+natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(natal_origins == "loss")]
 
-# Get the movements
-possible_movements <- SRH_envir$data$movements[, "col"][SRH_envir$data$movements[, "row"] == 8]
-possible_movements <- c(possible_movements, 43)
+# Use the parameter map to index the right effects
+origin_param_map <- data.frame(
+  natal_origin = natal_origins,
+  hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
+               1,NA,2,3, # UC
+               5,NA,1,4,2,3, # SR
+               NA, NA),
+  wild = c(1,3,NA,2,4,6,5, # MC
+           1,2,NA,3, # UC
+           6,1,2,5,3,4, # SR
+           NA, NA))
 
-# get median winter spill for this state
-SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
-                               date = as.vector(SRH_envir$data$transition_dates))
-spillwindow_data = SRH_envir$data$spill_window_data
-med_spillwindow <- median(temp_data[subset(SRH_states_dates, state == 8)$date,8])
-
-# get median spill window for this state
-winterspill_data = SRH_envir$data$winter_spill_days_data
-med_winterspill <- median(winterspill_data[,8])
-
-# Loop through all of the iterations
-for (iter in 1:niter){
+# Tell it the movements for which you want to estimate temperature effects
+# movements are formatted as matrix, with column for from and column for to
+estimate_temp_effect_UCW <- function(origin_select, movements){
   
-  # Loop through a sequence of temperature values to get predicted response
-  # temperature was z-scored so we can plot 3 standard deviations
-  for (j in 1:length(temp_predict)){
-    # evaluation movement 
-    temp_move_prob_array[8,9,j, iter] <- exp(b0_array_SRH[8,9,iter] +
-                                                       # btemp0_array_SRH[8,9,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                       btemp1_array_SRH[8,9,iter]*temp_predict[j] + 
-                                                       btemp1xorigin5_array_SRH[8,9,iter]*temp_predict[j]+
-                                                       borigin5_array_SRH[8,9,iter])/
-      sum(exp(b0_array_SRH[8, possible_movements,iter] +
-                # btemp0_array_SRH[8, possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                btemp1_array_SRH[8, possible_movements,iter]*temp_predict[j] + 
-                bspillwindow_array_SRH[8, possible_movements,iter]*med_spillwindow +
-                bwinterspill_array_SRH[8, possible_movements,iter]*med_winterspill +
-                # btemp0xorigin5_array_SRH[8, possible_movements,iter] +
-                btemp1xorigin5_array_SRH[8, possible_movements,iter]*temp_predict[j] +
-                borigin5_array_SRH[8, possible_movements,iter]))
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- rep(0,3)
+  
+  # index to the right origin param to turn it on
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = wild_origin_params[1]
+  origin2 = wild_origin_params[2]
+  origin3 = wild_origin_params[3]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- UCW_envir$data$movements[, "col"][UCW_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
+                                   date = as.vector(UCW_envir$data$transition_dates))
+    spillwindow_data <- UCW_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(UCW_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- UCW_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_UCW[from,to,iter] +
+                                                       # btemp0_array_UCW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                       btemp1_array_UCW[from,to,iter]*temp_predict[j] + 
+                                                       bspillwindow_array_UCW[from,to,iter]*med_spillwindow +
+                                                       # bwinterspill_array_UCW[from,to,iter]*med_winterspill +
+                                                       # btemp0xorigin1_array_UCW[from,to,iter]*origin1 +
+                                                       btemp1xorigin1_array_UCW[from,to,iter]*temp_predict[j]*origin1 +
+                                                       # btemp0xorigin2_array_UCW[from,to,iter]*origin2 + 
+                                                       btemp1xorigin2_array_UCW[from,to,iter]*temp_predict[j]*origin2 + 
+                                                       # btemp0xorigin3_array_UCW[from,to,iter]*origin3 +
+                                                       btemp1xorigin3_array_UCW[from,to,iter]*temp_predict[j]*origin3 +
+                                                       borigin1_array_UCW[from,to,iter]*origin1 +
+                                                       borigin2_array_UCW[from,to,iter]*origin2 +
+                                                       borigin3_array_UCW[from,to,iter]*origin3)/
+          sum(exp(b0_array_UCW[from,possible_movements,iter] +
+                    # btemp0_array_UCW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_UCW[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_UCW[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_UCW[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_UCW[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_UCW[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_UCW[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_UCW[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    # btemp0xorigin3_array_UCW[from,possible_movements,iter]*origin3 +
+                    btemp1xorigin3_array_UCW[from,possible_movements,iter]*temp_predict[j]*origin3 +
+                    borigin1_array_UCW[from,possible_movements,iter]*origin1 +
+                    borigin2_array_UCW[from,possible_movements,iter]*origin2 +
+                    borigin3_array_UCW[from,possible_movements,iter]*origin3))
+        
+      }
+      
+      
+      
+    }
     
   }
   
-  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
   
 }
 
+estimate_temp_effect_UCH <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  hatchery_origin_params <- rep(0,3)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = hatchery_origin_params[1]
+  origin2 = hatchery_origin_params[2]
+  origin3 = hatchery_origin_params[3]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- UCH_envir$data$movements[, "col"][UCH_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    UCH_states_dates <- data.frame(state = as.vector(UCH_envir$data$y),
+                                   date = as.vector(UCH_envir$data$transition_dates))
+    spillwindow_data <- UCH_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(UCH_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- UCH_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_UCH[from,to,iter] +
+                                                       # btemp0_array_UCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                       btemp1_array_UCH[from,to,iter]*temp_predict[j] + 
+                                                       bspillwindow_array_UCH[from,to,iter]*med_spillwindow +
+                                                       # bwinterspill_array_UCH[from,to,iter]*med_winterspill +
+                                                       # btemp0xorigin1_array_UCH[from,to,iter]*origin1 +
+                                                       btemp1xorigin1_array_UCH[from,to,iter]*temp_predict[j]*origin1 +
+                                                       # btemp0xorigin2_array_UCH[from,to,iter]*origin2 + 
+                                                       btemp1xorigin2_array_UCH[from,to,iter]*temp_predict[j]*origin2 + 
+                                                       # btemp0xorigin3_array_UCH[from,to,iter]*origin3 +
+                                                       btemp1xorigin3_array_UCH[from,to,iter]*temp_predict[j]*origin3 +
+                                                       borigin1_array_UCH[from,to,iter]*origin1 +
+                                                       borigin2_array_UCH[from,to,iter]*origin2 +
+                                                       borigin3_array_UCH[from,to,iter]*origin3)/
+          sum(exp(b0_array_UCH[from,possible_movements,iter] +
+                    # btemp0_array_UCH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_UCH[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_UCH[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_UCH[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_UCH[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_UCH[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_UCH[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_UCH[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    # btemp0xorigin3_array_UCH[from,possible_movements,iter]*origin3 +
+                    btemp1xorigin3_array_UCH[from,possible_movements,iter]*temp_predict[j]*origin3 +
+                    borigin1_array_UCH[from,possible_movements,iter]*origin1 +
+                    borigin2_array_UCH[from,possible_movements,iter]*origin2 +
+                    borigin3_array_UCH[from,possible_movements,iter]*origin3))
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
+  
+}
+
+estimate_temp_effect_MCW <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- rep(0,6)
+  
+  # index to the right origin param to turn it on
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = wild_origin_params[1]
+  origin2 = wild_origin_params[2]
+  origin3 = wild_origin_params[3]
+  origin4 = wild_origin_params[4]
+  origin5 = wild_origin_params[5]
+  origin6 = wild_origin_params[6]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- MCW_envir$data$movements[, "col"][MCW_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    MCW_states_dates <- data.frame(state = as.vector(MCW_envir$data$y),
+                                   date = as.vector(MCW_envir$data$transition_dates))
+    spillwindow_data <- MCW_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(MCW_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- MCW_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_MCW[from,to,iter] +
+                                                       # btemp0_array_MCW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                       btemp1_array_MCW[from,to,iter]*temp_predict[j] + 
+                                                       bspillwindow_array_MCW[from,to,iter]*med_spillwindow +
+                                                       # bwinterspill_array_MCW[from,to,iter]*med_winterspill +
+                                                       # btemp0xorigin1_array_MCW[from,to,iter]*origin1 +
+                                                       btemp1xorigin1_array_MCW[from,to,iter]*temp_predict[j]*origin1 +
+                                                       # btemp0xorigin2_array_MCW[from,to,iter]*origin2 + 
+                                                       btemp1xorigin2_array_MCW[from,to,iter]*temp_predict[j]*origin2 + 
+                                                       # btemp0xorigin3_array_MCW[from,to,iter]*origin3 +
+                                                       btemp1xorigin3_array_MCW[from,to,iter]*temp_predict[j]*origin3 +
+                                                       # btemp0xorigin4_array_MCW[from,to,iter]*origin4 +
+                                                       btemp1xorigin4_array_MCW[from,to,iter]*temp_predict[j]*origin4 +
+                                                       # btemp0xorigin5_array_MCW[from,to,iter]*origin5 +
+                                                       btemp1xorigin5_array_MCW[from,to,iter]*temp_predict[j]*origin5 +
+                                                       # btemp0xorigin6_array_MCW[from,to,iter]*origin6 +
+                                                       btemp1xorigin6_array_MCW[from,to,iter]*temp_predict[j]*origin6 +
+                                                       borigin1_array_MCW[from,to,iter]*origin1 +
+                                                       borigin2_array_MCW[from,to,iter]*origin2 +
+                                                       borigin3_array_MCW[from,to,iter]*origin3 +
+                                                       borigin4_array_MCW[from,to,iter]*origin4 +
+                                                       borigin5_array_MCW[from,to,iter]*origin5 +
+                                                       borigin6_array_MCW[from,to,iter]*origin6)/
+          sum(exp(b0_array_MCW[from,possible_movements,iter] +
+                    # btemp0_array_MCW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_MCW[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_MCW[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_MCW[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_MCW[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_MCW[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    # btemp0xorigin3_array_MCW[from,possible_movements,iter]*origin3 +
+                    btemp1xorigin3_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin3 +
+                    # btemp0xorigin4_array_MCW[from,possible_movements,iter]*origin4 +
+                    btemp1xorigin4_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin4 +
+                    # btemp0xorigin5_array_MCW[from,possible_movements,iter]*origin5 +
+                    btemp1xorigin5_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin5 +
+                    # btemp0xorigin6_array_MCW[from,possible_movements,iter]*origin6 +
+                    btemp1xorigin6_array_MCW[from,possible_movements,iter]*temp_predict[j]*origin6 +
+                    borigin1_array_MCW[from,possible_movements,iter]*origin1 +
+                    borigin2_array_MCW[from,possible_movements,iter]*origin2 +
+                    borigin3_array_MCW[from,possible_movements,iter]*origin3 +
+                    borigin4_array_MCW[from,possible_movements,iter]*origin4 +
+                    borigin5_array_MCW[from,possible_movements,iter]*origin5 +
+                    borigin6_array_MCW[from,possible_movements,iter]*origin6))
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
+  
+}
+
+estimate_temp_effect_MCH <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  hatchery_origin_params <- rep(0,2)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = hatchery_origin_params[1]
+  origin2 = hatchery_origin_params[2]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- MCH_envir$data$movements[, "col"][MCH_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    MCH_states_dates <- data.frame(state = as.vector(MCH_envir$data$y),
+                                   date = as.vector(MCH_envir$data$transition_dates))
+    spillwindow_data <- MCH_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(MCH_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- MCH_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_MCH[from,to,iter] +
+                                                       # btemp0_array_MCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                       btemp1_array_MCH[from,to,iter]*temp_predict[j] + 
+                                                       bspillwindow_array_MCH[from,to,iter]*med_spillwindow +
+                                                       # bwinterspill_array_MCH[from,to,iter]*med_winterspill +
+                                                       # btemp0xorigin1_array_MCH[from,to,iter]*origin1 +
+                                                       btemp1xorigin1_array_MCH[from,to,iter]*temp_predict[j]*origin1 +
+                                                       # btemp0xorigin2_array_MCH[from,to,iter]*origin2 + 
+                                                       btemp1xorigin2_array_MCH[from,to,iter]*temp_predict[j]*origin2 +
+                                                       borigin1_array_MCH[from,to,iter]*origin1 +
+                                                       borigin2_array_MCH[from,to,iter]*origin2)/
+          sum(exp(b0_array_MCH[from,possible_movements,iter] +
+                    # btemp0_array_MCH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_MCH[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_MCH[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_MCH[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_MCH[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_MCH[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_MCH[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_MCH[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    borigin1_array_MCH[from,possible_movements,iter]*origin1 +
+                    borigin2_array_MCH[from,possible_movements,iter]*origin2))
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
+  
+}
+
+estimate_temp_effect_SRW <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- rep(0,6)
+  
+  # index to the right origin param to turn it on
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = wild_origin_params[1]
+  origin2 = wild_origin_params[2]
+  origin3 = wild_origin_params[3]
+  origin4 = wild_origin_params[4]
+  origin5 = wild_origin_params[5]
+  origin6 = wild_origin_params[6]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- SRW_envir$data$movements[, "col"][SRW_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    SRW_states_dates <- data.frame(state = as.vector(SRW_envir$data$y),
+                                   date = as.vector(SRW_envir$data$transition_dates))
+    spillwindow_data <- SRW_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(SRW_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- SRW_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+  
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_SRW[from,to,iter] +
+              # btemp0_array_SRW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+              btemp1_array_SRW[from,to,iter]*temp_predict[j] + 
+              bspillwindow_array_SRW[from,to,iter]*med_spillwindow +
+              # bwinterspill_array_SRW[from,to,iter]*med_winterspill +
+              # btemp0xorigin1_array_SRW[from,to,iter]*origin1 +
+              btemp1xorigin1_array_SRW[from,to,iter]*temp_predict[j]*origin1 +
+              # btemp0xorigin2_array_SRW[from,to,iter]*origin2 + 
+              btemp1xorigin2_array_SRW[from,to,iter]*temp_predict[j]*origin2 + 
+              # btemp0xorigin3_array_SRW[from,to,iter]*origin3 +
+              btemp1xorigin3_array_SRW[from,to,iter]*temp_predict[j]*origin3 +
+              # btemp0xorigin4_array_SRW[from,to,iter]*origin4 +
+              btemp1xorigin4_array_SRW[from,to,iter]*temp_predict[j]*origin4 +
+              # btemp0xorigin5_array_SRW[from,to,iter]*origin5 +
+              btemp1xorigin5_array_SRW[from,to,iter]*temp_predict[j]*origin5 +
+              # btemp0xorigin6_array_SRW[from,to,iter]*origin6 +
+              btemp1xorigin6_array_SRW[from,to,iter]*temp_predict[j]*origin6 +
+              borigin1_array_SRW[from,to,iter]*origin1 +
+              borigin2_array_SRW[from,to,iter]*origin2 +
+              borigin3_array_SRW[from,to,iter]*origin3 +
+              borigin4_array_SRW[from,to,iter]*origin4 +
+              borigin5_array_SRW[from,to,iter]*origin5 +
+              borigin6_array_SRW[from,to,iter]*origin6)/
+          sum(exp(b0_array_SRW[from,possible_movements,iter] +
+                    # btemp0_array_SRW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_SRW[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_SRW[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_SRW[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_SRW[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_SRW[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    # btemp0xorigin3_array_SRW[from,possible_movements,iter]*origin3 +
+                    btemp1xorigin3_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin3 +
+                    # btemp0xorigin4_array_SRW[from,possible_movements,iter]*origin4 +
+                    btemp1xorigin4_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin4 +
+                    # btemp0xorigin5_array_SRW[from,possible_movements,iter]*origin5 +
+                    btemp1xorigin5_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin5 +
+                    # btemp0xorigin6_array_SRW[from,possible_movements,iter]*origin6 +
+                    btemp1xorigin6_array_SRW[from,possible_movements,iter]*temp_predict[j]*origin6 +
+                    borigin1_array_SRW[from,possible_movements,iter]*origin1 +
+                    borigin2_array_SRW[from,possible_movements,iter]*origin2 +
+                    borigin3_array_SRW[from,possible_movements,iter]*origin3 +
+                    borigin4_array_SRW[from,possible_movements,iter]*origin4 +
+                    borigin5_array_SRW[from,possible_movements,iter]*origin5 +
+                    borigin6_array_SRW[from,possible_movements,iter]*origin6))
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
+  
+}
+
+estimate_temp_effect_SRH <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  hatchery_origin_params <- rep(0,5)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = hatchery_origin_params[1]
+  origin2 = hatchery_origin_params[2]
+  origin3 = hatchery_origin_params[3]
+  origin4 = hatchery_origin_params[4]
+  origin5 = hatchery_origin_params[5]
+  
+  # set up temperature values to predict across
+  temp_predict <- seq(-2,2,length = 100)
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # get an array to store probabilities of movements at different temperatures
+  temp_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(temp_predict), niter))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- SRH_envir$data$movements[, "col"][SRH_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    # get median winter spill for this state
+    SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
+                                   date = as.vector(SRH_envir$data$transition_dates))
+    spillwindow_data <- SRH_envir$data$spill_window_data
+    med_spillwindow <- median(spillwindow_data[subset(SRH_states_dates, state == from)$date,from])
+    
+    # get median spill window for this state
+    winterspill_data <- SRH_envir$data$winter_spill_days_data
+    med_winterspill <- median(winterspill_data[,from])
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(temp_predict)){
+        # evaluation movement 
+        temp_move_prob_array[from,to,j, iter] <- exp(b0_array_SRH[from,to,iter] +
+                                                       # btemp0_array_SRH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                       btemp1_array_SRH[from,to,iter]*temp_predict[j] + 
+                                                       bspillwindow_array_SRH[from,to,iter]*med_spillwindow +
+                                                       # bwinterspill_array_SRH[from,to,iter]*med_winterspill +
+                                                       # btemp0xorigin1_array_SRH[from,to,iter]*origin1 +
+                                                       btemp1xorigin1_array_SRH[from,to,iter]*temp_predict[j]*origin1 +
+                                                       # btemp0xorigin2_array_SRH[from,to,iter]*origin2 + 
+                                                       btemp1xorigin2_array_SRH[from,to,iter]*temp_predict[j]*origin2 + 
+                                                       # btemp0xorigin3_array_SRH[from,to,iter]*origin3 +
+                                                       btemp1xorigin3_array_SRH[from,to,iter]*temp_predict[j]*origin3 +
+                                                       # btemp0xorigin4_array_SRH[from,to,iter]*origin4 +
+                                                       btemp1xorigin4_array_SRH[from,to,iter]*temp_predict[j]*origin4 +
+                                                       # btemp0xorigin5_array_SRH[from,to,iter]*origin5 +
+                                                       btemp1xorigin5_array_SRH[from,to,iter]*temp_predict[j]*origin5 +
+                                                       borigin1_array_SRH[from,to,iter]*origin1 +
+                                                       borigin2_array_SRH[from,to,iter]*origin2 +
+                                                       borigin3_array_SRH[from,to,iter]*origin3 +
+                                                       borigin4_array_SRH[from,to,iter]*origin4 +
+                                                       borigin5_array_SRH[from,to,iter]*origin5)/
+          sum(exp(b0_array_SRH[from,possible_movements,iter] +
+                    # btemp0_array_SRH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                    btemp1_array_SRH[from,possible_movements,iter]*temp_predict[j] + 
+                    bspillwindow_array_SRH[from,possible_movements,iter]*med_spillwindow +
+                    # bwinterspill_array_SRH[from,possible_movements,iter]*med_winterspill +
+                    # btemp0xorigin1_array_SRH[from,possible_movements,iter]*origin1 +
+                    btemp1xorigin1_array_SRH[from,possible_movements,iter]*temp_predict[j]*origin1 +
+                    # btemp0xorigin2_array_SRH[from,possible_movements,iter]*origin2 + 
+                    btemp1xorigin2_array_SRH[from,possible_movements,iter]*temp_predict[j]*origin2 + 
+                    # btemp0xorigin3_array_SRH[from,possible_movements,iter]*origin3 +
+                    btemp1xorigin3_array_SRH[from,possible_movements,iter]*temp_predict[j]*origin3 +
+                    # btemp0xorigin4_array_SRH[from,possible_movements,iter]*origin4 +
+                    btemp1xorigin4_array_SRH[from,possible_movements,iter]*temp_predict[j]*origin4 +
+                    # btemp0xorigin5_array_SRH[from,possible_movements,iter]*origin5 +
+                    btemp1xorigin5_array_SRH[from,possible_movements,iter]*temp_predict[j]*origin5 +
+                    borigin1_array_SRH[from,possible_movements,iter]*origin1 +
+                    borigin2_array_SRH[from,possible_movements,iter]*origin2 +
+                    borigin3_array_SRH[from,possible_movements,iter]*origin3 +
+                    borigin4_array_SRH[from,possible_movements,iter]*origin4 +
+                    borigin5_array_SRH[from,possible_movements,iter]*origin5))
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(temp_move_prob_array)
+  
+}
+
+# plot temp effect function
+
+# create df to index to right dam temp for plotting
+dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
+                        index = seq(2,9))
 
 
-temp_8_9_move_prob <- as.data.frame(temp_move_prob_array[8,9,,])
+plot_temp_effect <- function(move_prob_array, from, to, plot_title = NULL){
+  temp_move_prob <- as.data.frame(move_prob_array[from, to,,])
+  
+  colnames(temp_move_prob) <- paste0("iter", 1:niter) 
+  temp_predict <- seq(-2,2,length = 100)
+  temp_move_prob$temp <- temp_predict
+  
+  # Add a column with the actual temperatures
+  temp_move_prob %>% 
+    mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_mean")] + 
+             window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_sd")]*temp) -> temp_move_prob
+  
+  temp_move_prob %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+    group_by(temp_actual) %>% 
+    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) -> temp_move_prob_quantiles
+  
+  temp_move_prob_plot <- ggplot(temp_move_prob_quantiles, aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`)) +
+    geom_line() +
+    geom_ribbon(alpha = 0.2) +
+    scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+    scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+    xlab(expression(~"Temperature" ~ ("°C"))) +
+    ylab("Movement probability") +
+    ggtitle(plot_title)
+  
+  return(temp_move_prob_plot)
+}
 
-colnames(temp_8_9_move_prob) <- paste0("iter", 1:niter) 
-temp_8_9_move_prob$temp <- temp_predict
+# another plot option to compare between hatchery and wild
+rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+plot_compare_rear_temp_effect <- function(wild_move_prob_array, hatchery_move_prob_array, from, to, plot_title = NULL){
+  wild_temp_move_prob <- as.data.frame(wild_move_prob_array[from, to,,])
+  
+  niter <- 4000 # this is the number of draws we have
+  colnames(wild_temp_move_prob) <- paste0("iter", 1:niter) 
+  temp_predict <- seq(-2,2,length = 100)
+  wild_temp_move_prob$temp <- temp_predict
+  
+  # Add a column with the actual temperatures
+  wild_temp_move_prob %>% 
+    mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_mean")] + 
+             window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_sd")]*temp) -> wild_temp_move_prob
+  
+  wild_temp_move_prob %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+    group_by(temp_actual) %>% 
+    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) %>% 
+    mutate(rear = "wild") -> wild_temp_move_prob_quantiles
+  
+  hatchery_temp_move_prob <- as.data.frame(hatchery_move_prob_array[from, to,,])
+  
+  colnames(hatchery_temp_move_prob) <- paste0("iter", 1:niter) 
+  hatchery_temp_move_prob$temp <- temp_predict
+  
+  # Add a column with the actual temperatures
+  hatchery_temp_move_prob %>% 
+    mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_mean")] + 
+             window_temp_summary[, paste0(subset(dam_index, index == from)$dam, "_sd")]*temp) -> hatchery_temp_move_prob
+  
+  hatchery_temp_move_prob %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+    group_by(temp_actual) %>% 
+    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) %>% 
+    mutate(rear = "hatchery") -> hatchery_temp_move_prob_quantiles
+  
+  wild_temp_move_prob_quantiles %>% 
+    bind_rows(., hatchery_temp_move_prob_quantiles) -> rear_temp_move_prob_quantiles
+  
+  rear_temp_move_prob_plot <- ggplot(rear_temp_move_prob_quantiles, aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
+                                                                        color = rear, fill = rear)) +
+    geom_line() +
+    geom_ribbon(alpha = 0.2) +
+    scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+    scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+    scale_color_manual(values = rear_colors) +
+    scale_fill_manual(values = rear_colors) +
+    xlab(expression(~"Temperature" ~ ("°C"))) +
+    ylab("Movement probability") +
+    ggtitle(plot_title)
+  
+  return(rear_temp_move_prob_plot)
+}
 
-# Add a column with the actual temperatures
-temp_8_9_move_prob %>% 
-  mutate(temp_actual = window_temp_summary$ICH_mean + window_temp_summary$ICH_sd*temp) -> temp_8_9_move_prob
 
-temp_8_9_move_prob %>% 
-  pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
-  group_by(temp_actual) %>% 
-  summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
-  pivot_wider(names_from = q, values_from = prob) -> temp_8_9_move_prob_quantiles
+#### Plot rear type comparison overshoot for all ####
 
-tuc_lgr_overshoot <- ggplot(temp_8_9_move_prob_quantiles, aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`)) +
-  geom_line() +
-  geom_ribbon(alpha = 0.2) +
-  ylab("Probability of overshoot")
+### Upper Columbia ###
+# Wenatchee
+WEN_movements <- data.frame(from = c(5), to = c(6))
+WEN_hatchery_temp_move_prob_array <- estimate_temp_effect_UCH(origin_select = "Wenatchee River", movements = WEN_movements)
+WEN_wild_temp_move_prob_array <- estimate_temp_effect_UCW(origin_select = "Wenatchee River", movements = WEN_movements)
 
-ggsave(here::here("stan_actual", "output", "covariate_effects", "tuc_lgr_overshoot.png"), tuc_lgr_overshoot, height = 8, width = 8)
+WEN_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = WEN_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = WEN_hatchery_temp_move_prob_array,
+                                                            from = WEN_movements$from, to = WEN_movements$to, plot_title = "Wenatchee - overshoot RRE")
 
+ggsave(here::here("stan_actual", "output", "covariate_effects", "WEN_compare_overshoot_temp.png"), WEN_compare_overshoot_temp, height = 8, width = 8)
 
+# Entiat
+ENT_movements <- data.frame(from = c(6), to = c(7))
+ENT_hatchery_temp_move_prob_array <- estimate_temp_effect_UCH(origin_select = "Eniat River", movements = ENT_movements)
+ENT_wild_temp_move_prob_array <- estimate_temp_effect_UCW(origin_select = "Eniat River", movements = ENT_movements)
 
+ENT_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = ENT_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = ENT_hatchery_temp_move_prob_array,
+                                                            from = ENT_movements$from, to = ENT_movements$to, plot_title = "Eniat - overshoot WEL")
 
-
-
-
-
-
-
-
+ggsave(here::here("stan_actual", "output", "covariate_effects", "ENT_compare_overshoot_temp.png"), ENT_compare_overshoot_temp, height = 8, width = 8)
 
 
+
+
+
+
+### Middle Columbia ###
+
+# Deschutes River
+DES_movements <- data.frame(from = c(2), to = c(3))
+DES_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Deschutes River", movements = DES_movements)
+DES_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Deschutes River", movements = DES_movements)
+
+DES_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = DES_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = DES_hatchery_temp_move_prob_array,
+                                                            from = DES_movements$from, to = DES_movements$to, plot_title = "Deschutes - overshoot MCN")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "DES_compare_overshoot_temp.png"), DES_compare_overshoot_temp, height = 8, width = 8)
+
+
+# John Day River
+JDR_movements <- data.frame(from = c(2), to = c(3))
+JDR_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "John Day River", movements = JDR_movements)
+JDR_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "John Day River", movements = JDR_movements)
+
+JDR_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = JDR_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = JDR_hatchery_temp_move_prob_array,
+                                                            from = JDR_movements$from, to = JDR_movements$to, plot_title = "John Day - overshoot MCN")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "JDR_compare_overshoot_temp.png"), JDR_compare_overshoot_temp, height = 8, width = 8)
+
+
+# Fifteenmile Creek
+FIF_movements <- data.frame(from = c(2), to = c(3))
+FIF_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Fifteenmile Creek", movements = FIF_movements)
+FIF_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Fifteenmile Creek", movements = FIF_movements)
+
+FIF_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = FIF_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = FIF_hatchery_temp_move_prob_array,
+                                                            from = FIF_movements$from, to = FIF_movements$to, plot_title = "Fifteenmile - overshoot MCN")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "FIF_compare_overshoot_temp.png"), FIF_compare_overshoot_temp, height = 8, width = 8)
+
+
+# Umatilla River
+UMA_movements <- data.frame(from = c(2), to = c(3))
+UMA_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Umatilla River", movements = UMA_movements)
+UMA_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Umatilla River", movements = UMA_movements)
+
+UMA_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = UMA_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = UMA_hatchery_temp_move_prob_array,
+                                                            from = UMA_movements$from, to = UMA_movements$to, plot_title = "Umatilla - overshoot MCN")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "UMA_compare_overshoot_temp.png"), UMA_compare_overshoot_temp, height = 8, width = 8)
+
+
+# Yakima River
+YAK_movements <- data.frame(from = c(3), to = c(4))
+YAK_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Yakima River", movements = YAK_movements)
+YAK_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Yakima River", movements = YAK_movements)
+
+YAK_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = YAK_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = YAK_hatchery_temp_move_prob_array,
+                                                            from = YAK_movements$from, to = YAK_movements$to, plot_title = "Yakima - overshoot PRA")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "YAK_compare_overshoot_PRA_temp.png"), YAK_compare_overshoot_temp, height = 8, width = 8)
+
+YAK_movements <- data.frame(from = c(3), to = c(8))
+YAK_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Yakima River", movements = YAK_movements)
+YAK_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Yakima River", movements = YAK_movements)
+
+YAK_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = YAK_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = YAK_hatchery_temp_move_prob_array,
+                                                            from = YAK_movements$from, to = YAK_movements$to, plot_title = "Yakima - overshoot ICH")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "YAK_compare_overshoot_ICH_temp.png"), YAK_compare_overshoot_temp, height = 8, width = 8)
+
+
+# Walla Walla River
+WAWA_movements <- data.frame(from = c(3), to = c(4))
+WAWA_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_movements)
+WAWA_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_movements)
+
+WAWA_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = WAWA_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = WAWA_hatchery_temp_move_prob_array,
+                                                            from = WAWA_movements$from, to = WAWA_movements$to, plot_title = "Walla Walla - overshoot PRA")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "WAWA_compare_overshoot_PRA_temp.png"), WAWA_compare_overshoot_temp, height = 8, width = 8)
+
+
+WAWA_movements <- data.frame(from = c(3), to = c(8))
+WAWA_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_movements)
+WAWA_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_movements)
+
+WAWA_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = WAWA_wild_temp_move_prob_array,
+                                                             hatchery_move_prob_array = WAWA_hatchery_temp_move_prob_array,
+                                                             from = WAWA_movements$from, to = WAWA_movements$to, plot_title = "Walla Walla - overshoot ICH")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "WAWA_compare_overshoot_ICH_temp.png"), WAWA_compare_overshoot_temp, height = 8, width = 8)
+
+
+
+
+
+
+
+
+### Snake River ###
+
+## Tucannon River
+TUC_movements <- data.frame(from = c(8), to = c(9))
+TUC_hatchery_temp_move_prob_array <- estimate_temp_effect_SRH(origin_select = "Tucannon River", movements = TUC_movements)
+TUC_wild_temp_move_prob_array <- estimate_temp_effect_SRW(origin_select = "Tucannon River", movements = TUC_movements)
+
+TUC_compare_overshoot_temp <- plot_compare_rear_temp_effect(wild_move_prob_array = TUC_wild_temp_move_prob_array,
+                                                            hatchery_move_prob_array = TUC_hatchery_temp_move_prob_array,
+                                                            from = TUC_movements$from, to = TUC_movements$to, plot_title = "Tucannon - overshoot LGR")
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "TUC_compare_overshoot_temp.png"), TUC_compare_overshoot_temp, height = 8, width = 8)
 
 
 
