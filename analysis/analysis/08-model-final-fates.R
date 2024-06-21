@@ -438,7 +438,7 @@ final_fates_simulation_UCW <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
@@ -604,7 +604,7 @@ final_fates_simulation_UCH <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
@@ -771,7 +771,7 @@ final_fates_simulation_MCW <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
@@ -955,7 +955,7 @@ final_fates_simulation_MCH <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
@@ -1116,7 +1116,7 @@ final_fates_simulation_SRW <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
@@ -1301,7 +1301,7 @@ final_fates_simulation_SRH <- function(nsim,
   
   # convert these to random years for winter spill
   # From modeling code: We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
-  sample_year <- ceiling(sample_date/365.25)
+  sample_year <- ceiling(sample_date/365.25)+1
   
   
   winterspill <- rep(0, length(model_states))
