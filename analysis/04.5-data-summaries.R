@@ -115,7 +115,7 @@ for (i in 1:length(natal_origins)){
               rear_type_code_select = "W",
               data = ASC_final_states_count)
   
-  homing_plot_list[[i*2]] <- plot_homing(natal_origin_select = natal_origins[i],
+  homing_plot_list[[length(natal_origins)+i]] <- plot_homing(natal_origin_select = natal_origins[i],
               rear_type_code_select = "H",
               data = ASC_final_states_count)
   
@@ -167,7 +167,7 @@ for (i in 1:length(natal_origins)){
                                        rear_type_code_select = "W",
                                        data = ASC_final_states_count)
   
-  final_fate_plot_list[[i*2]] <- plot_final_fate(natal_origin_select = natal_origins[i],
+  final_fate_plot_list[[length(natal_origins)+i]] <- plot_final_fate(natal_origin_select = natal_origins[i],
                                          rear_type_code_select = "H",
                                          data = ASC_final_states_count)
   
