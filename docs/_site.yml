@@ -9,8 +9,8 @@ navbar:
       href: structure.html    
     - text: "Diagnostics"
       href: diagnostics.html      
-    - text: "Results"
-      href: results.html    
+    - text: "Results - final fates"
+      href: results-final-fates.html    
     - text: "New model"
       href: restructured_origin_effects.html    
 output:

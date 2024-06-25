@@ -1,0 +1,73 @@
+---
+title: "Results - Temperature"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+This page contains the results for the effects of temperature on key movements. As a reminder for how temperature is included in the model, temperature has an influence on every upstream movement and every movement into tributaries. However, on this page, I will focus only on how temperature affects overshoot and movements into tributaries.
+
+
+### Simulation steps
+
+For each dataset (combination of DPS and rear type), the following steps were run:
+
+1. Extract the median covariate values experienced by all fish in the dataset (for spill window, winter spill days, and temperature). These median values are used to estimate the probability of movement, except for the one that is being plotted.
+2. Create a sequence of temperature values from -2 SD to +2 SD around the mean
+3. Evaluate the probability of movement at each of those temperature values.
+
+If a tributary has both a hatchery and natural origin population, they are shown on the same plot.
+
+#### Middle Columbia
+
+
+![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/covariates/old/des_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/covariates/jdr_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/covariates/fif_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/covariates/uma_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for Yakima River Steelhead.](site_figures/covariates/yak_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for Walla Walla River Steelhead.](site_figures/covariates/wawa_ff_comp_median_plot_median_conditions.png)
+
+
+#### Upper Columbia
+
+![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/covariates/wen_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>
+
+![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/covariates/ent_ff_comp_median_plot_median_conditions.png)
+
+
+#### Snake River
+
+![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/covariates/tuc_ff_comp_median_plot_median_conditions.png)
+
+<br>
+<br>

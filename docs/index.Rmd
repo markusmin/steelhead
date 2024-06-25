@@ -13,9 +13,11 @@ This website contains the most up-to-date information on the model structure, di
 
 ### Design of this website
 
-The content of this website is currently divided into three sections:
+The content of this website is divided into multiple sections:
 
 1. Structure: This tab contains information on how the model is set up, how covariates are included, the model equations, and how the model was implemented in Stan.
 2. Diagnostics: This tab contains various diagnostics, including r-hat and effective sample size statistics, traceplots, and pairs plots.
-3. Results: This contains preliminary results from the current version of the model.
+3. Results - final fates: This contains the final fate simulations based on the model estimated parameters.
+4. Results - temperature/spill: This shows the effects of temperature and spill on key movements (overshoot and fallback).
+5. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
 
