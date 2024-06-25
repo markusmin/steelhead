@@ -82,27 +82,27 @@ to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
 
 
 # get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
+UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild","UCW_transition_counts.csv"))
 UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
 UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
 
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
+UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery","UCH_transition_counts.csv"))
 UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
 UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
 
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
+MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild","MCW_transition_counts.csv"))
 MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
 MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
 
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
+MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery","MCH_transition_counts.csv"))
 MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
 MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
 
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
+SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild","SRW_transition_counts.csv"))
 SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
 SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
 
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
+SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery","SRH_transition_counts.csv"))
 SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
 SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
 
@@ -117,17 +117,17 @@ MCW_envir <- new.env()
 MCH_envir <- new.env()
 SRW_envir <- new.env()
 SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "model_data.rda"),
      envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "model_data.rda"),
      envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "model_data.rda"),
      envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "model_data.rda"),
      envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "model_data.rda"),
      envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "model_data.rda"),
      envir = SRH_envir)
 
 
@@ -144,10 +144,10 @@ bind4chains <- function(chain1, chain2, chain3, chain4){
 }
 
 ## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
+UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
+UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
+UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
+UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
 
 # bind chains together
 UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
@@ -157,10 +157,10 @@ thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
 UCW_fit_summary <- summarise_draws(UCW_fit)
 
 ## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
+UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
+UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
+UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
+UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
 
 # bind chains together
 UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
@@ -170,10 +170,10 @@ thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
 UCH_fit_summary <- summarise_draws(UCH_fit)
 
 ## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
+MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
+MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
+MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
+MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
 
 # bind chains together
 MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
@@ -183,10 +183,10 @@ thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
 MCW_fit_summary <- summarise_draws(MCW_fit)
 
 ## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
+MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
+MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
+MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
+MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
 
 # bind chains together
 MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
@@ -196,10 +196,10 @@ thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
 MCH_fit_summary <- summarise_draws(MCH_fit)
 
 ## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
+SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
+SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
+SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
+SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
 
 # bind chains together
 SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
@@ -209,10 +209,10 @@ thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
+SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
+SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
+SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
 
 # bind chains together
 SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
@@ -593,7 +593,7 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
                                                          # btemp0_array_UCW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                          btemp1_array_UCW[from,to,iter]*med_temp[j] + 
                                                          bspillwindow_array_UCW[from,to,iter]*med_spillwindow[j] +
-                                                         # bwinterspill_array_UCW[from,to,iter]*med_winterspill[j] +
+                                                         bwinterspill_array_UCW[from,to,iter]*med_winterspill[j] +
                                                          # btemp0xorigin1_array_UCW[from,to,iter]*origin1 +
                                                          btemp1xorigin1_array_UCW[from,to,iter]*med_temp[j]*origin1 +
                                                          # btemp0xorigin2_array_UCW[from,to,iter]*origin2 + 
@@ -612,7 +612,7 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
                       # btemp0_array_UCW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                       btemp1_array_UCW[from,possible_movements,iter]*med_temp[j] + 
                       bspillwindow_array_UCW[from,possible_movements,iter]*med_spillwindow[j] +
-                      # bwinterspill_array_UCW[from,possible_movements,iter]*med_winterspill[j] +
+                      bwinterspill_array_UCW[from,possible_movements,iter]*med_winterspill[j] +
                       # btemp0xorigin1_array_UCW[from,possible_movements,iter]*origin1 +
                       btemp1xorigin1_array_UCW[from,possible_movements,iter]*med_temp[j]*origin1 +
                       # btemp0xorigin2_array_UCW[from,possible_movements,iter]*origin2 + 
@@ -724,7 +724,7 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
                                                          # btemp0_array_UCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                          btemp1_array_UCH[from,to,iter]*med_temp[j] + 
                                                          bspillwindow_array_UCH[from,to,iter]*med_spillwindow[j] +
-                                                         # bwinterspill_array_UCH[from,to,iter]*med_winterspill[j] +
+                                                         bwinterspill_array_UCH[from,to,iter]*med_winterspill[j] +
                                                          # btemp0xorigin1_array_UCH[from,to,iter]*origin1 +
                                                          btemp1xorigin1_array_UCH[from,to,iter]*med_temp[j]*origin1 +
                                                          # btemp0xorigin2_array_UCH[from,to,iter]*origin2 + 
@@ -743,7 +743,7 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
                       # btemp0_array_UCH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                       btemp1_array_UCH[from,possible_movements,iter]*med_temp[j] + 
                       bspillwindow_array_UCH[from,possible_movements,iter]*med_spillwindow[j] +
-                      # bwinterspill_array_UCH[from,possible_movements,iter]*med_winterspill[j] +
+                      bwinterspill_array_UCH[from,possible_movements,iter]*med_winterspill[j] +
                       # btemp0xorigin1_array_UCH[from,possible_movements,iter]*origin1 +
                       btemp1xorigin1_array_UCH[from,possible_movements,iter]*med_temp[j]*origin1 +
                       # btemp0xorigin2_array_UCH[from,possible_movements,iter]*origin2 + 
@@ -814,6 +814,70 @@ plot_prob_by_year <- function(year_move_prob_array, from, to, plot_title = NULL)
   
   return(year_move_prob_plot)
 }
+rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+plot_compare_prob_by_year <- function(wild_year_move_prob_array, hatchery_year_move_prob_array,
+                                      from, to, plot_title = NULL){
+  niter <- 4000 # for the number of draws
+  
+  wild_year_move_prob <- as.data.frame(wild_year_move_prob_array[from, to,,])
+  
+  colnames(wild_year_move_prob) <- paste0("iter", 1:niter) 
+  year_predict <- 1:18
+  wild_year_move_prob$year <- year_predict
+  
+  # Add a column with the actual temperatures
+  wild_year_move_prob$year_actual <- 2004:2021
+  
+  # drop years without observations
+  wild_year_move_prob <- na.omit(wild_year_move_prob)
+  
+  
+  wild_year_move_prob %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+    group_by(year_actual) %>% 
+    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) %>% 
+    mutate(rear = "wild") -> wild_year_move_prob_quantiles
+  
+  hatchery_year_move_prob <- as.data.frame(hatchery_year_move_prob_array[from, to,,])
+  
+  colnames(hatchery_year_move_prob) <- paste0("iter", 1:niter) 
+  year_predict <- 1:18
+  hatchery_year_move_prob$year <- year_predict
+  
+  # Add a column with the actual temperatures
+  hatchery_year_move_prob$year_actual <- 2004:2021
+  
+  # drop years without observations
+  hatchery_year_move_prob <- na.omit(hatchery_year_move_prob)
+  
+  
+  hatchery_year_move_prob %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+    group_by(year_actual) %>% 
+    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) %>% 
+    mutate(rear = "hatchery") -> hatchery_year_move_prob_quantiles
+  
+  # join hatchery and wild
+  wild_year_move_prob_quantiles %>% 
+    bind_rows(., hatchery_year_move_prob_quantiles) -> rear_year_move_prob_quantiles
+  
+  
+  rear_year_move_prob_plot <- ggplot(rear_year_move_prob_quantiles, aes(x = year_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
+                                                                        color = rear, fill = rear)) +
+    geom_line() +
+    geom_ribbon(alpha = 0.2, color = NA) +
+    scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+    scale_x_continuous(lim = c(2003, 2022), breaks = seq(2005, 2020, 5), expand = c(0,0)) +
+    scale_color_manual(values = rear_colors) +
+    scale_fill_manual(values = rear_colors) +
+    xlab("Run Year") +
+    ylab("Movement probability") +
+    ggtitle(plot_title)
+  
+  return(rear_year_move_prob_plot)
+}
 
 #### Function to plot random year effects on their own ####
 # separately, this function plots only the parameter value for the random effect of year
@@ -876,6 +940,24 @@ wen_hatchery_homing_movement_by_year_plot <- plot_prob_by_year(year_move_prob_ar
                                                                from = 5, to = 24, plot_title = "Wenatchee hatchery - movement into Wenatchee")
 
 ggsave(here::here("stan_actual", "output", "year_effects", "wen_hatchery_homing_movement_by_year_plot.png"), wen_hatchery_homing_movement_by_year_plot, height = 8, width = 8)
+
+# comparison plot
+wen_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(wild_year_move_prob_array = wen_wild_year_movement_probs, 
+                                                           hatchery_year_move_prob_array = wen_hatchery_year_movement_probs,
+                                                               from = 5, to = 24, plot_title = "Wenatchee - movement into Wenatchee")
+
+ggsave(here::here("stan_actual", "output", "year_effects", "wen_rear_homing_movement_by_year_plot.png"), wen_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
