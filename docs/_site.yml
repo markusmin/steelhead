@@ -10,7 +10,15 @@ navbar:
     - text: "Diagnostics"
       href: diagnostics.html      
     - text: "Results - final fates"
-      href: results-final-fates.html    
+      href: results-final-fates.html   
+    - text: "Results - temperature"
+      href: results-temperature.html   
+    - text: "Results - winter spill days"
+      href: results-spill-days.html    
+    - text: "Results - spill volume"
+      href: results-spill-window.html    
+    - text: "Results - interannual differences"
+      href: results-year.html    
     - text: "New model"
       href: restructured_origin_effects.html    
 output:

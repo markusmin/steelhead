@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-06-24" />
+<meta name="date" content="2024-06-27" />
 
 <title>Results - Final Fates</title>
 
@@ -333,6 +333,18 @@ div.tocify {
   <a href="results-final-fates.html">Results - final fates</a>
 </li>
 <li>
+  <a href="results-temperature.html">Results - temperature</a>
+</li>
+<li>
+  <a href="results-spill-days.html">Results - winter spill days</a>
+</li>
+<li>
+  <a href="results-spill-window.html">Results - spill volume</a>
+</li>
+<li>
+  <a href="results-year.html">Results - interannual differences</a>
+</li>
+<li>
   <a href="restructured_origin_effects.html">New model</a>
 </li>
       </ul>
@@ -349,7 +361,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results - Final Fates</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-06-24</h4>
+<h4 class="date">2024-06-27</h4>
 
 </div>
 
@@ -364,7 +376,8 @@ the fitted model object.</p>
 steps were run:</p>
 <ol style="list-style-type: decimal">
 <li>Extract the median covariate values experienced by all fish in the
-dataset (for spill window, winter spill days, and temperature).</li>
+dataset (for spill window, winter spill days, and temperature). These
+median values are used for the simulation.</li>
 <li>Randomly select one iteration from the model (one set of draws for
 all parameters)</li>
 <li>Simulate 1000 fish that start at Bonneville Dam and move through the
@@ -378,44 +391,38 @@ compared.</p>
 <div id="middle-columbia" class="section level4">
 <h4>Middle Columbia</h4>
 <div class="float">
-<img
-src="site_figures/final_fates/old/des_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/des_ff_comp_median_plot.png"
 alt="Final fates of Deschutes River Steelhead." />
 <div class="figcaption">Final fates of Deschutes River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/jdr_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/jdr_ff_comp_median_plot.png"
 alt="Final fates of John Day River Steelhead." />
 <div class="figcaption">Final fates of John Day River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/fif_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/fif_ff_comp_median_plot.png"
 alt="Final fates of Fifteenmile Creek Steelhead." />
 <div class="figcaption">Final fates of Fifteenmile Creek
 Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/uma_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/uma_ff_comp_median_plot.png"
 alt="Final fates of Umatilla River Steelhead." />
 <div class="figcaption">Final fates of Umatilla River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/yak_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/yak_ff_comp_median_plot.png"
 alt="Final fates of Yakima River Steelhead." />
 <div class="figcaption">Final fates of Yakima River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/wawa_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/wawa_ff_comp_median_plot.png"
 alt="Final fates of Walla Walla River Steelhead." />
 <div class="figcaption">Final fates of Walla Walla River
 Steelhead.</div>
@@ -424,29 +431,25 @@ Steelhead.</div>
 <div id="upper-columbia" class="section level4">
 <h4>Upper Columbia</h4>
 <div class="float">
-<img
-src="site_figures/final_fates/old/wen_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/wen_ff_comp_median_plot.png"
 alt="Final fates of Wenatchee River Steelhead." />
 <div class="figcaption">Final fates of Wenatchee River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/ent_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/ent_ff_comp_median_plot.png"
 alt="Final fates of Entiat River Steelhead." />
 <div class="figcaption">Final fates of Entiat River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/oka_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/oka_ff_comp_median_plot.png"
 alt="Final fates of Okanogan River Steelhead." />
 <div class="figcaption">Final fates of Okanogan River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/met_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/met_ff_comp_median_plot.png"
 alt="Final fates of Methow River Steelhead." />
 <div class="figcaption">Final fates of Methow River Steelhead.</div>
 </div>
@@ -454,46 +457,40 @@ alt="Final fates of Methow River Steelhead." />
 <div id="snake-river" class="section level4">
 <h4>Snake River</h4>
 <div class="float">
-<img
-src="site_figures/final_fates/old/tuc_ff_comp_median_plot_median_conditions.png"
-alt="Final fates of Tucannon River Steelhead." />
-<div class="figcaption">Final fates of Tucannon River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/final_fates/old/aso_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/aso_ff_comp_median_plot.png"
 alt="Final fates of Asotin Creek Steelhead." />
 <div class="figcaption">Final fates of Asotin Creek Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/cle_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/cle_ff_comp_median_plot.png"
 alt="Final fates of Clearwater River Steelhead." />
 <div class="figcaption">Final fates of Clearwater River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/imn_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/imn_ff_comp_median_plot.png"
 alt="Final fates of Imnaha River Steelhead." />
 <div class="figcaption">Final fates of Imnaha River Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/gr_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/gr_ff_comp_median_plot.png"
 alt="Final fates of Grande Ronde River Steelhead." />
 <div class="figcaption">Final fates of Grande Ronde River
 Steelhead.</div>
 </div>
 <p><br> <br></p>
 <div class="float">
-<img
-src="site_figures/final_fates/old/sal_ff_comp_median_plot_median_conditions.png"
+<img src="site_figures/final_fates/sal_ff_comp_median_plot.png"
 alt="Final fates of Salmon River Steelhead." />
 <div class="figcaption">Final fates of Salmon River Steelhead.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/final_fates/tuc_ff_comp_median_plot.png"
+alt="Final fates of Tucannon River Steelhead." />
+<div class="figcaption">Final fates of Tucannon River Steelhead.</div>
 </div>
 </div>
 </div>

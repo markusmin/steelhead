@@ -18,6 +18,8 @@ The content of this website is divided into multiple sections:
 1. Structure: This tab contains information on how the model is set up, how covariates are included, the model equations, and how the model was implemented in Stan.
 2. Diagnostics: This tab contains various diagnostics, including r-hat and effective sample size statistics, traceplots, and pairs plots.
 3. Results - final fates: This contains the final fate simulations based on the model estimated parameters.
-4. Results - temperature/spill: This shows the effects of temperature and spill on key movements (overshoot and fallback).
-5. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
+4. Results - temperature: This shows the effects of temperature on key movements (overshoot).
+5. Results - spill (volume): This shows the effects of spill (as volume of spill) on en-route fallback probabilities.
+6. Results - spill (days of winter spill): This shows the effects of spill (as the days of winter spill) on post-overshoot fallback probabilities.
+7. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
 

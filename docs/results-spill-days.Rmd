@@ -26,48 +26,92 @@ If a tributary has both a hatchery and natural origin population, they are shown
 
 #### Middle Columbia
 
+<br>
+<br>
 
-![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/covariates/old/des_ff_comp_median_plot_median_conditions.png)
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Deschutes River Steelhead.](site_figures/covariate_effects/spilldays/DES_compare_fallback_MCN_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/covariates/jdr_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for John Day River Steelhead.](site_figures/covariate_effects/spilldays/JDR_compare_fallback_MCN_spilldays.png)
+<br>
+<br>
+
+![Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead.](site_figures/covariate_effects/spilldays/JDR_compare_fallback_PRA_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/covariates/fif_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead.](site_figures/covariate_effects/spilldays/JDR_compare_fallback_ICH_spilldays.png)
+<br>
+<br>
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead.](site_figures/covariate_effects/spilldays/FIF_compare_fallback_MCN_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/covariates/uma_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spilldays/UMA_compare_fallback_MCN_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Yakima River Steelhead.](site_figures/covariates/yak_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spilldays/UMA_compare_fallback_ICH_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Walla Walla River Steelhead.](site_figures/covariates/wawa_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spilldays/UMA_compare_fallback_PRA_spilldays.png)
 
+<br>
+<br>
+
+![Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead.](site_figures/covariate_effects/spilldays/YAK_compare_fallback_PRA_spilldays.png)
+
+<br>
+<br>
+
+![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead.](site_figures/covariate_effects/spilldays/YAK_compare_fallback_ICH_spilldays.png)
+
+
+<br>
+<br>
+
+
+![Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spilldays/WAWA_compare_fallback_PRA_spilldays.png)
+
+<br>
+<br>
+
+
+![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png)
+
+<br>
+<br>
 
 #### Upper Columbia
 
-![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/covariates/wen_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spilldays/WEN_compare_fallback_RRE_spilldays.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/covariates/ent_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spilldays/WEN_compare_fallback_WEL_spilldays.png)
 
+<br>
+<br>
+
+![Effect of days of winter spill on post-overshoot fallback at Wells Dam for Entiat River Steelhead.](site_figures/covariate_effects/spilldays/ENT_compare_fallback_WEL_spilldays.png)
+
+
+<br>
+<br>
 
 #### Snake River
 
-![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/covariates/tuc_ff_comp_median_plot_median_conditions.png)
+![Effect of days of winter spill on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spilldays/TUC_compare_fallback_LGR_spilldays.png)
 
 <br>
 <br>

@@ -1,0 +1,174 @@
+---
+title: "Results - Annual Differences"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+This page contains results for how specific movement probabilities vary by year, and also shows the estimates for the random effect of year for certain parameters. As a reminder of how year effects were strcutured, a random effect for each year was included only for state transitions into or out of states within the DPS boundaries, and random effects for year were all origin specific (no DPS-wide year effects). Here, I investigate how the probability of making specific movements varies interannually,and also look into the specific parameter estimates for some years.
+
+
+### Annual movement probability estimation steps
+
+For each dataset (combination of DPS and rear type), the following steps were run:
+
+1. Extract the median covariate values experienced by all fish in the dataset in a specific year (for spill window, winter spill days, and temperature). These median values are used to estimate the probability of movement.
+2. Evaluate the probability of movement in each year, based on the random effect of year, plus the median covariate valus in that year.
+
+If a tributary has both a hatchery and natural origin population, they are shown on the same plot.
+
+
+### Notes
+
+*Why is the annual movement probability consistently lower than the proportion of fish whose final fate is their home tributary?* 
+
+
+
+#### Middle Columbia
+
+<br>
+<br>
+
+
+![Homing movement probability for Deschutes River Steelhead.](site_figures/annual/DES_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_DES_wild_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+
+
+
+![Homing movement probability for John Day River Steelhead.](site_figures/annual/JDR_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_JDR_wild_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Fifteenmile Creek Steelhead.](site_figures/annual/FIF_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_FIF_wild_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Umatilla River Steelhead.](site_figures/annual/UMA_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_UMA_wild_RE_year_plot.png","site_figures/year_effects/mainstem_UMA_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Yakima River Steelhead.](site_figures/annual/YAK_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_YAK_wild_RE_year_plot.png"))
+``` 
+
+
+<br>
+<br>
+
+
+![Homing movement probability for Walla Walla River Steelhead.](site_figures/annual/WAWA_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_WAWA_wild_RE_year_plot.png","site_figures/year_effects/mainstem_WAWA_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+#### Upper Columbia
+
+![Homing movement probability for Wenatchee River Steelhead.](site_figures/annual/WEN_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_WEN_wild_RE_year_plot.png","site_figures/year_effects/mainstem_WEN_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Entiat River Steelhead.](site_figures/annual/ENT_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_ENT_wild_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Okanogan River Steelhead.](site_figures/annual/OKA_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_OKA_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Methow River Steelhead.](site_figures/annual/MET_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_MET_wild_RE_year_plot.png", "site_figures/year_effects/mainstem_MET_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+#### Snake River
+
+
+![Homing movement probability for Asotin Creek Steelhead.](site_figures/annual/ASO_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_ASO_wild_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Clearwater River Steelhead.](site_figures/annual/CLE_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_CLE_wild_RE_year_plot.png","site_figures/year_effects/mainstem_CLE_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Imnaha River Steelhead.](site_figures/annual/IMN_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_IMN_wild_RE_year_plot.png", "site_figures/year_effects/mainstem_IMN_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Grande Ronde River Steelhead.](site_figures/annual/GR_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_GR_wild_RE_year_plot.png", "site_figures/year_effects/mainstem_GR_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>
+
+![Homing movement probability for Salmon River Steelhead.](site_figures/annual/SAL_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_SAL_wild_RE_year_plot.png", "site_figures/year_effects/mainstem_SAL_hatchery_RE_year_plot.png"))
+``` 
+<br>
+<br>
+
+![Homing movement probability for Tucannon River Steelhead.](site_figures/annual/TUC_rear_homing_movement_by_year_plot.png)
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("site_figures/year_effects/mainstem_TUC_wild_RE_year_plot.png", "site_figures/year_effects/mainstem_TUC_hatchery_RE_year_plot.png"))
+``` 
+
+<br>
+<br>

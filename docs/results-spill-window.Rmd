@@ -11,63 +11,217 @@ output:
 
 ## Description
 
-This page contains the results for the effects of spill (as the volume of spill) on key movements. As a reminder for how spill (volume) is included in the model, spill (volume) has an effect on every mainstem downstream movement. The same parameter is shared by all fish of the same DPS/rear type combination. On this page, I show how spill volume affects en-route fallback throughout the basin.
+This page contains the results for the effects of spill (as the volume of spill) on key movements. As a reminder for how spill (volume) is included in the model, spill (volume) has an effect on every mainstem downstream movement. The same parameter is shared by all fish of the same DPS/rear type combination. The only time when spill (volume) doesn't have an affect on downstream movement is when a fish is in a post-overshoot state during the winter months (January/February/March), in which case it instead receives the effect of winter spill days fallback.On this page, I show how spill volume affects en-route fallback throughout the basin.
 
 
 ### Calculation
 
 For each dataset (combination of DPS and rear type), the following steps were run:
 
-1. Extract the median covariate values experienced by all fish in the dataset (for winter spill days and temperature). These median values are used to estimate the probability of movement.
+1. Extract the median covariate values experienced by all fish in the dataset (for temperature). These median values are used to estimate the probability of movement.
 2. Create a sequence of volume of spill from 0 to the maximimum value experience by fish in the dataset.
 3. Evaluate the probability of movement at each of those spill values.
 
-If a tributary has both a hatchery and natural origin population, they are shown on the same plot.
+If a tributary has both a hatchery and natural origin population, they are shown on the same plot. The number of observations of fish in the state are shown as a rug plot in the margins. However, please note that because spill parameters are shared between fish of the same DPS, the actual data used to estimate each of the parameters is more than is shown for any individual origin. This is also why specific origins will have an estimated effect of spill, even when there is little or no data from that specific origin. Individual origins do however have different movement probabilities, as the overall probability of movement is affected by the relative strength of the predictor compared to the predictors for other movements (which may have origin-specific parameters).
 
 #### Middle Columbia
 
+For the Middle Columbia, we only show plots for the effect of spill volume on fallback at Bonneville Dam.
 
-![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/covariates/old/des_ff_comp_median_plot_median_conditions.png)
-
-<br>
-<br>
-
-![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/covariates/jdr_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for Deschutes River Steelhead.](site_figures/covariate_effects/spillwindow/DES_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/covariates/fif_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for John Day River Steelhead.](site_figures/covariate_effects/spillwindow/JDR_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/covariates/uma_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for Fifteenmile Creek Steelhead.](site_figures/covariate_effects/spillwindow/FIF_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Yakima River Steelhead.](site_figures/covariates/yak_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spillwindow/UMA_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Walla Walla River Steelhead.](site_figures/covariates/wawa_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for Yakima River Steelhead.](site_figures/covariate_effects/spillwindow/YAK_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spillwindow/WAWA_compare_fallback_BON_spillwindow.png)
 
 
 #### Upper Columbia
 
-![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/covariates/wen_ff_comp_median_plot_median_conditions.png)
+For Upper Columbia Steelhead, we will show en-route fallback at Bonneville, McNary, Priest Rapids, and Rock Island Dams.
+
+##### Bonneville
+
+![Effect of spill volume on fallback at Bonneville Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/covariates/ent_ff_comp_median_plot_median_conditions.png)
+![Effect of spill volume on fallback at Bonneville Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_BON_spillwindow.png)
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_BON_spillwindow.png)
+
+##### McNary
+
+![Effect of spill volume on fallback at McNary Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_MCN_spillwindow.png)
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_MCN_spillwindow.png)
+
+##### Priest Rapids
+
+![Effect of spill volume on fallback at Priest Rapids Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_PRA_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Priest Rapids Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_PRA_spillwindow.png)
+<br>
+<br>
+
+![Effect of spill volume on fallback at Priest Rapids Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_PRA_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Priest Rapids Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_PRA_spillwindow.png)
+
+##### Rock Island
+
+![Effect of spill volume on fallback at Rock Island Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_RIS_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Rock Island Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_RIS_spillwindow.png)
+<br>
+<br>
+
+![Effect of spill volume on fallback at Rock Island Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_RIS_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Rock Island Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_RIS_spillwindow.png)
+
 
 
 #### Snake River
 
-![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/covariates/tuc_ff_comp_median_plot_median_conditions.png)
+For Snake Steelhead, we will show en-route fallback at Bonneville, McNary, and Ice Harbor Dams.
+
+##### Bonneville
+
+![Effect of spill volume on fallback at Bonneville Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_BON_spillwindow.png)
 
 <br>
 <br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_BON_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_BON_spillwindow.png)
+
+##### McNary
+
+![Effect of spill volume on fallback at McNary Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_MCN_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_MCN_spillwindow.png)
+
+##### Ice Harbor
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_ICH_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_ICH_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_ICH_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_ICH_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_ICH_spillwindow.png)
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_ICH_spillwindow.png)
+

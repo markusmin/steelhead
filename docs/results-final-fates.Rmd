@@ -28,79 +28,80 @@ For each tributary, the final fates are plotted. If a tributary has both a hatch
 #### Middle Columbia
 
 
-![Final fates of Deschutes River Steelhead.](site_figures/final_fates/old/des_ff_comp_median_plot_median_conditions.png)
+![Final fates of Deschutes River Steelhead.](site_figures/final_fates/des_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of John Day River Steelhead.](site_figures/final_fates/old/jdr_ff_comp_median_plot_median_conditions.png)
+![Final fates of John Day River Steelhead.](site_figures/final_fates/jdr_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Fifteenmile Creek Steelhead.](site_figures/final_fates/old/fif_ff_comp_median_plot_median_conditions.png)
+![Final fates of Fifteenmile Creek Steelhead.](site_figures/final_fates/fif_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Umatilla River Steelhead.](site_figures/final_fates/old/uma_ff_comp_median_plot_median_conditions.png)
+![Final fates of Umatilla River Steelhead.](site_figures/final_fates/uma_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Yakima River Steelhead.](site_figures/final_fates/old/yak_ff_comp_median_plot_median_conditions.png)
+![Final fates of Yakima River Steelhead.](site_figures/final_fates/yak_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Walla Walla River Steelhead.](site_figures/final_fates/old/wawa_ff_comp_median_plot_median_conditions.png)
+![Final fates of Walla Walla River Steelhead.](site_figures/final_fates/wawa_ff_comp_median_plot.png)
 
 
 #### Upper Columbia
 
-![Final fates of Wenatchee River Steelhead.](site_figures/final_fates/old/wen_ff_comp_median_plot_median_conditions.png)
+![Final fates of Wenatchee River Steelhead.](site_figures/final_fates/wen_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Entiat River Steelhead.](site_figures/final_fates/old/ent_ff_comp_median_plot_median_conditions.png)
+![Final fates of Entiat River Steelhead.](site_figures/final_fates/ent_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Okanogan River Steelhead.](site_figures/final_fates/old/oka_ff_comp_median_plot_median_conditions.png)
+![Final fates of Okanogan River Steelhead.](site_figures/final_fates/oka_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Methow River Steelhead.](site_figures/final_fates/old/met_ff_comp_median_plot_median_conditions.png)
+![Final fates of Methow River Steelhead.](site_figures/final_fates/met_ff_comp_median_plot.png)
 
 
 #### Snake River
 
-![Final fates of Tucannon River Steelhead.](site_figures/final_fates/old/tuc_ff_comp_median_plot_median_conditions.png)
+![Final fates of Asotin Creek Steelhead.](site_figures/final_fates/aso_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Asotin Creek Steelhead.](site_figures/final_fates/old/aso_ff_comp_median_plot_median_conditions.png)
+![Final fates of Clearwater River Steelhead.](site_figures/final_fates/cle_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Clearwater River Steelhead.](site_figures/final_fates/old/cle_ff_comp_median_plot_median_conditions.png)
+![Final fates of Imnaha River Steelhead.](site_figures/final_fates/imn_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Imnaha River Steelhead.](site_figures/final_fates/old/imn_ff_comp_median_plot_median_conditions.png)
+![Final fates of Grande Ronde River Steelhead.](site_figures/final_fates/gr_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Grande Ronde River Steelhead.](site_figures/final_fates/old/gr_ff_comp_median_plot_median_conditions.png)
+![Final fates of Salmon River Steelhead.](site_figures/final_fates/sal_ff_comp_median_plot.png)
 
 <br>
 <br>
 
-![Final fates of Salmon River Steelhead.](site_figures/final_fates/old/sal_ff_comp_median_plot_median_conditions.png)
+![Final fates of Tucannon River Steelhead.](site_figures/final_fates/tuc_ff_comp_median_plot.png)
+

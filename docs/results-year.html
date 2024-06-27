@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Markus Min" />
+
+<meta name="date" content="2024-06-27" />
+
+<title>Results - Annual Differences</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Steelhead Movement</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="structure.html">Structure</a>
+</li>
+<li>
+  <a href="diagnostics.html">Diagnostics</a>
+</li>
+<li>
+  <a href="results-final-fates.html">Results - final fates</a>
+</li>
+<li>
+  <a href="results-temperature.html">Results - temperature</a>
+</li>
+<li>
+  <a href="results-spill-days.html">Results - winter spill days</a>
+</li>
+<li>
+  <a href="results-spill-window.html">Results - spill volume</a>
+</li>
+<li>
+  <a href="results-year.html">Results - interannual differences</a>
+</li>
+<li>
+  <a href="restructured_origin_effects.html">New model</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Results - Annual Differences</h1>
+<h4 class="author">Markus Min</h4>
+<h4 class="date">2024-06-27</h4>
+
+</div>
+
+
+<div id="description" class="section level2">
+<h2>Description</h2>
+<p>This page contains results for how specific movement probabilities
+vary by year, and also shows the estimates for the random effect of year
+for certain parameters. As a reminder of how year effects were
+strcutured, a random effect for each year was included only for state
+transitions into or out of states within the DPS boundaries, and random
+effects for year were all origin specific (no DPS-wide year effects).
+Here, I investigate how the probability of making specific movements
+varies interannually,and also look into the specific parameter estimates
+for some years.</p>
+<div id="annual-movement-probability-estimation-steps"
+class="section level3">
+<h3>Annual movement probability estimation steps</h3>
+<p>For each dataset (combination of DPS and rear type), the following
+steps were run:</p>
+<ol style="list-style-type: decimal">
+<li>Extract the median covariate values experienced by all fish in the
+dataset in a specific year (for spill window, winter spill days, and
+temperature). These median values are used to estimate the probability
+of movement.</li>
+<li>Evaluate the probability of movement in each year, based on the
+random effect of year, plus the median covariate valus in that
+year.</li>
+</ol>
+<p>If a tributary has both a hatchery and natural origin population,
+they are shown on the same plot.</p>
+</div>
+<div id="notes" class="section level3">
+<h3>Notes</h3>
+<p><em>Why is the annual movement probability consistently lower than
+the proportion of fish whose final fate is their home
+tributary?</em></p>
+<div id="middle-columbia" class="section level4">
+<h4>Middle Columbia</h4>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/des_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Deschutes River Steelhead." />
+<div class="figcaption">Homing movement probability for Deschutes River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_DES_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/jdr_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for John Day River Steelhead." />
+<div class="figcaption">Homing movement probability for John Day River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_JDR_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/fif_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Fifteenmile Creek Steelhead." />
+<div class="figcaption">Homing movement probability for Fifteenmile
+Creek Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_FIF_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/uma_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Umatilla River Steelhead." />
+<div class="figcaption">Homing movement probability for Umatilla River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_UMA_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_UMA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/yak_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Yakima River Steelhead." />
+<div class="figcaption">Homing movement probability for Yakima River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_YAK_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img
+src="site_figures/annual/WAWA_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Walla Walla River Steelhead." />
+<div class="figcaption">Homing movement probability for Walla Walla
+River Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_WAWA_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_WAWA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+</div>
+<div id="upper-columbia" class="section level4">
+<h4>Upper Columbia</h4>
+<div class="float">
+<img src="site_figures/annual/wen_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Wenatchee River Steelhead." />
+<div class="figcaption">Homing movement probability for Wenatchee River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_WEN_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_WEN_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/ent_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Entiat River Steelhead." />
+<div class="figcaption">Homing movement probability for Entiat River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_ENT_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/oka_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Okanogan River Steelhead." />
+<div class="figcaption">Homing movement probability for Okanogan River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_OKA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/met_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Methow River Steelhead." />
+<div class="figcaption">Homing movement probability for Methow River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_MET_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_MET_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+</div>
+<div id="snake-river" class="section level4">
+<h4>Snake River</h4>
+<div class="float">
+<img src="site_figures/annual/aso_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Asotin Creek Steelhead." />
+<div class="figcaption">Homing movement probability for Asotin Creek
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_ASO_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/cle_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Clearwater River Steelhead." />
+<div class="figcaption">Homing movement probability for Clearwater River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_CLE_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_CLE_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/imn_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Imnaha River Steelhead." />
+<div class="figcaption">Homing movement probability for Imnaha River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_IMN_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_IMN_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/gr_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Grande Ronde River Steelhead." />
+<div class="figcaption">Homing movement probability for Grande Ronde
+River Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_GR_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_GR_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/sal_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Salmon River Steelhead." />
+<div class="figcaption">Homing movement probability for Salmon River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_SAL_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_SAL_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/annual/tuc_rear_homing_movement_by_year_plot.png"
+alt="Homing movement probability for Tucannon River Steelhead." />
+<div class="figcaption">Homing movement probability for Tucannon River
+Steelhead.</div>
+</div>
+<div class="figure" style="text-align: center">
+<img src="site_figures/year_effects/mainstem_TUC_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_TUC_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<p class="caption">
+Random effect of year
+</p>
+</div>
+<p><br> <br></p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
