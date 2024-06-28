@@ -11,7 +11,7 @@ output:
 
 ## Description
 
-This page contains the results for the effects of temperature on key movements. As a reminder for how temperature is included in the model, temperature has an influence on every upstream movement and every movement into tributaries. Temperature parameters are origin-specific within DPS boundaries, and are shared between origins of the same DPS outside of DPS boundaries.On this page, I will focus only on how temperature affects overshoot and movements into tributaries.
+This page contains the results for the effects of temperature on key movements. As a reminder for how temperature is included in the model, temperature has an influence on every upstream movement and every movement into tributaries. The effect of temperature is modeled separately for winter/spring (January-May) and for summer/fall (June-December). Temperature parameters are origin-specific within DPS boundaries, and are shared between origins of the same DPS outside of DPS boundaries. On this page, I will focus only on how temperature affects overshoot and movements into tributaries, and focus only on the summer/fall temperature effect, as this is when upstream transitions are primarily occuring (and therefore, when the risk of overshoot is highest).
 
 
 ### Simulation steps

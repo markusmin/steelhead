@@ -9,23 +9,23 @@ output:
     toc_depth: 3
 ---
 
-## Description
+### Description
 
 This page contains the results for the final fates simulation, using the fitted model object. 
 
 
 ### Simulation steps
 
-For each dataset (combination of DPS and rear type), the following steps were run:
+For each combination of origin and rear type, the following steps were run:
 
 1. Extract the median covariate values experienced by all fish in the dataset (for spill window, winter spill days, and temperature). These median values are used for the simulation.
-2. Randomly select one iteration from the model (one set of draws for all parameters)
-3. Simulate 1000 fish that start at Bonneville Dam and move through the basin, with movements governed by the median covariate values and the values of the parameters from that iteration of the model.
-4. Repeat steps 2 and 3 1000 times, for a total of 1,000 fish.
+2. Randomly select one iteration from the model (one set of draws for all parameters). When given the choice, parameters corrected for detection efficiency were chosen (no parameters were used that were only estimated for years where detection efficiency was not estimated).
+3. Simulate 1,000 fish that start at Bonneville Dam and move through the basin, with movements governed by the median covariate values and the values of the parameters from that iteration of the model.
+4. Repeat steps 2 and 3 1,000 times, for a total of 1,000,000 simulated fish.
 
 For each tributary, the final fates are plotted. If a tributary has both a hatchery and natural origin population, the final fates are compared.
 
-#### Middle Columbia
+### Middle Columbia
 
 
 ![Final fates of Deschutes River Steelhead.](site_figures/final_fates/des_ff_comp_median_plot.png)
@@ -56,7 +56,7 @@ For each tributary, the final fates are plotted. If a tributary has both a hatch
 ![Final fates of Walla Walla River Steelhead.](site_figures/final_fates/wawa_ff_comp_median_plot.png)
 
 
-#### Upper Columbia
+### Upper Columbia
 
 ![Final fates of Wenatchee River Steelhead.](site_figures/final_fates/wen_ff_comp_median_plot.png)
 
@@ -76,7 +76,7 @@ For each tributary, the final fates are plotted. If a tributary has both a hatch
 ![Final fates of Methow River Steelhead.](site_figures/final_fates/met_ff_comp_median_plot.png)
 
 
-#### Snake River
+### Snake River
 
 ![Final fates of Asotin Creek Steelhead.](site_figures/final_fates/aso_ff_comp_median_plot.png)
 

@@ -48,7 +48,7 @@ run for each of our six populations.
 
 <br>
 
-![R-hat statistics. R-hat values should be less than 1.05, and all parameters here have an R-hat of less than 1.01.](site_figures/conv_eff/rhat_comb_plots.png)
+![R-hat statistics. R-hat values should be less than 1.05, and all parameters here have an R-hat of less than 1.01.](site_figures/output_spillrescaled/conv_eff/rhat_comb_plots.png)
 
 <br>
 
@@ -59,7 +59,7 @@ anticorrelation between draws, which reduces the reliability of the
 variance estimate. bulk-ESS indicates that all parameters have a
 sufficient sample size, but a handful of parameters exhibit a slight
 degree of anticorrelation (bulk-ESS \>
-4,000).](site_figures/conv_eff/ess_bulk_comb_plots.png)
+4,000).](site_figures/output_spillrescaled/conv_eff/ess_bulk_comb_plots.png)
 
 <br>
 
@@ -70,7 +70,7 @@ anticorrelation between draws, which reduces the reliability of the
 variance estimate. tail-ESS indicates that all parameters have a
 sufficient sample size, but a handful of parameters exhibit a slight
 degree of anticorrelation (tail-ESS \>
-4,000).](site_figures/conv_eff/ess_tail_comb_plots.png)
+4,000).](site_figures/output_spillrescaled/conv_eff/ess_tail_comb_plots.png)
 
 <br>
 
@@ -81,32 +81,32 @@ for all parameters will not be shown here. Instead, traceplots for a few
 parameters from each model will be shown here.
 
 ![Upper Columbia Wild
-traceplots.](site_figures/traceplots/UCW_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/UCW_traceplots.png)
 
 <br>
 
 ![Upper Columbia Hatchery
-traceplots.](site_figures/traceplots/UCH_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/UCH_traceplots.png)
 
 <br>
 
 ![Middle Columbia Wild
-traceplots.](site_figures/traceplots/MCW_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/MCW_traceplots.png)
 
 <br>
 
 ![Middle Columbia Hatchery
-traceplots.](site_figures/traceplots/MCH_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/MCH_traceplots.png)
 
 <br>
 
 ![Snake River Wild
-traceplots.](site_figures/traceplots/SRW_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/SRW_traceplots.png)
 
 <br>
 
 ![Snake River Hatchery
-traceplots.](site_figures/traceplots/SRH_traceplots.png)
+traceplots.](site_figures/output_spillrescaled/traceplots/SRH_traceplots.png)
 
 <br>
 
@@ -128,23 +128,21 @@ A description of collinearity of predictors in regressions can be found
 in the [Stan User
 Guide](https://mc-stan.org/docs/stan-users-guide/collinearity.html).
 
-The three potential issues that I observe related to collinearity are
-the following: 
+After making the change such that each fish receives only either a DPS-specific or an origin-specific intercept term (which fixed nonsensical collinearity issues between origin and intercept parameters), there are still two common cases of collinearity that are important to be aware of for interpreting parameter estimates:
 
 1. Collinearity between temperature and intercept parameters, for ascending mainstem dams: [Temperature and intercept collinearity]
-2. Collinearity between intercept and origin parameters: [Intercept and origin collinearity]
-3. Collinearity between intercept and spill parameters, for en-route fallback:[Intercept and spill collinearity]
+2. Collinearity between intercept and spill parameters, for en-route fallback:[Intercept and spill collinearity]
 
 <br>
 
 ### Temperature and intercept collinearity
 
-![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/UCW/2_3_pairs_plot.png)
+![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/output_spillrescaled/pairs_plots/UCW/2_3_pairs_plot.png)
 
 <br>
 <br>
 
-![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/pairs_plots/SRH/2_3_pairs_plot.png)
+![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/output_spillrescaled/pairs_plots/SRH/2_3_pairs_plot.png)
 
 <br> 
 <br>
@@ -180,6 +178,15 @@ Of course, temperature and day of year are strongly linked, as
 seen by these plots showing counts of ascents of McNary Dam by day of year and
 temperature, for Upper Columbia and Snake River Steelhead:
 
+![Upper Columbia Wild Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/output_spillrescaled/pairs_plots/UCW/2_3_pairs_plot.png){width=50%}
+
+<br>
+
+![Snake River Hatchery Steelhead, ascending McNary Dam (moving from state 2, BON to MCN, to state 3, MCN to PRA or ICH).](site_figures/output_spillrescaled/pairs_plots/SRH/2_3_pairs_plot.png){width=50%}
+
+
+<br>
+
 ![Upper Columbia River Steelhead ascents at McNary Dam by day of year and temperature.](site_figures/covariate_plots/UC_MCN_temp_v_date.png){width=50%}
 
 <br>
@@ -189,56 +196,10 @@ temperature, for Upper Columbia and Snake River Steelhead:
 <br>
 <br>
 
-### Intercept and origin collinearity
-
-For some movements there is a strong correlation between draws for the
-intercept term and draws for the origin term. This collinearity actually
-makes me want to restructure how we incorporate origin effects. To
-explain, let's look at this pairs plot for Upper Columbia Wild Steelhead
-(UCW), with the probability of descending Rocky Reach Dam (this is
-moving from state 6, which is RRE to WEL, to state 5, which is RIS to
-RRE).
-
-![Upper Columbia Wild Steelhead, descending Rocky Reach Dam (moving from state 6, which is RRE to WEL, to state 5, which is RIS to RRE).](site_figures/pairs_plots/UCW/6_5_pairs_plot.png) 
-
-<br>
-
-For UCW, we have three origins: Wenatchee, Entiat, and Methow. For
-Wenatchee Steelhead, this movement (falling back over Rocky Reach Dam) is beneficial (it represents
-post-overshoot fallback); for Entiat and Methow, which have origins
-above RRE, this movement is not desirable. To interpret these origin
-parameters, a reminder of how these are included in the model: 
-
-- Every fish gets an intercept term (this is *b0_matrix_6_5*) 
-- Wenatchee fish are origin 1, which means they get *borigin1_matrix_6_5* in
-addition to the intercept 
-- Entiat fish are origin 2, which means they get *borigin2_matrix_6_5* in addition to the intercept 
-- Methow fish receive -1 \* (*borigin1_matrix_6_5* + *borigin2_matrix_6_5*)
-
-According to where their natal tributaries are, *borigin2_matrix_6_5*
-should be **negative** for Entiat fish (they don't want to fall back),
-but should be **positive** for Methow fish (because they also don't want
-to fall back, but are affected by -1 \* *borigin2_matrix_6_5*). This
-leads to the biologically nonsensical positive estimate for
-*borigin2_matrix_6_5* that would imply that Entiat fish want to fall back over Rocky Reach (they dont't) seen in the pairs plot as well as the negative
-correlation between this parameter and *b0_matrix_6_5*, as higher
-positive values of *borigin2_matrix_6_5* require a more negative value
-of *b0_matrix_6_5* in order to fit the observed pattern of Entiat River
-fish not falling back.
-
-I propose that we get rid of the intercept term, and instead have only
-origin term when within DPS
-boundaries. This would help fix those strange patterns. The new
-structure would be as such: 
-
-- No intercept term (*b0_matrix_6_5* is eliminated) 
-- Wenatchee fish are origin 1, which means they get *borigin1_matrix_6_5* 
-- Entiat fish are origin 2, which means they get *borigin2_matrix_6_5* 
-- Methow fish are origin 3, which means they get *borigin3_matrix_6_5* (a new parameter)
 
 ### Intercept and spill collinearity
 
-![Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON).](site_figures/pairs_plots/UCW/2_1_pairs_plot.png)
+![Upper Columbia Wild Steelhead, falling back over Bonneville Dam (moving from state 2, which is BON to MCN, to state 1, which is mouth to BON).](site_figures/output_spillrescaled/pairs_plots/UCW/2_1_pairs_plot.png)
 
 <br>
 
@@ -246,10 +207,7 @@ For fallback movements, especially for fallback over BON, the intercept
 (*b0_matrix_2_1*) and spill window (*bspillwindow_matrix_2_1*)
 parameters are negatively correlated, with a similar pattern as that
 seen for the relationship between the *btemp* and *b0* parameters shown
-above. Note that the estimate of the spill parameter is small, but this
-is due to the fact that spill is not z-scored like temperature is,
-because zero values for spill are meaningful - so the covariate
-values that are being multiplied by the *bspill* parameters are about 100 times larger than the z-scored temperature value.
+above.
 
 The same pattern is observed for spill as is observed for temperature:
 fallback events occur primarily at high spill levels, but also with
@@ -266,7 +224,7 @@ high to explain the observed movements, and vice versa.
 
 ##### Pairs plots conclusions
 
-The correlation between temperature + intercept and spill + intercept don't really concern me too much - the posteriors seem to be properly behaved. They just need to be interpreted as representing seasonality as much as they are representing the covariates themselves. The origin vs. intercept correlation and the estimates of some origin parameters indicates that the origin effects in the model should be restructured, as the parameter estimates don't make sense according to the biology of the populations.
+The correlation between temperature + intercept and spill + intercept don't really concern me too much - the posteriors seem to be properly behaved. They just need to be interpreted as representing seasonality as much as they are representing the covariates themselves. 
 
 
 Big picture: The correlation between parameters emphasizes that parameter estimates

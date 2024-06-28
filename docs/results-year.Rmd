@@ -82,6 +82,7 @@ knitr::include_graphics(c("site_figures/year_effects/mainstem_YAK_wild_RE_year_p
 
 
 ![Homing movement probability for Walla Walla River Steelhead.](site_figures/annual/WAWA_rear_homing_movement_by_year_plot.png)
+
 ```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Random effect of year",fig.show='hold',fig.align='center'}
 knitr::include_graphics(c("site_figures/year_effects/mainstem_WAWA_wild_RE_year_plot.png","site_figures/year_effects/mainstem_WAWA_hatchery_RE_year_plot.png"))
 ``` 

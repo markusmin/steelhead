@@ -19,8 +19,6 @@ navbar:
       href: results-spill-window.html    
     - text: "Results - interannual differences"
       href: results-year.html    
-    - text: "New model"
-      href: restructured_origin_effects.html    
 output:
   html_document:
     theme: flatly

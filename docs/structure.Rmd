@@ -36,7 +36,7 @@ To test these hypotheses in the modeling framework, fish from different DPSs and
 In addition to the effects of DPS and rear type that are estimated via the separate estimation of model parameters for hatchery and wild fish from each DPS, four covariates were explicitly included via parameters in the model: origin, temperature, spill, and year.
 
 #### Natal Origin
-To reduce the number of parameters in the model, a fixed effect of natal origin was included only for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed the effect of unique natal origins to differentiate as they neared natal tributaries. Natal origin was modeled as a fixed effect.
+To reduce the number of parameters in the model, a fixed effect of natal origin was included only for state transitions into or out of states within the DPS boundaries, whereas for states outside of the DPS, all origins shared a common movement probability. This model structure allowed the effect of unique natal origins to differentiate as they neared natal tributaries. Natal origin was modeled as a fixed effect. Note that when a fish enters the boundaries of its DPS, the intercept term is eliminated and the origin effect functions as an intercept term.
 
 #### Temperature
 Two separate temperature effects were estimated in our modeling framework, to account for the temporal aspect of temperature. Because temperature is strongly correlated with day of year, which has been previously noted to influence Steelhead migration patterns (Siegel et al. 2021), we divided the effect of temperature into a winter/spring effect (January 1 - May 31) and a summer/fall effect (June 1 - December 31). Depending on the day of year of each movement, the temperature in the window was either multiplied by the winter/spring temperature parameter or the summer/fall temperature parameter. Approximately 96% of all movements occurred in the summer/fall period.
@@ -68,12 +68,11 @@ $$
 
 <br>
 
-In this equation, the parameter $b_0$ is the intercept (the grand mean for all fish in the DPS), and the term $[covariate\:effects]$ is a placeholder for the different covariates that are included in this model. Specifically, the covariates are estimated as follows:
+In this equation, the parameter $b_0$ is the intercept, and the term $[covariate\:effects]$ is a placeholder for the different covariates that are included in this model. Specifically, the covariates are estimated as follows:
 
 <br>
 
-* $b_0$ is a fixed effect for the grand mean of all fish in the model (i.e., the grand mean for all fish of one rear type from one DPS)
-* $b_{origin}$ is a fixed effect for the natal origin
+* $b_0$ is an intercept term (a fixed effect). When outside DPS boundaries this term represents the grand mean of all fish in the model (i.e., the grand mean for all fish of one rear type from one DPS). When inside DPS boundaries, each natal origin receives a different intercept term, which is referred to as $b_{origin}$ rather than $b_0$
 * $b_{spill-window}$ is a fixed effect for the volume of spill
 * $b_{spill-days}$ is a fixed effect for the days of winter spill
 * $b_{temp-early}$ is a fixed effect for temperature when a movement occurs during the winter and spring months (1 Jan - 31 May) for movements outside of a fish's DPS
@@ -85,7 +84,7 @@ In this equation, the parameter $b_0$ is the intercept (the grand mean for all f
 All fixed effects were estimated using a diffuse normal prior with a mean of 0 and a standard deviation of 5, and random effects were estimated using a diffuse Cauchy prior (location of 0 and scale of 1) on the standard deviation.
 
 
-As stated earlier, the covariate effects included vary depending on the type of movement and its relation to the fish's natal origin. To provide an example of the variable nature of which covariates to include, for the probability of a Wenatchee River fish falling back over Rocky Reach Dam, the covariate effects term in the numerator would be as follows:
+As stated earlier, the covariate effects included vary depending on the type of movement and its relation to the fish's natal origin. To provide an example of the variable nature of which covariates to include, for the probability of a Wenatchee River fish falling back over Rocky Reach Dam, the numerator would be as follows:
 
 <br> 
 
@@ -97,7 +96,7 @@ $$
 
 This is because the movement is:
 
-* inside the Upper Columbia DPS boundaries, so there is an effect of origin
+* inside the Upper Columbia DPS boundaries, so the intercept term is origin-specific ($b_origin$ rather than $b_0$)
 * a fallback movement over a dam, so there is an effect of the volume of spill
 * a post-overshoot fallback movement over a dam (because Rocky Reach Dam is upstream of the Wenatchee River), so there is an effect of the days of spill during the winter months
 * inside the Upper Columbia DPS boundaries, so there is an effect of year
