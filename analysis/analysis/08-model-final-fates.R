@@ -427,13 +427,21 @@ final_fates_simulation_UCW <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
-  
+
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(UCW_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -464,7 +472,11 @@ final_fates_simulation_UCW <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(UCW_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -476,7 +488,11 @@ final_fates_simulation_UCW <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(UCW_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -593,13 +609,21 @@ final_fates_simulation_UCH <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
   
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(UCH_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -630,7 +654,11 @@ final_fates_simulation_UCH <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(UCH_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -642,7 +670,11 @@ final_fates_simulation_UCH <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(UCH_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -760,13 +792,21 @@ final_fates_simulation_MCW <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
   
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(MCW_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -784,7 +824,7 @@ final_fates_simulation_MCW <- function(nsim,
       winterspill[i] <- median(winterspill_data[,i])
     }
     
-
+    
   }
   
   
@@ -797,7 +837,11 @@ final_fates_simulation_MCW <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(MCW_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -809,7 +853,11 @@ final_fates_simulation_MCW <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(MCW_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -944,13 +992,21 @@ final_fates_simulation_MCH <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
   
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(MCH_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -981,7 +1037,11 @@ final_fates_simulation_MCH <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(MCH_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -993,7 +1053,11 @@ final_fates_simulation_MCH <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(MCH_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -1105,13 +1169,21 @@ final_fates_simulation_SRW <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
   
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(SRW_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -1142,7 +1214,11 @@ final_fates_simulation_SRW <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(SRW_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -1154,7 +1230,11 @@ final_fates_simulation_SRW <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(SRW_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -1290,13 +1370,21 @@ final_fates_simulation_SRH <- function(nsim,
   # select the iteration you will use
   iter <- sample(1:4000, 1)
   
+  # for all conditions:
+  # if there are ever any states that aren't visited by this particular origin/rear
+  # combo, then borrow states_dates from the DPS
+  
   # randomly select dates from actual dates at states
   # create a vector of length 9 (for 9 mainstem sites)
   sample_date <- vector(length = 9)
   
   # populate by selecting one date randomly for each state
   for(i in 1:length(sample_date)){
-    sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    if(nrow(subset(states_dates, state == i)) == 0){
+      sample_date[i] <- sample(subset(SRH_states_dates, state == i)$date, 1)
+    } else{
+      sample_date[i] <- sample(subset(states_dates, state == i)$date, 1)
+    }
   }
   
   # convert these to random years for winter spill
@@ -1327,7 +1415,11 @@ final_fates_simulation_SRH <- function(nsim,
       temp[i] <- temp_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        temp[i] <- median(temp_data[subset(SRH_states_dates, state == i)$date,i])
+      } else {
+        temp[i] <- median(temp_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -1339,7 +1431,11 @@ final_fates_simulation_SRH <- function(nsim,
       spillwindow[i] <- spillwindow_data[sample_date[i],i]
     } else {
       # approach 2: Take the median conditions for each state
-      spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      if(nrow(subset(states_dates, state == i)) == 0){
+        spillwindow[i] <- median(spillwindow_data[subset(SRH_states_dates, state == i)$date,i])
+      } else {
+        spillwindow[i] <- median(spillwindow_data[subset(states_dates, state == i)$date,i])
+      }
     }
     
   }
@@ -1479,23 +1575,49 @@ SRW_states_dates <- data.frame(state = as.vector(SRW_envir$data$y),
 SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
                                date = as.vector(SRH_envir$data$transition_dates))
 
+# Get states/dates by origin as well
+get_origin_states_dates <- function(envir, origin_select, rear){
+  
+  origin_vector <- vector(length = nrow(envir$data$cat_X_mat))
+  for(i in 1:nrow(envir$data$cat_X_mat)){
+    origin_vector[i] <- which(envir$data$cat_X_mat[i,]==1)
+  }
+  
+  pop_states_dates <- data.frame(state = as.vector(t(envir$data$y)),
+                                 date = as.vector(t(envir$data$transition_dates)),
+                                 origin = rep(origin_vector, each = ncol(envir$data$y)))
+  
+  
+  # Now, keep only the origin selected
+  if(rear == "wild"){
+    origin_numeric <- subset(origin_param_map, natal_origin == origin_select)$wild
+  } else {
+    origin_numeric <- subset(origin_param_map, natal_origin == origin_select)$hatchery
+  }
+  
+  subset(pop_states_dates, origin == origin_numeric) -> origin_states_dates
+  
+  return(origin_states_dates)
+}
+
+wen_wild_states_dates <- get_origin_states_dates(envir = UCW_envir, origin_select = "Wenatchee River", rear = "wild")
 
 # create a list that maps origin numbers (params) to what they actually are
 natal_origins <- gsub(" Mouth| Upstream", "", model_states)
 natal_origins <- natal_origins[!(duplicated(natal_origins))]
 natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(grepl("other tributaries", natal_origins))]
 natal_origins <- natal_origins[!(natal_origins == "loss")]
 
+# Use the parameter map to index the right effects
 origin_param_map <- data.frame(
   natal_origin = natal_origins,
   hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
                1,NA,2,3, # UC
-               5,NA,1,4,2,3, # SR
-               NA, NA),
+               5,NA,1,4,2,3), # SR,
   wild = c(1,3,NA,2,4,6,5, # MC
            1,2,NA,3, # UC
-           6,1,2,5,3,4, # SR
-           NA, NA))
+           6,1,2,5,3,4)) # SR
 
 
 compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
@@ -1517,7 +1639,7 @@ compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for wild
       sim_wild <- final_fates_simulation_UCW(nsim = nsim,
-                                             start_state = 2, states_dates = UCW_states_dates,
+                                             start_state = 2, states_dates = get_origin_states_dates(envir = UCW_envir, origin_select = origin_select, rear = "wild"),
                                              origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                              temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, 
                                              winterspill_data = UCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1570,7 +1692,7 @@ compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for hatchery
       sim_hatchery <- final_fates_simulation_UCH(nsim = nsim,
-                                                 start_state = 2, states_dates = UCH_states_dates,
+                                                 start_state = 2, states_dates = get_origin_states_dates(envir = UCH_envir, origin_select = origin_select, rear = "hatchery"),
                                                  origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], origin3 = hatchery_origin_params[3],
                                                  temp_data = UCH_envir$data$temperature_data, spillwindow_data = UCH_envir$data$spill_window_data, 
                                                  winterspill_data = UCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1625,7 +1747,7 @@ compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
   for(i in 1:niter) {
     # Run final fates simulation for wild
     sim_wild <- final_fates_simulation_UCW(nsim = nsim,
-                                      start_state = 2, states_dates = UCW_states_dates,
+                                      start_state = 2, states_dates = get_origin_states_dates(envir = UCW_envir, origin_select = origin_select, rear = "wild"),
                                       origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                       temp_data = UCW_envir$data$temperature_data, spillwindow_data = UCW_envir$data$spill_window_data, 
                                       winterspill_data = UCW_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1634,7 +1756,7 @@ compare_final_fate_rear_type_UC <- function(niter, nsim, condition_jitter,
     
     # Run final fates simulation for hatchery
     sim_hatchery <- final_fates_simulation_UCH(nsim = nsim,
-                                      start_state = 2, states_dates = UCH_states_dates,
+                                      start_state = 2, states_dates = get_origin_states_dates(envir = UCH_envir, origin_select = origin_select, rear = "hatchery"),
                                       origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], origin3 = hatchery_origin_params[3],
                                       temp_data = UCH_envir$data$temperature_data, spillwindow_data = UCH_envir$data$spill_window_data, 
                                       winterspill_data = UCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1721,7 +1843,7 @@ compare_final_fate_rear_type_MC <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for wild
       sim_wild <- final_fates_simulation_MCW(nsim = nsim,
-                                             start_state = 2, states_dates = MCW_states_dates,
+                                             start_state = 2, states_dates = get_origin_states_dates(envir = MCW_envir, origin_select = origin_select, rear = "wild"),
                                              origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                              origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
                                              temp_data = MCW_envir$data$temperature_data, spillwindow_data = MCW_envir$data$spill_window_data, 
@@ -1775,7 +1897,7 @@ compare_final_fate_rear_type_MC <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for hatchery
       sim_hatchery <- final_fates_simulation_MCH(nsim = nsim,
-                                                 start_state = 2, states_dates = MCH_states_dates,
+                                                 start_state = 2, states_dates = get_origin_states_dates(envir = MCH_envir, origin_select = origin_select, rear = "hatchery"),
                                                  origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
                                                  temp_data = MCH_envir$data$temperature_data, spillwindow_data = MCH_envir$data$spill_window_data, 
                                                  winterspill_data = MCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1830,7 +1952,7 @@ compare_final_fate_rear_type_MC <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for wild
       sim_wild <- final_fates_simulation_MCW(nsim = nsim,
-                                             start_state = 2, states_dates = MCW_states_dates,
+                                             start_state = 2, states_dates = get_origin_states_dates(envir = MCW_envir, origin_select = origin_select, rear = "wild"),
                                              origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                              origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
                                              temp_data = MCW_envir$data$temperature_data, spillwindow_data = MCW_envir$data$spill_window_data, 
@@ -1840,7 +1962,7 @@ compare_final_fate_rear_type_MC <- function(niter, nsim, condition_jitter,
       
       # Run final fates simulation for hatchery
       sim_hatchery <- final_fates_simulation_MCH(nsim = nsim,
-                                                 start_state = 2, states_dates = MCH_states_dates,
+                                                 start_state = 2, states_dates = get_origin_states_dates(envir = MCH_envir, origin_select = origin_select, rear = "hatchery"),
                                                  origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2],
                                                  temp_data = MCH_envir$data$temperature_data, spillwindow_data = MCH_envir$data$spill_window_data, 
                                                  winterspill_data = MCH_envir$data$winter_spill_days_data, condition_jitter = condition_jitter)
@@ -1927,7 +2049,7 @@ compare_final_fate_rear_type_SR <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for wild
       sim_wild <- final_fates_simulation_SRW(nsim = nsim,
-                                             start_state = 2, states_dates = SRW_states_dates,
+                                             start_state = 2, states_dates = get_origin_states_dates(envir = SRW_envir, origin_select = origin_select, rear = "wild"),
                                              origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                              origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
                                              temp_data = SRW_envir$data$temperature_data, spillwindow_data = SRW_envir$data$spill_window_data, 
@@ -1981,7 +2103,7 @@ compare_final_fate_rear_type_SR <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for hatchery
       sim_hatchery <- final_fates_simulation_SRH(nsim = nsim,
-                                                 start_state = 2, states_dates = SRH_states_dates,
+                                                 start_state = 2, states_dates = get_origin_states_dates(envir = SRH_envir, origin_select = origin_select, rear = "hatchery"),
                                                  origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
                                                  origin3 = hatchery_origin_params[3], origin4 = hatchery_origin_params[4], 
                                                  origin5 = hatchery_origin_params[5],
@@ -2038,7 +2160,7 @@ compare_final_fate_rear_type_SR <- function(niter, nsim, condition_jitter,
     for(i in 1:niter) {
       # Run final fates simulation for wild
       sim_wild <- final_fates_simulation_SRW(nsim = nsim,
-                                             start_state = 2, states_dates = SRW_states_dates,
+                                             start_state = 2, states_dates = get_origin_states_dates(envir = SRW_envir, origin_select = origin_select, rear = "wild"),
                                              origin1 = wild_origin_params[1], origin2 = wild_origin_params[2], origin3 = wild_origin_params[3],
                                              origin4 = wild_origin_params[4], origin5 = wild_origin_params[5], origin6 = wild_origin_params[6],
                                              temp_data = SRW_envir$data$temperature_data, spillwindow_data = SRW_envir$data$spill_window_data, 
@@ -2048,7 +2170,7 @@ compare_final_fate_rear_type_SR <- function(niter, nsim, condition_jitter,
       
       # Run final fates simulation for hatchery
       sim_hatchery <- final_fates_simulation_SRH(nsim = nsim,
-                                                 start_state = 2, states_dates = SRH_states_dates,
+                                                 start_state = 2, states_dates = get_origin_states_dates(envir = SRH_envir, origin_select = origin_select, rear = "hatchery"),
                                                  origin1 = hatchery_origin_params[1], origin2 = hatchery_origin_params[2], 
                                                  origin3 = hatchery_origin_params[3], origin4 = hatchery_origin_params[4], 
                                                  origin5 = hatchery_origin_params[5],
@@ -2205,32 +2327,32 @@ ggsave(here::here("stan_actual", "output", "final_fates", "met_ff_comp_median_pl
 # Deschutes comparison
 des_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Deschutes River", condition_jitter = FALSE)
 des_ff_comp_median_plot <- plot_final_fate_rear_type(des_ff_comp_median, natal_origin = "Deschutes River")
-ggsave(here::here("stan_actual", "output", "final_fates", "des_ff_comp_median_plot_median_conditions.png"), des_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "des_ff_comp_median_plot.png"), des_ff_comp_median_plot, height = 8, width = 8)
 
 # John Day comparison
 jdr_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "John Day River", condition_jitter = FALSE)
 jdr_ff_comp_median_plot <- plot_final_fate_rear_type(jdr_ff_comp_median, natal_origin = "John Day River")
-ggsave(here::here("stan_actual", "output", "final_fates", "jdr_ff_comp_median_plot_median_conditions.png"), jdr_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "jdr_ff_comp_median_plot.png"), jdr_ff_comp_median_plot, height = 8, width = 8)
 
 # Fifteenmile Creek comparison
 fif_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Fifteenmile Creek", condition_jitter = FALSE)
 fif_ff_comp_median_plot <- plot_final_fate_rear_type(fif_ff_comp_median, natal_origin = "Fifteenmile Creek")
-ggsave(here::here("stan_actual", "output", "final_fates", "fif_ff_comp_median_plot_median_conditions.png"), fif_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "fif_ff_comp_median_plot.png"), fif_ff_comp_median_plot, height = 8, width = 8)
 
 # Umatilla comparison
 uma_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Umatilla River", condition_jitter = FALSE)
 uma_ff_comp_median_plot <- plot_final_fate_rear_type(uma_ff_comp_median, natal_origin = "Umatilla River")
-ggsave(here::here("stan_actual", "output", "final_fates", "uma_ff_comp_median_plot_median_conditions.png"), uma_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "uma_ff_comp_median_plot.png"), uma_ff_comp_median_plot, height = 8, width = 8)
 
 # Yakima comparison
 yak_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Yakima River", condition_jitter = FALSE)
 yak_ff_comp_median_plot <- plot_final_fate_rear_type(yak_ff_comp_median, natal_origin = "Yakima River")
-ggsave(here::here("stan_actual", "output", "final_fates", "yak_ff_comp_median_plot_median_conditions.png"), yak_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "yak_ff_comp_median_plot.png"), yak_ff_comp_median_plot, height = 8, width = 8)
 
 # Walla Walla comparison
 wawa_ff_comp_median <- compare_final_fate_rear_type_MC(niter = ff_iter, nsim = ff_nsim, origin_select = "Walla Walla River", condition_jitter = FALSE)
 wawa_ff_comp_median_plot <- plot_final_fate_rear_type(wawa_ff_comp_median, natal_origin = "Walla Walla River")
-ggsave(here::here("stan_actual", "output", "final_fates", "wawa_ff_comp_median_plot_median_conditions.png"), wawa_ff_comp_median_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "final_fates", "wawa_ff_comp_median_plot.png"), wawa_ff_comp_median_plot, height = 8, width = 8)
 
 
 ## Snake River
