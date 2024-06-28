@@ -16,6 +16,7 @@ library(stringr)
 library(rlang)
 library(tibble)
 library(forcats)
+library(lubridate)
 
 # get the model states into a df, to help with interpretation
 model_states = c(
@@ -400,6 +401,7 @@ borigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin5", 
 natal_origins <- gsub(" Mouth| Upstream", "", model_states)
 natal_origins <- natal_origins[!(duplicated(natal_origins))]
 natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(grepl("other tributaries", natal_origins))]
 natal_origins <- natal_origins[!(natal_origins == "loss")]
 
 # Use the parameter map to index the right effects
@@ -407,12 +409,10 @@ origin_param_map <- data.frame(
   natal_origin = natal_origins,
   hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
                1,NA,2,3, # UC
-               5,NA,1,4,2,3, # SR
-               NA, NA),
+               5,NA,1,4,2,3), # SR,
   wild = c(1,3,NA,2,4,6,5, # MC
            1,2,NA,3, # UC
-           6,1,2,5,3,4, # SR
-           NA, NA))
+           6,1,2,5,3,4)) # SR
 
 
 extract_covariate_experiences <- function(envir, rear, origin_select){
@@ -421,10 +421,15 @@ extract_covariate_experiences <- function(envir, rear, origin_select){
     origin_vector[i] <- which(envir$data$cat_X_mat[i,]==1)
   }
   
-  pop_states_dates <- data.frame(state = as.vector(envir$data$y),
-                                 date = as.vector(envir$data$transition_dates),
-                                 year = ceiling(as.vector(envir$data$transition_dates)/365.25)+1,
-                                 origin = rep(origin_vector, ncol(envir$data$y)))
+  
+  # for spill days - include the winter post-overshoot vector, which contains
+  # info on whether they could have experienced winter spill conditions or not
+  pop_states_dates <- data.frame(state = as.vector(t(envir$data$y)),
+                                 date = as.vector(t(envir$data$transition_dates)),
+                                 year = ceiling(as.vector(t(envir$data$transition_dates))/365.25)+1,
+                                 origin = rep(origin_vector, each = ncol(envir$data$y)))
+  
+  
   # add mainstem dam for each state
   dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
                           state = seq(2,9))
@@ -454,6 +459,14 @@ extract_covariate_experiences <- function(envir, rear, origin_select){
     left_join(., spill_window_long, by = c("date", "dam")) %>% 
     left_join(., temp_long, by = c("date", "dam")) %>% 
     left_join(., spill_days_long, by = c("year", "dam")) -> pop_states_dates_covariates
+  
+  # drop observations in the loss state and with index 0
+  pop_states_dates_covariates %>% 
+    filter(!(state %in% c(0,43))) -> pop_states_dates_covariates
+  
+  # now add winter post-overshoot vector
+  pop_states_dates_covariates$winter_post_overshoot_vector <- as.vector(envir$data$winter_post_overshoot_vector)
+  
   
   # Now, keep only the origin selected
   if(rear == "wild"){
@@ -500,7 +513,7 @@ estimate_spillwindow_effect_UCW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -545,7 +558,7 @@ estimate_spillwindow_effect_UCW <- function(origin_select, movements){
                                                  # btemp0_array_UCW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                  btemp1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp + 
                                                  bspillwindow_array_UCW[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                 bwinterspill_array_UCW[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                 # bwinterspill_array_UCW[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                  # btemp0xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  btemp1xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                  # btemp0xorigin2_array_UCW[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -559,7 +572,7 @@ estimate_spillwindow_effect_UCW <- function(origin_select, movements){
                     # btemp0_array_UCW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_UCW[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_UCW[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_UCW[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_UCW[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_UCW[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_UCW[movements$from[i],possible_movements,iter]*origin2 + 
@@ -597,7 +610,7 @@ estimate_spillwindow_effect_UCH <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -642,7 +655,7 @@ estimate_spillwindow_effect_UCH <- function(origin_select, movements){
                                                         # btemp0_array_UCH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                         btemp1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp + 
                                                         bspillwindow_array_UCH[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                        bwinterspill_array_UCH[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                        # bwinterspill_array_UCH[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                         # btemp0xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*origin1 +
                                                         btemp1xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                         # btemp0xorigin2_array_UCH[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -656,7 +669,7 @@ estimate_spillwindow_effect_UCH <- function(origin_select, movements){
                     # btemp0_array_UCH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_UCH[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_UCH[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_UCH[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_UCH[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_UCH[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_UCH[movements$from[i],possible_movements,iter]*origin2 + 
@@ -697,7 +710,7 @@ estimate_spillwindow_effect_MCW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -742,7 +755,7 @@ estimate_spillwindow_effect_MCW <- function(origin_select, movements){
                                                  # btemp0_array_MCW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                  btemp1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp + 
                                                  bspillwindow_array_MCW[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                 bwinterspill_array_MCW[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                 # bwinterspill_array_MCW[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                  # btemp0xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  btemp1xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                  # btemp0xorigin2_array_MCW[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -765,7 +778,7 @@ estimate_spillwindow_effect_MCW <- function(origin_select, movements){
                     # btemp0_array_MCW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_MCW[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_MCW[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_MCW[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_MCW[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_MCW[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_MCW[movements$from[i],possible_movements,iter]*origin2 + 
@@ -812,7 +825,7 @@ estimate_spillwindow_effect_MCH <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -857,7 +870,7 @@ estimate_spillwindow_effect_MCH <- function(origin_select, movements){
                                                  # btemp0_array_MCH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                  btemp1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp + 
                                                  bspillwindow_array_MCH[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                 bwinterspill_array_MCH[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                 # bwinterspill_array_MCH[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                  # btemp0xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*origin1 +
                                                  btemp1xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                  # btemp0xorigin2_array_MCH[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -868,7 +881,7 @@ estimate_spillwindow_effect_MCH <- function(origin_select, movements){
                     # btemp0_array_MCH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_MCH[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_MCH[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_MCH[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_MCH[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_MCH[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_MCH[movements$from[i],possible_movements,iter]*origin2 + 
@@ -907,7 +920,7 @@ estimate_spillwindow_effect_SRW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -952,7 +965,7 @@ estimate_spillwindow_effect_SRW <- function(origin_select, movements){
                                                  # btemp0_array_SRW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                  btemp1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp + 
                                                  bspillwindow_array_SRW[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                 bwinterspill_array_SRW[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                 # bwinterspill_array_SRW[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                  # btemp0xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  btemp1xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                  # btemp0xorigin2_array_SRW[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -975,7 +988,7 @@ estimate_spillwindow_effect_SRW <- function(origin_select, movements){
                     # btemp0_array_SRW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_SRW[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_SRW[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_SRW[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_SRW[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_SRW[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_SRW[movements$from[i],possible_movements,iter]*origin2 + 
@@ -1025,7 +1038,7 @@ estimate_spillwindow_effect_SRH <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -1070,7 +1083,7 @@ estimate_spillwindow_effect_SRH <- function(origin_select, movements){
                                                  # btemp0_array_SRH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                  btemp1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp + 
                                                  bspillwindow_array_SRH[movements$from[i],movements$to[i],iter]*spill_predict[j] +
-                                                 bwinterspill_array_SRH[movements$from[i],movements$to[i],iter]*med_winterspill +
+                                                 # bwinterspill_array_SRH[movements$from[i],movements$to[i],iter]*med_winterspill + # indexing is set up so that if spill window is selected, spill days is ignored
                                                  # btemp0xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*origin1 +
                                                  btemp1xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
                                                  # btemp0xorigin2_array_SRH[movements$from[i],movements$to[i],iter]*origin2 + 
@@ -1090,7 +1103,7 @@ estimate_spillwindow_effect_SRH <- function(origin_select, movements){
                     # btemp0_array_SRH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                     btemp1_array_SRH[movements$from[i],possible_movements,iter]*med_temp + 
                     bspillwindow_array_SRH[movements$from[i],possible_movements,iter]*spill_predict[j] +
-                    bwinterspill_array_SRH[movements$from[i],possible_movements,iter]*med_winterspill +
+                    # bwinterspill_array_SRH[movements$from[i],possible_movements,iter]*med_winterspill +
                     # btemp0xorigin1_array_SRH[movements$from[i],possible_movements,iter]*origin1 +
                     btemp1xorigin1_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
                     # btemp0xorigin2_array_SRH[movements$from[i],possible_movements,iter]*origin2 + 
@@ -1127,10 +1140,32 @@ estimate_spillwindow_effect_SRH <- function(origin_select, movements){
 
 # create df to index to right dam temp for plotting
 dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
-                        index = seq(2,9))
+                        state = seq(2,9))
 
 # another plot option to compare between hatchery and wild
 rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+
+# set up post-overshoot info so that we don't select fish that got the spill days covariate instead
+post_overshoot_combos <- list(c(NA), # Asotin Creek
+                              c(NA), # Clearwater River
+                              c(3,4,5,6,7,8,9), # Deschutes River
+                              c(7), # Entiat River
+                              c(3,4,5,6,7,8,9), # Fifteenmile Creek
+                              c(NA), # Grande Ronde River
+                              c(3,4,5,6,7,8,9), # Hood River
+                              c(NA), # Imnaha River
+                              c(3,4,5,6,7,8,9), # John Day River
+                              c(NA), # Methow River
+                              c(NA), # Okanogan River
+                              c(NA), # Salmon River
+                              c(9), # Tucannon River
+                              c(3,4,5,6,7,8,9), # Umatilla River
+                              c(4,5,6,7,8,9), # Walla Walla River
+                              c(6,7), # Wenatchee River
+                              c(4,5,6,7,8,9)) # Yakima River
+
+names(post_overshoot_combos) <- natal_origins[order(natal_origins)]
+
 
 plot_compare_rear_spill_effect <- function(origin_select,
                                            wild_move_prob_array = NULL, hatchery_move_prob_array = NULL,
@@ -1247,6 +1282,10 @@ plot_compare_rear_spill_effect <- function(origin_select,
     
     
   }
+  
+  # Remove any instances for rug plot of fish that would have received winter spill days covariate
+  covariate_experiences %>% 
+    filter(!(state %in% post_overshoot_combos[[origin_select]] & month %in% c(1,2,3))) -> covariate_experiences
   
   rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
                                                                           color = rear, fill = rear)) +
@@ -1742,7 +1781,7 @@ estimate_spilldays_effect_UCW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -1766,15 +1805,27 @@ estimate_spilldays_effect_UCW <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
-                                   date = as.vector(UCW_envir$data$transition_dates))
+                                   date_numeric = as.vector(UCW_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- UCW_envir$data$temperature
-    med_temp <- median(temp_data[subset(UCW_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    UCW_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> UCW_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- UCW_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(UCW_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(UCW_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(UCW_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -1784,30 +1835,30 @@ estimate_spilldays_effect_UCW <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_UCW[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_UCW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_UCW[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_UCW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_UCW[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_UCW[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_UCW[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
-                                                 # btemp0xorigin3_array_UCW[movements$from[i],movements$to[i],iter]*origin3 +
-                                                 btemp1xorigin3_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 btemp0xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin3_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 # btemp1xorigin3_array_UCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
                                                  borigin1_array_UCW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_UCW[movements$from[i],movements$to[i],iter]*origin2 +
                                                  borigin3_array_UCW[movements$from[i],movements$to[i],iter]*origin3)/
           sum(exp(b0_array_UCW[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_UCW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_UCW[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_UCW[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_UCW[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_UCW[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_UCW[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_UCW[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_UCW[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_UCW[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
-                    # btemp0xorigin3_array_UCW[movements$from[i],possible_movements,iter]*origin3 +
-                    btemp1xorigin3_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    btemp0xorigin1_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin3_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    # btemp1xorigin3_array_UCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
                     borigin1_array_UCW[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_UCW[movements$from[i],possible_movements,iter]*origin2 +
                     borigin3_array_UCW[movements$from[i],possible_movements,iter]*origin3))
@@ -1840,7 +1891,7 @@ estimate_spilldays_effect_UCH <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -1864,15 +1915,27 @@ estimate_spilldays_effect_UCH <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     UCH_states_dates <- data.frame(state = as.vector(UCH_envir$data$y),
-                                   date = as.vector(UCH_envir$data$transition_dates))
+                                   date_numeric = as.vector(UCH_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- UCH_envir$data$temperature
-    med_temp <- median(temp_data[subset(UCH_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    UCH_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> UCH_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- UCH_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(UCH_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(UCH_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(UCH_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -1882,30 +1945,30 @@ estimate_spilldays_effect_UCH <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_UCH[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_UCH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_UCH[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_UCH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_UCH[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_UCH[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_UCH[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
-                                                 # btemp0xorigin3_array_UCH[movements$from[i],movements$to[i],iter]*origin3 +
-                                                 btemp1xorigin3_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 btemp0xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin3_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 # btemp1xorigin3_array_UCH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
                                                  borigin1_array_UCH[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_UCH[movements$from[i],movements$to[i],iter]*origin2 +
                                                  borigin3_array_UCH[movements$from[i],movements$to[i],iter]*origin3)/
           sum(exp(b0_array_UCH[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_UCH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_UCH[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_UCH[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_UCH[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_UCH[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_UCH[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_UCH[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_UCH[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_UCH[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
-                    # btemp0xorigin3_array_UCH[movements$from[i],possible_movements,iter]*origin3 +
-                    btemp1xorigin3_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    btemp0xorigin1_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin3_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    # btemp1xorigin3_array_UCH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
                     borigin1_array_UCH[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_UCH[movements$from[i],possible_movements,iter]*origin2 +
                     borigin3_array_UCH[movements$from[i],possible_movements,iter]*origin3))
@@ -1922,6 +1985,7 @@ estimate_spilldays_effect_UCH <- function(origin_select, movements){
   return(spill_move_prob_array)
   
 }
+
 
 estimate_spilldays_effect_MCW <- function(origin_select, movements){
   
@@ -1941,7 +2005,7 @@ estimate_spilldays_effect_MCW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -1965,15 +2029,27 @@ estimate_spilldays_effect_MCW <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     MCW_states_dates <- data.frame(state = as.vector(MCW_envir$data$y),
-                                   date = as.vector(MCW_envir$data$transition_dates))
+                                   date_numeric = as.vector(MCW_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- MCW_envir$data$temperature
-    med_temp <- median(temp_data[subset(MCW_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    MCW_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> MCW_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- MCW_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(MCW_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(MCW_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(MCW_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -1983,22 +2059,22 @@ estimate_spilldays_effect_MCW <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_MCW[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_MCW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_MCW[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_MCW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_MCW[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_MCW[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_MCW[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
-                                                 # btemp0xorigin3_array_MCW[movements$from[i],movements$to[i],iter]*origin3 +
-                                                 btemp1xorigin3_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
-                                                 # btemp0xorigin4_array_MCW[movements$from[i],movements$to[i],iter]*origin4 +
-                                                 btemp1xorigin4_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
-                                                 # btemp0xorigin5_array_MCW[movements$from[i],movements$to[i],iter]*origin5 +
-                                                 btemp1xorigin5_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
-                                                 # btemp0xorigin6_array_MCW[movements$from[i],movements$to[i],iter]*origin6 +
-                                                 btemp1xorigin6_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
+                                                 btemp0xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin3_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 # btemp1xorigin3_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 btemp0xorigin4_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 # btemp1xorigin4_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 btemp0xorigin5_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 # btemp1xorigin5_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 btemp0xorigin6_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
+                                                 # btemp1xorigin6_array_MCW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
                                                  borigin1_array_MCW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_MCW[movements$from[i],movements$to[i],iter]*origin2 +
                                                  borigin3_array_MCW[movements$from[i],movements$to[i],iter]*origin3 +
@@ -2006,22 +2082,22 @@ estimate_spilldays_effect_MCW <- function(origin_select, movements){
                                                  borigin5_array_MCW[movements$from[i],movements$to[i],iter]*origin5 +
                                                  borigin6_array_MCW[movements$from[i],movements$to[i],iter]*origin6)/
           sum(exp(b0_array_MCW[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_MCW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_MCW[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_MCW[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_MCW[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_MCW[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_MCW[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_MCW[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_MCW[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_MCW[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
-                    # btemp0xorigin3_array_MCW[movements$from[i],possible_movements,iter]*origin3 +
-                    btemp1xorigin3_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
-                    # btemp0xorigin4_array_MCW[movements$from[i],possible_movements,iter]*origin4 +
-                    btemp1xorigin4_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
-                    # btemp0xorigin5_array_MCW[movements$from[i],possible_movements,iter]*origin5 +
-                    btemp1xorigin5_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
-                    # btemp0xorigin6_array_MCW[movements$from[i],possible_movements,iter]*origin6 +
-                    btemp1xorigin6_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
+                    btemp0xorigin1_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin3_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    # btemp1xorigin3_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    btemp0xorigin4_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    # btemp1xorigin4_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    btemp0xorigin5_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    # btemp1xorigin5_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    btemp0xorigin6_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
+                    # btemp1xorigin6_array_MCW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
                     borigin1_array_MCW[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_MCW[movements$from[i],possible_movements,iter]*origin2 +
                     borigin3_array_MCW[movements$from[i],possible_movements,iter]*origin3 +
@@ -2053,11 +2129,10 @@ estimate_spilldays_effect_MCH <- function(origin_select, movements){
   # use this vector to set all of the individual origin indices
   origin1 = hatchery_origin_params[1]
   origin2 = hatchery_origin_params[2]
-
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -2081,15 +2156,27 @@ estimate_spilldays_effect_MCH <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     MCH_states_dates <- data.frame(state = as.vector(MCH_envir$data$y),
-                                   date = as.vector(MCH_envir$data$transition_dates))
+                                   date_numeric = as.vector(MCH_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- MCH_envir$data$temperature
-    med_temp <- median(temp_data[subset(MCH_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    MCH_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> MCH_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- MCH_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(MCH_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(MCH_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(MCH_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -2099,25 +2186,25 @@ estimate_spilldays_effect_MCH <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_MCH[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_MCH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_MCH[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_MCH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_MCH[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_MCH[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_MCH[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_MCH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
                                                  borigin1_array_MCH[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_MCH[movements$from[i],movements$to[i],iter]*origin2)/
           sum(exp(b0_array_MCH[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_MCH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_MCH[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_MCH[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_MCH[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_MCH[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_MCH[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_MCH[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_MCH[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_MCH[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin1_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_MCH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
                     borigin1_array_MCH[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_MCH[movements$from[i],possible_movements,iter]*origin2))
         
@@ -2152,7 +2239,7 @@ estimate_spilldays_effect_SRW <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -2176,15 +2263,27 @@ estimate_spilldays_effect_SRW <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     SRW_states_dates <- data.frame(state = as.vector(SRW_envir$data$y),
-                                   date = as.vector(SRW_envir$data$transition_dates))
+                                   date_numeric = as.vector(SRW_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- SRW_envir$data$temperature
-    med_temp <- median(temp_data[subset(SRW_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    SRW_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> SRW_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- SRW_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(SRW_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(SRW_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(SRW_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -2194,22 +2293,22 @@ estimate_spilldays_effect_SRW <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_SRW[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_SRW[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_SRW[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_SRW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_SRW[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_SRW[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_SRW[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
-                                                 # btemp0xorigin3_array_SRW[movements$from[i],movements$to[i],iter]*origin3 +
-                                                 btemp1xorigin3_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
-                                                 # btemp0xorigin4_array_SRW[movements$from[i],movements$to[i],iter]*origin4 +
-                                                 btemp1xorigin4_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
-                                                 # btemp0xorigin5_array_SRW[movements$from[i],movements$to[i],iter]*origin5 +
-                                                 btemp1xorigin5_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
-                                                 # btemp0xorigin6_array_SRW[movements$from[i],movements$to[i],iter]*origin6 +
-                                                 btemp1xorigin6_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
+                                                 btemp0xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin3_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 # btemp1xorigin3_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 btemp0xorigin4_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 # btemp1xorigin4_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 btemp0xorigin5_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 # btemp1xorigin5_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 btemp0xorigin6_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
+                                                 # btemp1xorigin6_array_SRW[movements$from[i],movements$to[i],iter]*med_temp*origin6 +
                                                  borigin1_array_SRW[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_SRW[movements$from[i],movements$to[i],iter]*origin2 +
                                                  borigin3_array_SRW[movements$from[i],movements$to[i],iter]*origin3 +
@@ -2217,22 +2316,22 @@ estimate_spilldays_effect_SRW <- function(origin_select, movements){
                                                  borigin5_array_SRW[movements$from[i],movements$to[i],iter]*origin5 +
                                                  borigin6_array_SRW[movements$from[i],movements$to[i],iter]*origin6)/
           sum(exp(b0_array_SRW[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_SRW[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_SRW[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_SRW[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_SRW[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_SRW[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_SRW[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_SRW[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_SRW[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_SRW[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
-                    # btemp0xorigin3_array_SRW[movements$from[i],possible_movements,iter]*origin3 +
-                    btemp1xorigin3_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
-                    # btemp0xorigin4_array_SRW[movements$from[i],possible_movements,iter]*origin4 +
-                    btemp1xorigin4_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
-                    # btemp0xorigin5_array_SRW[movements$from[i],possible_movements,iter]*origin5 +
-                    btemp1xorigin5_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
-                    # btemp0xorigin6_array_SRW[movements$from[i],possible_movements,iter]*origin6 +
-                    btemp1xorigin6_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
+                    btemp0xorigin1_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin3_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    # btemp1xorigin3_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    btemp0xorigin4_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    # btemp1xorigin4_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    btemp0xorigin5_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    # btemp1xorigin5_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    btemp0xorigin6_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
+                    # btemp1xorigin6_array_SRW[movements$from[i],possible_movements,iter]*med_temp*origin6 +
                     borigin1_array_SRW[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_SRW[movements$from[i],possible_movements,iter]*origin2 +
                     borigin3_array_SRW[movements$from[i],possible_movements,iter]*origin3 +
@@ -2256,7 +2355,7 @@ estimate_spilldays_effect_SRW <- function(origin_select, movements){
 estimate_spilldays_effect_SRH <- function(origin_select, movements){
   
   # set up vectors to control which origin parameters are turned on
-  hatchery_origin_params <- rep(0,6)
+  hatchery_origin_params <- rep(0,5)
   
   # index to the right origin param to turn it on
   hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
@@ -2270,7 +2369,7 @@ estimate_spilldays_effect_SRH <- function(origin_select, movements){
   
   niter <- 4000 # this is the number of draws we have
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements at different spill
   # make this more memory efficient - store instead as array, with row names for from/to
   spill_move_prob_array <- array(dim = c(100, niter, nrow(movements)))
   dimnames(spill_move_prob_array)[[3]] <- paste0(movements$from, "_", movements$to)
@@ -2294,15 +2393,27 @@ estimate_spilldays_effect_SRH <- function(origin_select, movements){
     possible_movements <- c(possible_movements, 43)
     
     SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
-                                   date = as.vector(SRH_envir$data$transition_dates))
+                                   date_numeric = as.vector(SRH_envir$data$transition_dates))
     
-    # get median temperature for this state
-    temp_data <- SRH_envir$data$temperature
-    med_temp <- median(temp_data[subset(SRH_states_dates, state == from)$date,from])
+    # add month to states dates so that we can subset
+    SRH_states_dates %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> SRH_states_dates
     
-    # get median spill window for this state
-    spill_window_data <- SRH_envir$data$spill_window_data
-    med_spillwindow <- median(spill_window_data[subset(SRH_states_dates, state == from)$date,from])
+    # get median temperature for this state - only in Jan/Feb/Mar
+    temp_data <- as.data.frame(SRH_envir$data$temperature)
+    temp_data %>% 
+      rownames_to_column("date_numeric") %>% 
+      pivot_longer(cols = -c(date_numeric)) -> temp_data_long
+    
+    temp_data_long %>% 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) -> temp_data_long
+    
+    # only keep actual observed fish
+    med_temp <- median(temp_data[subset(SRH_states_dates, state == from & month %in% c(1,2,3))$date_numeric,from])
+    
+    # do not include spill window, because code is set up to index so that it's only one or the other
     
     # Loop through all of the iterations
     for (iter in 1:niter){
@@ -2312,40 +2423,40 @@ estimate_spilldays_effect_SRH <- function(origin_select, movements){
       for (j in 1:length(spill_days_predict)){
         # evaluation movement 
         spill_move_prob_array[j,iter,i] <- exp(b0_array_SRH[movements$from[i],movements$to[i],iter] +
-                                                 # btemp0_array_SRH[movements$from[i],movements$to[i],iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                 btemp1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp + 
-                                                 bspillwindow_array_SRH[movements$from[i],movements$to[i],iter]*med_spillwindow +
+                                                 btemp0_array_SRH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # btemp1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp + # select temp0 for any winterspill estimates
+                                                 # bspillwindow_array_SRH[movements$from[i],movements$to[i],iter]*med_spillwindow + # no spill window if spill days is indexed
                                                  bwinterspill_array_SRH[movements$from[i],movements$to[i],iter]*spill_days_predict[j] +
-                                                 # btemp0xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*origin1 +
-                                                 btemp1xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
-                                                 # btemp0xorigin2_array_SRH[movements$from[i],movements$to[i],iter]*origin2 + 
-                                                 btemp1xorigin2_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
-                                                 # btemp0xorigin3_array_SRH[movements$from[i],movements$to[i],iter]*origin3 +
-                                                 btemp1xorigin3_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
-                                                 # btemp0xorigin4_array_SRH[movements$from[i],movements$to[i],iter]*origin4 +
-                                                 btemp1xorigin4_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
-                                                 # btemp0xorigin5_array_SRH[movements$from[i],movements$to[i],iter]*origin5 +
-                                                 btemp1xorigin5_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 btemp0xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 # btemp1xorigin1_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin1 +
+                                                 btemp0xorigin2_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin2 +
+                                                 # btemp1xorigin2_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin2 + 
+                                                 btemp0xorigin3_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 # btemp1xorigin3_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin3 +
+                                                 btemp0xorigin4_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 # btemp1xorigin4_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin4 +
+                                                 btemp0xorigin5_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
+                                                 # btemp1xorigin5_array_SRH[movements$from[i],movements$to[i],iter]*med_temp*origin5 +
                                                  borigin1_array_SRH[movements$from[i],movements$to[i],iter]*origin1 +
                                                  borigin2_array_SRH[movements$from[i],movements$to[i],iter]*origin2 +
                                                  borigin3_array_SRH[movements$from[i],movements$to[i],iter]*origin3 +
                                                  borigin4_array_SRH[movements$from[i],movements$to[i],iter]*origin4 +
                                                  borigin5_array_SRH[movements$from[i],movements$to[i],iter]*origin5)/
           sum(exp(b0_array_SRH[movements$from[i],possible_movements,iter] +
-                    # btemp0_array_SRH[movements$from[i],possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                    btemp1_array_SRH[movements$from[i],possible_movements,iter]*med_temp + 
-                    bspillwindow_array_SRH[movements$from[i],possible_movements,iter]*med_spillwindow +
+                    btemp0_array_SRH[movements$from[i],possible_movements,iter]*med_temp + # select temp0 for any winterspill estimates
+                    # btemp1_array_SRH[movements$from[i],possible_movements,iter]*med_temp + 
+                    # bspillwindow_array_SRH[movements$from[i],possible_movements,iter]*med_spillwindow + # no spill window if spill days is indexed
                     bwinterspill_array_SRH[movements$from[i],possible_movements,iter]*spill_days_predict[j] +
-                    # btemp0xorigin1_array_SRH[movements$from[i],possible_movements,iter]*origin1 +
-                    btemp1xorigin1_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
-                    # btemp0xorigin2_array_SRH[movements$from[i],possible_movements,iter]*origin2 + 
-                    btemp1xorigin2_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
-                    # btemp0xorigin3_array_SRH[movements$from[i],possible_movements,iter]*origin3 +
-                    btemp1xorigin3_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
-                    # btemp0xorigin4_array_SRH[movements$from[i],possible_movements,iter]*origin4 +
-                    btemp1xorigin4_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin4 +
-                    # btemp0xorigin5_array_SRH[movements$from[i],possible_movements,iter]*origin5 +
-                    btemp1xorigin5_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    btemp0xorigin1_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    # btemp1xorigin1_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin1 +
+                    btemp0xorigin2_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin2 +
+                    # btemp1xorigin2_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin2 + 
+                    btemp0xorigin3_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    # btemp1xorigin3_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin3 +
+                    btemp0xorigin4_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    # btemp1xorigin4_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin4 +
+                    btemp0xorigin5_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin5 +
+                    # btemp1xorigin5_array_SRH[movements$from[i],possible_movements,iter]*med_temp*origin5 +
                     borigin1_array_SRH[movements$from[i],possible_movements,iter]*origin1 +
                     borigin2_array_SRH[movements$from[i],possible_movements,iter]*origin2 +
                     borigin3_array_SRH[movements$from[i],possible_movements,iter]*origin3 +
@@ -2365,11 +2476,13 @@ estimate_spilldays_effect_SRH <- function(origin_select, movements){
   
 }
 
+
+
 #### plot spill days function ####
 
 # create df to index to right dam temp for plotting
 dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
-                        index = seq(2,9))
+                        state = seq(2,9))
 
 # another plot option to compare between hatchery and wild
 rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
@@ -2440,7 +2553,8 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     
     hatchery_covariate_experiences %>% 
       # keep only the state that is our from state
-      filter(state == from) -> covariate_experiences
+      filter(state == from)  -> covariate_experiences
+    
   } 
   # else run both
   else {
@@ -2478,6 +2592,7 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
       mutate(spill_actual = spill*100) -> rear_spill_move_prob_quantiles
     
     # get data organized for rug plot
+    # filter to only keep jan/feb/mar
     wild_covariate_experiences %>% 
       mutate(rear = "wild") -> wild_covariate_experiences
     hatchery_covariate_experiences %>% 
@@ -2490,16 +2605,20 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     
   }
   
+  # Keep only fish where they could have experienced spill conditions for rug plot
+  covariate_experiences %>% 
+    filter(winter_post_overshoot_vector == 1) -> covariate_experiences
+  
   rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
                                                                           color = rear, fill = rear)) +
     geom_line() +
     geom_ribbon(alpha = 0.2, color = NA) +
-    geom_rug(data = subset(covariate_experiences, rear == "wild"), aes(x = winter_spill*100, color = rear), inherit.aes = FALSE,
-             sides = "t", length = unit(0.3, "cm")) +
-    geom_rug(data = subset(covariate_experiences, rear == "hatchery"), aes(x = winter_spill*100, color = rear), inherit.aes = FALSE,
-             sides = "b", length = unit(0.3, "cm")) +
+    geom_rug(data = subset(covariate_experiences, rear == "wild"), aes(x = winter_spill*100, color = rear, y = 0), inherit.aes = FALSE,
+             sides = "t", length = unit(0.3, "cm"), position = "jitter") +
+    geom_rug(data = subset(covariate_experiences, rear == "hatchery"), aes(x = winter_spill*100, color = rear, y = 0), inherit.aes = FALSE,
+             sides = "b", length = unit(0.3, "cm"), position = "jitter") +
     scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
-    scale_x_continuous(lim = c(-1,NA), expand = c(0,0)) +
+    scale_x_continuous(lim = c(-1,max(rear_spill_move_prob_quantiles$spill_actual)+1), expand = c(0,0)) +
     scale_color_manual(values = rear_colors) +
     scale_fill_manual(values = rear_colors) +
     xlab("Days of winter spill") +
@@ -2522,6 +2641,7 @@ SR_postovershoot_fallback_movements <- data.frame(dam = c("LGR"),
                                                   from = c(9), to = c(8))
 
 #### Upper Columbia ####
+# only Entiat and Wenatchee
 
 UCH_spill_days_data <- UCH_envir$data$winter_spill_days_data
 UCW_spill_days_data <- UCW_envir$data$winter_spill_days_data
@@ -2538,20 +2658,28 @@ WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_
 # Wenatchee - use a loop to plot all of them
 WEN_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
 for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  WEN_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Wenatchee River",
-                                                                        wild_move_prob_array = WEN_wild_spilldays_move_prob_array,
-                                                                        hatchery_move_prob_array = WEN_hatchery_spilldays_move_prob_array,
-                                                                        wild_covariate_experiences = WEN_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
-                                                                        movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                        spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                        from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Wenatchee - fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+  # if a movement doesn't have any data, don't plot it
+  filter(WEN_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> WEN_data_to_plot
   
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("WEN_compare_fallback_", 
-                                                                                      UC_postovershoot_fallback_movements$dam[i],
-                                                                                        "_spilldays.png")),
-         WEN_fallback_spilldays_plots[[i]], height = 8, width = 8)
+  if(nrow(WEN_data_to_plot)>0){
+    WEN_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Wenatchee River",
+                                                                          wild_move_prob_array = WEN_wild_spilldays_move_prob_array,
+                                                                          hatchery_move_prob_array = WEN_hatchery_spilldays_move_prob_array,
+                                                                          wild_covariate_experiences = WEN_wild_covariate_experiences, 
+                                                                          hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+                                                                          movements_evaluated = UC_postovershoot_fallback_movements,
+                                                                          spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
+                                                                          plot_title = paste0("Wenatchee - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+    
+    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("WEN_compare_fallback_", 
+                                                                                        UC_postovershoot_fallback_movements$dam[i],
+                                                                                          "_spilldays.png")),
+           WEN_fallback_spilldays_plots[[i]], height = 8, width = 8)
+  } else {
+    # if it is zero, do nothing
+    
+  }
   
 }
 
@@ -2565,79 +2693,35 @@ ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envi
 # Entiat - use a loop to plot all of them
 ENT_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
 for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  ENT_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Entiat River",
-                                                                          wild_move_prob_array = ENT_wild_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = ENT_wild_covariate_experiences, 
-                                                                          movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(UC_UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Entiat - fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+  # if a movement doesn't have any data, don't plot it
+  filter(ENT_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> ENT_data_to_plot
   
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("ENT_compare_fallback_", 
-                                                                                      UC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         ENT_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  if(nrow(ENT_data_to_plot)>0){
+    
+    ENT_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Entiat River",
+                                                                            wild_move_prob_array = ENT_wild_spilldays_move_prob_array,
+                                                                            wild_covariate_experiences = ENT_wild_covariate_experiences, 
+                                                                            movements_evaluated = UC_postovershoot_fallback_movements,
+                                                                            spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                            from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
+                                                                            plot_title = paste0("Entiat - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+    
+    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("ENT_compare_fallback_", 
+                                                                                        UC_postovershoot_fallback_movements$dam[i],
+                                                                                        "_spilldays.png")),
+           ENT_fallback_spilldays_plots[[i]], height = 8, width = 8)
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
-# Methow - evaluate all fallback move probs
-MET_wild_spilldays_move_prob_array <- estimate_spilldays_effect_UCW(origin_select= "Methow River", movements = UC_postovershoot_fallback_movements)
-MET_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_UCH(origin_select= "Methow River", movements = UC_postovershoot_fallback_movements)
-
-# Methow - get covariate experiences
-MET_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Methow River")
-MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Methow River")
-
-# Methow - use a loop to plot all of them
-MET_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
-for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  MET_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Methow River",
-                                                                          wild_move_prob_array = MET_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = MET_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = MET_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = MET_hatchery_covariate_experiences,
-                                                                          movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(UC_UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Methow - fallback at ", UC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("MET_compare_fallback_", 
-                                                                                      UC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         MET_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Okanoagn - evaluate all fallback move probs
-# Only hatchery for Okanogan
-OKA_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_UCH(origin_select= "Okanogan River", movements = UC_postovershoot_fallback_movements)
-
-# Okanogan - get covariate experiences
-OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Okanogan River")
-
-# Okanogan - use a loop to plot all of them
-OKA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
-for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  OKA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Okanogan River",
-                                                                          hatchery_move_prob_array = OKA_hatchery_spilldays_move_prob_array,
-                                                                          hatchery_covariate_experiences = OKA_hatchery_covariate_experiences,
-                                                                          movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(UC_UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Okanogan - fallback at ", UC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("OKA_compare_fallback_", 
-                                                                                      UC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         OKA_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
 
 
 #### Middle Columbia ####
-MCH_spill_window_data <- MCH_envir$data$spill_window_data
-MCW_spill_window_data <- MCW_envir$data$spill_window_data
-MC_spill_window_data <- bind_rows(as.data.frame(MCH_spill_window_data), as.data.frame(MCW_spill_window_data))
+MCH_spill_days_data <- MCH_envir$data$winter_spill_days_data
+MCW_spill_days_data <- MCW_envir$data$winter_spill_days_data
+MC_spill_days_data <- bind_rows(as.data.frame(MCH_spill_days_data), as.data.frame(MCW_spill_days_data))
 
 # Deschutes - evaluate all fallback move probs
 # Deschutes is wild only
@@ -2649,20 +2733,31 @@ DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envi
 # Deschutes - use a loop to plot all of them
 DES_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  DES_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Deschutes River",
-                                                                          wild_move_prob_array = DES_wild_spilldays_move_prob_array,
-                                                                          
-                                                                          wild_covariate_experiences = DES_wild_covariate_experiences, 
-                                                                          
-                                                                          movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Deschutes - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+  # if a movement doesn't have any data, don't plot it
+  filter(DES_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> DES_data_to_plot
   
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("DES_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         DES_fallback_spilldays_plots[[i]], height = 8, width = 8)
+  if(nrow(DES_data_to_plot)>0){
+    DES_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Deschutes River",
+                                                                            wild_move_prob_array = DES_wild_spilldays_move_prob_array,
+                                                                            
+                                                                            wild_covariate_experiences = DES_wild_covariate_experiences, 
+                                                                            
+                                                                            movements_evaluated = MC_postovershoot_fallback_movements,
+                                                                            spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                            from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+                                                                            plot_title = paste0("Deschutes - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+    
+    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("DES_compare_fallback_", 
+                                                                                        MC_postovershoot_fallback_movements$dam[i],
+                                                                                        "_spilldays.png")),
+           DES_fallback_spilldays_plots[[i]], height = 8, width = 8)
+    
+  } else {
+    # if it is zero, do nothing
+    
+  }
+  
+
   
 }
 
@@ -2676,21 +2771,28 @@ JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envi
 # John Day - use a loop to plot all of them
 JDR_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(JDR_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> JDR_data_to_plot
+  
+  if(nrow(JDR_data_to_plot)>0){
   JDR_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "John Day River",
                                                                           wild_move_prob_array = JDR_wild_spilldays_move_prob_array,
                                                                           
                                                                           wild_covariate_experiences = JDR_wild_covariate_experiences, 
                                                                           
                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("John Day - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+                                                                          plot_title = paste0("John Day - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("JDR_compare_fallback_", 
                                                                                       MC_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          JDR_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 
@@ -2704,21 +2806,28 @@ FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envi
 # Fifteenmile - use a loop to plot all of them
 FIF_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(FIF_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> FIF_data_to_plot
+  
+  if(nrow(FIF_data_to_plot)>0){
   FIF_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Fifteenmile Creek",
                                                                           wild_move_prob_array = FIF_wild_spilldays_move_prob_array,
                                                                           
                                                                           wild_covariate_experiences = FIF_wild_covariate_experiences, 
                                                                           
                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Fifteenmile - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+                                                                          plot_title = paste0("Fifteenmile - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("FIF_compare_fallback_", 
                                                                                       MC_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          FIF_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 # Umatilla - evaluate all fallback move probs
@@ -2732,21 +2841,29 @@ UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_
 # Umatilla - use a loop to plot all of them
 UMA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(UMA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_wild_data_to_plot
+  filter(UMA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_hatchery_data_to_plot
+  
+  if(nrow(UMA_wild_data_to_plot)>0 | nrow(UMA_hatchery_data_to_plot)>0){
   UMA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Umatilla River",
                                                                           wild_move_prob_array = UMA_wild_spilldays_move_prob_array,
                                                                           hatchery_move_prob_array = UMA_hatchery_spilldays_move_prob_array,
                                                                           wild_covariate_experiences = UMA_wild_covariate_experiences, 
                                                                           hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Umatilla - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+                                                                          plot_title = paste0("Umatilla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("UMA_compare_fallback_", 
                                                                                       MC_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          UMA_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 # Yakima - evaluate all fallback move probs
@@ -2759,21 +2876,28 @@ YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envi
 # Yakima - use a loop to plot all of them
 YAK_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(YAK_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> YAK_data_to_plot
+  
+  if(nrow(YAK_data_to_plot)>0){
   YAK_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Yakima River",
                                                                           wild_move_prob_array = YAK_wild_spilldays_move_prob_array,
                                                                           
                                                                           wild_covariate_experiences = YAK_wild_covariate_experiences, 
                                                                           
                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Yakima - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+                                                                          plot_title = paste0("Yakima - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("YAK_compare_fallback_", 
                                                                                       MC_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          YAK_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 # Walla Walla - evaluate all fallback move probs
@@ -2787,167 +2911,39 @@ WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH
 # Walla Walla - use a loop to plot all of them
 WAWA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
 for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(WAWA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_wild_data_to_plot
+  filter(WAWA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_hatchery_data_to_plot
+  
+  if(nrow(WAWA_wild_data_to_plot)>0 | nrow(WAWA_hatchery_data_to_plot)>0){
   WAWA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Walla Walla River",
                                                                            wild_move_prob_array = WAWA_wild_spilldays_move_prob_array,
                                                                            hatchery_move_prob_array = WAWA_hatchery_spilldays_move_prob_array,
                                                                            wild_covariate_experiences = WAWA_wild_covariate_experiences, 
                                                                            hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
                                                                            movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                           spill_predict = seq(0, max(MC_UC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                            from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                           plot_title = paste0("Walla Walla - fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+                                                                           plot_title = paste0("Walla Walla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("WAWA_compare_fallback_", 
                                                                                       MC_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          WAWA_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 
 #### Snake River ####
-SRH_spill_window_data <- SRH_envir$data$spill_window_data
-SRW_spill_window_data <- SRW_envir$data$spill_window_data
-SR_spill_window_data <- bind_rows(as.data.frame(SRH_spill_window_data), as.data.frame(SRW_spill_window_data))
+# only one post-overshoot fallback: Tucannon
 
-# Asotin Creek - evaluate all fallback move probs
-# Asotin is wild only
-ASO_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Asotin Creek", movements = SR_postovershoot_fallback_movements)
+SRH_spill_days_data <- SRH_envir$data$winter_spill_days_data
+SRW_spill_days_data <- SRW_envir$data$winter_spill_days_data
+SR_spill_days_data <- bind_rows(as.data.frame(SRH_spill_days_data), as.data.frame(SRW_spill_days_data))
 
-# Asotin Creek - get covariate experiences
-ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Asotin Creek")
-
-# Asotin Creek - use a loop to plot all of them
-ASO_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  ASO_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Asotin Creek",
-                                                                          wild_move_prob_array = ASO_wild_spilldays_move_prob_array,
-                                                                          
-                                                                          wild_covariate_experiences = ASO_wild_covariate_experiences, 
-                                                                          
-                                                                          movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Asotin Creek - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("ASO_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         ASO_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Clearwater River - evaluate all fallback move probs
-CLE_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Clearwater River", movements = SR_postovershoot_fallback_movements)
-CLE_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Clearwater River", movements = SR_postovershoot_fallback_movements)
-
-# Clearwater River - get covariate experiences
-CLE_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Clearwater River")
-CLE_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Clearwater River")
-
-# Clearwater River - use a loop to plot all of them
-CLE_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  CLE_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Clearwater River",
-                                                                          wild_move_prob_array = CLE_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = CLE_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = CLE_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = CLE_hatchery_covariate_experiences,
-                                                                          movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Clearwater River - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("CLE_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         CLE_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Grande Ronde River - evaluate all fallback move probs
-GR_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Grande Ronde River", movements = SR_postovershoot_fallback_movements)
-GR_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Grande Ronde River", movements = SR_postovershoot_fallback_movements)
-
-# Grande Ronde River - get covariate experiences
-GR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Grande Ronde River")
-GR_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Grande Ronde River")
-
-# Grande Ronde River - use a loop to plot all of them
-GR_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  GR_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Grande Ronde River",
-                                                                         wild_move_prob_array = GR_wild_spilldays_move_prob_array,
-                                                                         hatchery_move_prob_array = GR_hatchery_spilldays_move_prob_array,
-                                                                         wild_covariate_experiences = GR_wild_covariate_experiences, 
-                                                                         hatchery_covariate_experiences = GR_hatchery_covariate_experiences,
-                                                                         movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                         spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                         from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                         plot_title = paste0("Grande Ronde River - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("GR_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         GR_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Imnaha River - evaluate all fallback move probs
-IMN_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Imnaha River", movements = SR_postovershoot_fallback_movements)
-IMN_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Imnaha River", movements = SR_postovershoot_fallback_movements)
-
-# Imnaha River - get covariate experiences
-IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
-IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
-
-# Imnaha River - use a loop to plot all of them
-IMN_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  IMN_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Imnaha River",
-                                                                          wild_move_prob_array = IMN_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = IMN_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = IMN_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
-                                                                          movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Imnaha River - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("IMN_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         IMN_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Salmon River - evaluate all fallback move probs
-SAL_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Salmon River", movements = SR_postovershoot_fallback_movements)
-SAL_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Salmon River", movements = SR_postovershoot_fallback_movements)
-
-# Salmon River - get covariate experiences
-SAL_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Salmon River")
-SAL_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Salmon River")
-
-# Salmon River - use a loop to plot all of them
-SAL_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  SAL_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Salmon River",
-                                                                          wild_move_prob_array = SAL_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = SAL_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = SAL_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = SAL_hatchery_covariate_experiences,
-                                                                          movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Salmon River - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("SAL_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         SAL_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
-}
 # Tucannon River - evaluate all fallback move probs
 TUC_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
 TUC_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
@@ -2959,21 +2955,29 @@ TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_
 # Tucannon River - use a loop to plot all of them
 TUC_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
 for (i in 1:nrow(SR_postovershoot_fallback_movements)){
+  # if a movement doesn't have any data, don't plot it
+  filter(TUC_wild_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_wild_data_to_plot
+  filter(TUC_hatchery_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_hatchery_data_to_plot
+  
+  if(nrow(TUC_wild_data_to_plot)>0 | nrow(TUC_hatchery_data_to_plot)>0){
   TUC_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Tucannon River",
                                                                           wild_move_prob_array = TUC_wild_spilldays_move_prob_array,
                                                                           hatchery_move_prob_array = TUC_hatchery_spilldays_move_prob_array,
                                                                           wild_covariate_experiences = TUC_wild_covariate_experiences, 
                                                                           hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
                                                                           movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_UC_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
+                                                                          spill_predict = seq(0, max(SR_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
                                                                           from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Tucannon River - fallback at ", SR_postovershoot_fallback_movements$dam[i]))
+                                                                          plot_title = paste0("Tucannon River - post-overshoot fallback at ", SR_postovershoot_fallback_movements$dam[i]))
   
   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("TUC_compare_fallback_", 
                                                                                       SR_postovershoot_fallback_movements$dam[i],
                                                                                       "_spilldays.png")),
          TUC_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  
+  } else {
+    # if it is zero, do nothing
+    
+  }
 }
 
 
