@@ -426,10 +426,12 @@ make_year_origin_parameter_draws_array <- function(fit, fit_summary, origin_sele
   param_indices$from_to <- paste0(param_indices$row, "_", param_indices$col)
   
   # Now, include only the indices that actually have year effects
-  movement_indices <- filter(param_indices, from_to %in% year_raw_params_indices$from_to)
-  movement_indices %>% 
-    dplyr::rename(from = row, to = col) -> movement_indices
+  year_movement_indices <- filter(param_indices, from_to %in% year_raw_params_indices$from_to)
+  year_movement_indices %>% 
+    dplyr::rename(from = row, to = col) -> year_movement_indices
   # Loop through this (?) to create the param array below
+
+  
   
   
   # extract year effect as an 4-d array with rows=from, columns=to, years = slices, and iter=4th dimension
@@ -446,22 +448,30 @@ make_year_origin_parameter_draws_array <- function(fit, fit_summary, origin_sele
   
   year_origin_params_indices <- data.frame(parameter = year_origin_params, index = year_origin_params_index, year = year_origin_params_year)
   year_origin_params_indices %>% 
-    left_join(., movement_indices, by = "index") %>% 
+    left_join(., year_movement_indices, by = "index") %>% 
     filter(!(is.na(from))) -> year_origin_params_indices
   
+  # get a repeating index for indexing the 3d array below
+  year_origin_params_indices$array_index <- rep(1:length(unique(year_origin_params_indices$index)), length(unique(year_origin_params_indices$year)))
   
-  # arrange all parameter values into an array
-  # 0 is meaningful for loss (this is what is used in the stan code)
-  # 0s for all other movements that are not overwritten will not be used
-  year_origin_param_array <- array(data = 0, dim = c(length(model_states), length(model_states),
-                                         length(unique(year_origin_params_indices$year)),
-                                         length(as.matrix(fit[,,1]))))
   
+  # update: extract year effect as 3-d array, with rows = movements, columns = years, iter = slices
+  # include movements that don't have a year effect, to make our indexing easier later on
+  # these will all have zero (for no year effect)
+  year_origin_param_array <- array(data = 0, dim = c(nrow(param_indices),
+                                                     length(unique(year_origin_params_indices$year)),
+                                                     length(as.matrix(fit[,,1]))))
+  
+  # give them names that indicate movements
+  rownames(year_origin_param_array) <- param_indices$from_to
 
   # now populate the array with the iteration draws
   for(i in 1:nrow(year_origin_params_indices)){
-    year_origin_param_array[year_origin_params_indices[i, "from"], year_origin_params_indices[i, "to"], year_origin_params_indices[i, "year"], ] <- as.matrix(fit[,,year_origin_params_indices[i, "parameter"]])
+    year_origin_param_array[year_origin_params_indices[i, "index"], year_origin_params_indices[i, "year"], ] <- as.matrix(fit[,,year_origin_params_indices[i, "parameter"]])
   }
+  
+
+  
   
   return(year_origin_param_array)
 }
@@ -488,6 +498,69 @@ origin2_year_param_array_UCH <- make_year_origin_parameter_draws_array(fit = UCH
 origin3_year_param_array_UCH <- make_year_origin_parameter_draws_array(fit = UCH_fit, fit_summary = UCH_fit_summary, 
                                                                        origin_select_numeric = "origin3", envir = UCH_envir)
 
+### MCW ###
+origin1_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin1", envir = MCW_envir)
+
+origin2_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin2", envir = MCW_envir)
+
+origin3_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin3", envir = MCW_envir)
+
+origin4_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin4", envir = MCW_envir)
+
+origin5_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin5", envir = MCW_envir)
+
+origin6_year_param_array_MCW <- make_year_origin_parameter_draws_array(fit = MCW_fit, fit_summary = MCW_fit_summary, 
+                                                                       origin_select_numeric = "origin6", envir = MCW_envir)
+
+### MCH ###
+origin1_year_param_array_MCH <- make_year_origin_parameter_draws_array(fit = MCH_fit, fit_summary = MCH_fit_summary, 
+                                                                       origin_select_numeric = "origin1", envir = MCH_envir)
+
+origin2_year_param_array_MCH <- make_year_origin_parameter_draws_array(fit = MCH_fit, fit_summary = MCH_fit_summary, 
+                                                                       origin_select_numeric = "origin2", envir = MCH_envir)
+
+### SRW ###
+origin1_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin1", envir = SRW_envir)
+
+origin2_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin2", envir = SRW_envir)
+
+origin3_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin3", envir = SRW_envir)
+
+origin4_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin4", envir = SRW_envir)
+
+origin5_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin5", envir = SRW_envir)
+
+origin6_year_param_array_SRW <- make_year_origin_parameter_draws_array(fit = SRW_fit, fit_summary = SRW_fit_summary, 
+                                                                       origin_select_numeric = "origin6", envir = SRW_envir)
+
+### SRH ###
+origin1_year_param_array_SRH <- make_year_origin_parameter_draws_array(fit = SRH_fit, fit_summary = SRH_fit_summary, 
+                                                                       origin_select_numeric = "origin1", envir = SRH_envir)
+
+origin2_year_param_array_SRH <- make_year_origin_parameter_draws_array(fit = SRH_fit, fit_summary = SRH_fit_summary, 
+                                                                       origin_select_numeric = "origin2", envir = SRH_envir)
+
+origin3_year_param_array_SRH <- make_year_origin_parameter_draws_array(fit = SRH_fit, fit_summary = SRH_fit_summary, 
+                                                                       origin_select_numeric = "origin3", envir = SRH_envir)
+
+origin4_year_param_array_SRH <- make_year_origin_parameter_draws_array(fit = SRH_fit, fit_summary = SRH_fit_summary, 
+                                                                       origin_select_numeric = "origin4", envir = SRH_envir)
+
+origin5_year_param_array_SRH <- make_year_origin_parameter_draws_array(fit = SRH_fit, fit_summary = SRH_fit_summary, 
+                                                                       origin_select_numeric = "origin5", envir = SRH_envir)
+
+
+
 
 
 #### Functions to estimate movement probability by year ####
@@ -501,6 +574,7 @@ origin3_year_param_array_UCH <- make_year_origin_parameter_draws_array(fit = UCH
 natal_origins <- gsub(" Mouth| Upstream", "", model_states)
 natal_origins <- natal_origins[!(duplicated(natal_origins))]
 natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(grepl("other tributaries", natal_origins))]
 natal_origins <- natal_origins[!(natal_origins == "loss")]
 
 # Use the parameter map to index the right effects
@@ -508,12 +582,10 @@ origin_param_map <- data.frame(
   natal_origin = natal_origins,
   hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
                1,NA,2,3, # UC
-               5,NA,1,4,2,3, # SR
-               NA, NA),
+               5,NA,1,4,2,3), # SR,
   wild = c(1,3,NA,2,4,6,5, # MC
            1,2,NA,3, # UC
-           6,1,2,5,3,4, # SR
-           NA, NA))
+           6,1,2,5,3,4)) # SR
 
 estimate_year_move_prob_UCW <- function(origin_select, movements){
   
@@ -531,9 +603,11 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
   # set up years to predict across
   year_predict <- seq(1,18)
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements in different years
   niter <- 4000 # this is the number of draws we have
-  year_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(year_predict), niter))
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
   
   
   for (i in 1:nrow(movements)){
@@ -589,7 +663,7 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
         # if there aren't any movements in that year, skip it
         if (!(is.na(med_temp[j]))){
           # evaluation movement 
-          year_move_prob_array[from,to,j, iter] <- exp(b0_array_UCW[from,to,iter] +
+          year_move_prob_array[j, iter, i] <- exp(b0_array_UCW[from,to,iter] +
                                                          # btemp0_array_UCW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                                                          btemp1_array_UCW[from,to,iter]*med_temp[j] + 
                                                          bspillwindow_array_UCW[from,to,iter]*med_spillwindow[j] +
@@ -605,9 +679,9 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
                                                          borigin3_array_UCW[from,to,iter]*origin3 +
                                                          
                                                          # year effects
-                                                         origin1_year_param_array_UCW[from, to, j, iter]*origin1 +
-                                                         origin2_year_param_array_UCW[from, to, j, iter]*origin2 +
-                                                         origin3_year_param_array_UCW[from, to, j, iter]*origin3)/
+                                                         origin1_year_param_array_UCW[paste0(from, "_", to), j, iter]*origin1 +
+                                                         origin2_year_param_array_UCW[paste0(from, "_", to), j, iter]*origin2 +
+                                                         origin3_year_param_array_UCW[paste0(from, "_", to), j, iter]*origin3)/
             sum(exp(b0_array_UCW[from,possible_movements,iter] +
                       # btemp0_array_UCW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                       btemp1_array_UCW[from,possible_movements,iter]*med_temp[j] + 
@@ -623,9 +697,9 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
                       borigin2_array_UCW[from,possible_movements,iter]*origin2 +
                       borigin3_array_UCW[from,possible_movements,iter]*origin3+
                   # year effects
-                  origin1_year_param_array_UCW[from, possible_movements, j, iter]*origin1 +
-                  origin2_year_param_array_UCW[from, possible_movements, j, iter]*origin2 +
-                  origin3_year_param_array_UCW[from, possible_movements, j, iter]*origin3))
+                  c(origin1_year_param_array_UCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                  c(origin2_year_param_array_UCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2 +
+                  c(origin3_year_param_array_UCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin3))
           
         } else {
           
@@ -662,9 +736,11 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
   # set up years to predict across
   year_predict <- seq(1,18)
   
-  # get an array to store probabilities of movements at different temperatures
+  # get an array to store probabilities of movements in different years
   niter <- 4000 # this is the number of draws we have
-  year_move_prob_array <- array(dim = c(length(model_states), length(model_states), length(year_predict), niter))
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
   
   
   for (i in 1:nrow(movements)){
@@ -720,25 +796,25 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
         # if there aren't any movements in that year, skip it
         if (!(is.na(med_temp[j]))){
           # evaluation movement 
-          year_move_prob_array[from,to,j, iter] <- exp(b0_array_UCH[from,to,iter] +
-                                                         # btemp0_array_UCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
-                                                         btemp1_array_UCH[from,to,iter]*med_temp[j] + 
-                                                         bspillwindow_array_UCH[from,to,iter]*med_spillwindow[j] +
-                                                         bwinterspill_array_UCH[from,to,iter]*med_winterspill[j] +
-                                                         # btemp0xorigin1_array_UCH[from,to,iter]*origin1 +
-                                                         btemp1xorigin1_array_UCH[from,to,iter]*med_temp[j]*origin1 +
-                                                         # btemp0xorigin2_array_UCH[from,to,iter]*origin2 + 
-                                                         btemp1xorigin2_array_UCH[from,to,iter]*med_temp[j]*origin2 + 
-                                                         # btemp0xorigin3_array_UCH[from,to,iter]*origin3 +
-                                                         btemp1xorigin3_array_UCH[from,to,iter]*med_temp[j]*origin3 +
-                                                         borigin1_array_UCH[from,to,iter]*origin1 +
-                                                         borigin2_array_UCH[from,to,iter]*origin2 +
-                                                         borigin3_array_UCH[from,to,iter]*origin3 +
-                                                         
-                                                         # year effects
-                                                         origin1_year_param_array_UCH[from, to, j, iter]*origin1 +
-                                                         origin2_year_param_array_UCH[from, to, j, iter]*origin2 +
-                                                         origin3_year_param_array_UCH[from, to, j, iter]*origin3)/
+          year_move_prob_array[j, iter, i] <- exp(b0_array_UCH[from,to,iter] +
+                                                    # btemp0_array_UCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                    btemp1_array_UCH[from,to,iter]*med_temp[j] + 
+                                                    bspillwindow_array_UCH[from,to,iter]*med_spillwindow[j] +
+                                                    bwinterspill_array_UCH[from,to,iter]*med_winterspill[j] +
+                                                    # btemp0xorigin1_array_UCH[from,to,iter]*origin1 +
+                                                    btemp1xorigin1_array_UCH[from,to,iter]*med_temp[j]*origin1 +
+                                                    # btemp0xorigin2_array_UCH[from,to,iter]*origin2 + 
+                                                    btemp1xorigin2_array_UCH[from,to,iter]*med_temp[j]*origin2 + 
+                                                    # btemp0xorigin3_array_UCH[from,to,iter]*origin3 +
+                                                    btemp1xorigin3_array_UCH[from,to,iter]*med_temp[j]*origin3 +
+                                                    borigin1_array_UCH[from,to,iter]*origin1 +
+                                                    borigin2_array_UCH[from,to,iter]*origin2 +
+                                                    borigin3_array_UCH[from,to,iter]*origin3 +
+                                                    
+                                                    # year effects
+                                                    origin1_year_param_array_UCH[paste0(from, "_", to), j, iter]*origin1 +
+                                                    origin2_year_param_array_UCH[paste0(from, "_", to), j, iter]*origin2 +
+                                                    origin3_year_param_array_UCH[paste0(from, "_", to), j, iter]*origin3)/
             sum(exp(b0_array_UCH[from,possible_movements,iter] +
                       # btemp0_array_UCH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
                       btemp1_array_UCH[from,possible_movements,iter]*med_temp[j] + 
@@ -754,9 +830,9 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
                       borigin2_array_UCH[from,possible_movements,iter]*origin2 +
                       borigin3_array_UCH[from,possible_movements,iter]*origin3+
                       # year effects
-                      origin1_year_param_array_UCH[from, possible_movements, j, iter]*origin1 +
-                      origin2_year_param_array_UCH[from, possible_movements, j, iter]*origin2 +
-                      origin3_year_param_array_UCH[from, possible_movements, j, iter]*origin3))
+                      c(origin1_year_param_array_UCH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                      c(origin2_year_param_array_UCH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2 +
+                      c(origin3_year_param_array_UCH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin3))
           
         } else {
           
@@ -776,6 +852,602 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
   return(year_move_prob_array)
   
 }
+
+estimate_year_move_prob_MCW <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- rep(0,6)
+  
+  # index to the right origin param to turn it on
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = wild_origin_params[1]
+  origin2 = wild_origin_params[2]
+  origin3 = wild_origin_params[3]
+  origin4 = wild_origin_params[4]
+  origin5 = wild_origin_params[5]
+  origin6 = wild_origin_params[6]
+  
+  # set up years to predict across
+  year_predict <- seq(1,18)
+  
+  # get an array to store probabilities of movements in different years
+  niter <- 4000 # this is the number of draws we have
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- MCW_envir$data$movements[, "col"][MCW_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    MCW_states_dates_years <- data.frame(state = as.vector(MCW_envir$data$y),
+                                         date = as.vector(MCW_envir$data$transition_dates))
+    
+    MCW_states_dates_years$year <- ceiling(MCW_states_dates_years$date/365.25)+1
+    
+    # get median spill window for this state, by year - this will be indexed the same as year, using j
+    spillwindow_data <- MCW_envir$data$spill_window_data
+    
+    med_spillwindow <- vector(length = 18)
+    
+    # for spill and temp, if there were no fish in year/state combination,
+    # there will be NAs in the vector - and that's ok
+    
+    for (x in 1:length(med_spillwindow)){
+      med_spillwindow[x] <- median(spillwindow_data[subset(MCW_states_dates_years, state == from & year == x)$date,from])
+    }
+    
+    # get median winter spill for this state (note that this is just one value, since each year already only has one winter spill value), 
+    # by year - this will be indexed the same as year, using j
+    winterspill_data <- MCW_envir$data$winter_spill_days_data
+    med_winterspill <- vector(length = 18)
+    
+    for (y in 1:length(med_winterspill)){
+      med_winterspill[y] <- winterspill_data[y,from]
+    }
+    
+    # get median temperature for this state, by year - this will be indexed the same as year, using j
+    temp_data <- MCW_envir$data$temperature_data
+    
+    med_temp <- vector(length = 18)
+    
+    for (z in 1:length(med_temp)){
+      med_temp[z] <- median(temp_data[subset(MCW_states_dates_years, state == from & year == z)$date,from])
+    }
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(year_predict)){
+        
+        # if there aren't any movements in that year, skip it
+        if (!(is.na(med_temp[j]))){
+          # evaluation movement 
+          year_move_prob_array[j, iter, i] <- exp(b0_array_MCW[from,to,iter] +
+                                                    # btemp0_array_MCW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                    btemp1_array_MCW[from,to,iter]*med_temp[j] + 
+                                                    bspillwindow_array_MCW[from,to,iter]*med_spillwindow[j] +
+                                                    bwinterspill_array_MCW[from,to,iter]*med_winterspill[j] +
+                                                    # btemp0xorigin1_array_MCW[from,to,iter]*origin1 +
+                                                    btemp1xorigin1_array_MCW[from,to,iter]*med_temp[j]*origin1 +
+                                                    # btemp0xorigin2_array_MCW[from,to,iter]*origin2 + 
+                                                    btemp1xorigin2_array_MCW[from,to,iter]*med_temp[j]*origin2 + 
+                                                    # btemp0xorigin3_array_MCW[from,to,iter]*origin3 +
+                                                    btemp1xorigin3_array_MCW[from,to,iter]*med_temp[j]*origin3 +
+                                                    # btemp0xorigin4_array_MCW[from,to,iter]*origin4 +
+                                                    btemp1xorigin4_array_MCW[from,to,iter]*med_temp[j]*origin4 +
+                                                    # btemp0xorigin5_array_MCW[from,to,iter]*origin5 +
+                                                    btemp1xorigin5_array_MCW[from,to,iter]*med_temp[j]*origin5 +
+                                                    # btemp0xorigin6_array_MCW[from,to,iter]*origin6 +
+                                                    btemp1xorigin6_array_MCW[from,to,iter]*med_temp[j]*origin6 +
+                                                    borigin1_array_MCW[from,to,iter]*origin1 +
+                                                    borigin2_array_MCW[from,to,iter]*origin2 +
+                                                    borigin3_array_MCW[from,to,iter]*origin3 +
+                                                    borigin4_array_MCW[from,to,iter]*origin4 +
+                                                    borigin5_array_MCW[from,to,iter]*origin5 +
+                                                    borigin6_array_MCW[from,to,iter]*origin6 +
+                                                    
+                                                    # year effects
+                                                    origin1_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin1 +
+                                                    origin2_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin2 +
+                                                    origin3_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin3 +
+                                                    origin4_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin4 +
+                                                    origin5_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin5 +
+                                                    origin6_year_param_array_MCW[paste0(from, "_", to), j, iter]*origin6)/
+            sum(exp(b0_array_MCW[from,possible_movements,iter] +
+                      # btemp0_array_MCW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                      btemp1_array_MCW[from,possible_movements,iter]*med_temp[j] + 
+                      bspillwindow_array_MCW[from,possible_movements,iter]*med_spillwindow[j] +
+                      bwinterspill_array_MCW[from,possible_movements,iter]*med_winterspill[j] +
+                      # btemp0xorigin1_array_MCW[from,possible_movements,iter]*origin1 +
+                      btemp1xorigin1_array_MCW[from,possible_movements,iter]*med_temp[j]*origin1 +
+                      # btemp0xorigin2_array_MCW[from,possible_movements,iter]*origin2 + 
+                      btemp1xorigin2_array_MCW[from,possible_movements,iter]*med_temp[j]*origin2 + 
+                      # btemp0xorigin3_array_MCW[from,possible_movements,iter]*origin3 +
+                      btemp1xorigin3_array_MCW[from,possible_movements,iter]*med_temp[j]*origin3 +
+                      # btemp0xorigin4_array_MCW[from,possible_movements,iter]*origin4 +
+                      btemp1xorigin4_array_MCW[from,possible_movements,iter]*med_temp[j]*origin4 +
+                      # btemp0xorigin5_array_MCW[from,possible_movements,iter]*origin5 +
+                      btemp1xorigin5_array_MCW[from,possible_movements,iter]*med_temp[j]*origin5 +
+                      # btemp0xorigin6_array_MCW[from,possible_movements,iter]*origin6 +
+                      btemp1xorigin6_array_MCW[from,possible_movements,iter]*med_temp[j]*origin6 +
+                      borigin1_array_MCW[from,possible_movements,iter]*origin1 +
+                      borigin2_array_MCW[from,possible_movements,iter]*origin2 +
+                      borigin3_array_MCW[from,possible_movements,iter]*origin3 +
+                      borigin4_array_MCW[from,possible_movements,iter]*origin4 +
+                      borigin5_array_MCW[from,possible_movements,iter]*origin5 +
+                      borigin6_array_MCW[from,possible_movements,iter]*origin6 +
+                      # year effects
+                      c(origin1_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                      c(origin2_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2 +
+                      c(origin3_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin3 +
+                      c(origin4_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin4 +
+                      c(origin5_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin5 +
+                      c(origin6_year_param_array_MCW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin6))
+          
+        } else {
+          
+        }
+        
+        
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(year_move_prob_array)
+  
+}
+
+estimate_year_move_prob_MCH <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  hatchery_origin_params <- rep(0,2)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = hatchery_origin_params[1]
+  origin2 = hatchery_origin_params[2]
+  
+  # set up years to predict across
+  year_predict <- seq(1,18)
+  
+  # get an array to store probabilities of movements in different years
+  niter <- 4000 # this is the number of draws we have
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- MCH_envir$data$movements[, "col"][MCH_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    MCH_states_dates_years <- data.frame(state = as.vector(MCH_envir$data$y),
+                                         date = as.vector(MCH_envir$data$transition_dates))
+    
+    MCH_states_dates_years$year <- ceiling(MCH_states_dates_years$date/365.25)+1
+    
+    # get median spill window for this state, by year - this will be indexed the same as year, using j
+    spillwindow_data <- MCH_envir$data$spill_window_data
+    
+    med_spillwindow <- vector(length = 18)
+    
+    # for spill and temp, if there were no fish in year/state combination,
+    # there will be NAs in the vector - and that's ok
+    
+    for (x in 1:length(med_spillwindow)){
+      med_spillwindow[x] <- median(spillwindow_data[subset(MCH_states_dates_years, state == from & year == x)$date,from])
+    }
+    
+    # get median winter spill for this state (note that this is just one value, since each year already only has one winter spill value), 
+    # by year - this will be indexed the same as year, using j
+    winterspill_data <- MCH_envir$data$winter_spill_days_data
+    med_winterspill <- vector(length = 18)
+    
+    for (y in 1:length(med_winterspill)){
+      med_winterspill[y] <- winterspill_data[y,from]
+    }
+    
+    # get median temperature for this state, by year - this will be indexed the same as year, using j
+    temp_data <- MCH_envir$data$temperature_data
+    
+    med_temp <- vector(length = 18)
+    
+    for (z in 1:length(med_temp)){
+      med_temp[z] <- median(temp_data[subset(MCH_states_dates_years, state == from & year == z)$date,from])
+    }
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(year_predict)){
+        
+        # if there aren't any movements in that year, skip it
+        if (!(is.na(med_temp[j]))){
+          # evaluation movement 
+          year_move_prob_array[j, iter, i] <- exp(b0_array_MCH[from,to,iter] +
+                                                    # btemp0_array_MCH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                    btemp1_array_MCH[from,to,iter]*med_temp[j] + 
+                                                    bspillwindow_array_MCH[from,to,iter]*med_spillwindow[j] +
+                                                    bwinterspill_array_MCH[from,to,iter]*med_winterspill[j] +
+                                                    # btemp0xorigin1_array_MCH[from,to,iter]*origin1 +
+                                                    btemp1xorigin1_array_MCH[from,to,iter]*med_temp[j]*origin1 +
+                                                    # btemp0xorigin2_array_MCH[from,to,iter]*origin2 + 
+                                                    btemp1xorigin2_array_MCH[from,to,iter]*med_temp[j]*origin2 + 
+                                                    borigin1_array_MCH[from,to,iter]*origin1 +
+                                                    borigin2_array_MCH[from,to,iter]*origin2 +
+                                                    
+                                                    # year effects
+                                                    origin1_year_param_array_MCH[paste0(from, "_", to), j, iter]*origin1 +
+                                                    origin2_year_param_array_MCH[paste0(from, "_", to), j, iter]*origin2)/
+            sum(exp(b0_array_MCH[from,possible_movements,iter] +
+                      # btemp0_array_MCH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                      btemp1_array_MCH[from,possible_movements,iter]*med_temp[j] + 
+                      bspillwindow_array_MCH[from,possible_movements,iter]*med_spillwindow[j] +
+                      bwinterspill_array_MCH[from,possible_movements,iter]*med_winterspill[j] +
+                      # btemp0xorigin1_array_MCH[from,possible_movements,iter]*origin1 +
+                      btemp1xorigin1_array_MCH[from,possible_movements,iter]*med_temp[j]*origin1 +
+                      # btemp0xorigin2_array_MCH[from,possible_movements,iter]*origin2 + 
+                      btemp1xorigin2_array_MCH[from,possible_movements,iter]*med_temp[j]*origin2 + 
+                      borigin1_array_MCH[from,possible_movements,iter]*origin1 +
+                      borigin2_array_MCH[from,possible_movements,iter]*origin2 +
+                      # year effects
+                      c(origin1_year_param_array_MCH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                      c(origin2_year_param_array_MCH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2))
+          
+        } else {
+          
+        }
+        
+        
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(year_move_prob_array)
+  
+}
+
+estimate_year_move_prob_SRW <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  wild_origin_params <- rep(0,6)
+  
+  # index to the right origin param to turn it on
+  wild_origin_params[subset(origin_param_map, natal_origin == origin_select)$wild] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = wild_origin_params[1]
+  origin2 = wild_origin_params[2]
+  origin3 = wild_origin_params[3]
+  origin4 = wild_origin_params[4]
+  origin5 = wild_origin_params[5]
+  origin6 = wild_origin_params[6]
+  
+  # set up years to predict across
+  year_predict <- seq(1,18)
+  
+  # get an array to store probabilities of movements in different years
+  niter <- 4000 # this is the number of draws we have
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- SRW_envir$data$movements[, "col"][SRW_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    SRW_states_dates_years <- data.frame(state = as.vector(SRW_envir$data$y),
+                                         date = as.vector(SRW_envir$data$transition_dates))
+    
+    SRW_states_dates_years$year <- ceiling(SRW_states_dates_years$date/365.25)+1
+    
+    # get median spill window for this state, by year - this will be indexed the same as year, using j
+    spillwindow_data <- SRW_envir$data$spill_window_data
+    
+    med_spillwindow <- vector(length = 18)
+    
+    # for spill and temp, if there were no fish in year/state combination,
+    # there will be NAs in the vector - and that's ok
+    
+    for (x in 1:length(med_spillwindow)){
+      med_spillwindow[x] <- median(spillwindow_data[subset(SRW_states_dates_years, state == from & year == x)$date,from])
+    }
+    
+    # get median winter spill for this state (note that this is just one value, since each year already only has one winter spill value), 
+    # by year - this will be indexed the same as year, using j
+    winterspill_data <- SRW_envir$data$winter_spill_days_data
+    med_winterspill <- vector(length = 18)
+    
+    for (y in 1:length(med_winterspill)){
+      med_winterspill[y] <- winterspill_data[y,from]
+    }
+    
+    # get median temperature for this state, by year - this will be indexed the same as year, using j
+    temp_data <- SRW_envir$data$temperature_data
+    
+    med_temp <- vector(length = 18)
+    
+    for (z in 1:length(med_temp)){
+      med_temp[z] <- median(temp_data[subset(SRW_states_dates_years, state == from & year == z)$date,from])
+    }
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(year_predict)){
+        
+        # if there aren't any movements in that year, skip it
+        if (!(is.na(med_temp[j]))){
+          # evaluation movement 
+          year_move_prob_array[j, iter, i] <- exp(b0_array_SRW[from,to,iter] +
+                                                    # btemp0_array_SRW[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                    btemp1_array_SRW[from,to,iter]*med_temp[j] + 
+                                                    bspillwindow_array_SRW[from,to,iter]*med_spillwindow[j] +
+                                                    bwinterspill_array_SRW[from,to,iter]*med_winterspill[j] +
+                                                    # btemp0xorigin1_array_SRW[from,to,iter]*origin1 +
+                                                    btemp1xorigin1_array_SRW[from,to,iter]*med_temp[j]*origin1 +
+                                                    # btemp0xorigin2_array_SRW[from,to,iter]*origin2 + 
+                                                    btemp1xorigin2_array_SRW[from,to,iter]*med_temp[j]*origin2 + 
+                                                    # btemp0xorigin3_array_SRW[from,to,iter]*origin3 +
+                                                    btemp1xorigin3_array_SRW[from,to,iter]*med_temp[j]*origin3 +
+                                                    # btemp0xorigin4_array_SRW[from,to,iter]*origin4 +
+                                                    btemp1xorigin4_array_SRW[from,to,iter]*med_temp[j]*origin4 +
+                                                    # btemp0xorigin5_array_SRW[from,to,iter]*origin5 +
+                                                    btemp1xorigin5_array_SRW[from,to,iter]*med_temp[j]*origin5 +
+                                                    # btemp0xorigin6_array_SRW[from,to,iter]*origin6 +
+                                                    btemp1xorigin6_array_SRW[from,to,iter]*med_temp[j]*origin6 +
+                                                    borigin1_array_SRW[from,to,iter]*origin1 +
+                                                    borigin2_array_SRW[from,to,iter]*origin2 +
+                                                    borigin3_array_SRW[from,to,iter]*origin3 +
+                                                    borigin4_array_SRW[from,to,iter]*origin4 +
+                                                    borigin5_array_SRW[from,to,iter]*origin5 +
+                                                    borigin6_array_SRW[from,to,iter]*origin6 +
+                                                    
+                                                    # year effects
+                                                    origin1_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin1 +
+                                                    origin2_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin2 +
+                                                    origin3_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin3 +
+                                                    origin4_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin4 +
+                                                    origin5_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin5 +
+                                                    origin6_year_param_array_SRW[paste0(from, "_", to), j, iter]*origin6)/
+            sum(exp(b0_array_SRW[from,possible_movements,iter] +
+                      # btemp0_array_SRW[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                      btemp1_array_SRW[from,possible_movements,iter]*med_temp[j] + 
+                      bspillwindow_array_SRW[from,possible_movements,iter]*med_spillwindow[j] +
+                      bwinterspill_array_SRW[from,possible_movements,iter]*med_winterspill[j] +
+                      # btemp0xorigin1_array_SRW[from,possible_movements,iter]*origin1 +
+                      btemp1xorigin1_array_SRW[from,possible_movements,iter]*med_temp[j]*origin1 +
+                      # btemp0xorigin2_array_SRW[from,possible_movements,iter]*origin2 + 
+                      btemp1xorigin2_array_SRW[from,possible_movements,iter]*med_temp[j]*origin2 + 
+                      # btemp0xorigin3_array_SRW[from,possible_movements,iter]*origin3 +
+                      btemp1xorigin3_array_SRW[from,possible_movements,iter]*med_temp[j]*origin3 +
+                      # btemp0xorigin4_array_SRW[from,possible_movements,iter]*origin4 +
+                      btemp1xorigin4_array_SRW[from,possible_movements,iter]*med_temp[j]*origin4 +
+                      # btemp0xorigin5_array_SRW[from,possible_movements,iter]*origin5 +
+                      btemp1xorigin5_array_SRW[from,possible_movements,iter]*med_temp[j]*origin5 +
+                      # btemp0xorigin6_array_SRW[from,possible_movements,iter]*origin6 +
+                      btemp1xorigin6_array_SRW[from,possible_movements,iter]*med_temp[j]*origin6 +
+                      borigin1_array_SRW[from,possible_movements,iter]*origin1 +
+                      borigin2_array_SRW[from,possible_movements,iter]*origin2 +
+                      borigin3_array_SRW[from,possible_movements,iter]*origin3 +
+                      borigin4_array_SRW[from,possible_movements,iter]*origin4 +
+                      borigin5_array_SRW[from,possible_movements,iter]*origin5 +
+                      borigin6_array_SRW[from,possible_movements,iter]*origin6 +
+                      # year effects
+                      c(origin1_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                      c(origin2_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2 +
+                      c(origin3_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin3 +
+                      c(origin4_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin4 +
+                      c(origin5_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin5 +
+                      c(origin6_year_param_array_SRW[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin6))
+          
+        } else {
+          
+        }
+        
+        
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(year_move_prob_array)
+  
+}
+
+estimate_year_move_prob_SRH <- function(origin_select, movements){
+  
+  # set up vectors to control which origin parameters are turned on
+  hatchery_origin_params <- rep(0,5)
+  
+  # index to the right origin param to turn it on
+  hatchery_origin_params[subset(origin_param_map, natal_origin == origin_select)$hatchery] <- 1
+  
+  # use this vector to set all of the individual origin indices
+  origin1 = hatchery_origin_params[1]
+  origin2 = hatchery_origin_params[2]
+  origin3 = hatchery_origin_params[3]
+  origin4 = hatchery_origin_params[4]
+  origin5 = hatchery_origin_params[5]
+  
+  # set up years to predict across
+  year_predict <- seq(1,18)
+  
+  # get an array to store probabilities of movements in different years
+  niter <- 4000 # this is the number of draws we have
+  
+  # set this up where rownames = years, columns = iter, slices = movements
+  year_move_prob_array <- array(dim = c(length(year_predict), niter, nrow(movements)))
+  
+  
+  for (i in 1:nrow(movements)){
+    from <- movements$from[i]
+    to <- movements$to[i]
+    
+    # Get the movements
+    possible_movements <- SRH_envir$data$movements[, "col"][SRH_envir$data$movements[, "row"] == from]
+    possible_movements <- c(possible_movements, 43)
+    
+    SRH_states_dates_years <- data.frame(state = as.vector(SRH_envir$data$y),
+                                         date = as.vector(SRH_envir$data$transition_dates))
+    
+    SRH_states_dates_years$year <- ceiling(SRH_states_dates_years$date/365.25)+1
+    
+    # get median spill window for this state, by year - this will be indexed the same as year, using j
+    spillwindow_data <- SRH_envir$data$spill_window_data
+    
+    med_spillwindow <- vector(length = 18)
+    
+    # for spill and temp, if there were no fish in year/state combination,
+    # there will be NAs in the vector - and that's ok
+    
+    for (x in 1:length(med_spillwindow)){
+      med_spillwindow[x] <- median(spillwindow_data[subset(SRH_states_dates_years, state == from & year == x)$date,from])
+    }
+    
+    # get median winter spill for this state (note that this is just one value, since each year already only has one winter spill value), 
+    # by year - this will be indexed the same as year, using j
+    winterspill_data <- SRH_envir$data$winter_spill_days_data
+    med_winterspill <- vector(length = 18)
+    
+    for (y in 1:length(med_winterspill)){
+      med_winterspill[y] <- winterspill_data[y,from]
+    }
+    
+    # get median temperature for this state, by year - this will be indexed the same as year, using j
+    temp_data <- SRH_envir$data$temperature_data
+    
+    med_temp <- vector(length = 18)
+    
+    for (z in 1:length(med_temp)){
+      med_temp[z] <- median(temp_data[subset(SRH_states_dates_years, state == from & year == z)$date,from])
+    }
+    
+    # Loop through all of the iterations
+    for (iter in 1:niter){
+      
+      # Loop through a sequence of temperature values to get predicted response
+      # temperature was z-scored so we can plot 2 standard deviations
+      for (j in 1:length(year_predict)){
+        
+        # if there aren't any movements in that year, skip it
+        if (!(is.na(med_temp[j]))){
+          # evaluation movement 
+          year_move_prob_array[j, iter, i] <- exp(b0_array_SRH[from,to,iter] +
+                                                    # btemp0_array_SRH[from,to,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                                                    btemp1_array_SRH[from,to,iter]*med_temp[j] + 
+                                                    bspillwindow_array_SRH[from,to,iter]*med_spillwindow[j] +
+                                                    bwinterspill_array_SRH[from,to,iter]*med_winterspill[j] +
+                                                    # btemp0xorigin1_array_SRH[from,to,iter]*origin1 +
+                                                    btemp1xorigin1_array_SRH[from,to,iter]*med_temp[j]*origin1 +
+                                                    # btemp0xorigin2_array_SRH[from,to,iter]*origin2 + 
+                                                    btemp1xorigin2_array_SRH[from,to,iter]*med_temp[j]*origin2 + 
+                                                    # btemp0xorigin3_array_SRH[from,to,iter]*origin3 +
+                                                    btemp1xorigin3_array_SRH[from,to,iter]*med_temp[j]*origin3 +
+                                                    # btemp0xorigin4_array_SRH[from,to,iter]*origin4 +
+                                                    btemp1xorigin4_array_SRH[from,to,iter]*med_temp[j]*origin4 +
+                                                    # btemp0xorigin5_array_SRH[from,to,iter]*origin5 +
+                                                    btemp1xorigin5_array_SRH[from,to,iter]*med_temp[j]*origin5 +
+                                                    borigin1_array_SRH[from,to,iter]*origin1 +
+                                                    borigin2_array_SRH[from,to,iter]*origin2 +
+                                                    borigin3_array_SRH[from,to,iter]*origin3 +
+                                                    borigin4_array_SRH[from,to,iter]*origin4 +
+                                                    borigin5_array_SRH[from,to,iter]*origin5 +
+                                                    
+                                                    # year effects
+                                                    origin1_year_param_array_SRH[paste0(from, "_", to), j, iter]*origin1 +
+                                                    origin2_year_param_array_SRH[paste0(from, "_", to), j, iter]*origin2 +
+                                                    origin3_year_param_array_SRH[paste0(from, "_", to), j, iter]*origin3 +
+                                                    origin4_year_param_array_SRH[paste0(from, "_", to), j, iter]*origin4 +
+                                                    origin5_year_param_array_SRH[paste0(from, "_", to), j, iter]*origin5)/
+            sum(exp(b0_array_SRH[from,possible_movements,iter] +
+                      # btemp0_array_SRH[from,possible_movements,iter] + # ignore this parameter - because the vast majority of transitions occur in summer/fall, which corresponds to temp1 param
+                      btemp1_array_SRH[from,possible_movements,iter]*med_temp[j] + 
+                      bspillwindow_array_SRH[from,possible_movements,iter]*med_spillwindow[j] +
+                      bwinterspill_array_SRH[from,possible_movements,iter]*med_winterspill[j] +
+                      # btemp0xorigin1_array_SRH[from,possible_movements,iter]*origin1 +
+                      btemp1xorigin1_array_SRH[from,possible_movements,iter]*med_temp[j]*origin1 +
+                      # btemp0xorigin2_array_SRH[from,possible_movements,iter]*origin2 + 
+                      btemp1xorigin2_array_SRH[from,possible_movements,iter]*med_temp[j]*origin2 + 
+                      # btemp0xorigin3_array_SRH[from,possible_movements,iter]*origin3 +
+                      btemp1xorigin3_array_SRH[from,possible_movements,iter]*med_temp[j]*origin3 +
+                      # btemp0xorigin4_array_SRH[from,possible_movements,iter]*origin4 +
+                      btemp1xorigin4_array_SRH[from,possible_movements,iter]*med_temp[j]*origin4 +
+                      # btemp0xorigin5_array_SRH[from,possible_movements,iter]*origin5 +
+                      btemp1xorigin5_array_SRH[from,possible_movements,iter]*med_temp[j]*origin5 +
+                      borigin1_array_SRH[from,possible_movements,iter]*origin1 +
+                      borigin2_array_SRH[from,possible_movements,iter]*origin2 +
+                      borigin3_array_SRH[from,possible_movements,iter]*origin3 +
+                      borigin4_array_SRH[from,possible_movements,iter]*origin4 +
+                      borigin5_array_SRH[from,possible_movements,iter]*origin5 +
+                      # year effects
+                      c(origin1_year_param_array_SRH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin1 +
+                      c(origin2_year_param_array_SRH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin2 +
+                      c(origin3_year_param_array_SRH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin3 +
+                      c(origin4_year_param_array_SRH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin4 +
+                      c(origin5_year_param_array_SRH[paste0(from, "_", possible_movements[1:(length(possible_movements)-1)]), j, iter],0)*origin5))
+          
+        } else {
+          
+        }
+        
+        
+        
+      }
+      
+      
+      
+    }
+    
+  }
+  
+  # return the array that contains movement probs across all movements, temps, and iter
+  return(year_move_prob_array)
+  
+}
+
 
 #### Function to plot probability of movements in different years ####
 
@@ -815,53 +1487,115 @@ plot_prob_by_year <- function(year_move_prob_array, from, to, plot_title = NULL)
   return(year_move_prob_plot)
 }
 rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
-plot_compare_prob_by_year <- function(wild_year_move_prob_array, hatchery_year_move_prob_array,
+plot_compare_prob_by_year <- function(origin_select,
+                                      wild_year_move_prob_array = NULL, hatchery_year_move_prob_array = NULL,
+                                      movements_evaluated = NULL,
                                       from, to, plot_title = NULL){
+  if(is.null(movements_evaluated)){
+    movements_evaluated <- data.frame(from = from, to = to)
+  }
+  
   niter <- 4000 # for the number of draws
+  array_index <- which(movements_evaluated$from == from & movements_evaluated$to == to)
   
-  wild_year_move_prob <- as.data.frame(wild_year_move_prob_array[from, to,,])
+  # If hatchery is NA, run wild only
+  if (is.na(subset(origin_param_map, natal_origin == origin_select)$hatchery)){
+    wild_year_move_prob <- as.data.frame(wild_year_move_prob_array[,,array_index])
+    
+    colnames(wild_year_move_prob) <- paste0("iter", 1:niter) 
+    year_predict <- 1:18
+    wild_year_move_prob$year <- year_predict
+    
+    # Add a column with the actual years
+    wild_year_move_prob$year_actual <- 2004:2021
+    
+    # drop years without observations
+    wild_year_move_prob <- na.omit(wild_year_move_prob)
+    
+    
+    wild_year_move_prob %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear = "wild") -> wild_year_move_prob_quantiles
+    
+    wild_year_move_prob_quantiles -> rear_year_move_prob_quantiles
+  }
   
-  colnames(wild_year_move_prob) <- paste0("iter", 1:niter) 
-  year_predict <- 1:18
-  wild_year_move_prob$year <- year_predict
-  
-  # Add a column with the actual temperatures
-  wild_year_move_prob$year_actual <- 2004:2021
-  
-  # drop years without observations
-  wild_year_move_prob <- na.omit(wild_year_move_prob)
-  
-  
-  wild_year_move_prob %>% 
-    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
-    group_by(year_actual) %>% 
-    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
-    pivot_wider(names_from = q, values_from = prob) %>% 
-    mutate(rear = "wild") -> wild_year_move_prob_quantiles
-  
-  hatchery_year_move_prob <- as.data.frame(hatchery_year_move_prob_array[from, to,,])
-  
-  colnames(hatchery_year_move_prob) <- paste0("iter", 1:niter) 
-  year_predict <- 1:18
-  hatchery_year_move_prob$year <- year_predict
-  
-  # Add a column with the actual temperatures
-  hatchery_year_move_prob$year_actual <- 2004:2021
-  
-  # drop years without observations
-  hatchery_year_move_prob <- na.omit(hatchery_year_move_prob)
-  
-  
-  hatchery_year_move_prob %>% 
-    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
-    group_by(year_actual) %>% 
-    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
-    pivot_wider(names_from = q, values_from = prob) %>% 
-    mutate(rear = "hatchery") -> hatchery_year_move_prob_quantiles
-  
-  # join hatchery and wild
-  wild_year_move_prob_quantiles %>% 
-    bind_rows(., hatchery_year_move_prob_quantiles) -> rear_year_move_prob_quantiles
+  # If wild is NA, run hatchery only
+  else if (is.na(subset(origin_param_map, natal_origin == origin_select)$wild)){
+    
+    hatchery_year_move_prob <- as.data.frame(hatchery_year_move_prob_array[,,array_index])
+    
+    colnames(hatchery_year_move_prob) <- paste0("iter", 1:niter) 
+    year_predict <- 1:18
+    hatchery_year_move_prob$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    hatchery_year_move_prob$year_actual <- 2004:2021
+    
+    # drop years without observations
+    hatchery_year_move_prob <- na.omit(hatchery_year_move_prob)
+    
+    
+    hatchery_year_move_prob %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear = "hatchery") -> hatchery_year_move_prob_quantiles
+    
+    # join hatchery and wild
+    hatchery_year_move_prob_quantiles -> rear_year_move_prob_quantiles
+  }
+  # else run both
+  else {
+    wild_year_move_prob <- as.data.frame(wild_year_move_prob_array[,,array_index])
+    
+    colnames(wild_year_move_prob) <- paste0("iter", 1:niter) 
+    year_predict <- 1:18
+    wild_year_move_prob$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    wild_year_move_prob$year_actual <- 2004:2021
+    
+    # drop years without observations
+    wild_year_move_prob <- na.omit(wild_year_move_prob)
+    
+    
+    wild_year_move_prob %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear = "wild") -> wild_year_move_prob_quantiles
+    
+    hatchery_year_move_prob <- as.data.frame(hatchery_year_move_prob_array[,,array_index])
+    
+    colnames(hatchery_year_move_prob) <- paste0("iter", 1:niter) 
+    year_predict <- 1:18
+    hatchery_year_move_prob$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    hatchery_year_move_prob$year_actual <- 2004:2021
+    
+    # drop years without observations
+    hatchery_year_move_prob <- na.omit(hatchery_year_move_prob)
+    
+    
+    hatchery_year_move_prob %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) %>% 
+      mutate(rear = "hatchery") -> hatchery_year_move_prob_quantiles
+    
+    # join hatchery and wild
+    wild_year_move_prob_quantiles %>% 
+      bind_rows(., hatchery_year_move_prob_quantiles) -> rear_year_move_prob_quantiles
+    
+  }
   
   
   rear_year_move_prob_plot <- ggplot(rear_year_move_prob_quantiles, aes(x = year_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
@@ -883,7 +1617,7 @@ plot_compare_prob_by_year <- function(wild_year_move_prob_array, hatchery_year_m
 # separately, this function plots only the parameter value for the random effect of year
 
 plot_RE_year <- function(year_param_array, from, to, plot_title = NULL){
-  RE_df <- as.data.frame(year_param_array[from, to, ,])
+  RE_df <- as.data.frame(year_param_array[paste0(from, "_", to), ,])
   
   niter <- 4000 # for the number of draws
   
@@ -920,39 +1654,197 @@ plot_RE_year <- function(year_param_array, from, to, plot_title = NULL){
 
 #### Plot movement prob by year for different origins ####
 
-### UCW ###
+#### Upper Columbia ####
 
 ## Wenatchee River
-# Wild
 wen_wild_year_movement_probs <- estimate_year_move_prob_UCW(origin_select = "Wenatchee River", movements = data.frame(from = c(5), to = c(24)))
 
-
-wen_wild_homing_movement_by_year_plot <- plot_prob_by_year(year_move_prob_array = wen_wild_year_movement_probs, 
-                                                      from = 5, to = 24, plot_title = "Wenatchee Wild - movement into Wenatchee")
-
-ggsave(here::here("stan_actual", "output", "year_effects", "wen_wild_homing_movement_by_year_plot.png"), wen_wild_homing_movement_by_year_plot, height = 8, width = 8)
-
-# Hatchery
 wen_hatchery_year_movement_probs <- estimate_year_move_prob_UCH(origin_select = "Wenatchee River", movements = data.frame(from = c(5), to = c(24)))
 
-
-wen_hatchery_homing_movement_by_year_plot <- plot_prob_by_year(year_move_prob_array = wen_hatchery_year_movement_probs, 
-                                                               from = 5, to = 24, plot_title = "Wenatchee hatchery - movement into Wenatchee")
-
-ggsave(here::here("stan_actual", "output", "year_effects", "wen_hatchery_homing_movement_by_year_plot.png"), wen_hatchery_homing_movement_by_year_plot, height = 8, width = 8)
-
 # comparison plot
-wen_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(wild_year_move_prob_array = wen_wild_year_movement_probs, 
+wen_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Wenatchee River",
+                                                                   wild_year_move_prob_array = wen_wild_year_movement_probs, 
                                                            hatchery_year_move_prob_array = wen_hatchery_year_movement_probs,
                                                                from = 5, to = 24, plot_title = "Wenatchee - movement into Wenatchee")
 
-ggsave(here::here("stan_actual", "output", "year_effects", "wen_rear_homing_movement_by_year_plot.png"), wen_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "wen_rear_homing_movement_by_year_plot.png"), wen_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Entiat River
+ent_wild_year_movement_probs <- estimate_year_move_prob_UCW(origin_select = "Entiat River", movements = data.frame(from = c(6), to = c(26)))
+
+# comparison plot
+ent_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Entiat River", 
+                                                                   wild_year_move_prob_array = ent_wild_year_movement_probs, 
+                                                                   from = 6, to = 26, plot_title = "Entiat - movement into Entiat")
+
+ggsave(here::here("stan_actual", "output", "annual", "ent_rear_homing_movement_by_year_plot.png"), ent_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Okanogan River
+
+oka_hatchery_year_movement_probs <- estimate_year_move_prob_UCH(origin_select = "Okanogan River", movements = data.frame(from = c(7), to = c(28)))
+
+# comparison plot
+oka_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Okanogan River",
+                                                                   hatchery_year_move_prob_array = oka_hatchery_year_movement_probs,
+                                                                   from = 7, to = 28, plot_title = "Okanogan - movement into Okanogan")
+
+ggsave(here::here("stan_actual", "output", "annual", "oka_rear_homing_movement_by_year_plot.png"), oka_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Methow River
+met_wild_year_movement_probs <- estimate_year_move_prob_UCW(origin_select = "Methow River", movements = data.frame(from = c(7), to = c(30)))
+
+met_hatchery_year_movement_probs <- estimate_year_move_prob_UCH(origin_select = "Methow River", movements = data.frame(from = c(7), to = c(30)))
+
+# comparison plot
+met_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Methow River",
+                                                                   wild_year_move_prob_array = met_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = met_hatchery_year_movement_probs,
+                                                                   from = 7, to = 30, plot_title = "Methow - movement into Methow")
+
+ggsave(here::here("stan_actual", "output", "annual", "met_rear_homing_movement_by_year_plot.png"), met_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+#### Middle Columbia ####
+## Deschutes River
+des_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Deschutes River", movements = data.frame(from = c(2), to = c(10)))
+
+# comparison plot
+des_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Deschutes River",
+                                                                   wild_year_move_prob_array = des_wild_year_movement_probs, 
+                                                                   from = 2, to = 10, plot_title = "Deschutes - movement into Deschutes")
+
+ggsave(here::here("stan_actual", "output", "annual", "des_rear_homing_movement_by_year_plot.png"), des_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## John Day River
+jdr_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "John Day River", movements = data.frame(from = c(2), to = c(12)))
+
+# comparison plot
+jdr_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "John Day River",
+                                                                   wild_year_move_prob_array = jdr_wild_year_movement_probs, 
+                                                                   from = 2, to = 12, plot_title = "John Day - movement into John Day")
+
+ggsave(here::here("stan_actual", "output", "annual", "jdr_rear_homing_movement_by_year_plot.png"), jdr_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Fifteenmile Creek
+fif_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Fifteenmile Creek", movements = data.frame(from = c(2), to = c(16)))
+
+# comparison plot
+fif_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Fifteenmile Creek",
+                                                                   wild_year_move_prob_array = fif_wild_year_movement_probs, 
+                                                                   from = 2, to = 16, plot_title = "Fifteenmile Creek - movement into Fifteenmile Creek")
+
+ggsave(here::here("stan_actual", "output", "annual", "fif_rear_homing_movement_by_year_plot.png"), fif_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Umatilla River
+uma_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Umatilla River", movements = data.frame(from = c(2), to = c(18)))
+
+uma_hatchery_year_movement_probs <- estimate_year_move_prob_MCH(origin_select = "Umatilla River", movements = data.frame(from = c(2), to = c(18)))
+
+# comparison plot
+uma_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Umatilla River",
+                                                                   wild_year_move_prob_array = uma_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = uma_hatchery_year_movement_probs,
+                                                                   from = 2, to = 18, plot_title = "Umatilla - movement into Umatilla")
+
+ggsave(here::here("stan_actual", "output", "annual", "uma_rear_homing_movement_by_year_plot.png"), uma_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Yakima River
+yak_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Yakima River", movements = data.frame(from = c(3), to = c(20)))
+
+yak_hatchery_year_movement_probs <- estimate_year_move_prob_MCH(origin_select = "Yakima River", movements = data.frame(from = c(3), to = c(20)))
+
+# comparison plot
+yak_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Yakima River",
+                                                                   wild_year_move_prob_array = yak_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = yak_hatchery_year_movement_probs,
+                                                                   from = 3, to = 20, plot_title = "Yakima - movement into Yakima")
+
+ggsave(here::here("stan_actual", "output", "annual", "yak_rear_homing_movement_by_year_plot.png"), yak_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Walla Walla River
+wawa_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Walla Walla River", movements = data.frame(from = c(3), to = c(22)))
+
+wawa_hatchery_year_movement_probs <- estimate_year_move_prob_MCH(origin_select = "Walla Walla River", movements = data.frame(from = c(3), to = c(22)))
+
+# comparison plot
+wawa_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Walla Walla River",
+                                                                   wild_year_move_prob_array = wawa_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = wawa_hatchery_year_movement_probs,
+                                                                   from = 3, to = 22, plot_title = "Walla Walla - movement into Walla Walla")
+
+ggsave(here::here("stan_actual", "output", "annual", "wawa_rear_homing_movement_by_year_plot.png"), wawa_rear_homing_movement_by_year_plot, height = 8, width = 8)
 
 
+#### Snake River ####
+## Asotin Creek
+aso_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Asotin Creek", movements = data.frame(from = c(9), to = c(34)))
 
+# comparison plot
+aso_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Asotin Creek",
+                                                                    wild_year_move_prob_array = aso_wild_year_movement_probs, 
+                                                                    from = 9, to = 34, plot_title = "Asotin Creek - movement into Asotin Creek")
 
+ggsave(here::here("stan_actual", "output", "annual", "aso_rear_homing_movement_by_year_plot.png"), aso_rear_homing_movement_by_year_plot, height = 8, width = 8)
 
+## Clearwater River
+cle_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Clearwater River", movements = data.frame(from = c(9), to = c(36)))
 
+cle_hatchery_year_movement_probs <- estimate_year_move_prob_SRH(origin_select = "Clearwater River", movements = data.frame(from = c(9), to = c(36)))
+
+# comparison plot
+cle_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Clearwater River",
+                                                                   wild_year_move_prob_array = cle_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = cle_hatchery_year_movement_probs,
+                                                                   from = 9, to = 36, plot_title = "Clearwater - movement into Clearwater")
+
+ggsave(here::here("stan_actual", "output", "annual", "cle_rear_homing_movement_by_year_plot.png"), cle_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Imnaha River
+imn_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Imnaha River", movements = data.frame(from = c(9), to = c(39)))
+imn_hatchery_year_movement_probs <- estimate_year_move_prob_SRH(origin_select = "Imnaha River", movements = data.frame(from = c(9), to = c(39)))
+
+# comparison plot
+imn_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Imnaha River",
+                                                                   wild_year_move_prob_array = imn_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = imn_hatchery_year_movement_probs,
+                                                                   from = 9, to = 39, plot_title = "Imnaha - movement into Imnaha")
+
+ggsave(here::here("stan_actual", "output", "annual", "imn_rear_homing_movement_by_year_plot.png"), imn_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Grande Ronde River
+gr_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Grande Ronde River", movements = data.frame(from = c(9), to = c(38)))
+gr_hatchery_year_movement_probs <- estimate_year_move_prob_SRH(origin_select = "Grande Ronde River", movements = data.frame(from = c(9), to = c(38)))
+
+# comparison plot
+gr_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Grande Ronde River",
+                                                                   wild_year_move_prob_array = gr_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = gr_hatchery_year_movement_probs,
+                                                                   from = 9, to = 38, plot_title = "Grande Ronde - movement into Grande Ronde")
+
+ggsave(here::here("stan_actual", "output", "annual", "gr_rear_homing_movement_by_year_plot.png"), gr_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Salmon River
+sal_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Salmon River", movements = data.frame(from = c(9), to = c(37)))
+sal_hatchery_year_movement_probs <- estimate_year_move_prob_SRH(origin_select = "Salmon River", movements = data.frame(from = c(9), to = c(37)))
+
+# comparison plot
+sal_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Salmon River",
+                                                                   wild_year_move_prob_array = sal_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = sal_hatchery_year_movement_probs,
+                                                                   from = 9, to = 37, plot_title = "Salmon - movement into Salmon")
+
+ggsave(here::here("stan_actual", "output", "annual", "sal_rear_homing_movement_by_year_plot.png"), sal_rear_homing_movement_by_year_plot, height = 8, width = 8)
+
+## Tucannon River
+tuc_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Tucannon River", movements = data.frame(from = c(8), to = c(32)))
+tuc_hatchery_year_movement_probs <- estimate_year_move_prob_SRH(origin_select = "Tucannon River", movements = data.frame(from = c(8), to = c(32)))
+
+# comparison plot
+tuc_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select = "Tucannon River",
+                                                                   wild_year_move_prob_array = tuc_wild_year_movement_probs, 
+                                                                   hatchery_year_move_prob_array = tuc_hatchery_year_movement_probs,
+                                                                   from = 8, to = 32, plot_title = "Tucannon - movement into Tucannon")
+
+ggsave(here::here("stan_actual", "output", "annual", "tuc_rear_homing_movement_by_year_plot.png"), tuc_rear_homing_movement_by_year_plot, height = 8, width = 8)
 
 
 
@@ -964,18 +1856,145 @@ ggsave(here::here("stan_actual", "output", "year_effects", "wen_rear_homing_move
 #### Plot year effect parameter estimates for different origins ####
 # use origin_param_map to determine which parameters to select when plotting individual REs
 
-### UCW
+#### Upper Columbia ####
 # Wenatchee River
 subset(origin_param_map, natal_origin == "Wenatchee River")
 
-mainstem_WEN_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCW, from = 5, to = 24, plot_title = "Year effect for wild: moving from mainstem into Wenatchee")
+mainstem_WEN_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCW, from = 5, to = 24, plot_title = "Year effect for wild Wenatchee: mainstem into Wenatchee")
 ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_wild_RE_year_plot.png"), mainstem_WEN_wild_RE_year_plot, height = 8, width = 8)
 
-mainstem_WEN_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCH, from = 5, to = 24, plot_title = "Year effect for hatchery: moving from mainstem into Wenatchee")
+mainstem_WEN_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCH, from = 5, to = 24, plot_title = "Year effect for hatchery Wenatchee: mainstem into Wenatchee")
 ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_hatchery_RE_year_plot.png"), mainstem_WEN_hatchery_RE_year_plot, height = 8, width = 8)
 
 # this is interesting, but what seems to be happening is that maybe there are correlations with
 # other parameters elsewhere
+
+# Entiat River
+subset(origin_param_map, natal_origin == "Entiat River")
+
+mainstem_ENT_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_UCW, from = 6, to = 26, plot_title = "Year effect for wild Entiat: mainstem into Entiat")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ENT_wild_RE_year_plot.png"), mainstem_ENT_wild_RE_year_plot, height = 8, width = 8)
+
+# Okanogan River
+subset(origin_param_map, natal_origin == "Okanogan River")
+
+mainstem_OKA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_UCH, from = 7, to = 28, plot_title = "Year effect for hatchery Okanogan: mainstem into Okanogan")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_OKA_hatchery_RE_year_plot.png"), mainstem_OKA_hatchery_RE_year_plot, height = 8, width = 8)
+
+# Methow River
+subset(origin_param_map, natal_origin == "Methow River")
+
+mainstem_MET_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_UCW, from = 7, to = 30, plot_title = "Year effect for wild Methow: mainstem into Methow")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_MET_wild_RE_year_plot.png"), mainstem_MET_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_MET_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_UCH, from = 7, to = 30, plot_title = "Year effect for hatchery Methow: mainstem into Methow")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_MET_hatchery_RE_year_plot.png"), mainstem_MET_hatchery_RE_year_plot, height = 8, width = 8)
+
+
+#### Middle Columbia ####
+# Deschutes River
+subset(origin_param_map, natal_origin == "Deschutes River")
+
+mainstem_DES_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_MCW, from = 2, to = 10, plot_title = "Year effect for wild Deschutes: mainstem into Deschutes")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_DES_wild_RE_year_plot.png"), mainstem_DES_wild_RE_year_plot, height = 8, width = 8)
+
+# John Day River
+subset(origin_param_map, natal_origin == "John Day River")
+
+mainstem_JDR_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_MCW, from = 2, to = 12, plot_title = "Year effect for wild John Day: mainstem into John Day")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_JDR_wild_RE_year_plot.png"), mainstem_JDR_wild_RE_year_plot, height = 8, width = 8)
+
+
+# Fifteenmile Creek
+subset(origin_param_map, natal_origin == "Fifteenmile Creek")
+
+mainstem_FIF_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_MCW, from = 2, to = 16, plot_title = "Year effect for wild Fifteenmile: mainstem into Fifteenmile")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_FIF_wild_RE_year_plot.png"), mainstem_FIF_wild_RE_year_plot, height = 8, width = 8)
+
+# Umatilla River
+subset(origin_param_map, natal_origin == "Umatilla River")
+
+mainstem_UMA_wild_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_MCW, from = 2, to = 18, plot_title = "Year effect for wild Umatilla: mainstem into Umatilla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_UMA_wild_RE_year_plot.png"), mainstem_UMA_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_UMA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_MCH, from = 2, to = 18, plot_title = "Year effect for hatchery Umatilla: mainstem into Umatilla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_UMA_hatchery_RE_year_plot.png"), mainstem_UMA_hatchery_RE_year_plot, height = 8, width = 8)
+
+# Yakima River
+subset(origin_param_map, natal_origin == "Yakima River")
+
+mainstem_YAK_wild_RE_year_plot <- plot_RE_year(year_param_array = origin6_year_param_array_MCW, from = 3, to = 20, plot_title = "Year effect for wild Yakima: mainstem into Yakima")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_YAK_wild_RE_year_plot.png"), mainstem_YAK_wild_RE_year_plot, height = 8, width = 8)
+
+# Walla Walla River
+subset(origin_param_map, natal_origin == "Walla Walla River")
+
+mainstem_WAWA_wild_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_MCW, from = 3, to = 22, plot_title = "Year effect for wild Walla Walla: mainstem into Walla Walla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WAWA_wild_RE_year_plot.png"), mainstem_WAWA_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_WAWA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_MCH, from = 3, to = 22, plot_title = "Year effect for hatchery Walla Walla: mainstem into Walla Walla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WAWA_hatchery_RE_year_plot.png"), mainstem_WAWA_hatchery_RE_year_plot, height = 8, width = 8)
+
+#### Snake River ####
+
+# Tucannon River
+subset(origin_param_map, natal_origin == "Tucannon River")
+
+mainstem_TUC_wild_RE_year_plot <- plot_RE_year(year_param_array = origin6_year_param_array_SRW, from = 8, to = 32, plot_title = "Year effect for wild Tucannon: mainstem into Tucannon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_TUC_wild_RE_year_plot.png"), mainstem_TUC_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_TUC_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_SRH, from = 8, to = 32, plot_title = "Year effect for hatchery Tucannon: mainstem into Tucannon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_TUC_hatchery_RE_year_plot.png"), mainstem_TUC_hatchery_RE_year_plot, height = 8, width = 8)
+
+# Asotin Creek
+subset(origin_param_map, natal_origin == "Asotin Creek")
+
+mainstem_ASO_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_SRW, from = 9, to = 34, plot_title = "Year effect for wild Asotin: mainstem into Asotin")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ASO_wild_RE_year_plot.png"), mainstem_ASO_wild_RE_year_plot, height = 8, width = 8)
+
+
+# Clearwater River
+subset(origin_param_map, natal_origin == "Clearwater River")
+
+mainstem_CLE_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_SRW, from = 9, to = 36, plot_title = "Year effect for wild Clearwater: mainstem into Clearwater")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_CLE_wild_RE_year_plot.png"), mainstem_CLE_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_CLE_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_SRH, from = 9, to = 36, plot_title = "Year effect for hatchery Clearwater: mainstem into Clearwater")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_CLE_hatchery_RE_year_plot.png"), mainstem_CLE_hatchery_RE_year_plot, height = 8, width = 8)
+
+
+# Imnaha River
+subset(origin_param_map, natal_origin == "Imnaha River")
+
+mainstem_IMN_wild_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_SRW, from = 9, to = 39, plot_title = "Year effect for wild Imnaha: mainstem into Imnaha")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_IMN_wild_RE_year_plot.png"), mainstem_IMN_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_IMN_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_SRH, from = 9, to = 39, plot_title = "Year effect for hatchery Imnaha: mainstem into Imnaha")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_IMN_hatchery_RE_year_plot.png"), mainstem_IMN_hatchery_RE_year_plot, height = 8, width = 8)
+
+
+# Grande Ronde River
+subset(origin_param_map, natal_origin == "Grande Ronde River")
+
+mainstem_GR_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_SRW, from = 9, to = 38, plot_title = "Year effect for wild Grande Ronde: mainstem into Grande Ronde")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_GR_wild_RE_year_plot.png"), mainstem_GR_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_GR_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_SRH, from = 9, to = 38, plot_title = "Year effect for hatchery Grande Ronde: mainstem into Grande Ronde")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_GR_hatchery_RE_year_plot.png"), mainstem_GR_hatchery_RE_year_plot, height = 8, width = 8)
+
+
+# Salmon River
+subset(origin_param_map, natal_origin == "Salmon River")
+
+mainstem_SAL_wild_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_SRW, from = 9, to = 37, plot_title = "Year effect for wild Salmon: mainstem into Salmon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_SAL_wild_RE_year_plot.png"), mainstem_SAL_wild_RE_year_plot, height = 8, width = 8)
+
+mainstem_SAL_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_SRH, from = 9, to = 37, plot_title = "Year effect for hatchery Salmon: mainstem into Salmon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_SAL_hatchery_RE_year_plot.png"), mainstem_SAL_hatchery_RE_year_plot, height = 8, width = 8)
+
+
+
+
 
 
 
