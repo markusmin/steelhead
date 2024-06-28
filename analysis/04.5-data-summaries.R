@@ -60,6 +60,7 @@ ASC %>%
 
 ASC %>% 
   group_by(natal_origin, run_year, run_year_numeric, rear_type_code) %>% 
+  filter(!(duplicated(tag_code_2))) %>% 
   summarise(total = n()) -> ASC_origin_year_counts
 
 
@@ -85,7 +86,10 @@ ASC_final_states_count %>%
   left_join(ASC_origin_year_counts, by = c("natal_origin", "run_year", "run_year_numeric", "rear_type_code")) %>% 
   mutate(prop = count/total) -> ASC_final_states_count
 
-# Plot homing
+
+
+
+#### Plot homing ####
 plot_homing <- function(natal_origin_select, rear_type_code_select, data){
   plot_data <- filter(data, natal_origin == natal_origin_select & rear_type_code == rear_type_code_select)
   
@@ -183,6 +187,275 @@ dev.off()
 # at what point we dropped the years of origins where we didn't have detection capacity
 
 
+#### Investigate final fates across all years ####
+# Let's drop all observations from non-DE years, to keep comparison most accurate
+deschutes_river_trib_det_eff_capability <- data.frame(natal_origin = "Deschutes River",
+                                                      run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                      DE = c(rep(0,9), rep(1,6), rep(0,3)))
+
+john_day_river_trib_det_eff_capability <- data.frame(natal_origin = "John Day River",
+                                                     run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                     DE = c(rep(0,8), rep(1,10)))
+
+hood_river_trib_det_eff_capability <- data.frame(natal_origin = "Hood River",
+                                                 run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                 DE = c(rep(0,9), rep(1,9)))
+
+fifteenmile_creek_trib_det_eff_capability <- data.frame(natal_origin = "Fifteenmile Creek",
+                                                        run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                        DE = c(rep(0,8), rep(1,10)))
+
+umatilla_river_trib_det_eff_capability <- data.frame(natal_origin = "Umatilla River",
+                                                     run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                     DE = c(rep(0,3), rep(1,15)))
+
+yakima_river_trib_det_eff_capability <- data.frame(natal_origin = "Yakima River",     
+                                                   run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                   # DE = c(rep(1,18)))
+                                                   # For now - remove 04/05 run year
+                                                   DE = c(0, rep(1,17)))
+
+walla_walla_river_trib_det_eff_capability <- data.frame(natal_origin = "Walla Walla River",
+                                                        run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                        DE = c(rep(0,1), rep(1,17)))
+
+wenatchee_river_trib_det_eff_capability <- data.frame(natal_origin = "Wenatchee River",
+                                                      run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                      DE = c(rep(0,7), rep(1,11)))
+
+entiat_river_trib_det_eff_capability <- data.frame(natal_origin = "Entiat River",
+                                                   run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                   DE = c(rep(0,4), rep(1,14)))
+
+okanogan_river_trib_det_eff_capability <- data.frame(natal_origin = "Okanogan River",
+                                                     run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                     DE = c(rep(0,9), rep(1,9)))
+
+methow_river_trib_det_eff_capability <- data.frame(natal_origin = "Methow River",
+                                                   run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                   DE = c(rep(0,5), rep(1,13)))
+
+tucannon_river_trib_det_eff_capability <- data.frame(natal_origin = "Tucannon River",
+                                                     run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                     DE = c(rep(0,7), rep(1,11)))
+
+asotin_creek_trib_det_eff_capability <- data.frame(natal_origin = "Asotin Creek",      
+                                                   run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                   DE = c(rep(0,7), rep(1,11)))
+
+imnaha_river_trib_det_eff_capability <- data.frame(natal_origin = "Imnaha River",
+                                                   run_year = run_year[1:18], # ignore 22/23 to keep consistent
+                                                   DE = c(rep(0,7), rep(1,11)))
+
+
+deschutes_river_trib_det_eff_capability %>% 
+  bind_rows(., john_day_river_trib_det_eff_capability) %>% 
+  bind_rows(., hood_river_trib_det_eff_capability) %>% 
+  bind_rows(., fifteenmile_creek_trib_det_eff_capability) %>% 
+  bind_rows(., umatilla_river_trib_det_eff_capability) %>% 
+  bind_rows(., yakima_river_trib_det_eff_capability) %>% 
+  bind_rows(., walla_walla_river_trib_det_eff_capability) %>% 
+  bind_rows(., wenatchee_river_trib_det_eff_capability) %>% 
+  bind_rows(., entiat_river_trib_det_eff_capability) %>% 
+  bind_rows(., okanogan_river_trib_det_eff_capability) %>% 
+  bind_rows(., methow_river_trib_det_eff_capability) %>% 
+  bind_rows(., tucannon_river_trib_det_eff_capability) %>% 
+  bind_rows(., asotin_creek_trib_det_eff_capability) %>% 
+  bind_rows(., imnaha_river_trib_det_eff_capability) -> trib_det_eff_capability
+
+
+
+
+plot_final_fate_proportions_DE <- function(natal_origin_select,  data){
+  filter_data <- filter(data, natal_origin == natal_origin_select)
+  
+  # join with DE capability DF, drop non-DE years of data
+  filter_data %>% 
+    left_join(., trib_det_eff_capability, by = c("natal_origin", "run_year")) %>% 
+    filter(DE == 1) -> filter_data
+  
+  
+  # drop Wells Trap fish
+  filter_data %>% 
+    filter(state != "Wells Trap") -> filter_data
+  
+  # summarise across all years
+  filter_data %>% 
+    group_by(state, rear_type_code) %>% 
+    summarise(count = sum(count)) -> final_fates_counts
+  
+  final_fates_counts %>% 
+    ungroup() %>% 
+    group_by(rear_type_code) %>% 
+    summarise(total = sum(count)) -> rear_type_counts
+  
+  final_fates_counts %>% 
+    left_join(., rear_type_counts, by = "rear_type_code") %>% 
+    mutate(prop = count/total) -> final_fates_counts
+      
+      
+  states_order_for_plot <- gsub(" Mouth| Upstream", "", model_states)
+  states_order_for_plot <- states_order_for_plot[!(duplicated(states_order_for_plot))]
+  # Make a couple of changes to make them be in the order from most downstream to most upstream
+  states_order_for_plot[10] <- "Hood River"
+  states_order_for_plot[11] <- "Fifteenmile Creek"
+  states_order_for_plot[12] <- "Deschutes River"
+  states_order_for_plot[13] <- "John Day River"
+  states_order_for_plot[15] <- "Walla Walla River"
+  states_order_for_plot[16] <- "Yakima River"
+  states_order_for_plot[19] <- "Methow River"
+  states_order_for_plot[20] <- "Okanogan River"
+  
+  states_order_for_plot[16:29] <- states_order_for_plot[15:28]
+  states_order_for_plot[15] <- "BON to MCN other tributaries"
+  states_order_for_plot[23:29] <- states_order_for_plot[22:28]
+  states_order_for_plot[22] <- "Upstream WEL other tributaries"
+  states_order_for_plot[29] <- "loss"
+  
+  states_order_for_plot[24] <- "Clearwater River"
+  states_order_for_plot[25] <- "Asotin Creek"
+  states_order_for_plot[26] <- "Grande Ronde River"
+  states_order_for_plot[27] <- "Salmon River"
+  
+  rear_colors <- c(H = "#ff7f00", W = "#33a02c")
+  
+  
+  # add all the unvisited states for plotting
+  full_states <- data.frame(state = rep(states_order_for_plot,2),
+                            rear_type_code = rep(c("H","W"), each = length(states_order_for_plot)),
+                            prop = rep(0, length(states_order_for_plot)*2))
+  
+  final_fates_counts %>% 
+    bind_rows(., full_states) %>% 
+    distinct(state, rear_type_code, .keep_all = TRUE) -> final_fates_counts
+  
+  
+  final_fates_counts$state <- fct_rev(factor(final_fates_counts$state, levels = states_order_for_plot))
+  
+  final_fates_counts_plot <- ggplot(final_fates_counts, aes(x = state, y = prop, color = rear_type_code)) +
+    geom_point(size = 3.5, shape = 18, position=position_dodge(width=0.5)) +
+    coord_flip() +
+    ylab("Final Fates") +
+    xlab("Model State") +
+    # ggtitle(" ") +
+    # Create a scale common to all
+    scale_y_continuous(lim = c(0, 1), breaks = seq(0, 1, 0.25)) +
+    scale_color_manual(values = rear_colors) +
+    theme(plot.title = element_text(size = 12),
+          # axis.text.y = element_text(color = rev(state_significance_colors)),
+          axis.title = element_text(size = 14),
+          axis.text.x = element_text(size = 12)) +
+    ggtitle(natal_origin_select)
+  
+  
+  
+}
+
+final_fate_DE_data_plot_list <- vector(mode = "list", length = length(natal_origins))
+
+for (i in 1:length(natal_origins)){
+  final_fate_DE_data_plot_list[[i]] <- plot_final_fate_proportions_DE(natal_origin_select = natal_origins[i],
+                                               data = ASC_final_states_count)
+  
+}
+
+# make a pdf of these
+pdf(file = here::here("figures", "final_fates_from_data_DE_years.pdf"))
+final_fate_DE_data_plot_list
+dev.off()
+
+plot_final_fate_proportions_all_years <- function(natal_origin_select,  data){
+  filter_data <- filter(data, natal_origin == natal_origin_select)
+  
+  
+  # drop Wells Trap fish
+  filter_data %>% 
+    filter(state != "Wells Trap") -> filter_data
+  
+  # summarise across all years
+  filter_data %>% 
+    group_by(state, rear_type_code) %>% 
+    summarise(count = sum(count)) -> final_fates_counts
+  
+  final_fates_counts %>% 
+    ungroup() %>% 
+    group_by(rear_type_code) %>% 
+    summarise(total = sum(count)) -> rear_type_counts
+  
+  final_fates_counts %>% 
+    left_join(., rear_type_counts, by = "rear_type_code") %>% 
+    mutate(prop = count/total) -> final_fates_counts
+  
+  
+  states_order_for_plot <- gsub(" Mouth| Upstream", "", model_states)
+  states_order_for_plot <- states_order_for_plot[!(duplicated(states_order_for_plot))]
+  # Make a couple of changes to make them be in the order from most downstream to most upstream
+  states_order_for_plot[10] <- "Hood River"
+  states_order_for_plot[11] <- "Fifteenmile Creek"
+  states_order_for_plot[12] <- "Deschutes River"
+  states_order_for_plot[13] <- "John Day River"
+  states_order_for_plot[15] <- "Walla Walla River"
+  states_order_for_plot[16] <- "Yakima River"
+  states_order_for_plot[19] <- "Methow River"
+  states_order_for_plot[20] <- "Okanogan River"
+  
+  states_order_for_plot[16:29] <- states_order_for_plot[15:28]
+  states_order_for_plot[15] <- "BON to MCN other tributaries"
+  states_order_for_plot[23:29] <- states_order_for_plot[22:28]
+  states_order_for_plot[22] <- "Upstream WEL other tributaries"
+  states_order_for_plot[29] <- "loss"
+  
+  states_order_for_plot[24] <- "Clearwater River"
+  states_order_for_plot[25] <- "Asotin Creek"
+  states_order_for_plot[26] <- "Grande Ronde River"
+  states_order_for_plot[27] <- "Salmon River"
+  
+  rear_colors <- c(H = "#ff7f00", W = "#33a02c")
+  
+  
+  # add all the unvisited states for plotting
+  full_states <- data.frame(state = rep(states_order_for_plot,2),
+                            rear_type_code = rep(c("H","W"), each = length(states_order_for_plot)),
+                            prop = rep(0, length(states_order_for_plot)*2))
+  
+  final_fates_counts %>% 
+    bind_rows(., full_states) %>% 
+    distinct(state, rear_type_code, .keep_all = TRUE) -> final_fates_counts
+  
+  
+  final_fates_counts$state <- fct_rev(factor(final_fates_counts$state, levels = states_order_for_plot))
+  
+  final_fates_counts_plot <- ggplot(final_fates_counts, aes(x = state, y = prop, color = rear_type_code)) +
+    geom_point(size = 3.5, shape = 18, position=position_dodge(width=0.5)) +
+    coord_flip() +
+    ylab("Final Fates") +
+    xlab("Model State") +
+    # ggtitle(" ") +
+    # Create a scale common to all
+    scale_y_continuous(lim = c(0, 1), breaks = seq(0, 1, 0.25)) +
+    scale_color_manual(values = rear_colors) +
+    theme(plot.title = element_text(size = 12),
+          # axis.text.y = element_text(color = rev(state_significance_colors)),
+          axis.title = element_text(size = 14),
+          axis.text.x = element_text(size = 12)) +
+    ggtitle(natal_origin_select)
+  
+  
+  
+}
+
+final_fate_data_plot_list <- vector(mode = "list", length = length(natal_origins))
+
+for (i in 1:length(natal_origins)){
+  final_fate_data_plot_list[[i]] <- plot_final_fate_proportions_all_years(natal_origin_select = natal_origins[i],
+                                                                      data = ASC_final_states_count)
+  
+}
+
+# make a pdf of these
+pdf(file = here::here("figures", "final_fates_from_data_all_years.pdf"))
+final_fate_data_plot_list
+dev.off()
 
 
 
