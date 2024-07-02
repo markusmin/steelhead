@@ -1,0 +1,111 @@
+---
+title: "Results - Detection Efficiency"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+This page shows the estimated detection efficiency for each tributary by year. As a reminder, detection efficiency is modeled in a two step process:
+
+1. A model is fit to estimate the detection efficiency of the river mouth array at each tributary, for a which a river mouth array and some upstream arrays are available. Detection efficiency is modeled as a function of an intercept term (where some tributaries have different intercept terms depending on the year, to account for changing array configurations) and discharge.
+2. The posteriors from the previous model are then used as priors for the same terms in the full model, where movements throughout the basin are modeled. Note that because hatchery and wild populations were fit in separate models, the posteriors for the detection efficiency from each model are slightly different. 
+
+PLEASE NOTE: There was a typo in the indexing of the detection efficiency correction in the main Stan model. This typo has been fixed and the updated model is now running on Hyak, but the results shown here are still the old model (which indexed discharge data incorrectly, meaning that the tributaries were all matched with the wrong discharge data)
+
+
+#### Middle Columbia
+
+<br>
+<br>
+
+
+![Detection efficiency for the Deschutes River.](site_figures/detection_efficiency/deschutes_DE_plot.png)
+
+<br>
+<br>
+
+
+![Detection efficiency for the John Day River.](site_figures/detection_efficiency/john_day_DE_plot.png)
+
+<br>
+<br>
+
+
+![Detection efficiency for Fifteenmile Creek.](site_figures/detection_efficiency/fifteenmile_DE_plot.png)
+
+<br>
+<br>
+
+
+![Detection efficiency for the Umatilla River.](site_figures/detection_efficiency/umatilla_DE_plot.png)
+
+<br>
+<br>
+
+
+![Detection efficiency for the Yakima River.](site_figures/detection_efficiency/yakima_DE_plot.png)
+
+<br>
+<br>
+
+
+![Detection efficiency for the Walla Walla River.](site_figures/detection_efficiency/walla_walla_DE_plot.png)
+
+
+#### Upper Columbia
+
+![Detection efficiency for the Wenatchee River.](site_figures/detection_efficiency/wenatchee_DE_plot.png)
+
+<br>
+<br>
+
+![Detection efficiency for the Entiat River.](site_figures/detection_efficiency/entiat_DE_plot.png)
+
+<br>
+<br>
+
+![Detection efficiency for the Okanogan River.](site_figures/detection_efficiency/okanogan_DE_plot.png)
+
+<br>
+<br>
+
+![Detection efficiency for the Methow River.](site_figures/detection_efficiency/methow_DE_plot.png)
+
+
+#### Snake River
+
+![Detection efficiency for Asotin Creek.](site_figures/detection_efficiency/asotin_DE_plot.png)
+
+<br>
+<br>
+
+**Detection efficiency cannot be estimated for the Clearwater River.**
+
+<br>
+<br>
+
+![Detection efficiency for the Imnaha River.](site_figures/detection_efficiency/imnaha_DE_plot.png)
+
+<br>
+<br>
+
+**Detection efficiency cannot be estimated for the Grande Ronde River.**
+
+<br>
+<br>
+
+**Detection efficiency cannot be estimated for the Salmon River.**
+
+<br>
+<br>
+
+![Detection efficiency for the Tucannon River.](site_figures/detection_efficiency/tucannon_DE_plot.png)
+
+<br>
+<br>

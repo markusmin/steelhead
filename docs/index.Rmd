@@ -17,9 +17,10 @@ This website is divided into multiple sections, with an emphasis on preliminary 
 
 1. Structure: This tab contains information on how the model is set up, how covariates are included, the model equations, and how the model was implemented in Stan.
 2. Diagnostics: This tab contains various diagnostics, including r-hat and effective sample size statistics, traceplots, and pairs plots.
-3. Results - final fates: This contains the simulated final fates of fish based on the model estimated parameters.
-4. Results - temperature: This shows the effects of temperature on key movements (overshoot).
-5. Results - spill volume: This shows the effects of spill (as volume of spill) on en-route fallback probabilities.
-6. Results - days of winter spill: This shows the effects of spill (as the days of winter spill) on post-overshoot fallback probabilities.
-7. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
+3. Results - detection efficiency: This contains the modeled detection efficiency by tributary.
+4. Results - final fates: This contains the simulated final fates of fish based on the model estimated parameters.
+5. Results - temperature: This shows the effects of temperature on key movements (overshoot).
+6. Results - spill volume: This shows the effects of spill (as volume of spill) on en-route fallback probabilities.
+7. Results - days of winter spill: This shows the effects of spill (as the days of winter spill) on post-overshoot fallback probabilities.
+8. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
 

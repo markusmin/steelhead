@@ -11,9 +11,9 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-07-01" />
+<meta name="date" content="2024-07-02" />
 
-<title>Steelhead Movement</title>
+<title>Results - Detection Efficiency</title>
 
 <script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -330,6 +330,9 @@ div.tocify {
   <a href="diagnostics.html">Diagnostics</a>
 </li>
 <li>
+  <a href="results-detection-efficiency.html">Results - detection efficiency</a>
+</li>
+<li>
   <a href="results-final-fates.html">Results - final fates</a>
 </li>
 <li>
@@ -356,41 +359,138 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Steelhead Movement</h1>
+<h1 class="title toc-ignore">Results - Detection Efficiency</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-07-01</h4>
+<h4 class="date">2024-07-02</h4>
 
 </div>
 
 
-<div id="analysis-updates-for-columbia-basin-steelhead-modeling-project"
-class="section level2">
-<h2>Analysis updates for Columbia Basin Steelhead modeling project</h2>
-<p>This website contains the most up-to-date information on the model
-structure, diagnostics, and results for the movement model for the adult
-migration of Steelhead in the Columbia River Basin.</p>
-<div id="navigating-this-website" class="section level3">
-<h3>Navigating this website</h3>
-<p>This website is divided into multiple sections, with an emphasis on
-preliminary results:</p>
+<div id="description" class="section level2">
+<h2>Description</h2>
+<p>This page shows the estimated detection efficiency for each tributary
+by year. As a reminder, detection efficiency is modeled in a two step
+process:</p>
 <ol style="list-style-type: decimal">
-<li>Structure: This tab contains information on how the model is set up,
-how covariates are included, the model equations, and how the model was
-implemented in Stan.</li>
-<li>Diagnostics: This tab contains various diagnostics, including r-hat
-and effective sample size statistics, traceplots, and pairs plots.</li>
-<li>Results - final fates: This contains the simulated final fates of
-fish based on the model estimated parameters.</li>
-<li>Results - temperature: This shows the effects of temperature on key
-movements (overshoot).</li>
-<li>Results - spill volume: This shows the effects of spill (as volume
-of spill) on en-route fallback probabilities.</li>
-<li>Results - days of winter spill: This shows the effects of spill (as
-the days of winter spill) on post-overshoot fallback probabilities.</li>
-<li>Results - annual differences: This shows the parameter estimates for
-the random effect of year, as well as how all model inputs combine to
-estimate different probabilities of movement by year.</li>
+<li>A model is fit to estimate the detection efficiency of the river
+mouth array at each tributary, for a which a river mouth array and some
+upstream arrays are available. Detection efficiency is modeled as a
+function of an intercept term (where some tributaries have different
+intercept terms depending on the year, to account for changing array
+configurations) and discharge.</li>
+<li>The posteriors from the previous model are then used as priors for
+the same terms in the full model, where movements throughout the basin
+are modeled. Note that because hatchery and wild populations were fit in
+separate models, the posteriors for the detection efficiency from each
+model are slightly different.</li>
 </ol>
+<p>PLEASE NOTE: There was a typo in the indexing of the detection
+efficiency correction in the main Stan model. This typo has been fixed
+and the updated model is now running on Hyak, but the results shown here
+are still the old model (which indexed discharge data incorrectly,
+meaning that the tributaries were all matched with the wrong discharge
+data)</p>
+<div id="middle-columbia" class="section level4">
+<h4>Middle Columbia</h4>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/deschutes_DE_plot.png"
+alt="Detection efficiency for the Deschutes River." />
+<div class="figcaption">Detection efficiency for the Deschutes
+River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/john_day_DE_plot.png"
+alt="Detection efficiency for the John Day River." />
+<div class="figcaption">Detection efficiency for the John Day
+River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/fifteenmile_DE_plot.png"
+alt="Detection efficiency for Fifteenmile Creek." />
+<div class="figcaption">Detection efficiency for Fifteenmile
+Creek.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/umatilla_DE_plot.png"
+alt="Detection efficiency for the Umatilla River." />
+<div class="figcaption">Detection efficiency for the Umatilla
+River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/yakima_DE_plot.png"
+alt="Detection efficiency for the Yakima River." />
+<div class="figcaption">Detection efficiency for the Yakima River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/walla_walla_DE_plot.png"
+alt="Detection efficiency for the Walla Walla River." />
+<div class="figcaption">Detection efficiency for the Walla Walla
+River.</div>
+</div>
+</div>
+<div id="upper-columbia" class="section level4">
+<h4>Upper Columbia</h4>
+<div class="float">
+<img src="site_figures/detection_efficiency/wenatchee_DE_plot.png"
+alt="Detection efficiency for the Wenatchee River." />
+<div class="figcaption">Detection efficiency for the Wenatchee
+River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/entiat_DE_plot.png"
+alt="Detection efficiency for the Entiat River." />
+<div class="figcaption">Detection efficiency for the Entiat River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/okanogan_DE_plot.png"
+alt="Detection efficiency for the Okanogan River." />
+<div class="figcaption">Detection efficiency for the Okanogan
+River.</div>
+</div>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/methow_DE_plot.png"
+alt="Detection efficiency for the Methow River." />
+<div class="figcaption">Detection efficiency for the Methow River.</div>
+</div>
+</div>
+<div id="snake-river" class="section level4">
+<h4>Snake River</h4>
+<div class="float">
+<img src="site_figures/detection_efficiency/asotin_DE_plot.png"
+alt="Detection efficiency for Asotin Creek." />
+<div class="figcaption">Detection efficiency for Asotin Creek.</div>
+</div>
+<p><br> <br></p>
+<p>Detection efficiency cannot be estimated for the Clearwater
+River.</p>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/imnaha_DE_plot.png"
+alt="Detection efficiency for the Imnaha River." />
+<div class="figcaption">Detection efficiency for the Imnaha River.</div>
+</div>
+<p><br> <br></p>
+<p>Detection efficiency cannot be estimated for the Grande Ronde
+River.</p>
+<p><br> <br></p>
+<p>Detection efficiency cannot be estimated for the Salmon River.</p>
+<p><br> <br></p>
+<div class="float">
+<img src="site_figures/detection_efficiency/tucannon_DE_plot.png"
+alt="Detection efficiency for the Tucannon River." />
+<div class="figcaption">Detection efficiency for the Tucannon
+River.</div>
+</div>
+<p><br> <br></p>
 </div>
 </div>
 

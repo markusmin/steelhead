@@ -25,6 +25,15 @@ For each combination of origin and rear type, the following steps were run:
 
 For each tributary, the final fates are plotted. If a tributary has both a hatchery and natural origin population, the final fates are compared.
 
+### Notes for interpretation
+
+1. 
+2. The Grande Ronde, Salmon, and Clearwater Rivers all do not have arrays set up to estimate detection efficiency
+
+
+
+
+
 ### Middle Columbia
 
 

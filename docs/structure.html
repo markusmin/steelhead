@@ -11,11 +11,11 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-04-08" />
+<meta name="date" content="2024-07-01" />
 
 <title>Model Structure</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -31,7 +31,7 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
@@ -330,10 +330,19 @@ div.tocify {
   <a href="diagnostics.html">Diagnostics</a>
 </li>
 <li>
-  <a href="results.html">Results</a>
+  <a href="results-final-fates.html">Results - final fates</a>
 </li>
 <li>
-  <a href="restructured_origin_effects.html">New model</a>
+  <a href="results-temperature.html">Results - temperature</a>
+</li>
+<li>
+  <a href="results-spill-days.html">Results - winter spill days</a>
+</li>
+<li>
+  <a href="results-spill-window.html">Results - spill volume</a>
+</li>
+<li>
+  <a href="results-year.html">Results - interannual differences</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -349,7 +358,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Model Structure</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-04-08</h4>
+<h4 class="date">2024-07-01</h4>
 
 </div>
 
@@ -360,11 +369,8 @@ alt="States in the model" />
 <div class="figcaption">States in the model</div>
 </div>
 <p><br></p>
-<div id="covariates" class="section level1">
-<h1>Covariates</h1>
-<p><br></p>
-<div id="description" class="section level2">
-<h2>Description</h2>
+<div id="overview-of-covariate-inclusion" class="section level1">
+<h1>Overview of covariate inclusion</h1>
 <p>The covariate effects were structured in the model to test specific
 hypotheses about the effects of these factors on movements of
 interest:</p>
@@ -414,7 +420,6 @@ A random effect of year was not included for movements outside of a
 fish’s DPS, as outside of the DPS, we expected individuals to behave
 similarly regardless of the year.</p>
 <p><br></p>
-</div>
 <div id="how-covariates-are-coded-in-the-model" class="section level2">
 <h2>How covariates are coded in the model</h2>
 <p>In addition to the effects of DPS and rear type that are estimated
@@ -428,8 +433,10 @@ natal origin was included only for state transitions into or out of
 states within the DPS boundaries, whereas for states outside of the DPS,
 all origins shared a common movement probability. This model structure
 allowed the effect of unique natal origins to differentiate as they
-neared natal tributaries. Natal origin was modeled as a fixed
-effect.</p>
+neared natal tributaries. Natal origin was modeled as a fixed effect.
+Note that when a fish enters the boundaries of its DPS, the intercept
+term is eliminated and the origin effect functions as an intercept
+term.</p>
 </div>
 <div id="temperature" class="section level4">
 <h4>Temperature</h4>
@@ -513,18 +520,19 @@ exp(b_{0,1} + [covariate\:effects]_{1}) +
 \]</span></p>
 <p><br></p>
 <p>In this equation, the parameter <span
-class="math inline">\(b_0\)</span> is the intercept (the grand mean for
-all fish in the DPS), and the term <span
+class="math inline">\(b_0\)</span> is the intercept, and the term <span
 class="math inline">\([covariate\:effects]\)</span> is a placeholder for
 the different covariates that are included in this model. Specifically,
 the covariates are estimated as follows:</p>
 <p><br></p>
 <ul>
-<li><span class="math inline">\(b_0\)</span> is a fixed effect for the
+<li><span class="math inline">\(b_0\)</span> is an intercept term (a
+fixed effect). When outside DPS boundaries this term represents the
 grand mean of all fish in the model (i.e., the grand mean for all fish
-of one rear type from one DPS)</li>
-<li><span class="math inline">\(b_{origin}\)</span> is a fixed effect
-for the natal origin</li>
+of one rear type from one DPS). When inside DPS boundaries, each natal
+origin receives a different intercept term, which is referred to as
+<span class="math inline">\(b_{origin}\)</span> rather than <span
+class="math inline">\(b_0\)</span></li>
 <li><span class="math inline">\(b_{spill-window}\)</span> is a fixed
 effect for the volume of spill</li>
 <li><span class="math inline">\(b_{spill-days}\)</span> is a fixed
@@ -557,8 +565,7 @@ the standard deviation.</p>
 the type of movement and its relation to the fish’s natal origin. To
 provide an example of the variable nature of which covariates to
 include, for the probability of a Wenatchee River fish falling back over
-Rocky Reach Dam, the covariate effects term in the numerator would be as
-follows:</p>
+Rocky Reach Dam, the numerator would be as follows:</p>
 <p><br></p>
 <p><span class="math display">\[
 b_{origin,1} + b_{spill-window,1} * spillvolume +  b_{spill-days,1} *
@@ -567,8 +574,9 @@ spilldays + b_{origin,year,1}
 <p><br></p>
 <p>This is because the movement is:</p>
 <ul>
-<li>inside the Upper Columbia DPS boundaries, so there is an effect of
-origin</li>
+<li>inside the Upper Columbia DPS boundaries, so the intercept term is
+origin-specific (<span class="math inline">\(b_origin\)</span> rather
+than <span class="math inline">\(b_0\)</span>)</li>
 <li>a fallback movement over a dam, so there is an effect of the volume
 of spill</li>
 <li>a post-overshoot fallback movement over a dam (because Rocky Reach

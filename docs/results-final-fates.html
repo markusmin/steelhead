@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-06-27" />
+<meta name="date" content="2024-07-01" />
 
 <title>Results - Final Fates</title>
 
@@ -344,9 +344,6 @@ div.tocify {
 <li>
   <a href="results-year.html">Results - interannual differences</a>
 </li>
-<li>
-  <a href="restructured_origin_effects.html">New model</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -361,35 +358,40 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results - Final Fates</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-06-27</h4>
+<h4 class="date">2024-07-01</h4>
 
 </div>
 
 
-<div id="description" class="section level2">
-<h2>Description</h2>
+<div id="description" class="section level3">
+<h3>Description</h3>
 <p>This page contains the results for the final fates simulation, using
 the fitted model object.</p>
+</div>
 <div id="simulation-steps" class="section level3">
 <h3>Simulation steps</h3>
-<p>For each dataset (combination of DPS and rear type), the following
-steps were run:</p>
+<p>For each combination of origin and rear type, the following steps
+were run:</p>
 <ol style="list-style-type: decimal">
 <li>Extract the median covariate values experienced by all fish in the
 dataset (for spill window, winter spill days, and temperature). These
 median values are used for the simulation.</li>
 <li>Randomly select one iteration from the model (one set of draws for
-all parameters)</li>
-<li>Simulate 1000 fish that start at Bonneville Dam and move through the
-basin, with movements governed by the median covariate values and the
-values of the parameters from that iteration of the model.</li>
-<li>Repeat steps 2 and 3 1000 times, for a total of 1,000 fish.</li>
+all parameters). When given the choice, parameters corrected for
+detection efficiency were chosen (no parameters were used that were only
+estimated for years where detection efficiency was not estimated).</li>
+<li>Simulate 1,000 fish that start at Bonneville Dam and move through
+the basin, with movements governed by the median covariate values and
+the values of the parameters from that iteration of the model.</li>
+<li>Repeat steps 2 and 3 1,000 times, for a total of 1,000,000 simulated
+fish.</li>
 </ol>
 <p>For each tributary, the final fates are plotted. If a tributary has
 both a hatchery and natural origin population, the final fates are
 compared.</p>
-<div id="middle-columbia" class="section level4">
-<h4>Middle Columbia</h4>
+</div>
+<div id="middle-columbia" class="section level3">
+<h3>Middle Columbia</h3>
 <div class="float">
 <img src="site_figures/final_fates/des_ff_comp_median_plot.png"
 alt="Final fates of Deschutes River Steelhead." />
@@ -428,8 +430,8 @@ alt="Final fates of Walla Walla River Steelhead." />
 Steelhead.</div>
 </div>
 </div>
-<div id="upper-columbia" class="section level4">
-<h4>Upper Columbia</h4>
+<div id="upper-columbia" class="section level3">
+<h3>Upper Columbia</h3>
 <div class="float">
 <img src="site_figures/final_fates/wen_ff_comp_median_plot.png"
 alt="Final fates of Wenatchee River Steelhead." />
@@ -454,8 +456,8 @@ alt="Final fates of Methow River Steelhead." />
 <div class="figcaption">Final fates of Methow River Steelhead.</div>
 </div>
 </div>
-<div id="snake-river" class="section level4">
-<h4>Snake River</h4>
+<div id="snake-river" class="section level3">
+<h3>Snake River</h3>
 <div class="float">
 <img src="site_figures/final_fates/aso_ff_comp_median_plot.png"
 alt="Final fates of Asotin Creek Steelhead." />
@@ -491,8 +493,6 @@ alt="Final fates of Salmon River Steelhead." />
 <img src="site_figures/final_fates/tuc_ff_comp_median_plot.png"
 alt="Final fates of Tucannon River Steelhead." />
 <div class="figcaption">Final fates of Tucannon River Steelhead.</div>
-</div>
-</div>
 </div>
 </div>
 

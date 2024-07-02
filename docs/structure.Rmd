@@ -13,10 +13,7 @@ output:
 
 <br>
 
-# Covariates
-<br>
-
-## Description
+# Overview of covariate inclusion
 
 The covariate effects were structured in the model to test specific hypotheses about the effects of these factors on movements of interest:
 

@@ -9,6 +9,8 @@ navbar:
       href: structure.html    
     - text: "Diagnostics"
       href: diagnostics.html      
+    - text: "Results - detection efficiency"
+      href: results-detection-efficiency.html   
     - text: "Results - final fates"
       href: results-final-fates.html   
     - text: "Results - temperature"
