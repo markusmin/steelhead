@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-06-27" />
+<meta name="date" content="2024-07-10" />
 
 <title>Results - Annual Differences</title>
 
@@ -330,6 +330,9 @@ div.tocify {
   <a href="diagnostics.html">Diagnostics</a>
 </li>
 <li>
+  <a href="results-detection-efficiency.html">Results - detection efficiency</a>
+</li>
+<li>
   <a href="results-final-fates.html">Results - final fates</a>
 </li>
 <li>
@@ -343,9 +346,6 @@ div.tocify {
 </li>
 <li>
   <a href="results-year.html">Results - interannual differences</a>
-</li>
-<li>
-  <a href="restructured_origin_effects.html">New model</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -361,22 +361,20 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results - Annual Differences</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-06-27</h4>
+<h4 class="date">2024-07-10</h4>
 
 </div>
 
 
 <div id="description" class="section level2">
 <h2>Description</h2>
-<p>This page contains results for how specific movement probabilities
-vary by year, and also shows the estimates for the random effect of year
-for certain parameters. As a reminder of how year effects were
+<p>This page contains results for how the probability of homing varies
+by year, and also shows the estimates for the random effect of year for
+this specific movement. As a reminder of how year effects were
 strcutured, a random effect for each year was included only for state
 transitions into or out of states within the DPS boundaries, and random
-effects for year were all origin specific (no DPS-wide year effects).
-Here, I investigate how the probability of making specific movements
-varies interannually,and also look into the specific parameter estimates
-for some years.</p>
+effects for year were all origin specific (no DPS-wide year
+effects).</p>
 <div id="annual-movement-probability-estimation-steps"
 class="section level3">
 <h3>Annual movement probability estimation steps</h3>
@@ -384,11 +382,11 @@ class="section level3">
 steps were run:</p>
 <ol style="list-style-type: decimal">
 <li>Extract the median covariate values experienced by all fish in the
-dataset in a specific year (for spill window, winter spill days, and
+dataset in a specific year (for spill volume, winter spill days, and
 temperature). These median values are used to estimate the probability
 of movement.</li>
-<li>Evaluate the probability of movement in each year, based on the
-random effect of year, plus the median covariate valus in that
+<li>Evaluate the probability of movement in each year based on the
+random effect of year plus the median covariate values in that
 year.</li>
 </ol>
 <p>If a tributary has both a hatchery and natural origin population,
@@ -396,224 +394,229 @@ they are shown on the same plot.</p>
 </div>
 <div id="notes" class="section level3">
 <h3>Notes</h3>
-<p><em>Why is the annual movement probability consistently lower than
-the proportion of fish whose final fate is their home
-tributary?</em></p>
+<ul>
+<li>The Salmon, Grande Ronde, and Clearwater River do not have detection
+efficiency corrections (no suitable arrays). As a result, the random
+effect of year shows much clearer patterns for these tributaries
+compared to the others, with the random effect of year explaining much
+of the year-to-year difference in detection efficiency (note the clear
+upward trend in the random effect of year for these populations as more
+arrays were installed over time).</li>
+</ul>
 <div id="middle-columbia" class="section level4">
 <h4>Middle Columbia</h4>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/des_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Deschutes River Steelhead." />
-<div class="figcaption">Homing movement probability for Deschutes River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_DES_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/des_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Deschutes River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Deschutes River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_DES_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Deschutes" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Deschutes
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/jdr_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for John Day River Steelhead." />
-<div class="figcaption">Homing movement probability for John Day River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_JDR_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/jdr_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for John Day River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for John Day River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_JDR_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; John Day" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; John Day
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/fif_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Fifteenmile Creek Steelhead." />
-<div class="figcaption">Homing movement probability for Fifteenmile
-Creek Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_FIF_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/fif_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Fifteenmile Creek Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Fifteenmile Creek Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_FIF_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Fifteenmile Creek" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Fifteenmile Creek
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/uma_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Umatilla River Steelhead." />
-<div class="figcaption">Homing movement probability for Umatilla River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_UMA_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_UMA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/uma_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Umatilla River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Umatilla River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_UMA_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Umatilla" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Umatilla
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/yak_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Yakima River Steelhead." />
-<div class="figcaption">Homing movement probability for Yakima River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_YAK_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/yak_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Yakima River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Yakima River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_YAK_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Yakima" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Yakima
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/annual/WAWA_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Walla Walla River Steelhead." />
-<div class="figcaption">Homing movement probability for Walla Walla
-River Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_WAWA_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_WAWA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/wawa_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Walla Walla River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Walla Walla River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_WAWA_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Walla Walla" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Walla Walla
 </p>
 </div>
 <p><br> <br></p>
 </div>
 <div id="upper-columbia" class="section level4">
 <h4>Upper Columbia</h4>
-<div class="float">
-<img src="site_figures/annual/wen_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Wenatchee River Steelhead." />
-<div class="figcaption">Homing movement probability for Wenatchee River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_WEN_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_WEN_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/wen_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Wenatchee River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Wenatchee River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_WEN_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Wenatchee" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Wenatchee
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/ent_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Entiat River Steelhead." />
-<div class="figcaption">Homing movement probability for Entiat River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_ENT_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/ent_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Entiat River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Entiat River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_ENT_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Entiat" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Entiat
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/oka_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Okanogan River Steelhead." />
-<div class="figcaption">Homing movement probability for Okanogan River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_OKA_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/oka_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Okanogan River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Okanogan River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_OKA_hatchery_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Okanogan" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Okanogan
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/met_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Methow River Steelhead." />
-<div class="figcaption">Homing movement probability for Methow River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_MET_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_MET_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/met_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Methow River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Methow River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_MET_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Methow" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Methow
 </p>
 </div>
 <p><br> <br></p>
 </div>
 <div id="snake-river" class="section level4">
 <h4>Snake River</h4>
-<div class="float">
-<img src="site_figures/annual/aso_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Asotin Creek Steelhead." />
-<div class="figcaption">Homing movement probability for Asotin Creek
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_ASO_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/aso_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Asotin Creek Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Asotin Creek Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_ASO_wild_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Asotin Creek" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Asotin Creek
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/cle_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Clearwater River Steelhead." />
-<div class="figcaption">Homing movement probability for Clearwater River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_CLE_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_CLE_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/cle_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Clearwater River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Clearwater River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_CLE_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Clearwater" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Clearwater
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/imn_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Imnaha River Steelhead." />
-<div class="figcaption">Homing movement probability for Imnaha River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_IMN_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_IMN_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/imn_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Imnaha River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Imnaha River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_IMN_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Imnaha" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Imnaha
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/gr_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Grande Ronde River Steelhead." />
-<div class="figcaption">Homing movement probability for Grande Ronde
-River Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_GR_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_GR_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/gr_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Grande Ronde River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Grande Ronde River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_GR_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Grande Ronde" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Grande Ronde
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/sal_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Salmon River Steelhead." />
-<div class="figcaption">Homing movement probability for Salmon River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_SAL_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_SAL_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/sal_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Salmon River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Salmon River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_SAL_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Salmon" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Salmon
 </p>
 </div>
 <p><br> <br></p>
-<div class="float">
-<img src="site_figures/annual/tuc_rear_homing_movement_by_year_plot.png"
-alt="Homing movement probability for Tucannon River Steelhead." />
-<div class="figcaption">Homing movement probability for Tucannon River
-Steelhead.</div>
-</div>
-<div class="figure" style="text-align: center">
-<img src="site_figures/year_effects/mainstem_TUC_wild_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" /><img src="site_figures/year_effects/mainstem_TUC_hatchery_RE_year_plot.png" alt="Random effect of year" width="49%" height="20%" />
+<div class="figure" style="text-align: left">
+<img src="site_figures/annual/tuc_rear_homing_movement_by_year_plot.png" alt="Homing movement probability for Tucannon River Steelhead." width="50%" height="50%" />
 <p class="caption">
-Random effect of year
+Homing movement probability for Tucannon River Steelhead.
+</p>
+</div>
+<div class="figure" style="text-align: left">
+<img src="site_figures/year_effects/mainstem_TUC_RE_year_plot.png" alt="Random effect of year for mainstem -&gt; Tucannon" width="50%" height="50%" />
+<p class="caption">
+Random effect of year for mainstem -&gt; Tucannon
 </p>
 </div>
 <p><br> <br></p>

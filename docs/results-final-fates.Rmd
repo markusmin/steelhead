@@ -25,10 +25,10 @@ For each combination of origin and rear type, the following steps were run:
 
 For each tributary, the final fates are plotted. If a tributary has both a hatchery and natural origin population, the final fates are compared.
 
-### Notes for interpretation
+### Notes
 
-1. 
-2. The Grande Ronde, Salmon, and Clearwater Rivers all do not have arrays set up to estimate detection efficiency
+1. A consistent issue across many populations is an overestimation of straying rates, particularly into the Deschutes River. This is especially common for populations from the Middle Columbia, but is seen in many populations. For an example, see Fifteenmile Creek. I am still trying to understand why this is happening.
+2. The Grande Ronde, Salmon, and Clearwater Rivers all do not have arrays set up to estimate detection efficiency, which is why their mainstem final fates are much higher.
 
 
 

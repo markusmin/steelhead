@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-06-27" />
+<meta name="date" content="2024-07-10" />
 
 <title>Results - Temperature</title>
 
@@ -330,6 +330,9 @@ div.tocify {
   <a href="diagnostics.html">Diagnostics</a>
 </li>
 <li>
+  <a href="results-detection-efficiency.html">Results - detection efficiency</a>
+</li>
+<li>
   <a href="results-final-fates.html">Results - final fates</a>
 </li>
 <li>
@@ -343,9 +346,6 @@ div.tocify {
 </li>
 <li>
   <a href="results-year.html">Results - interannual differences</a>
-</li>
-<li>
-  <a href="restructured_origin_effects.html">New model</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -361,7 +361,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results - Temperature</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-06-27</h4>
+<h4 class="date">2024-07-10</h4>
 
 </div>
 
@@ -371,10 +371,15 @@ div.tocify {
 <p>This page contains the results for the effects of temperature on key
 movements. As a reminder for how temperature is included in the model,
 temperature has an influence on every upstream movement and every
-movement into tributaries. Temperature parameters are origin-specific
-within DPS boundaries, and are shared between origins of the same DPS
-outside of DPS boundaries.On this page, I will focus only on how
-temperature affects overshoot and movements into tributaries.</p>
+movement into tributaries. The effect of temperature is modeled
+separately for winter/spring (January-May) and for summer/fall
+(June-December). Temperature parameters are origin-specific within DPS
+boundaries, and are shared between origins of the same DPS outside of
+DPS boundaries. On this page, I will focus only on how temperature
+affects overshoot and movements into tributaries, and focus only on the
+summer/fall temperature effect, as this is when upstream transitions are
+primarily occuring (and therefore, when the risk of overshoot is
+highest).</p>
 <div id="simulation-steps" class="section level3">
 <h3>Simulation steps</h3>
 <p>For each dataset (combination of DPS and rear type), the following
@@ -390,13 +395,15 @@ the mean</li>
 values.</li>
 </ol>
 <p>If a tributary has both a hatchery and natural origin population,
-they are shown on the same plot.</p>
+they are shown on the same plot. The rug plot (lines in the margins)
+indicate the number of observations at each temperature.</p>
 <div id="middle-columbia" class="section level4">
 <h4>Middle Columbia</h4>
 <p><br> <br></p>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/DES_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Deschutes River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for Deschutes
 River Steelhead.</div>
@@ -405,6 +412,7 @@ River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/JDR_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for John Day River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for John Day
 River Steelhead.</div>
@@ -413,6 +421,7 @@ River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/FIF_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Fifteenmile Creek Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for
 Fifteenmile Creek Steelhead.</div>
@@ -421,6 +430,7 @@ Fifteenmile Creek Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/UMA_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Umatilla River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for Umatilla
 River Steelhead.</div>
@@ -429,6 +439,7 @@ River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/YAK_compare_overshoot_PRA_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot of Priest Rapids Dam for Yakima River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot of Priest
 Rapids Dam for Yakima River Steelhead.</div>
@@ -437,6 +448,7 @@ Rapids Dam for Yakima River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/YAK_compare_overshoot_ICH_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot of Ice Harbor Dam for Yakima River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot of Ice Harbor
 Dam for Yakima River Steelhead.</div>
@@ -445,6 +457,7 @@ Dam for Yakima River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/WAWA_compare_overshoot_PRA_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot of Priest Rapids Dam for Walla Walla River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot of Priest
 Rapids Dam for Walla Walla River Steelhead.</div>
@@ -453,6 +466,7 @@ Rapids Dam for Walla Walla River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/WAWA_compare_overshoot_ICH_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot of Ice Harbor Dam for Walla Walla River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot of Ice Harbor
 Dam for Walla Walla River Steelhead.</div>
@@ -464,6 +478,7 @@ Dam for Walla Walla River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/WEN_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Wenatchee River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for Wenatchee
 River Steelhead.</div>
@@ -472,6 +487,7 @@ River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/ENT_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Entiat River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for Entiat
 River Steelhead.</div>
@@ -483,6 +499,7 @@ River Steelhead.</div>
 <div class="float">
 <img
 src="site_figures/covariate_effects/temperature/TUC_compare_overshoot_temp.png"
+style="width:50.0%"
 alt="Effect of temperature on overshoot for Tucannon River Steelhead." />
 <div class="figcaption">Effect of temperature on overshoot for Tucannon
 River Steelhead.</div>
