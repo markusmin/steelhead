@@ -11,7 +11,6 @@ output:
 This website contains the most up-to-date information on the model structure, diagnostics, and results for the movement model for the adult migration of Steelhead in the Columbia River Basin.
 
 
-
 ### Navigating this website
 
 This website is divided into multiple sections, with an emphasis on preliminary results:
