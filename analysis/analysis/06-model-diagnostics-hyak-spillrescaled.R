@@ -8,11 +8,11 @@
 # the minor changes described on the github.io website
 
 # If packages have been deleted from gscratch/scrubbed, run the following lines:
-# install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-# install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
-# install.packages("bayesplot")
-# install.packages("here")
-# install.packages("ggpubr")
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
+install.packages("bayesplot")
+install.packages("here")
+install.packages("ggpubr")
 
 #### Load libraries, state information ####
 library(cmdstanr)

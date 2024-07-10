@@ -6,8 +6,65 @@
 # Here, we are analyzing all of the output from the v2 runs, where we made
 # the minor changes described on the github.io website
 
+# Note that the package installation suddenly became much more complicated after that July 9 2024 Hyak update, not sure why
+
 # If packages have been deleted from gscratch/scrubbed, run the following lines:
-# install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+# cmdstanr and rstan both apparently require some additional dependencies, try this:
+# install.packages("checkmate")
+# install.packages("data.table")
+# install.packages("jsonlite")
+# install.packages("processx")
+# install.packages("R6")
+# install.packages("withr")
+# install.packages("rlang")
+# install.packages("backports")
+# install.packages("abind")
+# install.packages("distributional")
+# install.packages("vctrs")
+# install.packages("generics")
+# install.packages("tidyverse")
+# install.packages("lifecycle")
+# install.packages("tibble")
+# install.packages("magrittr")
+# install.packages("ggplot2", dependcies = TRUE)
+# install.packages("gtable")
+# install.packages("dplyr")
+# install.packages("tidyselect")
+# install.packages("rprojroot")
+# install.packages("scales")
+# install.packages("munsell")
+# install.packages("colorspace")
+# install.packages("ggsignif")
+# install.packages("StanHeaders")
+# install.packages("inline")
+# install.packages("gridExtra")
+# install.packages("Rcpp")
+# install.packages("RcppParallel")
+# install.packages("loo")
+# install.packages("pkgbuild")
+# install.packages("QuickJSR")
+# install.packages("RcppEigen")
+# install.packages("BH")
+# install.packages("purrr")
+# install.packages("rstatix")
+# install.packages("broom")
+# install.packages("tidyr")
+# install.packages("car")
+# install.packages("carData")
+# install.packages("stringr")
+# install.packages("stringi")
+# install.packages("forcats")
+# install.packages("cowplot")
+# install.packages("labeling")
+# install.packages("farver")
+# install.packages("reshape2")
+install.packages("plyr")
+
+
+
+# # install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")), dependencies = TRUE)
+# # alternatively: remotes::install_github("stan-dev/cmdstanr")
+# alternatively: renv::install("stan-dev/cmdstanr") # this ended up working
 # install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
 # install.packages("bayesplot")
 # install.packages("here")
@@ -187,7 +244,9 @@ thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
+# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
+# temporary - chain1 didn't finish so read chain 4 twice
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
 SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
 SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
 SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
