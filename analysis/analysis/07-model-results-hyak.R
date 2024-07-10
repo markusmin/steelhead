@@ -337,6 +337,14 @@ calculate_movement_probabilities <- function(fit, fit_summary, state){
   
 }
 
+#### Investigate individual movement probabilities ####
+
+# Let's look into homing vs. straying, especially for Middle Columbia fish
+MCW_fit_summary$variable
+
+
+# Returning from tribuatries
+
 
 
 

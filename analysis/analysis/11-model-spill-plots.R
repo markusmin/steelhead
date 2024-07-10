@@ -79,27 +79,27 @@ to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
 
 
 # get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild","UCW_transition_counts.csv"))
+UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
 UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
 UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
 
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery","UCH_transition_counts.csv"))
+UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
 UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
 UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
 
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild","MCW_transition_counts.csv"))
+MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
 MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
 MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
 
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery","MCH_transition_counts.csv"))
+MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
 MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
 MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
 
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild","SRW_transition_counts.csv"))
+SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
 SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
 SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
 
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery","SRH_transition_counts.csv"))
+SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
 SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
 SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
 
@@ -114,17 +114,17 @@ MCW_envir <- new.env()
 MCH_envir <- new.env()
 SRW_envir <- new.env()
 SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
      envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
      envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
      envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
      envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
      envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
      envir = SRH_envir)
 
 
@@ -141,10 +141,10 @@ bind4chains <- function(chain1, chain2, chain3, chain4){
 }
 
 ## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
+UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
+UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
+UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
+UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
 
 # bind chains together
 UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
@@ -154,10 +154,10 @@ thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
 UCW_fit_summary <- summarise_draws(UCW_fit)
 
 ## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
+UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
+UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
+UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
+UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
 
 # bind chains together
 UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
@@ -167,10 +167,10 @@ thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
 UCH_fit_summary <- summarise_draws(UCH_fit)
 
 ## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
+MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
+MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
+MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
+MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
 
 # bind chains together
 MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
@@ -180,10 +180,10 @@ thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
 MCW_fit_summary <- summarise_draws(MCW_fit)
 
 ## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
+MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
+MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
+MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
+MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
 
 # bind chains together
 MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
@@ -193,10 +193,10 @@ thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
 MCH_fit_summary <- summarise_draws(MCH_fit)
 
 ## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
+SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
+SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
+SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
+SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
 
 # bind chains together
 SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
@@ -206,10 +206,12 @@ thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
+# temporary - chain1 didn't finish so read chain 4 twice
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
+SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
+SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
 
 # bind chains together
 SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
@@ -1284,8 +1286,20 @@ plot_compare_rear_spill_effect <- function(origin_select,
   }
   
   # Remove any instances for rug plot of fish that would have received winter spill days covariate
-  covariate_experiences %>% 
-    filter(!(state %in% post_overshoot_combos[[origin_select]] & month %in% c(1,2,3))) -> covariate_experiences
+  # if there aren't any for this combination, don't try to manipulate it
+  if(nrow(covariate_experiences) != 0) {
+    covariate_experiences %>% 
+      dplyr::rename(date_numeric = date) %>% 
+      # keep only jan/feb/mar 
+      mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+      mutate(month = month(date)) %>% 
+      filter(!(state %in% post_overshoot_combos[[origin_select]] & month %in% c(1,2,3))) -> covariate_experiences
+    
+  } else {
+    
+    
+  }
+
   
   rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
                                                                           color = rear, fill = rear)) +

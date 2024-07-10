@@ -82,27 +82,27 @@ to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
 
 
 # get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild","UCW_transition_counts.csv"))
+UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
 UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
 UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
 
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery","UCH_transition_counts.csv"))
+UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
 UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
 UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
 
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild","MCW_transition_counts.csv"))
+MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
 MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
 MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
 
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery","MCH_transition_counts.csv"))
+MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
 MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
 MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
 
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild","SRW_transition_counts.csv"))
+SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
 SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
 SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
 
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery","SRH_transition_counts.csv"))
+SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
 SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
 SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
 
@@ -117,17 +117,17 @@ MCW_envir <- new.env()
 MCH_envir <- new.env()
 SRW_envir <- new.env()
 SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
      envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
      envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
      envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
      envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
      envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
      envir = SRH_envir)
 
 
@@ -144,10 +144,10 @@ bind4chains <- function(chain1, chain2, chain3, chain4){
 }
 
 ## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
+UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
+UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
+UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
+UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
 
 # bind chains together
 UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
@@ -157,10 +157,10 @@ thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
 UCW_fit_summary <- summarise_draws(UCW_fit)
 
 ## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
+UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
+UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
+UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
+UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
 
 # bind chains together
 UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
@@ -170,10 +170,10 @@ thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
 UCH_fit_summary <- summarise_draws(UCH_fit)
 
 ## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
+MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
+MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
+MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
+MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
 
 # bind chains together
 MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
@@ -183,10 +183,10 @@ thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
 MCW_fit_summary <- summarise_draws(MCW_fit)
 
 ## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
+MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
+MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
+MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
+MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
 
 # bind chains together
 MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
@@ -196,10 +196,10 @@ thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
 MCH_fit_summary <- summarise_draws(MCH_fit)
 
 ## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
+SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
+SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
+SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
+SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
 
 # bind chains together
 SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
@@ -209,10 +209,12 @@ thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2_spillrescaled", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
+# temporary - chain1 didn't finish so read chain 4 twice
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
+SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
+SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
 
 # bind chains together
 SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
@@ -1616,33 +1618,125 @@ plot_compare_prob_by_year <- function(origin_select,
 #### Function to plot random year effects on their own ####
 # separately, this function plots only the parameter value for the random effect of year
 
-plot_RE_year <- function(year_param_array, from, to, plot_title = NULL){
-  RE_df <- as.data.frame(year_param_array[paste0(from, "_", to), ,])
+plot_RE_year <- function(wild_year_param_array = NULL,
+                         hatchery_year_param_array = NULL,
+                         from, to, plot_title = NULL){
+  rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+  year_predict <- seq(1,18)
   
-  niter <- 4000 # for the number of draws
+  if(is.null(hatchery_year_param_array)){
+    wild_RE_df <- as.data.frame(wild_year_param_array[paste0(from, "_", to), ,])
+    
+    niter <- 4000 # for the number of draws
+    
+    colnames(wild_RE_df) <- paste0("iter", 1:niter) 
+    wild_year_predict <- 1:18
+    wild_RE_df$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    wild_RE_df$year_actual <- 2004:2021
+    
+    # drop years without observations
+    wild_RE_df <- na.omit(wild_RE_df)
+    
+    
+    wild_RE_df %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) -> wild_RE_df_quantiles
+    
+    wild_RE_df_quantiles %>% 
+      mutate(rear = "wild") -> RE_df_quantiles
+    
+  } else if(is.null(wild_year_param_array)){
+    hatchery_RE_df <- as.data.frame(hatchery_year_param_array[paste0(from, "_", to), ,])
+    
+    niter <- 4000 # for the number of draws
+    
+    colnames(hatchery_RE_df) <- paste0("iter", 1:niter) 
+    hatchery_year_predict <- 1:18
+    hatchery_RE_df$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    hatchery_RE_df$year_actual <- 2004:2021
+    
+    # drop years without observations
+    hatchery_RE_df <- na.omit(hatchery_RE_df)
+    
+    
+    hatchery_RE_df %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) -> hatchery_RE_df_quantiles
+    
+    hatchery_RE_df_quantiles %>% 
+      mutate(rear = "hatchery") -> RE_df_quantiles
+    
+  } else {
+    wild_RE_df <- as.data.frame(wild_year_param_array[paste0(from, "_", to), ,])
+    
+    niter <- 4000 # for the number of draws
+    
+    colnames(wild_RE_df) <- paste0("iter", 1:niter) 
+    wild_year_predict <- 1:18
+    wild_RE_df$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    wild_RE_df$year_actual <- 2004:2021
+    
+    # drop years without observations
+    wild_RE_df <- na.omit(wild_RE_df)
+    
+    
+    wild_RE_df %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) -> wild_RE_df_quantiles
+    
+    wild_RE_df_quantiles %>% 
+      mutate(rear = "wild") -> wild_RE_df_quantiles
+    
+    hatchery_RE_df <- as.data.frame(hatchery_year_param_array[paste0(from, "_", to), ,])
+    
+    niter <- 4000 # for the number of draws
+    
+    colnames(hatchery_RE_df) <- paste0("iter", 1:niter) 
+    hatchery_year_predict <- 1:18
+    hatchery_RE_df$year <- year_predict
+    
+    # Add a column with the actual temperatures
+    hatchery_RE_df$year_actual <- 2004:2021
+    
+    # drop years without observations
+    hatchery_RE_df <- na.omit(hatchery_RE_df)
+    
+    
+    hatchery_RE_df %>% 
+      pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+      group_by(year_actual) %>% 
+      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      pivot_wider(names_from = q, values_from = prob) -> hatchery_RE_df_quantiles
+    
+    hatchery_RE_df_quantiles %>% 
+      mutate(rear = "hatchery") -> hatchery_RE_df_quantiles
+    
+    wild_RE_df_quantiles %>% 
+      bind_rows(., hatchery_RE_df_quantiles) -> RE_df_quantiles
+    
+  }
   
-  colnames(RE_df) <- paste0("iter", 1:niter) 
-  year_predict <- 1:18
-  RE_df$year <- year_predict
-  
-  # Add a column with the actual temperatures
-  RE_df$year_actual <- 2004:2021
-  
-  # drop years without observations
-  RE_df <- na.omit(RE_df)
-  
-  
-  RE_df %>% 
-    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
-    group_by(year_actual) %>% 
-    summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
-    pivot_wider(names_from = q, values_from = prob) -> RE_df_quantiles
   
   
   # start here!
-  RE_year_plot <- ggplot(RE_df_quantiles, aes(x = year_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`)) +
+  RE_year_plot <- ggplot(RE_df_quantiles, aes(x = year_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
+                                              color = rear, fill = rear)) +
     geom_line() +
-    geom_ribbon(alpha = 0.2) +
+    geom_ribbon(alpha = 0.2, color = NA) +
+    scale_color_manual(values = rear_colors) +
+    scale_fill_manual(values = rear_colors) +
     # scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
     scale_x_continuous(lim = c(2003, 2022), breaks = seq(2005, 2020, 5), expand = c(0,0)) +
     xlab("Run Year") +
@@ -1667,7 +1761,7 @@ wen_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                            hatchery_year_move_prob_array = wen_hatchery_year_movement_probs,
                                                                from = 5, to = 24, plot_title = "Wenatchee - movement into Wenatchee")
 
-ggsave(here::here("stan_actual", "output", "annual", "wen_rear_homing_movement_by_year_plot.png"), wen_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "wen_rear_homing_movement_by_year_plot.png"), wen_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Entiat River
 ent_wild_year_movement_probs <- estimate_year_move_prob_UCW(origin_select = "Entiat River", movements = data.frame(from = c(6), to = c(26)))
@@ -1677,7 +1771,7 @@ ent_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    wild_year_move_prob_array = ent_wild_year_movement_probs, 
                                                                    from = 6, to = 26, plot_title = "Entiat - movement into Entiat")
 
-ggsave(here::here("stan_actual", "output", "annual", "ent_rear_homing_movement_by_year_plot.png"), ent_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "ent_rear_homing_movement_by_year_plot.png"), ent_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Okanogan River
 
@@ -1688,7 +1782,7 @@ oka_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = oka_hatchery_year_movement_probs,
                                                                    from = 7, to = 28, plot_title = "Okanogan - movement into Okanogan")
 
-ggsave(here::here("stan_actual", "output", "annual", "oka_rear_homing_movement_by_year_plot.png"), oka_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "oka_rear_homing_movement_by_year_plot.png"), oka_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Methow River
 met_wild_year_movement_probs <- estimate_year_move_prob_UCW(origin_select = "Methow River", movements = data.frame(from = c(7), to = c(30)))
@@ -1701,7 +1795,7 @@ met_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = met_hatchery_year_movement_probs,
                                                                    from = 7, to = 30, plot_title = "Methow - movement into Methow")
 
-ggsave(here::here("stan_actual", "output", "annual", "met_rear_homing_movement_by_year_plot.png"), met_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "met_rear_homing_movement_by_year_plot.png"), met_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 #### Middle Columbia ####
 ## Deschutes River
@@ -1712,7 +1806,7 @@ des_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    wild_year_move_prob_array = des_wild_year_movement_probs, 
                                                                    from = 2, to = 10, plot_title = "Deschutes - movement into Deschutes")
 
-ggsave(here::here("stan_actual", "output", "annual", "des_rear_homing_movement_by_year_plot.png"), des_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "des_rear_homing_movement_by_year_plot.png"), des_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## John Day River
 jdr_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "John Day River", movements = data.frame(from = c(2), to = c(12)))
@@ -1722,7 +1816,7 @@ jdr_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    wild_year_move_prob_array = jdr_wild_year_movement_probs, 
                                                                    from = 2, to = 12, plot_title = "John Day - movement into John Day")
 
-ggsave(here::here("stan_actual", "output", "annual", "jdr_rear_homing_movement_by_year_plot.png"), jdr_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "jdr_rear_homing_movement_by_year_plot.png"), jdr_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Fifteenmile Creek
 fif_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Fifteenmile Creek", movements = data.frame(from = c(2), to = c(16)))
@@ -1732,7 +1826,7 @@ fif_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    wild_year_move_prob_array = fif_wild_year_movement_probs, 
                                                                    from = 2, to = 16, plot_title = "Fifteenmile Creek - movement into Fifteenmile Creek")
 
-ggsave(here::here("stan_actual", "output", "annual", "fif_rear_homing_movement_by_year_plot.png"), fif_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "fif_rear_homing_movement_by_year_plot.png"), fif_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Umatilla River
 uma_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Umatilla River", movements = data.frame(from = c(2), to = c(18)))
@@ -1745,7 +1839,7 @@ uma_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = uma_hatchery_year_movement_probs,
                                                                    from = 2, to = 18, plot_title = "Umatilla - movement into Umatilla")
 
-ggsave(here::here("stan_actual", "output", "annual", "uma_rear_homing_movement_by_year_plot.png"), uma_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "uma_rear_homing_movement_by_year_plot.png"), uma_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Yakima River
 yak_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Yakima River", movements = data.frame(from = c(3), to = c(20)))
@@ -1758,7 +1852,7 @@ yak_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = yak_hatchery_year_movement_probs,
                                                                    from = 3, to = 20, plot_title = "Yakima - movement into Yakima")
 
-ggsave(here::here("stan_actual", "output", "annual", "yak_rear_homing_movement_by_year_plot.png"), yak_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "yak_rear_homing_movement_by_year_plot.png"), yak_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Walla Walla River
 wawa_wild_year_movement_probs <- estimate_year_move_prob_MCW(origin_select = "Walla Walla River", movements = data.frame(from = c(3), to = c(22)))
@@ -1771,7 +1865,7 @@ wawa_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_selec
                                                                    hatchery_year_move_prob_array = wawa_hatchery_year_movement_probs,
                                                                    from = 3, to = 22, plot_title = "Walla Walla - movement into Walla Walla")
 
-ggsave(here::here("stan_actual", "output", "annual", "wawa_rear_homing_movement_by_year_plot.png"), wawa_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "wawa_rear_homing_movement_by_year_plot.png"), wawa_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 
 #### Snake River ####
@@ -1783,7 +1877,7 @@ aso_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                     wild_year_move_prob_array = aso_wild_year_movement_probs, 
                                                                     from = 9, to = 34, plot_title = "Asotin Creek - movement into Asotin Creek")
 
-ggsave(here::here("stan_actual", "output", "annual", "aso_rear_homing_movement_by_year_plot.png"), aso_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "aso_rear_homing_movement_by_year_plot.png"), aso_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Clearwater River
 cle_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Clearwater River", movements = data.frame(from = c(9), to = c(36)))
@@ -1796,7 +1890,7 @@ cle_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = cle_hatchery_year_movement_probs,
                                                                    from = 9, to = 36, plot_title = "Clearwater - movement into Clearwater")
 
-ggsave(here::here("stan_actual", "output", "annual", "cle_rear_homing_movement_by_year_plot.png"), cle_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "cle_rear_homing_movement_by_year_plot.png"), cle_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Imnaha River
 imn_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Imnaha River", movements = data.frame(from = c(9), to = c(39)))
@@ -1808,7 +1902,7 @@ imn_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = imn_hatchery_year_movement_probs,
                                                                    from = 9, to = 39, plot_title = "Imnaha - movement into Imnaha")
 
-ggsave(here::here("stan_actual", "output", "annual", "imn_rear_homing_movement_by_year_plot.png"), imn_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "imn_rear_homing_movement_by_year_plot.png"), imn_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Grande Ronde River
 gr_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Grande Ronde River", movements = data.frame(from = c(9), to = c(38)))
@@ -1820,7 +1914,7 @@ gr_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select 
                                                                    hatchery_year_move_prob_array = gr_hatchery_year_movement_probs,
                                                                    from = 9, to = 38, plot_title = "Grande Ronde - movement into Grande Ronde")
 
-ggsave(here::here("stan_actual", "output", "annual", "gr_rear_homing_movement_by_year_plot.png"), gr_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "gr_rear_homing_movement_by_year_plot.png"), gr_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Salmon River
 sal_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Salmon River", movements = data.frame(from = c(9), to = c(37)))
@@ -1832,7 +1926,7 @@ sal_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = sal_hatchery_year_movement_probs,
                                                                    from = 9, to = 37, plot_title = "Salmon - movement into Salmon")
 
-ggsave(here::here("stan_actual", "output", "annual", "sal_rear_homing_movement_by_year_plot.png"), sal_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "sal_rear_homing_movement_by_year_plot.png"), sal_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 ## Tucannon River
 tuc_wild_year_movement_probs <- estimate_year_move_prob_SRW(origin_select = "Tucannon River", movements = data.frame(from = c(8), to = c(32)))
@@ -1844,7 +1938,7 @@ tuc_rear_homing_movement_by_year_plot <- plot_compare_prob_by_year(origin_select
                                                                    hatchery_year_move_prob_array = tuc_hatchery_year_movement_probs,
                                                                    from = 8, to = 32, plot_title = "Tucannon - movement into Tucannon")
 
-ggsave(here::here("stan_actual", "output", "annual", "tuc_rear_homing_movement_by_year_plot.png"), tuc_rear_homing_movement_by_year_plot, height = 8, width = 8)
+ggsave(here::here("stan_actual", "output", "annual", "tuc_rear_homing_movement_by_year_plot.png"), tuc_rear_homing_movement_by_year_plot, height = 5, width = 8)
 
 
 
@@ -1860,11 +1954,12 @@ ggsave(here::here("stan_actual", "output", "annual", "tuc_rear_homing_movement_b
 # Wenatchee River
 subset(origin_param_map, natal_origin == "Wenatchee River")
 
-mainstem_WEN_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCW, from = 5, to = 24, plot_title = "Year effect for wild Wenatchee: mainstem into Wenatchee")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_wild_RE_year_plot.png"), mainstem_WEN_wild_RE_year_plot, height = 8, width = 8)
+mainstem_WEN_RE_year_plot <- plot_RE_year(wild_year_param_array = origin1_year_param_array_UCW, 
+                                          hatchery_year_param_array = origin1_year_param_array_UCH,
+                                          from = 5, to = 24, plot_title = "Year effect for Wenatchee: mainstem into Wenatchee")
 
-mainstem_WEN_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_UCH, from = 5, to = 24, plot_title = "Year effect for hatchery Wenatchee: mainstem into Wenatchee")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_hatchery_RE_year_plot.png"), mainstem_WEN_hatchery_RE_year_plot, height = 8, width = 8)
+
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_RE_year_plot.png"), mainstem_WEN_RE_year_plot, height = 5, width = 8)
 
 # this is interesting, but what seems to be happening is that maybe there are correlations with
 # other parameters elsewhere
@@ -1872,125 +1967,119 @@ ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WEN_hatcher
 # Entiat River
 subset(origin_param_map, natal_origin == "Entiat River")
 
-mainstem_ENT_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_UCW, from = 6, to = 26, plot_title = "Year effect for wild Entiat: mainstem into Entiat")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ENT_wild_RE_year_plot.png"), mainstem_ENT_wild_RE_year_plot, height = 8, width = 8)
+mainstem_ENT_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin2_year_param_array_UCW, from = 6, to = 26, plot_title = "Year effect for wild Entiat: mainstem into Entiat")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ENT_wild_RE_year_plot.png"), mainstem_ENT_wild_RE_year_plot, height = 5, width = 8)
 
 # Okanogan River
 subset(origin_param_map, natal_origin == "Okanogan River")
 
-mainstem_OKA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_UCH, from = 7, to = 28, plot_title = "Year effect for hatchery Okanogan: mainstem into Okanogan")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_OKA_hatchery_RE_year_plot.png"), mainstem_OKA_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_OKA_hatchery_RE_year_plot <- plot_RE_year(hatchery_year_param_array = origin2_year_param_array_UCH, from = 7, to = 28, plot_title = "Year effect for hatchery Okanogan: mainstem into Okanogan")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_OKA_hatchery_RE_year_plot.png"), mainstem_OKA_hatchery_RE_year_plot, height = 5, width = 8)
 
 # Methow River
 subset(origin_param_map, natal_origin == "Methow River")
 
-mainstem_MET_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_UCW, from = 7, to = 30, plot_title = "Year effect for wild Methow: mainstem into Methow")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_MET_wild_RE_year_plot.png"), mainstem_MET_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_MET_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_UCH, from = 7, to = 30, plot_title = "Year effect for hatchery Methow: mainstem into Methow")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_MET_hatchery_RE_year_plot.png"), mainstem_MET_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_MET_RE_year_plot <- plot_RE_year(wild_year_param_array = origin3_year_param_array_UCW,
+                                          hatchery_year_param_array = origin3_year_param_array_UCH,
+                                          from = 7, to = 30, plot_title = "Year effect for Methow: mainstem into Methow")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_MET_RE_year_plot.png"), mainstem_MET_RE_year_plot, height = 5, width = 8)
 
 
 #### Middle Columbia ####
 # Deschutes River
 subset(origin_param_map, natal_origin == "Deschutes River")
 
-mainstem_DES_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_MCW, from = 2, to = 10, plot_title = "Year effect for wild Deschutes: mainstem into Deschutes")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_DES_wild_RE_year_plot.png"), mainstem_DES_wild_RE_year_plot, height = 8, width = 8)
+mainstem_DES_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin1_year_param_array_MCW, from = 2, to = 10, plot_title = "Year effect for wild Deschutes: mainstem into Deschutes")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_DES_wild_RE_year_plot.png"), mainstem_DES_wild_RE_year_plot, height = 5, width = 8)
 
 # John Day River
 subset(origin_param_map, natal_origin == "John Day River")
 
-mainstem_JDR_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_MCW, from = 2, to = 12, plot_title = "Year effect for wild John Day: mainstem into John Day")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_JDR_wild_RE_year_plot.png"), mainstem_JDR_wild_RE_year_plot, height = 8, width = 8)
+mainstem_JDR_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin3_year_param_array_MCW, from = 2, to = 12, plot_title = "Year effect for wild John Day: mainstem into John Day")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_JDR_wild_RE_year_plot.png"), mainstem_JDR_wild_RE_year_plot, height = 5, width = 8)
 
 
 # Fifteenmile Creek
 subset(origin_param_map, natal_origin == "Fifteenmile Creek")
 
-mainstem_FIF_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_MCW, from = 2, to = 16, plot_title = "Year effect for wild Fifteenmile: mainstem into Fifteenmile")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_FIF_wild_RE_year_plot.png"), mainstem_FIF_wild_RE_year_plot, height = 8, width = 8)
+mainstem_FIF_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin2_year_param_array_MCW, from = 2, to = 16, plot_title = "Year effect for wild Fifteenmile: mainstem into Fifteenmile")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_FIF_wild_RE_year_plot.png"), mainstem_FIF_wild_RE_year_plot, height = 5, width = 8)
 
 # Umatilla River
 subset(origin_param_map, natal_origin == "Umatilla River")
 
-mainstem_UMA_wild_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_MCW, from = 2, to = 18, plot_title = "Year effect for wild Umatilla: mainstem into Umatilla")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_UMA_wild_RE_year_plot.png"), mainstem_UMA_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_UMA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_MCH, from = 2, to = 18, plot_title = "Year effect for hatchery Umatilla: mainstem into Umatilla")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_UMA_hatchery_RE_year_plot.png"), mainstem_UMA_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_UMA_RE_year_plot <- plot_RE_year(wild_year_param_array = origin4_year_param_array_MCW, 
+                                          hatchery_year_param_array = origin1_year_param_array_MCH,
+                                          from = 2, to = 18, plot_title = "Year effect for Umatilla: mainstem into Umatilla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_UMA_RE_year_plot.png"), mainstem_UMA_RE_year_plot, height = 5, width = 8)
 
 # Yakima River
 subset(origin_param_map, natal_origin == "Yakima River")
 
-mainstem_YAK_wild_RE_year_plot <- plot_RE_year(year_param_array = origin6_year_param_array_MCW, from = 3, to = 20, plot_title = "Year effect for wild Yakima: mainstem into Yakima")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_YAK_wild_RE_year_plot.png"), mainstem_YAK_wild_RE_year_plot, height = 8, width = 8)
+mainstem_YAK_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin6_year_param_array_MCW, from = 3, to = 20, plot_title = "Year effect for wild Yakima: mainstem into Yakima")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_YAK_wild_RE_year_plot.png"), mainstem_YAK_wild_RE_year_plot, height = 5, width = 8)
 
 # Walla Walla River
 subset(origin_param_map, natal_origin == "Walla Walla River")
 
-mainstem_WAWA_wild_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_MCW, from = 3, to = 22, plot_title = "Year effect for wild Walla Walla: mainstem into Walla Walla")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WAWA_wild_RE_year_plot.png"), mainstem_WAWA_wild_RE_year_plot, height = 8, width = 8)
+mainstem_WAWA_RE_year_plot <- plot_RE_year(wild_year_param_array = origin5_year_param_array_MCW, 
+                                           hatchery_year_param_array = origin2_year_param_array_MCH,
+                                           from = 3, to = 22, plot_title = "Year effect for Walla Walla: mainstem into Walla Walla")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WAWA_RE_year_plot.png"), mainstem_WAWA_RE_year_plot, height = 5, width = 8)
 
-mainstem_WAWA_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_MCH, from = 3, to = 22, plot_title = "Year effect for hatchery Walla Walla: mainstem into Walla Walla")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_WAWA_hatchery_RE_year_plot.png"), mainstem_WAWA_hatchery_RE_year_plot, height = 8, width = 8)
 
 #### Snake River ####
 
 # Tucannon River
 subset(origin_param_map, natal_origin == "Tucannon River")
 
-mainstem_TUC_wild_RE_year_plot <- plot_RE_year(year_param_array = origin6_year_param_array_SRW, from = 8, to = 32, plot_title = "Year effect for wild Tucannon: mainstem into Tucannon")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_TUC_wild_RE_year_plot.png"), mainstem_TUC_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_TUC_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_SRH, from = 8, to = 32, plot_title = "Year effect for hatchery Tucannon: mainstem into Tucannon")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_TUC_hatchery_RE_year_plot.png"), mainstem_TUC_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_TUC_RE_year_plot <- plot_RE_year(wild_year_param_array = origin6_year_param_array_SRW, 
+                                          hatchery_year_param_array = origin5_year_param_array_SRH,
+                                          from = 8, to = 32, plot_title = "Year effect for Tucannon: mainstem into Tucannon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_TUC_RE_year_plot.png"), mainstem_TUC_RE_year_plot, height = 5, width = 8)
 
 # Asotin Creek
 subset(origin_param_map, natal_origin == "Asotin Creek")
 
-mainstem_ASO_wild_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_SRW, from = 9, to = 34, plot_title = "Year effect for wild Asotin: mainstem into Asotin")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ASO_wild_RE_year_plot.png"), mainstem_ASO_wild_RE_year_plot, height = 8, width = 8)
+mainstem_ASO_wild_RE_year_plot <- plot_RE_year(wild_year_param_array = origin1_year_param_array_SRW, from = 9, to = 34, plot_title = "Year effect for wild Asotin: mainstem into Asotin")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_ASO_wild_RE_year_plot.png"), mainstem_ASO_wild_RE_year_plot, height = 5, width = 8)
 
 
 # Clearwater River
 subset(origin_param_map, natal_origin == "Clearwater River")
 
-mainstem_CLE_wild_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_SRW, from = 9, to = 36, plot_title = "Year effect for wild Clearwater: mainstem into Clearwater")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_CLE_wild_RE_year_plot.png"), mainstem_CLE_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_CLE_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin1_year_param_array_SRH, from = 9, to = 36, plot_title = "Year effect for hatchery Clearwater: mainstem into Clearwater")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_CLE_hatchery_RE_year_plot.png"), mainstem_CLE_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_CLE_RE_year_plot <- plot_RE_year(wild_year_param_array = origin2_year_param_array_SRW,
+                                          hatchery_year_param_array = origin1_year_param_array_SRH,
+                                          from = 9, to = 36, plot_title = "Year effect for Clearwater: mainstem into Clearwater")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_CLE_RE_year_plot.png"), mainstem_CLE_RE_year_plot, height = 5, width = 8)
 
 
 # Imnaha River
 subset(origin_param_map, natal_origin == "Imnaha River")
 
-mainstem_IMN_wild_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_SRW, from = 9, to = 39, plot_title = "Year effect for wild Imnaha: mainstem into Imnaha")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_IMN_wild_RE_year_plot.png"), mainstem_IMN_wild_RE_year_plot, height = 8, width = 8)
+mainstem_IMN_RE_year_plot <- plot_RE_year(wild_year_param_array = origin4_year_param_array_SRW, 
+                                          hatchery_year_param_array = origin3_year_param_array_SRH,
+                                          from = 9, to = 39, plot_title = "Year effect for Imnaha: mainstem into Imnaha")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_IMN_RE_year_plot.png"), mainstem_IMN_RE_year_plot, height = 5, width = 8)
 
-mainstem_IMN_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_SRH, from = 9, to = 39, plot_title = "Year effect for hatchery Imnaha: mainstem into Imnaha")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_IMN_hatchery_RE_year_plot.png"), mainstem_IMN_hatchery_RE_year_plot, height = 8, width = 8)
 
 
 # Grande Ronde River
 subset(origin_param_map, natal_origin == "Grande Ronde River")
 
-mainstem_GR_wild_RE_year_plot <- plot_RE_year(year_param_array = origin3_year_param_array_SRW, from = 9, to = 38, plot_title = "Year effect for wild Grande Ronde: mainstem into Grande Ronde")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_GR_wild_RE_year_plot.png"), mainstem_GR_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_GR_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin2_year_param_array_SRH, from = 9, to = 38, plot_title = "Year effect for hatchery Grande Ronde: mainstem into Grande Ronde")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_GR_hatchery_RE_year_plot.png"), mainstem_GR_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_GR_RE_year_plot <- plot_RE_year(wild_year_param_array = origin3_year_param_array_SRW, 
+                                              hatchery_year_param_array = origin2_year_param_array_SRH,
+                                              from = 9, to = 38, plot_title = "Year effect for Grande Ronde: mainstem into Grande Ronde")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_GR_RE_year_plot.png"), mainstem_GR_RE_year_plot, height = 5, width = 8)
 
 
 # Salmon River
 subset(origin_param_map, natal_origin == "Salmon River")
 
-mainstem_SAL_wild_RE_year_plot <- plot_RE_year(year_param_array = origin5_year_param_array_SRW, from = 9, to = 37, plot_title = "Year effect for wild Salmon: mainstem into Salmon")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_SAL_wild_RE_year_plot.png"), mainstem_SAL_wild_RE_year_plot, height = 8, width = 8)
-
-mainstem_SAL_hatchery_RE_year_plot <- plot_RE_year(year_param_array = origin4_year_param_array_SRH, from = 9, to = 37, plot_title = "Year effect for hatchery Salmon: mainstem into Salmon")
-ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_SAL_hatchery_RE_year_plot.png"), mainstem_SAL_hatchery_RE_year_plot, height = 8, width = 8)
+mainstem_SAL_RE_year_plot <- plot_RE_year(wild_year_param_array = origin5_year_param_array_SRW,
+                                               hatchery_year_param_array = origin4_year_param_array_SRH,
+                                               from = 9, to = 37, plot_title = "Year effect for Salmon: mainstem into Salmon")
+ggsave(here::here("stan_actual", "output", "year_effects", "mainstem_SAL_RE_year_plot.png"), mainstem_SAL_RE_year_plot, height = 5, width = 8)
 
 
 
