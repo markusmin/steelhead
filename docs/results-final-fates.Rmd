@@ -27,7 +27,7 @@ For each tributary, the final fates are plotted. If a tributary has both a hatch
 
 ### Notes
 
-1. A consistent issue across many populations is an overestimation of straying rates, particularly into the Deschutes River. See the "Outstanding issues" tab for a deep dive into this issue, which I am still trying to resolve.
+1. A consistent issue across many populations is an overestimation of straying rates, particularly into the Deschutes River. See the "Outstanding issues" tab for more information on this issue, which I am still trying to resolve.
 2. The Grande Ronde, Salmon, and Clearwater Rivers all do not have arrays set up to estimate detection efficiency, which is why their mainstem final fates are much higher.
 
 
