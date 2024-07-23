@@ -23,4 +23,6 @@ This website is divided into multiple sections, with an emphasis on preliminary 
 6. Results - spill volume: This shows the effects of spill (as volume of spill) on en-route fallback probabilities.
 7. Results - days of winter spill: This shows the effects of spill (as the days of winter spill) on post-overshoot fallback probabilities.
 8. Results - annual differences: This shows the parameter estimates for the random effect of year, as well as how all model inputs combine to estimate different probabilities of movement by year.
+9. Results - final fates and covariates: This shows how different values of covariates (currently, spill days and spill volume) affect the final fates of fish (in particular, homing).
+10. Outstanding issues: Describes potential issues with the model itself or the code that is used to generate the derived quantities.
 

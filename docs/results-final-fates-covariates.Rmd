@@ -1,0 +1,14 @@
+---
+title: "Results - Final fates and covariates"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+This page will contain how final fates are affected by different covariate values (in particular, spill and temperature).

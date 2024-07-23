@@ -21,6 +21,10 @@ navbar:
       href: results-spill-window.html    
     - text: "Results - interannual differences"
       href: results-year.html    
+    - text: "Results - final fates and covariates"
+      href: results-final-fates-covariates.html    
+    - text: "Outstanding issues"
+      href: issues.html    
 output:
   html_document:
     theme: flatly

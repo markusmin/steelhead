@@ -1,0 +1,70 @@
+---
+title: "Diagnostics"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+This page is where I document outstanding issues with either the model itself, or the code used to generate derived quantities. Currently, the primary issue that I see is that movement probabilities into the Deschutes River appear to be too high, particularly at high temperature values. This manifests itself in final fates in the Deschutes River that appear to be too high for many Middle Columbia populations.
+
+
+### Deschutes River movement probabilities
+
+To sanity check the final fates results, I have been comparing the simulated final fates of fish using our model estimated parameters to what is seen in the data. When visualizing final fates directly from the data, I have been looking at the final fates from years where the home tributary had the ability to estimate detection efficiency, as this is more representative of the data that the model is fitting than the years without the ability to estimate detection efficiency.
+
+Below are the final fates from data, for the six Middle Columbia populations. If you compare these figures to the final fates estimated by the model, the overestimation of straying into the Deschutes River is apparent, especially for Fifteenmile Creek and Umatilla River (hatchery) Steelhead.
+
+![Final fates of Deschutes River Steelhead, from the data.](site_figures/final_fates_from_data/Deschutes_River_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+![Final fates of John Day River Steelhead, from the data.](site_figures/final_fates_from_data/John_Day_River_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+![Final fates of Fifteenmile Creek Steelhead, from the data.](site_figures/final_fates_from_data/Fifteenmile_Creek_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+![Final fates of Umatilla River Steelhead, from the data.](site_figures/final_fates_from_data/Umatilla_River_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+![Final fates of Yakima River Steelhead, from the data.](site_figures/final_fates_from_data/Yakima_River_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+![Final fates of Walla Walla River Steelhead, from the data.](site_figures/final_fates_from_data/Walla_Walla_River_final_fates_from_data.png){width=70%}
+
+<br>
+<br>
+
+
+
+If we then examine movement probabilities into the Deschutes River and compare them with the data, we observe that the estimated probability of movement into the Deschutes is not reflective of the data. Here is the plot of movement probability into the Deschutes for Umatilla Hatchery Steelhead, by temperature:
+
+![Probability of moving into the Deschutes River by temperature, for Umatilla River Hatchery Steelhead (model estimated).](site_figures/covariate_effects/temperature/UMA_compare_move_deschutes_temp.png){width=70%}
+
+<br>
+
+And here is the plot of the data for that same movement, showing movement choices by temperature:
+
+![Movement choices of Umatilla River Hatchery Steelhead, by temperature (from data).](site_figures/data_plots/UMA_H_temp_move_plot.png){width=70%}
+
+
+<br>
+
+As seen in the figure, movements into the Deschutes are not common at any of the observed temperatures, yet the model is estimating that the movement is quite likely at the upper range of temperatures. I haven't yet gotten to the bottom of why the model is not fitting this particularl movement well.
+
+
