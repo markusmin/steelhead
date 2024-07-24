@@ -11,4 +11,21 @@ output:
 
 ## Description
 
-This page will contain how final fates are affected by different covariate values (in particular, spill and temperature).
+This page will contain how final fates are affected by different covariate values (in particular, spill and temperature). This allows us to understand the overall impact of these changes, when the whole migration is taken into account.
+
+
+### Winter spill
+
+NOTE: The following plot is accurate for wild, but not hatchery Steelhead. There was a typo in the simulation code for hatchery fish where the incorrect origin effects were assigned (leading to a very low overall probability of homing for hatchery fish).
+
+
+![Homing probability of Walla Walla River Steelhead under median temperature conditions and different values of winter spill days at Ice Harbor Dam.](site_figures/final_fates_covariates/WAWA_ICH_winterspill_homing_plot.png){width=70%}
+
+<br>
+<br>
+
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at Ice Harbor Dam for this population:
+
+
+![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png){width=70%}
