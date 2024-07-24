@@ -52,7 +52,7 @@ Below are the final fates from data, for the six Middle Columbia populations. If
 
 
 
-If we then examine movement probabilities into the Deschutes River and compare them with the data, we observe that the estimated probability of movement into the Deschutes is not reflective of the data. Here is the plot of movement probability into the Deschutes for Umatilla Hatchery Steelhead, by temperature:
+If we then examine movement probabilities into the Deschutes River and compare them with the data, we observe that the estimated probability of movement into the Deschutes is not reflective of the data. For example, here is the plot of movement probability into the Deschutes for Umatilla Hatchery Steelhead, by temperature:
 
 ![Probability of moving into the Deschutes River by temperature, for Umatilla River Hatchery Steelhead (model estimated).](site_figures/covariate_effects/temperature/UMA_compare_move_deschutes_temp.png){width=70%}
 
@@ -65,6 +65,6 @@ And here is the plot of the data for that same movement, showing movement choice
 
 <br>
 
-As seen in the figure, movements into the Deschutes are not common at any of the observed temperatures, yet the model is estimating that the movement is quite likely at the upper range of temperatures. I haven't yet gotten to the bottom of why the model is not fitting this particularl movement well.
+As seen in the figure, movements into the Deschutes are not common at any of the observed temperatures, yet the model is estimating that the movement is quite likely at the upper range of temperatures. I haven't yet gotten to the bottom of why the model is not fitting this particular movement well.
 
 
