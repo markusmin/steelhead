@@ -18,7 +18,7 @@ This page contains results for how the probability of homing varies by year, and
 
 For each dataset (combination of DPS and rear type), the following steps were run:
 
-1. Extract the median covariate values experienced by all fish in the dataset in a specific year (for spill volume, winter spill days, and temperature). These median values are used to estimate the probability of movement.
+1. Extract the median covariate values experienced by all fish in the dataset in a specific year (for spill volume, winter spill days, and temperature). These median values are used to estimate the probability of movement. NOTE: Because median values across the full dataset are used, populations with strong temperature responses (for overshoot and movement into other tributaries) will have low movement probabilities to home tributaries.
 2. Evaluate the probability of movement in each year based on the random effect of year plus the median covariate values in that year.
 
 If a tributary has both a hatchery and natural origin population, they are shown on the same plot.
