@@ -28,6 +28,20 @@ To examine the effect of temperature, simulations were conducted using different
 <br>
 <br>
 
+Because there is some relationship between temperature and spill, for each representative run year, both the temperature and the spill values were pulled from a representative run year. Here are some plots showing the relationship between temperature and spill volume, as experience by fish:
+
+![Temperature vs. spill for Upper Columbia, Hatchery fish.](site_figures/data_plots/UCH_states_dates_cov_plot.png){width=70%}
+
+<br>
+
+![Temperature vs. spill for Snake River, Wild fish.](site_figures/data_plots/SRW_states_dates_cov_plot.png){width=70%}
+<br>
+
+It is worth noting, however, that there does not appear to be a correlation between parameters that govern the effect of spill volume and temperature. Here is one such representative pairs plot, in this case showing the temperature and spill parameters for movements out of the BON to MCN state for Walla Walla River hatchery fish.
+
+![Temperature vs. spill for Snake River, Wild fish.](site_figures/MCH_from_2_origin_2temp_v_spill_pairs_plot.png){width=70%}
+
+
 *Winter spill conditions*
 
 The number of winter spill days at the first overshoot dam were fixed to a sequence of values ranging from 0 to 50 days, with the simulation re-run at each of those values.
