@@ -9,20 +9,22 @@ navbar:
       href: structure.html    
     - text: "Diagnostics"
       href: diagnostics.html      
-    - text: "Results - detection efficiency"
-      href: results-detection-efficiency.html   
-    - text: "Results - final fates"
-      href: results-final-fates.html   
-    - text: "Results - temperature"
-      href: results-temperature.html   
-    - text: "Results - winter spill days"
-      href: results-spill-days.html    
-    - text: "Results - spill volume"
-      href: results-spill-window.html    
-    - text: "Results - interannual differences"
-      href: results-year.html    
-    - text: "Results - final fates and covariates"
-      href: results-final-fates-covariates.html    
+    - text: "Results"
+      menu:  
+      - text: "Detection efficiency"
+        href: results-detection-efficiency.html   
+      - text: "Final fates"
+        href: results-final-fates.html   
+      - text: "Temperature"
+        href: results-temperature.html   
+      - text: "Winter spill days"
+        href: results-spill-days.html    
+      - text: "Spill volume"
+        href: results-spill-window.html    
+      - text: "Interannual differences"
+        href: results-year.html    
+      - text: "Final fates and covariates"
+        href: results-final-fates-covariates.html    
     - text: "Outstanding issues"
       href: issues.html    
 output:
