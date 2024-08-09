@@ -11,21 +11,180 @@ output:
 
 ## Description
 
-This page will contain how final fates are affected by different covariate values (in particular, spill and temperature). This allows us to understand the overall impact of these changes, when the whole migration is taken into account.
+This page contains how final fates are affected by different covariate values (in particular, spill and temperature). This allows us to understand the overall impact of these changes, when the whole migration is taken into account.
+
+### Simulation steps
+
+The code used to estimate the effect of covariate conditions on the final fates of fish is very similar to the code used to estimate the final fates of fish under different conditions. The only addition to the final fates code are additional arguments that allow conditions to be fixed. Conditions were fixed using the following methods:
+
+*Temperature conditions*
+
+To examine the effect of temperature, simulations were conducted using different run years as representative of cool (25th percentile), average (50th percentile), and warm (75th percentile) conditions. Based on this criteria, the run years that were chosen as representative were 08/09 (cool), 19/20 (average), and 17/18 (warm). The coldest year in our dataset is 07/08, and the hottest year in our dataset is 15/16. Here are the median temperatures across run years:
+
+![Temperature conditions by run year in the Columbia River Basin.](site_figures/data_plots/median_temp_by_run_year_BON.png){width=70%}
 
 
-### Winter spill
-
-NOTE: The following plot is accurate for wild, but not hatchery Steelhead. There was a typo in the simulation code for hatchery fish where the incorrect origin effects were assigned (leading to a very low overall probability of homing for hatchery fish).
-
-
-![Homing probability of Walla Walla River Steelhead under median temperature conditions and different values of winter spill days at Ice Harbor Dam.](site_figures/final_fates_covariates/WAWA_ICH_winterspill_homing_plot.png){width=70%}
 
 <br>
 <br>
 
+*Winter spill conditions*
+
+The number of winter spill days at the first overshoot dam were fixed to a sequence of values ranging from 0 to 50 days, with the simulation re-run at each of those values.
+
+*Spill volume*
+
+To test the effects of spill volume on homing probability, the simulation is set up to allow the spill volume over specific date ranges at specific projects to be fixed. While the model is not time-explicit, the simulation is set up to use the distribution of movement timing in different states to estimate the proportion of fish that would encounter these spill conditions.
+
+## Winter spill
+
+For the effects of winter spill, we are focusing on the following origins, which each have high overshoot probabilities:
+
+	- John Day River (55% MCN, 14% ICH)
+	- Umatilla River (40% MCN, 8% ICH)
+	- Walla Walla River (52% ICH, 21% LGR)
+	- Wenatchee River (47% RRE, 31% WEL)
+	- Tucannon River (44% LGR)
+	- Entiat River (35% WEL)
+	- Yakima river (13% PRA)
+
+These are also the populations that Shelby looked at, using the following criteria:
+
+> Because steelhead located further than 120 rkm from the nearest upstream dam with adult detectors overshot at negligible rates (i.e., <5%), we only used regression analyses to evaluate within-stock effects for steelhead from tributaries less than 120 rkm downstream of a dam where overshooting could be measured. These included steelhead from the John Day, Umatilla, Walla Walla, Yakima, Wenatchee, Entiat, and Tucannon rivers. (Richins and Skalski 2018)
+
+
+#### John Day River ####
+
+![Homing probability of John Day River Steelhead under three representative temperature conditions and different values of winter spill days at McNary Dam.](site_figures/final_fates_covariates/JDR_MCN_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at McNary Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for John Day River Steelhead.](site_figures/covariate_effects/spilldays/JDR_compare_fallback_MCN_spilldays.png){width=70%}
+
+<br>
+<br>
+
+#### Umatilla River ####
+
+![Homing probability of Umatilla River Steelhead under three representative temperature conditions and different values of winter spill days at McNary Dam.](site_figures/final_fates_covariates/UMA_MCN_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at McNary Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spilldays/UMA_compare_fallback_MCN_spilldays.png){width=70%}
+
+<br>
+<br>
+
+#### Walla Walla River ####
+
+
+![Homing probability of Walla Walla River Steelhead under three representative temperature conditions and different values of winter spill days at Ice Harbor Dam.](site_figures/final_fates_covariates/WAWA_ICH_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
 
 As a reminder, here is the plot showing the effect of winter spill on fallback at Ice Harbor Dam for this population:
 
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png){width=70%}
 
-![Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png){width=70%}
+<br>
+<br>
+
+#### Wenatchee River ####
+
+
+![Homing probability of Wenatchee River Steelhead under three representative temperature conditions and different values of winter spill days at Rocky Reach Dam.](site_figures/final_fates_covariates/WEN_RRE_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at Rocky Reach Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spilldays/WEN_compare_fallback_RRE_spilldays.png){width=70%}
+
+<br>
+<br>
+
+#### Tucannon River ####
+
+
+![Homing probability of Tucannon River Steelhead under three representative temperature conditions and different values of winter spill days at Lower Granite Dam.](site_figures/final_fates_covariates/TUC_LGR_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at Lower Granite Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at McNary Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spilldays/TUC_compare_fallback_LGR_spilldays.png){width=70%}
+
+<br>
+<br>
+
+#### Entiat River ####
+
+
+![Homing probability of Entiat River Steelhead under three representative temperature conditions and different values of winter spill days at Wells Dam.](site_figures/final_fates_covariates/ENT_WEL_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at Wells Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at Wells Dam for Entiat River Steelhead.](site_figures/covariate_effects/spilldays/ENT_compare_fallback_WEL_spilldays.png){width=70%}
+
+<br>
+<br>
+
+#### Yakima River ####
+
+<br>
+<br>
+
+![Homing probability of Yakima River Steelhead under three representative temperature conditions and different values of winter spill days at Priest Rapids Dam.](site_figures/final_fates_covariates/YAK_PRA_winterspill_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot showing the effect of winter spill on fallback at Priest Rapids Dam for this population:
+
+![Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead.](site_figures/covariate_effects/spilldays/YAK_compare_fallback_PRA_spilldays.png){width=70%}
+
+<br>
+<br>
+
+
+## Spill volume
+
+![Homing probability of John Day River Steelhead under three representative temperature conditions with varying amounts of spill at Bonneville Dam. In this simulation, we tested the effect of 50, 100, or 150 kcfs of spill at Bonneville Dam during the period April 3 - June 30.](site_figures/final_fates_covariates/JDR_BON_spillvolume_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+As a reminder, here is the plot of spill volume vs. fallback probability at Bonneville Dam for John Day River Steelhead (and remember that the effect of spill volume on fallback is shared across origins within the same DPS).
+
+![Effect of spill volume on fallback at Bonneville Dam for John Day River Steelhead.](site_figures/covariate_effects/spillwindow/JDR_compare_fallback_BON_spillwindow.png){width=50%}
+
+
+<br>
+<br>
+
+
+![Homing probability of Entiat River Steelhead under three representative temperature conditions with varying amounts of spill at both Bonneville Dam and McNary Dam. In this simulation, we tested the consequences of four spill scenarios with 0, 50, 100, or 150 kcfs of spill at Bonneville Dam during the period April 3 - June 30 and 0, 50, 100, or 150 kcfs of spill at McNary dam during the period March 1 - March 31.](site_figures/final_fates_covariates/ENT_BON_MCN_spillvolume_homing_plot_temps.png){width=70%}
+
+<br>
+<br>
+
+Here are the plots of spill volume vs. fallback at Bonneville and McNary Dam for Entiat River Steelhead.
+
+![Effect of spill volume on fallback at Bonneville Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_BON_spillwindow.png){width=50%}
+
+<br>
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_MCN_spillwindow.png){width=50%}

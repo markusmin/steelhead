@@ -18,39 +18,43 @@ This page is where I document outstanding issues with either the model itself, o
 
 To sanity check the final fates results, I have been comparing the simulated final fates of fish using our model estimated parameters to what is seen in the data. When visualizing final fates directly from the data, I have been looking at the final fates from years where the home tributary had the ability to estimate detection efficiency, as this is more representative of the data that the model is fitting than the years without the ability to estimate detection efficiency.
 
-Below are the final fates from data, for the six Middle Columbia populations. If you compare these figures to the final fates estimated by the model, the overestimation of straying into the Deschutes River is apparent, especially for Fifteenmile Creek and Umatilla River (hatchery) Steelhead.
+Below are the final fates from data compared to our simulation-generated values (this is the same plot as on the Final Fates tab). If you compare these figures to the final fates estimated by the model, the overestimation of straying into the Deschutes River is apparent for Middle Columbia populations, especially for Fifteenmile Creek and Umatilla River (hatchery) Steelhead.
 
-![Final fates of Deschutes River Steelhead, from the data.](site_figures/final_fates_from_data/Deschutes_River_final_fates_from_data.png){width=70%}
-
-<br>
-<br>
-
-![Final fates of John Day River Steelhead, from the data.](site_figures/final_fates_from_data/John_Day_River_final_fates_from_data.png){width=70%}
+![Final fates, from the model vs. the data.](site_figures/final_fates/FF_sim_data_comp_plot.png){width=100%}
 
 <br>
 <br>
 
-![Final fates of Fifteenmile Creek Steelhead, from the data.](site_figures/final_fates_from_data/Fifteenmile_Creek_final_fates_from_data.png){width=70%}
+I went back to some of the old results from previous (and much simpler) versions of the model and discovered that this issue doesn't appear to only be related to including covariates in the model. Here are plots of the final fates from back when the model was an intercept-only model, and Fifteenmile Creek and the Umatilla River still have final fates in the Deschutes River overestimated:
+
+![Final fates for Fifteenmile Creek fish, from the 2022 report which included the results from an intercept-only model.](site_figures/FIF_2022_FF.png){width=100%}
+
+<br>
+
+![Final fates for Umatilla River fish, from the 2022 report which included the results from an intercept-only model.](site_figures/UMA_2022_FF.png){width=100%}
 
 <br>
 <br>
 
-![Final fates of Umatilla River Steelhead, from the data.](site_figures/final_fates_from_data/Umatilla_River_final_fates_from_data.png){width=70%}
+Comparing our current final fates results to those derived from the intercept-only model, it appears that we've actually closer to fitting the data with a more complicated model. There's something weird going on that still requires investigation. Below are some fairly disjointed thoughts and things I've looked into but none of them have revealed a root cause...
+
+
+
+
+## Investigations
+
+A note on detection efficiency: Detection efficiency in the Deschutes River was one of the first things I thought of that might explain this pattern - but I don't think it is. Detection probability is shared across all populations within a DPS/rear type combination (that's how the model is set up), so if it was just a detection efficiency issue, it should affect all populations within the same DPS/rear type. But it's not - some origins look just fine, whereas others look severely overestimated.
+
+<br>
+
+I decided to plot all of the parameter values for all movements out of the BON to MCN state across all Middle Columbia populations. This plot is quite busy, but there are a few interesting patterns that emerge.
+
+![Median parameter estimates for movments from BON to MCN to the other connecting states, for the effect of origin (this is the intercept), temp0 (the effect of temperature during the winter/spring), and temp1 (the effect of temperature during the summer/fall).](site_figures/MC_state_2_param_plot.png){width=100%}
+
+- Fifteenmile Creek fish have the highest intercept for movements into the Deschutes River (see the left panel, orange dots for Fifteenmile Creek). This is a bit odd, but it's also worth remembering that movement probabilities are always governed by the relative values of the parameters. For example, Deschutes River fish have a negative intercept for movements into the Deschutes (their home state!), but of all of the intercept parameters, it's the highest - and the final fates for the Deschutes look fine.
 
 <br>
 <br>
-
-![Final fates of Yakima River Steelhead, from the data.](site_figures/final_fates_from_data/Yakima_River_final_fates_from_data.png){width=70%}
-
-<br>
-<br>
-
-![Final fates of Walla Walla River Steelhead, from the data.](site_figures/final_fates_from_data/Walla_Walla_River_final_fates_from_data.png){width=70%}
-
-<br>
-<br>
-
-
 
 If we then examine movement probabilities into the Deschutes River and compare them with the data, we observe that the estimated probability of movement into the Deschutes is not reflective of the data. For example, here is the plot of movement probability into the Deschutes for Umatilla Hatchery Steelhead, by temperature:
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-07-23" />
+<meta name="date" content="2024-08-09" />
 
 <title>Results - Final Fates</title>
 
@@ -369,7 +369,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Results - Final Fates</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-07-23</h4>
+<h4 class="date">2024-08-09</h4>
 
 </div>
 
@@ -388,8 +388,11 @@ were run:</p>
 dataset (for spill window, winter spill days, and temperature). For
 spill window and temperature, these median values are separately
 estimated for fish moving upstream (previous state a downstream mainstem
-state) and for fish moving downstream (previous state an upstream
-mainstem state or a tributary). These values are then used in the
+state) vs. moving downstream (previous state an upstream mainstem state
+or a tributary), as well as for fish moving during the winter/spring and
+summer/fall. This results in four different median temperatures
+(winter/spring, upstream; winter/spring, downstream; summer/fall,
+upstream; summer/fall, downstream) These values are then used in the
 simulation.</li>
 <li>Randomly select one iteration from the model (one set of draws for
 all parameters). When given the choice, parameters corrected for
@@ -415,6 +418,35 @@ still trying to resolve.</li>
 <li>The Grande Ronde, Salmon, and Clearwater Rivers all do not have
 arrays set up to estimate detection efficiency, which is why their
 mainstem final fates are much higher.</li>
+</ol>
+</div>
+<div id="final-fates---fit-to-data" class="section level3">
+<h3>Final fates - fit to data</h3>
+<p>Below is a plot comparing the simulated final fates to those observed
+in the data. For this plot, the final fates from the data only includes
+the years where detection efficiency was estimable (meaning that there
+was both a river mouth site and upstream sites available). This includes
+detections at both mouth and upstream states, whereas the model only
+models detections at the mouth site (but uses the upstream sites to
+estimate detection efficiency at that site). While not a perfect
+comparison, this gives a feel for how well the simulated final fates are
+fitting the data.</p>
+<div class="float">
+<img src="site_figures/final_fates/FF_sim_data_comp_plot.png"
+style="width:100.0%" alt="Final fates, from the model vs. the data." />
+<div class="figcaption">Final fates, from the model vs. the data.</div>
+</div>
+<p><br></p>
+<p>Some observations:</p>
+<ol style="list-style-type: decimal">
+<li>The model estimated final fate in the home state is frequently (but
+not always) higher than that from the data, and mainstem final fates are
+frequently lower than that from the data. This may be due to the
+detection efficiency correction.</li>
+<li>The Deschutes River (points) is fairly consistently overestimated
+for Middle Columbia populations, but the only populations where this
+overestimation is severe is Fifteenmile Creek and Umatilla River
+(hatchery)</li>
 </ol>
 </div>
 <div id="middle-columbia" class="section level3">

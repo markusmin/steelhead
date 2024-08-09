@@ -18,7 +18,7 @@ This page contains the results for the final fates simulation, using the fitted 
 
 For each combination of origin and rear type, the following steps were run:
 
-1. Extract the median covariate values experienced by all fish in the dataset (for spill window, winter spill days, and temperature). For spill window and temperature, these median values are separately estimated for fish moving upstream (previous state a downstream mainstem state) and for fish moving downstream (previous state an upstream mainstem state or a tributary). These values are then used in the simulation.
+1. Extract the median covariate values experienced by all fish in the dataset (for spill window, winter spill days, and temperature). For spill window and temperature, these median values are separately estimated for fish moving upstream (previous state a downstream mainstem state) vs. moving downstream (previous state an upstream mainstem state or a tributary), as well as for fish moving during the winter/spring and summer/fall. This results in four different median temperatures (winter/spring, upstream; winter/spring, downstream; summer/fall, upstream; summer/fall, downstream) These values are then used in the simulation.
 2. Randomly select one iteration from the model (one set of draws for all parameters). When given the choice, parameters corrected for detection efficiency were chosen (no parameters were used that were only estimated for years where detection efficiency was not estimated).
 3. Simulate 1,000 fish that start at Bonneville Dam and move through the basin, with movements governed by the median covariate values and the values of the parameters from that iteration of the model.
 4. Repeat steps 2 and 3 1,000 times, for a total of 1,000,000 simulated fish.
@@ -42,6 +42,19 @@ load(here::here("docs", "site_figures", "final_fates", "DPS_rear_updown_temps.rd
 
 ```
 
+
+### Final fates - fit to data
+
+Below is a plot comparing the simulated final fates to those observed in the data. For this plot, the final fates from the data only includes the years where detection efficiency was estimable (meaning that there was both a river mouth site and upstream sites available). This includes detections at both mouth and upstream states, whereas the model only models detections at the mouth site (but uses the upstream sites to estimate detection efficiency at that site). While not a perfect comparison, this gives a feel for how well the simulated final fates are fitting the data.
+
+![Final fates, from the model vs. the data.](site_figures/final_fates/FF_sim_data_comp_plot.png){width=100%}
+
+<br>
+
+Some observations:
+
+1. The model estimated final fate in the home state is frequently (but not always) higher than that from the data, and mainstem final fates are frequently lower than that from the data. This may be due to the detection efficiency correction.
+2. The Deschutes River (points) is fairly consistently overestimated for Middle Columbia populations, but the only populations where this overestimation is severe is Fifteenmile Creek and Umatilla River (hatchery)
 
 
 ### Middle Columbia
