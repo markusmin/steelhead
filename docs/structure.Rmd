@@ -9,11 +9,16 @@ output:
     toc_depth: 3
 ---
 
-![States in the model](site_figures/full_model_diagram.png)
+![States in the model.](site_figures/full_model_diagram.png)
 
 <br>
 
 # Overview of covariate inclusion
+
+![Draft figure for how covariates are modeled.](site_figures/modeling_structure_diagram.png)
+
+<br>
+<br>
 
 The covariate effects were structured in the model to test specific hypotheses about the effects of these factors on movements of interest:
 
