@@ -6611,6 +6611,581 @@ detection efficiency plots
 
 - Detection efficiency: I wonder if those posteriors that we are using as priors are too tight. It might
 be causing DE to be pulled too strongly in a way that's not realistic
+- Can we plot DE fit vs. data?
+
+# pull updated RE year plots
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/year_effects ./
+
+# going to shorten the requested time, to make sure we can get our runs in
+- dropped them all down to 144 hours - some populations were already set to that. Some were already down to 24 hours.
+Only SRH was up to 240 hours
+
+### 2024-07-09 ###
+
+- 3 of four SRH runs completed in 6 hours. To make the code run, I'm going to load the 
+first chain twice, so that we still have the same number of iter. But in the future obviously
+I'll have to re-submit these
+
+### 2024-07-10 ###
+
+I'm a dummy - I forgot to move the latest runs from gscratch/stf/mmin to gscratch/scrubbed/mmin, and 
+then I was confused as to why everything looked exactly the same.
+
+Let's move those files over, then re-run
+The latest runs finished (with spill rescaled). Let's move them to gscratch/scrubbed and run diagnostic tests on them.
+Of note - these ran about 20% faster than the old runs. I wonder if making the spill have a more reasonable prior for
+the scale of the covariate (because before the parameter estimate was very close to zero given the very high scale)
+
+[mmin@klone-login03 stan_actual]$ pwd
+/gscratch/scrubbed/mmin/stan_actual
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/ ./
+
+
+# I think that we can deleted analysis script 12-model-spill-days-plots.R, since 11 already includes the spill days plots
+
+# Looking at final fates with corrected DE, there are definitely some improvements, but many of the same
+issues remain, especially with straying rates being inflated
+- I should look at movement probabilities for returning from tributaries, see if those are fitting data well
+
+
+# Pull our various plots
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+# Year effects
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/year_effects ./
+# Annual probabilities
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/annual ./
+# Final fates
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates ./
+# temperature
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/temperature ./
+# spill window
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/spillwindow ./
+# spill days
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/spilldays ./
+# Detection efficiency
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/detection_efficiency ./
+
+
+# some notes on detection efficiency
+- it's not really reflecting the data well, if you compare with the data that went into the DE
+stan model initially. It makes sense though, because we removed all upstream detections
+for the model itself, so even though those went into the original DE stan model, they're
+not relevant for the full movement model
+- would it be better to have DE modeled from the data? rather than trying to explain it using discharge?
+because sometimes it's clearly not even a very good fit...
+
+# Pulled scripts
+
+# resubmitted chain1 for SRH
+
+### 2024-07-15 ####
+- run failed - slurm out not in the right place, can't find it. Just resubmitted. Now it's working!
+
+
+### 2024-07-16 ###
+
+Trying to figure out those weird straying results.
+
+Maybe it’s a temp0 vs temp1 thing, or just that median values aren’t representative of upstream migration - 
+all fish are getting temp1, which maybe has fish going into tribs especially much. 
+- perhaps I can remedy this by using the covariate_experiences part of the code for the covariate effects, 
+to allow us to see what it looks like if we don’t just use the median
+    - no, the code already pulls the states and dates for an origin, and then bases the median on that. So
+    that wouldn't really make sense
+
+Let's look at movement probabilities into and out of the Deschutes
+- It looks like a problem with movements into the Deschutes, not out of the Deschutes.
+Data says that 11.4% of fish move into the Deschutes from BON to MCN; based on 
+relationship with temperature, I'd estimate that about 40% are moving into Deschutes.
+but why?
+
+# okay, why are a bunch of upstream states turning up here (but not all)? And then why are a lot of those probs the
+# same as the loss prob?
+# for example: 11 = 17 = 19 = 43
+# Those are DES upstream, FIF upstream, UMA upstream. Why those? JDR upstream isn't there
+# I think it's because of the possible_movements - it's not actually in the stan model,
+# but according to the code here those are techincally possible
+
+# it might be related to temperature? For example, for Fifteenmile, it's saying that
+movement into Fifteenmile is negative with temp, whereas movement into Deschutes
+is positive with temp. The weird thing though is that movements into FIF are primarily
+occurring when temp is >0, but with a wider distribution than movements into DES or into loss
+
+Okay - this is actually a big issue with the final fates code right now. It's giving them 
+the same logit as loss: exp(0) = 1. This explains why
+some of the tributaries, namely Fifteenmile and Umatilla, are getting a weird bump (for example with the Deschutes population)
+- re-running the final fates simulations now - we'll see what difference that makes
+
+### 2024-07-17 ###
+
+Note that the final fates correction with upstream states actually needs to be done for every one of the other results things
+as well - would affect all movement probabilities from states that connect to upstream states
+
+Final fates finished - let's compare:
+- Wow, this is so much better. Homing probabilities across the board look more reasonable.
+On top of that, there are now populations where the homing probability is greater than the
+proportion in the data - which makes sense given the detection efficiency correction
+But there are still some tribs with weird results - it didn't fix Fifteenmile, for example
+- remember also that when looking at just the final fates from data, we are including 
+upstream states - so it makes sense that the overall probabilities should be similar
+
+So, here are the populations that are still an issue:
+- JDR: straying into Deschutes a bit too high. MCN to ICH or PRA too high
+- FIF: straying into Deschutes way too high
+- UMA: Straying into Deschutes too high for wild and hatchery
+- WAWA: MCN to ICH or PRA too high, as are overshoot states on the Snake. It seems that populations with high overshoot rates
+have final overshoot probabilities that are too high - likely because if we use a median
+temperature, fish that fallback often just overshoot again (because the median temp doesn't
+reflect the fact that the temperature is now lower)
+- TUC: ICH to LGR and upstream of LGR too high. I think this is also an overshoot/temperature issue
+
+Ok - so how are going to get the final fates simulation to reflect a range of temperatures,
+rather than a median?
+- could resample from covariate experiences - this would overall still get you the median
+- could figure out a way where temperature in each simulation run changes over time.
+	- could have temperature change depending on what number visit it is for that fish in this
+	state (e.g, median for first visit vs. second vs. third). That would allow temp to change and decrease over time
+	- could also have temperature change depending on where the fish is coming from. If coming
+	from downstream, that's one median; if coming from a tributary or from upstream, that's a
+	different median
+		- this is probably the more accurate, and actually easier to implement.
+			- if state # > current state #, that's all you need to pick a median temp
+			- one problem: you don't know yet if a fish is going to move upstream or downstream,
+			just based on the current state. But if you use the state where it came from,
+			you can then choose the right movement probabilities
+			- another problem: choosing temp0 vs. temp1. They're super correlated, but
+			if you're picking different dates based on upstream vs. downstream movement,
+			it would follow that there should be some where temp1 comes into play instead temp0
+
+Ok, let's first re-knit the website HTML with the current final fates and upload, so
+that's updated and we can compare.
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+# Final fates
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates ./
+
+- the new changes are definitely helping, at least with the final fate overshoot overestimation issue. JDR looks way better
+	- JDR also seemed to take a lot longer than Deschutes, probably because it has more
+	complicated movements (more overshoot, more switching between upstream and downstream movements)
+	- Fifteenmile looks way better - homing has now passed straying. It's still a bit weird though, with straying too high
+	(but at least now it looks like that's coming out of mainstem final fates instead of homing)
+	- Umatilla looks way better, hatchery straying into Deschutes is still high though
+	
+	
+Need to re-load final fates functions for SR and UC, then run all populations
+
+### 2024-07-18 ###
+
+Final fates simulation is really taking forever now. Maybe a couple hours per population, on average.
+Let's see if it's possible to get two Rstudio windows running simultaneously on hyak
+
+- need to update Rebecca
+
+
+### 2024-07-22 ###
+
+Pulled updated final fates simulations:
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates ./
+
+# Observations on new final fates
+- homing is almost too high in some cases? I mean, this could be explained by DE correction, they're not out of the reasonable range
+- Umatilla: Homing is definitely higher than data is saying, but straying into Deschutes is as well (especially for hatchery)
+
+# Looking at data: Only 12 of 671 hatchery Umatilla transitions out of BON to MCN are into the Deschutes. So why 
+is the movement prob so high?
+
+- one note: If you fit a logistic regression for Umatilla hatchery just to movements into the Deschutes,
+there's a strong threshold effect just after 21 degrees. The actual estimate from the model
+is much more gradual
+
+
+# Pull updated temperature plots - these generally have a greater temp response than the old ones,
+now that I've correctly removed the possibility of moving into upstream states
+-> differences are most visible for the Middle Columbia populations
+
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/temperature ./
+
+### 2024-07-23 ###
+
+# SRH chain 1 finished. Move it to gscratch/scrubbed
+[mmin@klone-login03 snake_river_hatchery]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2/snake_river_hatchery
+[mmin@klone-login03 stan_actual]$ scp mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2/snake_river_hatchery/chain1_SRH_reparam_v2_fit.rds ./
+
+After doing this, changed all the scripts to now actually read that chain in as well.
+
+# move the median temp/spillwindow tables to local
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates/ ./
+
+# create some figures for the issues tab, need to download
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/data_plots/ ./
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/temperature/ ./covariate_effects/
+
+Updated website
+
+Let's look at how days of winter spill affects homing probability
+- Good candidates for looking at this: Walla Walla (both H and W), John Day (W), Umatilla (H and W)
+
+Note that Richins & Skalski looked at different dams (included more dams, such as those ones directly upstream
+like Lower Monumental for Tucannon), and also different predictors (days of spill by month). March
+spill was found to have an effect, but spill in January and February didn't have an effect.
+
+# Final fates: I seem to have too many origins allowed for MCH? Should only be two, but I'm seeing 6 in the code
+# shouldn't matter, they're just arguments that don't get used
+
+PULL SCRIPTS AT END
+
+### 2024-07-24 ###
+
+Winter spill days final fates script almost worked, there was just a typo in the hatchery portion
+that made them all be far too low
+
+# pull that figure
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates/ ./
+
+
+I will eventually need to re-run basically everything, with the latest results. And need to remove the upstream movement possibility
+for all scripts
+- I think that there was a typo in how this was done for final fates. Sometimes upstream is capitalized, sometimes it's not.
+If it's capitalized, it'll drop tributary upstream. If it's not capitalized, it'll drop mainstem upstream states. IT NEEDS TO BE CAPITALIZED.
+It also should have a space, because there is one state "Upstream WEL other tributaries" that should not be dropped.
+- 12-model-spill-days-plots.R deleted!
+
+This has now been fixed in all scripts. Now, run all the scripts again:
+- Done for 10-model-year-plots
+	- This looks like it's underestimating movement into Middle Columbia tributaries, except for the Deschutes. I think that this might
+	be related to the temperature issue, because we're using median temperature.
+- Done for spill days of 11-model-spill-plots
+# Pull these latest plots and re-knit
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/annual/ ./
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/spilldays/ ./covariate_effects
+
+NOTE: Currently, the year plots are using the median for the whole DPS. That should be changed to be origin specific
+
+Deschutes movement
+- what if it's a sample size issue? Maybe we shouldn't have a shared temperature effect across the whole DPS?
+	- No, this isn't it - temperature responses are only shared outside of the DPS
+	
+	
+### 2024-07-26 ###
+
+- Currently, the model is set up such that movements out of tributaries don't get a year effect.
+I think that generally makes sense, since those movements are so infrequent that you can't really
+estimate a random effect, with the Deschutes being a notable exception. That should be described
+in the methods though because it's not clear
+
+- Interesting: If we look at the old final fates, before the model included any covariates, for Fifteenmile
+Creek it was still overestimating (significantly) movements into the Deschutes. So it's not just a temperature issue.
+	- Deschutes final fates are overestimated for every Middle Columbia population. What's going on??
+
+- there are some weird origins where there is an extremely strong negative effect of winter spill on fallback - 
+see Tucannon River and Wenatchee River hatchery populations
+- Tucannon is also just weird and maybe misfit overall - hatchery population especially seems to have fallback
+rates that are too high, leading to homing that's too high
+
+# What origins do we care about the most?
+
+Conservation concern: All of them. But according to the most recent docs, Upper Columbia
+stocks are of even greater concern than Middle Columbia or Snake River stocks
+
+Complexity of movement history (which is where our model comes in):
+- We could actually quantify this - one easy way would be to count the average number of movements before
+loss by each origin. And of course we have information on overshoot and fallback rates from the data.
+- Based on overshoot rates (overall rates >30%): 
+	- John Day River (55% MCN, 14% ICH)
+	- Umatilla River (40% MCN, 8% ICH)
+	- Walla Walla River (52% ICH, 21% LGR)
+	- Wenatchee River (47% RRE, 31% WEL)
+	- Tucannon River (44% LGR)
+	- Entiat River (35% WEL)
+	- Honorable mention: Yakima river (13% PRA)
+was the one other stock that Shelby analyzed for overshoot, so could be included (but that makes 7,
+which is a more awkward number for plotting)
+	- Wenatchee River is the tributary where they started acclimation practices for hatchery
+	stocks at some point, which significantly decreased overshooting rates
+		- Would be interesting to look at overshoot rates by year, and also the probability
+		of that movement by year (and the RE of year for that movement)
+
+### 2024-07-29 ###
+
+Still trying to figure out what's going on with the Deschutes.
+- Checked the modeling code, looked for "2_10" to see if I had made a typo with how the Deschutes
+was treated at any point - nope!
+
+Let's plot the posteriors for each of the parameters that govern the 2-10 movement
+
+# pulled scripts
+
+### 2024-07-30 ###
+
+Deschutes issues thoughts:
+- what about a temp0 vs. temp1 issue? Right now, final fates is completely ignoring the temp0
+effect, which could make a difference. I need to plot how often each origin is getting the temp0 vs.
+temp1 parameter.
+	- For example, for Umatilla hatchery: 
+		- temp0<temp1 for 2_10 (straying to Deschutes)
+		- temp0>temp1 for 2_18 (homing to Umatilla)
+	- It could matter a bit, but I don't think it'll fully resolve the straying
+	- Furthermore, if the winter/spring (temp0) temperature is generally negative when z-scored,
+	and summer/fall (temp1) temperature is generally positive, then this might turn out to be a wash?
+	- Well either way, it needs to be investigated and potentially implemented
+
+# Implementing temp0 v temp1 in final fates:
+- resample temp0 v temp1, with proportions based on seasonality by state by direction
+
+# Running this for Middle Columbia populations - let's see if it makes a difference...
+- Even if it doesn't, I think we should still implement this for all populations, since
+it reflects reality a bit better
+
+### 2024-07-31 ###
+
+Let's turn a lot of what I've been doing on RStudio on Hyak into jobs!
+- 08-final fates as a job
+- 14-final-fates covariates
+
+Use the submit chains as a template
+[mmin@klone-login03 analysis]$ pwd
+/gscratch/scrubbed/mmin/analysis/analysis
+[mmin@klone-login03 analysis]$ scp /gscratch/stf/mmin/stan_runs/reparameterization_v2/upper_columbia_wild/job_ckpt_UCW_reparam_v2_chain1.slurm ./
+
+FATAL:   While checking container encryption: could not open image /gscratch/scrubbed/cmdstanr_latest.sif: 
+failed to retrieve path for /gscratch/scrubbed/cmdstanr_latest.sif: lstat /mmfs1/gscratch/scrubbed/cmdstanr_latest.sif: no such file or directory
+FATAL:   While checking container encryption: could not open image /gscratch/scrubbed/cmdstanr_latest.sif: 
+failed to retrieve path for /gscratch/scrubbed/cmdstanr_latest.sif: lstat /mmfs1/gscratch/scrubbed/cmdstanr_latest.sif: no such file or directory
+FATAL:   While checking container encryption: could not open image /gscratch/cmdstanr_latest.sif: 
+failed to retrieve path for /gscratch/cmdstanr_latest.sif: lstat /mmfs1/gscratch/cmdstanr_latest.sif: no such file or directory
+FATAL:   While checking container encryption: could not open image /gscratch/gscratch/stf/mmin/cmdstanr_latest.sif: 
+failed to retrieve path for /gscratch/gscratch/stf/mmin/cmdstanr_latest.sif: lstat /mmfs1/gscratch/gscratch: no such file or directory
+
+here() starts at /gscratch/scrubbed/mmin/analysis/analysis
+Loading required package: ggplot2
+Error in file(file, "rt") : cannot open the connection
+Calls: read.csv -> read.table -> file
+In addition: Warning message:
+In file(file, "rt") :
+  cannot open file '/gscratch/scrubbed/mmin/analysis/analysis/stan_actual/reparameterization_v2/upper_columbia_wild/UCW_transition_counts.csv': No such file or directory
+Execution halted
+
+
+Ok - working now. Just had to change the bind path to be gscratch/scrubbed/mmin, and also relative paths so that it could
+find the .sif file to run R. In the R script, manually had to set working directory to mounted directory ("/gscratch/scrubbed/mmin"),
+and then call the here() library afterwards
+
+# Ok, if we're going to be plotting fits to final fates, then I need to save the data outputs as well 
+from final fates, not just the plots
+- Made sure to save output, resubmitted slurm job for FF
+
+### 2024-08-02 ###
+
+FF run worked, completed in 1-01:52:01
+- In the future, if I need this faster, I could run this on separate scripts
+
+Okay, update the FF covariate scripts
+- With the new temp0/temp1 inclusion, we also need to modify the conditions to separate by
+by season in addition to existing upstream/downstream
+
+Libraries appear to have been deleted again on gscratch/scrubbed??
+- ran 06 script and re-installed all packages
+
+Ok, so I'm realizing with the final fates that I really should have divided temp_upstream and temp_downstream
+by season as well (so I should have four different temperature medians) - it doesn't make sense to 
+have one temperature for upstream/downstream for both the cold and warm seasons.
+
+# Resubmitted FF run with that new code! There were also some typos I caught...
+
+
+### 2024-08-05 ###
+
+Qualitatively, these don't really look any different than the old ones. But that's okay!
+- Deschutes still seems to be an issue.
+
+
+Let's run FF/cov simulations, by submitting jobs!
+
+Winter spill days under different temperature
+- submitted the first three, start with 14.4 when you get back!
+
+
+Spill volume under different temperature
+
+
+# Let's look at final fates fit to data
+# Let's transfer the latest final fates runs to local, and then use 04.5-data-summaries.R
+script to compare
+
+                                                                                                                                                                                  100%  985KB   8.0MB/s   00:00    
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates/ ./
+
+### 2024-08-06 ###
+
+# Let's plot the MCW origins against each other, showing the parameter estimates for each of the 
+movements out of state 2. That will help us identify why certain origins are showing a high
+probability of movement into the Deschutes and not others
+- Given that not all show high prob into the Deschutes, it's not a detection efficiency issue
+(since that would affect all origins, as it's a shared parameter)
+
+
+# Made a typo in the FF cov jobs - need to resubmit and re-run
+
+# The current 1 million fish is overkill, especially at this stage.
+ff_iter <- 250
+ff_nsim <- 250
+
+# Let's also make sure that we save our data output.
+- Updated this in all 14.1-14.7 scripts
+
+### 2024-08-07 ###
+
+Made some typos, need to fix and resubmit jobs.
+The other jobs finished in 3.5-6.5 hours, which is pretty good!
+
+### 2024-08-08 ###
+
+Working on allowing spill window to be toggled only for season times of year.
+I think that now that we're introducing more resampling statements, it makes more sense 
+to increase the number of times we resample and reduce the number of fish.
+Instead of ff_iter <- 1000 and ff_nsim <- 1000, I think
+we should maybe go to ff_iter <- 10000 and ff_nsim <- 100, to get more variability
+
+# so with the ff cov simulations, we currently have a representative run year selected,
+from which we pull spill and temp data.
+Now that we are altering spill conditions, we're making two changes to spill: taking spill
+from the representative run year, and then replacing select values from that run year with 
+the fixed ones. I think that's fine, but just something to be aware of
+
+# Our move probabilities aren't summing to 1 across the full row.
+- Turns out this was because of a typo, where I was determining whether movement was upstream or
+downstream based on the to state, not the from state. That's a mistake. Needs to be changed in all
+of the scripts that use final fates.
+# changed this in final fates. Let's resubmit that script.
+
+MAKE SURE TO CHANGE THIS IN FF COV SCRIPTS
+
+# Okay, let's update the website
+# Let's pull the latest versions of every figure
+
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+# Data plots
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/data_plots ./
+# final fates and covariates
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
+# Final fates
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates ./
+# plot of MC parameter values
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/MC_state_2_param_plot.png ./
+
+We may be overestimating the importance of winter spill in all of our final fates simulation, because
+currently we are not using the observed transition timing to control how often that effect is being invoked
+in the same way that it is implemented during the model fitting process. Should probably change that...?
+
+### 2024-08-09 ###
+
+Tucannon run keeps failing. Not really sure why, but need to get into the SR FF covariates code.
+
+# Pull one representative pairs plot
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/pairs_plots/temp_v_spill/MCH_from_2_origin_1temp_v_spill_pairs_plot.png ./
+
+
+### 2024-08-12 ###
+
+What is different about Fifteenmile Creek and its relationship with the Deschutes?
+- Well, it has the highest proportion of final fates in the Deschutes outside of the Deschutes itself.
+- It's also not fair to look at the total detections only in DE years and say that's "the truth". For
+fish for whom that tributary is the natal tributary, that'll be close to the truth. But for fish
+who it is not, they will visit upstream states much less frequently, and therefore we don't know
+"the truth", but instead have to rely primarily on the model to estimate detection efficiency and
+then modify detections at the mouth site to get us an estimate. And if you look at that, then we 
+are squarely in the right ballpark! So Fifteenmile can be considered resolved.
+- Note that this also has to extend to all other tributaries, which should all get a slightly inflated
+looking (if not actually inflated) proportion of movements into the Deschutes.
+
+
+What is different about Umatilla River and its relationship with the Deschutes?
+- It really seems like a temperature issue. In the final fates simulation code, we're fixing
+temperature at the median upstream, which is around 20 degrees celsius. Wild fish have a 0.25
+and hatchery fish have a 0.13 probability of moving into the Deschutes at that point.
+What is confusing about this explanation though is that it's hatchery fish that are the main
+culprit, with a ratio of 8, rather than a ratio of 3 like wild fish. So it can't just
+be temperature that's explaining this.
+- Is it taking mainstem final fates, where fish move into loss, and saying that at high 
+temperatures, it predicts those fish are actually entering Deschutes and then loss?
+- Also worth noting that the Umatilla has some of the highest uncertainties of any state;
+the 95% credible interval for Deschutes final fates ranges from like 0.01 to 0.37
+
+- Perhaps it's related to movements back out of the Deschutes, once they're there?
+
+### 2024-08-14 ###
+
+Note that when we are now plotting the movements on top of the fits, we are now back to
+plotting only tributary mouth detections, so we would not expect the fits to be great for
+any movements into tributaries
+
+### 2024-08-15 ###
+
+So, how are we going to account for tributary detection efficiency for plotting fits to data?
+- What if we added a line, that was movement probability (uncorrected for DE) - where basically
+we just divide the existing line by the DE correction, to get back to the data?
+- Okay, so we need to get a weighted average of detection efficiency (counts x years), from
+which we can then adjust movement probs by
+	- this needs to be specific to a specific natal origin for each tributary, because
+	that's how we are plotting our data currently
+	
+# Okay, made some updated temperature effect plots - let's pull them:
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/temperature/ ./covariate_effects
+
+
+What if instead of modeling detection efficiency as discharge + intercept for configuration,
+we modeled it just as a random effect of year?
+
+### 2024-08-19 ###
+
+Alright, let's try fitting the model again with march spill days, instead of winter.
+I should only have to change the data prep script, to change how spill is indexed, and which
+spill file to read in
+
+# the stan model won't change at all - all we need to do is change the input model_data.rda file
+to pull in march spill days and only allow for post_overshoot fallback for march only
+
+# created a new folder: reparameterization_v2_marchspilldays
+# In this folder, I copied over the input files from the normal reparameterization_v2 file,
+# but none of job or stan scripts
+
+# create a new script: stan_data_prep_MCW_reparam_v2_marchspilldays.R
+- this changes how the winter spill days data is indexed and pulled in when the stan model is run
+
+# this will output a new model_data.rda file. On hyak, create a folder where we can put these new 
+input data files
+[mmin@klone-login03 stan_runs]$ scp -r reparameterization_v2/ reparameterization_v2_marchspilldays/
+
+# move the new input model_data.rda files to hyak
+
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v2_marchspilldays
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./middle_columbia_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./middle_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./upper_columbia_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/upper_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./upper_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/upper_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./snake_river_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/snake_river_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./snake_river_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/snake_river_wild
+
+
+
+
+
+
+
+
+
 
 
 
