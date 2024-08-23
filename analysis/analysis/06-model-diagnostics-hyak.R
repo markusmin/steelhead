@@ -10,65 +10,69 @@
 
 # If packages have been deleted from gscratch/scrubbed, run the following lines:
 # cmdstanr and rstan both apparently require some additional dependencies, try this:
-# install.packages("checkmate")
-# install.packages("data.table")
-# install.packages("jsonlite")
-# install.packages("processx")
-# install.packages("R6")
-# install.packages("withr")
-# install.packages("rlang")
-# install.packages("backports")
-# install.packages("abind")
-# install.packages("distributional")
-# install.packages("vctrs")
-# install.packages("generics")
-# install.packages("tidyverse")
-# install.packages("lifecycle")
-# install.packages("tibble")
-# install.packages("magrittr")
-# install.packages("ggplot2", dependcies = TRUE)
-# install.packages("gtable")
-# install.packages("dplyr")
-# install.packages("tidyselect")
-# install.packages("rprojroot")
-# install.packages("scales")
-# install.packages("munsell")
-# install.packages("colorspace")
-# install.packages("ggsignif")
-# install.packages("StanHeaders")
-# install.packages("inline")
-# install.packages("gridExtra")
-# install.packages("Rcpp")
-# install.packages("RcppParallel")
-# install.packages("loo")
-# install.packages("pkgbuild")
-# install.packages("QuickJSR")
-# install.packages("RcppEigen")
-# install.packages("BH")
-# install.packages("purrr")
-# install.packages("rstatix")
-# install.packages("broom")
-# install.packages("tidyr")
-# install.packages("car")
-# install.packages("carData")
-# install.packages("stringr")
-# install.packages("stringi")
-# install.packages("forcats")
-# install.packages("cowplot")
-# install.packages("labeling")
-# install.packages("farver")
-# install.packages("reshape2")
+install.packages("checkmate")
+install.packages("data.table")
+install.packages("jsonlite")
+install.packages("processx")
+install.packages("R6")
+install.packages("withr")
+install.packages("rlang")
+install.packages("backports")
+install.packages("abind")
+install.packages("distributional")
+install.packages("vctrs")
+install.packages("generics")
+install.packages("tidyverse")
+install.packages("lifecycle")
+install.packages("tibble")
+install.packages("magrittr")
+install.packages("ggplot2", dependcies = TRUE)
+install.packages("gtable")
+install.packages("dplyr")
+install.packages("tidyselect")
+install.packages("rprojroot")
+install.packages("scales")
+install.packages("munsell")
+install.packages("colorspace")
+install.packages("ggsignif")
+install.packages("StanHeaders")
+install.packages("inline")
+install.packages("gridExtra")
+install.packages("Rcpp")
+install.packages("RcppParallel")
+install.packages("loo")
+install.packages("pkgbuild")
+install.packages("QuickJSR")
+install.packages("RcppEigen")
+install.packages("BH")
+install.packages("purrr")
+install.packages("rstatix")
+install.packages("broom")
+install.packages("tidyr")
+install.packages("car")
+install.packages("carData")
+install.packages("stringr")
+install.packages("stringi")
+install.packages("forcats")
+install.packages("cowplot")
+install.packages("labeling")
+install.packages("farver")
+install.packages("reshape2")
 install.packages("plyr")
-
+install.packages("ggthemes")
+install.packages("timechange")
+install.packages("lubridate")
 
 
 # # install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")), dependencies = TRUE)
 # # alternatively: remotes::install_github("stan-dev/cmdstanr")
 # alternatively: renv::install("stan-dev/cmdstanr") # this ended up working
-# install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
-# install.packages("bayesplot")
-# install.packages("here")
-# install.packages("ggpubr")
+install.packages("renv")
+renv::install("stan-dev/cmdstanr")
+install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
+install.packages("bayesplot")
+install.packages("here")
+install.packages("ggpubr")
 
 #### Load libraries, state information ####
 library(cmdstanr)
@@ -134,6 +138,23 @@ model_states = c(
   # Loss
   "loss"
 )
+
+# create a list that maps origin numbers (params) to what they actually are
+natal_origins <- gsub(" Mouth| Upstream", "", model_states)
+natal_origins <- natal_origins[!(duplicated(natal_origins))]
+natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
+natal_origins <- natal_origins[!(grepl("other tributaries", natal_origins))]
+natal_origins <- natal_origins[!(natal_origins == "loss")]
+
+# Use the parameter map to index the right effects
+origin_param_map <- data.frame(
+  natal_origin = natal_origins,
+  hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
+               1,NA,2,3, # UC
+               5,NA,1,4,2,3), # SR,
+  wild = c(1,3,NA,2,4,6,5, # MC
+           1,2,NA,3, # UC
+           6,1,2,5,3,4)) # SR
 
 # Get info about state names and numbers
 from_state_number_names <- data.frame(from = seq(1,43,1), from_name = model_states)
@@ -505,3 +526,102 @@ for (i in 1:length(populations)){
            height = 15, width = 15)
   }
 }
+
+
+
+
+#### Pairs plot, comparing temperature and spill parameters ####
+plot_spillwindow_v_temp1_by_state_origin <- function(fit, fit_summary, from_state, origin_numeric){
+  parameters <- unique(fit_summary$variable)
+  
+  spillwindow_param <- parameters[grep(paste0("bspillwindow_matrix_", from_state), parameters)]
+  temp1_params <- parameters[grep(paste0("btemp1xorigin", origin_numeric, "_matrix_", from_state), parameters)]
+  pars_to_compare <- c(spillwindow_param, temp1_params) 
+  
+  # remove NDE parameters
+  pars_to_compare <- pars_to_compare[!(grepl("NDE", pars_to_compare))]
+  
+  if (length(pars_to_compare) > 1) {
+    # generate the plot
+    pairs_plot <- mcmc_pairs(fit, pars = pars_to_compare,
+                             off_diag_args = list(size = 0.5))
+    
+  } else {
+    print(paste0("Temp1 and spillwindow do not both affect movements out of this state:", from_state))
+  }
+  
+  
+  return(pairs_plot)
+}
+
+
+# run this for all mainstem states and all origins
+# run for UCW
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[8:11,"wild"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = UCW_fit, fit_summary = UCW_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "UCW_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+# run for UCH
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[8:11,"hatchery"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = UCH_fit, fit_summary = UCH_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "UCH_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+# run for MCW
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[1:7,"wild"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = MCW_fit, fit_summary = MCW_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "MCW_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+# run for MCH
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[1:7,"hatchery"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = MCH_fit, fit_summary = MCH_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "MCH_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+# run for SRW
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[12:17,"wild"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = SRW_fit, fit_summary = SRW_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "SRW_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+# run for SRH
+for (i in 2:9){ # for all mainstem states
+  for (j in 1:max(origin_param_map[12:17,"hatchery"], na.rm = T)) { # for all origins
+    plot <- plot_spillwindow_v_temp1_by_state_origin(fit = SRH_fit, fit_summary = SRH_fit_summary, from_state = i, origin_numeric = j)
+    
+    ggsave(file = paste0("stan_actual/output/pairs_plots/temp_v_spill/", "SRH_from_", i, "_origin_", j, 
+                         "temp_v_spill_pairs_plot.png"), plot,
+           height = 15, width = 15)
+  } 
+}
+
+
+
+

@@ -104,121 +104,119 @@ SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_cou
 SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
 
 
-##### Load the model runs #####
-
-# Load the model data associated with each run (necessary to load covariates)
-# Store these each in an environment, because most things share names
-UCW_envir <- new.env()
-UCH_envir <- new.env()
-MCW_envir <- new.env()
-MCH_envir <- new.env()
-SRW_envir <- new.env()
-SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
-     envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
-     envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
-     envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
-     envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
-     envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
-     envir = SRH_envir)
-
-
-
-
-# Function to bind four chains together
-bind4chains <- function(chain1, chain2, chain3, chain4){
-  bound_draws <- bind_draws(chain1$draws(),
-                            chain2$draws(),
-                            chain3$draws(),
-                            chain4$draws(), along = "chain")
-  
-  return(bound_draws)
-}
-
-## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
-
-# bind chains together
-UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
-# thin2
-thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
-# summarise
-UCW_fit_summary <- summarise_draws(UCW_fit)
-
-## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
-
-# bind chains together
-UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
-# thin2
-thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
-# summarise
-UCH_fit_summary <- summarise_draws(UCH_fit)
-
-## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
-
-# bind chains together
-MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
-# thin2
-thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
-# summarise
-MCW_fit_summary <- summarise_draws(MCW_fit)
-
-## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
-
-# bind chains together
-MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
-# thin2
-thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
-# summarise
-MCH_fit_summary <- summarise_draws(MCH_fit)
-
-## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
-
-# bind chains together
-SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
-# thin2
-thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
-# summarise
-SRW_fit_summary <- summarise_draws(SRW_fit)
-
-## Snake River, Hatchery
+# #### Load the model runs #####
+# 
+# # Load the model data associated with each run (necessary to load covariates)
+# # Store these each in an environment, because most things share names
+# UCW_envir <- new.env()
+# UCH_envir <- new.env()
+# MCW_envir <- new.env()
+# MCH_envir <- new.env()
+# SRW_envir <- new.env()
+# SRH_envir <- new.env()
+# load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
+#      envir = UCW_envir)
+# load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
+#      envir = UCH_envir)
+# load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
+#      envir = MCW_envir)
+# load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
+#      envir = MCH_envir)
+# load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
+#      envir = SRW_envir)
+# load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
+#      envir = SRH_envir)
+# 
+# 
+# 
+# 
+# # Function to bind four chains together
+# bind4chains <- function(chain1, chain2, chain3, chain4){
+#   bound_draws <- bind_draws(chain1$draws(),
+#                             chain2$draws(),
+#                             chain3$draws(),
+#                             chain4$draws(), along = "chain")
+#   
+#   return(bound_draws)
+# }
+# 
+# ## Upper Columbia, Wild
+# UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
+# UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
+# UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
+# UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
+# # thin2
+# thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
+# # summarise
+# UCW_fit_summary <- summarise_draws(UCW_fit)
+# 
+# ## Upper Columbia, Hatchery
+# UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
+# UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
+# UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
+# UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
+# # thin2
+# thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
+# # summarise
+# UCH_fit_summary <- summarise_draws(UCH_fit)
+# 
+# ## Middle Columbia, Wild
+# MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
+# MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
+# MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
+# MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
+# # thin2
+# thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
+# # summarise
+# MCW_fit_summary <- summarise_draws(MCW_fit)
+# 
+# ## Middle Columbia, Hatchery
+# MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
+# MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
+# MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
+# MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
+# # thin2
+# thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
+# # summarise
+# MCH_fit_summary <- summarise_draws(MCH_fit)
+# 
+# ## Snake River, Wild
+# SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
+# SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
+# SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
+# SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
+# # thin2
+# thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
+# # summarise
+# SRW_fit_summary <- summarise_draws(SRW_fit)
+# 
+# ## Snake River, Hatchery
 # SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-# temporary - chain1 didn't finish so read chain 4 twice
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
-
-# bind chains together
-SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
-# thin2
-thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
-# summarise
-SRH_fit_summary <- summarise_draws(SRH_fit)
+# SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
+# SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
+# SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+# 
+# # bind chains together
+# SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
+# # thin2
+# thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
+# # summarise
+# SRH_fit_summary <- summarise_draws(SRH_fit)
 
 #### Extract all parameter values from the model fit objects ####
 
@@ -390,7 +388,7 @@ SRW_DE_param_matrix <- extract_DE_parameters(fit = SRW_fit, fit_summary = SRW_fi
 SRH_DE_param_matrix <- extract_DE_parameters(fit = SRH_fit, fit_summary = SRH_fit_summary)
 
 
-### calculate detection efficiency by tributary ###
+#### calculate and plot annual detection efficiency by tributary ####
 
 # first some quick sanity checks to make sure that our data is formatted properly
 dim(MCW_envir$data$tributary_design_matrices_array)
@@ -475,5 +473,257 @@ ggsave(here::here("stan_actual", "output", "detection_efficiency", "tucannon_DE_
 
 
 
+
+
+
+
+
+
+#### Calculate average detection efficiency by tributary ####
+
+# This is the same function from 09-model-temperature-plots.R
+
+extract_covariate_experiences <- function(envir, rear, origin_select){
+  origin_vector <- vector(length = nrow(envir$data$cat_X_mat))
+  for(i in 1:nrow(envir$data$cat_X_mat)){
+    origin_vector[i] <- which(envir$data$cat_X_mat[i,]==1)
+  }
+  
+  
+  
+  # for spill days - include the winter post-overshoot vector, which contains
+  # info on whether they could have experienced winter spill conditions or not
+  # add a new fish_ID column, which is not the same as tag code but will allow us to differentiate between fish
+  pop_states_dates <- data.frame(fish_ID = rep(1:length(origin_vector), each = ncol(envir$data$y)),
+                                 state = as.vector(t(envir$data$y)),
+                                 date = as.vector(t(envir$data$transition_dates)),
+                                 year = ceiling(as.vector(t(envir$data$transition_dates))/365.25)+1,
+                                 origin = rep(origin_vector, each = ncol(envir$data$y)))
+  
+  
+  # add mainstem dam for each state
+  dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
+                          state = seq(2,9))
+  pop_states_dates %>% 
+    left_join(., dam_index, by = "state") -> pop_states_dates
+  
+  
+  # reformat covariates so that they can be joined
+  as.data.frame(envir$data$spill_window_data) %>% 
+    rownames_to_column("date") %>% 
+    mutate(date = as.numeric(date)) %>% 
+    pivot_longer(cols = -c(date), names_to = "dam", values_to = "spill_window") -> spill_window_long
+  
+  as.data.frame(envir$data$temperature_data) %>% 
+    rownames_to_column("date") %>% 
+    mutate(date = as.numeric(date)) %>% 
+    pivot_longer(cols = -c(date), names_to = "dam", values_to = "temperature") -> temp_long
+  
+  as.data.frame(envir$data$winter_spill_days_data) %>% 
+    rownames_to_column("year") %>% 
+    mutate(year = as.numeric(year)) %>% 
+    pivot_longer(cols = -c(year), names_to = "dam", values_to = "winter_spill") -> spill_days_long
+  
+  
+  # add temperature, spill window, winter spill days
+  pop_states_dates %>% 
+    left_join(., spill_window_long, by = c("date", "dam")) %>% 
+    left_join(., temp_long, by = c("date", "dam")) %>% 
+    left_join(., spill_days_long, by = c("year", "dam")) -> pop_states_dates_covariates
+  
+  # drop observations in the loss state and with index 0
+  pop_states_dates_covariates %>% 
+    filter(!(state %in% c(0,43))) -> pop_states_dates_covariates
+  
+  # now add winter post-overshoot vector
+  pop_states_dates_covariates$winter_post_overshoot_vector <- as.vector(envir$data$winter_post_overshoot_vector)
+  
+  
+  # Now, keep only the origin selected
+  if(rear == "wild"){
+    origin_numeric <- subset(origin_param_map, natal_origin == origin_select)$wild
+  } else {
+    origin_numeric <- subset(origin_param_map, natal_origin == origin_select)$hatchery
+  }
+  
+  subset(pop_states_dates_covariates, origin == origin_numeric) -> origin_states_dates_covariates
+  
+  return(origin_states_dates_covariates)
+  
+}
+
+
+
+calculate_weighted_DE <- function(DE_param_matrix, tributary, tributary_design_matrices_array,
+                                 covariate_experiences){
+  
+  ## calculate estimated detection efficiency by year
+  # get the index for the tributary state (needs to be mouth since that's where we're correcting for DE)
+  tributary_state <- intersect(grep(tributary, model_states, ignore.case = TRUE), grep("Mouth", model_states, ignore.case = TRUE))
+  
+  tributary_from_state_df <- data.frame(from = c(rep(2,5),3,3,5,6,7,7,8,9,9),
+                                        to = grep("Mouth", model_states, ignore.case = FALSE))
+  
+  tributary_mainstem_state <- subset(tributary_from_state_df, to == tributary_state)$from
+  
+  # use the state indexing to get the right design matrix
+  trib_design_matrix <- tributary_design_matrices_array[,,tributary_state]
+  
+  # create a matrix to store DE per year, per iter
+  niter <- 4000
+  DE_matrix <- matrix(nrow = nrow(trib_design_matrix), ncol = niter)
+  
+  # for each run year, get a confidence interval around detection efficiency by using the different draws
+  for (i in 1:nrow(trib_design_matrix)){
+    # if there is no intercept term, that means there is no DE correction for that year - so skip and leave as NA
+    if(sum(trib_design_matrix[i,1:21]) == 0){
+      
+      
+    } else {
+      for (j in 1:niter){
+        eta <- sum(trib_design_matrix[i,] * DE_param_matrix[,j])
+        DE_matrix[i,j] <- exp(eta)/(1 + exp(eta))
+      }
+      
+    }
+    
+    
+  }
+  
+  colnames(DE_matrix) <- paste0("iter", 1:niter)
+  
+  DE_matrix %>% 
+    as.data.frame() %>% 
+    rownames_to_column("year") %>% 
+    mutate(year = as.numeric(year)) %>% 
+    pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "detection_probability") %>% 
+    group_by(year) %>% 
+    summarise(prob = quantile(detection_probability, c(0.025, 0.5, 0.975), na.rm = T), q = c(0.025, 0.5, 0.975)) %>% 
+    pivot_wider(names_from = q, values_from = prob) %>% 
+    mutate(rear = "wild") -> DE_matrix_long
+  
+  DE_matrix_long$year_actual <- 2004:2021
+  
+  ## calculate number of transitions into that tributary by year
+  covariate_experiences %>% 
+    mutate(next_state = ifelse(lead(fish_ID) == fish_ID, lead(state), 43)) -> covariate_experiences
+  
+  # get a table of counts by run year, into that tributary
+  as.data.frame(table(subset(covariate_experiences, state == tributary_mainstem_state & next_state == tributary_state)$year)) %>% 
+    dplyr::rename(index = Var1, count = Freq) %>% 
+    mutate(index = as.numeric(as.character(index))) -> trib_entries_by_year
+  
+  # add in the actual year (not index year). 2004 = year 1
+  year_indices <- data.frame(index = 1:19, year_actual = 2004:2022)
+  trib_entries_by_year %>% 
+    left_join(year_indices, by = "index") -> trib_entries_by_year
+  
+  DE_matrix_long %>% 
+    left_join(dplyr::select(trib_entries_by_year, count, year_actual), by = "year_actual") -> DE_by_year
+  
+  # create a weighted average
+  # make sure to drop any years where DE isn't estimated in the model
+  DE_by_year %>% 
+    filter(!(is.na(`0.5`))) %>% 
+    group_by(rear) %>% 
+    mutate(weight = count/sum(count, na.rm = T)) %>% 
+    summarise(weighted_DE = sum(`0.5`*weight, na.rm = T)) -> weighted_DE
+  
+  return(list(DE_by_year = DE_by_year, weighted_average = weighted_DE$weighted_DE))
+}
+
+
+# first, get all covariate experiences
+DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
+JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
+UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Wenatchee River")
+WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Entiat River")
+OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Okanogan River")
+MET_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Methow River")
+MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Methow River")
+ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Asotin Creek")
+IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Imnaha River")
+IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Imnaha River")
+TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Tucannon River")
+TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Tucannon River")
+
+
+
+### Middle Columbia
+des_des_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "deschutes", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                            covariate_experiences = DES_wild_covariate_experiences)
+uma_hatchery_des_average_DE <- calculate_weighted_DE(DE_param_matrix = MCH_DE_param_matrix, tributary = "deschutes", tributary_design_matrices_array = MCH_envir$data$tributary_design_matrices_array,
+                                                     covariate_experiences = UMA_hatchery_covariate_experiences)
+uma_wild_des_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "deschutes", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                                 covariate_experiences = UMA_wild_covariate_experiences)
+
+
+john_day_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "john", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                             covariate_experiences = JDR_wild_covariate_experiences)
+
+fifteenmile_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "fifteenmile", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                                covariate_experiences = FIF_wild_covariate_experiences)
+
+
+
+umatilla_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "umatilla", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                             covariate_experiences = UMA_wild_covariate_experiences)
+umatilla_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = MCH_DE_param_matrix, tributary = "umatilla", tributary_design_matrices_array = MCH_envir$data$tributary_design_matrices_array,
+                                                      covariate_experiences = UMA_wild_covariate_experiences)
+
+
+yakima_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "yakima", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                           covariate_experiences = YAK_wild_covariate_experiences)
+
+
+walla_walla_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = "walla", tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
+                                                covariate_experiences = WAWA_wild_covariate_experiences)
+
+walla_walla_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = MCH_DE_param_matrix, tributary = "walla", tributary_design_matrices_array = MCH_envir$data$tributary_design_matrices_array,
+                                                         covariate_experiences = WAWA_wild_covariate_experiences)
+
+### Upper Columbia
+wenatchee_average_DE <- calculate_weighted_DE(DE_param_matrix = UCW_DE_param_matrix, tributary = "wenatchee", tributary_design_matrices_array = UCW_envir$data$tributary_design_matrices_array,
+                                              covariate_experiences = WEN_wild_covariate_experiences)
+
+wenatchee_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = UCH_DE_param_matrix, tributary = "wenatchee", tributary_design_matrices_array = UCH_envir$data$tributary_design_matrices_array,
+                                                       covariate_experiences = WEN_wild_covariate_experiences)
+
+entiat_average_DE <- calculate_weighted_DE(DE_param_matrix = UCW_DE_param_matrix, tributary = "entiat", tributary_design_matrices_array = UCW_envir$data$tributary_design_matrices_array,
+                                           covariate_experiences = ENT_wild_covariate_experiences)
+
+okanogan_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = UCH_DE_param_matrix, tributary = "okanogan", tributary_design_matrices_array = UCH_envir$data$tributary_design_matrices_array,
+                                                      covariate_experiences = OKA_wild_covariate_experiences)
+
+methow_average_DE <- calculate_weighted_DE(DE_param_matrix = UCW_DE_param_matrix, tributary = "methow", tributary_design_matrices_array = UCW_envir$data$tributary_design_matrices_array,
+                                           covariate_experiences = MET_wild_covariate_experiences)
+
+methow_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = UCH_DE_param_matrix, tributary = "methow", tributary_design_matrices_array = UCH_envir$data$tributary_design_matrices_array,
+                                                    covariate_experiences = MET_wild_covariate_experiences)
+
+### Snake River
+asotin_average_DE <- calculate_weighted_DE(DE_param_matrix = SRW_DE_param_matrix, tributary = "asotin", tributary_design_matrices_array = SRW_envir$data$tributary_design_matrices_array,
+                                           covariate_experiences = ASO_wild_covariate_experiences)
+
+imnaha_average_DE <- calculate_weighted_DE(DE_param_matrix = SRW_DE_param_matrix, tributary = "imnaha", tributary_design_matrices_array = SRW_envir$data$tributary_design_matrices_array,
+                                           covariate_experiences = IMN_wild_covariate_experiences)
+
+imnaha_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = SRH_DE_param_matrix, tributary = "imnaha", tributary_design_matrices_array = SRH_envir$data$tributary_design_matrices_array,
+                                                    covariate_experiences = IMN_wild_covariate_experiences)
+
+
+tucannon_average_DE <- calculate_weighted_DE(DE_param_matrix = SRW_DE_param_matrix, tributary = "tucannon", tributary_design_matrices_array = SRW_envir$data$tributary_design_matrices_array,
+                                             covariate_experiences = TUC_wild_covariate_experiences)
+
+
+tucannon_DE_by_year_hatchery <- calculate_weighted_DE(DE_param_matrix = SRH_DE_param_matrix, tributary = "tucannon", tributary_design_matrices_array = SRH_envir$data$tributary_design_matrices_array,
+                                                      covariate_experiences = TUC_wild_covariate_experiences)
 
 

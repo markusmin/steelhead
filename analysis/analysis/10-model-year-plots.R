@@ -209,9 +209,7 @@ thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-# temporary - chain1 didn't finish so read chain 4 twice
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
 SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
 SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
 SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
@@ -620,6 +618,10 @@ estimate_year_move_prob_UCW <- function(origin_select, movements){
     possible_movements <- UCW_envir$data$movements[, "col"][UCW_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
     
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
+    
     UCW_states_dates_years <- data.frame(state = as.vector(UCW_envir$data$y),
                                    date = as.vector(UCW_envir$data$transition_dates))
     
@@ -752,6 +754,10 @@ estimate_year_move_prob_UCH <- function(origin_select, movements){
     # Get the movements
     possible_movements <- UCH_envir$data$movements[, "col"][UCH_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
+    
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
     
     UCH_states_dates_years <- data.frame(state = as.vector(UCH_envir$data$y),
                                          date = as.vector(UCH_envir$data$transition_dates))
@@ -888,6 +894,10 @@ estimate_year_move_prob_MCW <- function(origin_select, movements){
     # Get the movements
     possible_movements <- MCW_envir$data$movements[, "col"][MCW_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
+    
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
     
     MCW_states_dates_years <- data.frame(state = as.vector(MCW_envir$data$y),
                                          date = as.vector(MCW_envir$data$transition_dates))
@@ -1045,6 +1055,10 @@ estimate_year_move_prob_MCH <- function(origin_select, movements){
     possible_movements <- MCH_envir$data$movements[, "col"][MCH_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
     
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
+    
     MCH_states_dates_years <- data.frame(state = as.vector(MCH_envir$data$y),
                                          date = as.vector(MCH_envir$data$transition_dates))
     
@@ -1172,6 +1186,10 @@ estimate_year_move_prob_SRW <- function(origin_select, movements){
     # Get the movements
     possible_movements <- SRW_envir$data$movements[, "col"][SRW_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
+    
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
     
     SRW_states_dates_years <- data.frame(state = as.vector(SRW_envir$data$y),
                                          date = as.vector(SRW_envir$data$transition_dates))
@@ -1331,6 +1349,10 @@ estimate_year_move_prob_SRH <- function(origin_select, movements){
     # Get the movements
     possible_movements <- SRH_envir$data$movements[, "col"][SRH_envir$data$movements[, "row"] == from]
     possible_movements <- c(possible_movements, 43)
+    
+    # make sure to drop all movements to upstream states (in DE years, these aren't possible)
+    grep(" Upstream", model_states) -> upstream_indices
+    possible_movements <- possible_movements[!(possible_movements %in% upstream_indices)]
     
     SRH_states_dates_years <- data.frame(state = as.vector(SRH_envir$data$y),
                                          date = as.vector(SRH_envir$data$transition_dates))
