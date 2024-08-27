@@ -1,0 +1,86 @@
+---
+title: "Winter spill and year effects"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+On this page, I describe how the effect of winter spill is confounded with the random effect of year, and how this is causing poor fits of the model to the winter spill data.
+
+<br>
+
+### Model setup
+
+As a reminder, winter spill is modeled as an effect on post-overshoot fallback movements that may have occurred during the winter months (January, February, March). It is an effect that is shared between all natal origins within a DPS for which that movement is a post-overshoot fallback movement. The random effect of year is an origin-specific random effect, where only movements that are within a fish's DPS boundaries receive a random effect of year. The random effect of year is modeled using the matt trick, wherein the effect of year for each individual year is drawn from a standard normal, and all year effects for a particular movement are scaled by a scale parameter that is estimated separately for each movement.
+
+
+This model setup means that sometimes, the effect of winter spill days and the random effect of year affect the same post-overshoot fallback movement. The issue is that these two effects are tightly connected, as each year has both a unique number of spill days and a unique year effect. This creates a situation where these two effects are confounded, and allows the model to explain year-to-year variation in post-overshoot fallback rates as some combination of these two effects.
+
+<br>
+
+### Poor fits to data
+
+
+The clearest example of poor fits to the winter spill data caused by year effects is the fallback movement for Tucannon River fish over Lower Granite Dam. The fit to the winter spill days data for hatchery fish is especially poor:
+
+![Effect of days of winter spill on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead](site_figures/fit_to_data/spilldays/TUC_compare_fallback_LGR_spilldays.png){width=100%}
+
+
+<br>
+
+Another example is post-overshoot fallabck at Wells Dam for Wenatchee River hatchery fish:
+
+![Effect of days of winter spill on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead](site_figures/fit_to_data/spilldays/WEN_compare_fallback_WEL_spilldays.png){width=100%}
+
+<br>
+
+### Year effects
+
+If we then examine the year effects for the Snake River hatchery model, it is revealed that some of the largest year effect estimates are for this specific movement. Other movements with strong year effects are primarily for movements into the Salmon, Grande Ronde, and Clearwater Rivers, which do not have detection efficiency corrections (and thus year effects are primarily reflecting changes in detection efficiency).
+
+<br>
+
+![Raw (unscaled) parameter estimates for the effect of year on post-overshoot fallback at Lower Granite Dam for Snake River Hatchery fish.](site_figures/fit_to_data/spilldays/SRH_year_raw_plot.png){width=100%}
+
+<br>
+
+![Scale parameter estimates for the effect of year on post-overshoot fallback at Lower Granite Dam for Snake River Hatchery fish.](site_figures/fit_to_data/spilldays/SRH_year_scale_plot.png){width=100%}
+
+
+<br>
+
+If we look at the year effects for individual years vs. the winter spill values in that year, it is very clear that these two are confounded.
+
+![Year effect vs. winter spill values, Tucannon River hatchery fish fallback at Lower Granite Dam.](site_figures/fit_to_data/spilldays/TUC_year_v_winterspill_9_8_plot.png){width=100%}
+
+<br>
+
+A very similar story can be seen for Wenatchee River hatchery fish at Wells Dam:
+
+<br>
+
+![Raw (unscaled) parameter estimates for the effect of year on post-overshoot fallback at Wells Dam for Upper Columbia hatchery fish.](site_figures/fit_to_data/spilldays/UCH_year_raw_plot.png){width=100%}
+
+<br>
+
+![Scale parameter estimates for the effect of year on post-overshoot fallback at Wells Dam for Upper Columbia hatchery fish.](site_figures/fit_to_data/spilldays/UCH_year_scale_plot.png){width=100%}
+
+<br>
+
+![Year effect vs. winter spill values, Tucannon River hatchery fish fallback at Lower Granite Dam.](site_figures/fit_to_data/spilldays/TUC_year_v_winterspill_9_8_plot.png){width=100%}
+
+<br>
+
+### Potential solutions
+
+Given that one of our primary interests is in the effects of winter spill, this model behavior is not desirable. Here are some potential solutions:
+
+1) If we tightened the priors on the scaling parameter for the year effect, it would in effect force the model to explain more of the year-to-year variation in fallback rates as a function of year-to-year variability in spill. Currently, we are using the matt trick approach, wherein we the random effect of year is modeled as the product of a standard normal (normal(0,1)) and a half Cauchy (Cauchy(0,1) with a lower bound of zero). We could reduce the scale parameter of the Cauchy prior.
+2) Remove the random effect of year entirely for any movements for which there is an effect of winter spill
+3) Index the model so that if a fish receives the effect of winter spill, it does not also receive a random year effect

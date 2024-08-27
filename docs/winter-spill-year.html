@@ -13,7 +13,7 @@
 
 <meta name="date" content="2024-08-27" />
 
-<title>Results - Spill Days</title>
+<title>Winter spill and year effects</title>
 
 <script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -369,7 +369,13 @@ div.tocify {
     <li>
       <a href="issues-2024-08-09.html">2024-08-09</a>
     </li>
+    <li>
+      <a href="issues-2024-08-14.html">2024-08-14</a>
+    </li>
   </ul>
+</li>
+<li>
+  <a href="winter-spill-investigation.html">Winter spill - v2</a>
 </li>
 <li>
   <a href="winter-spill-year.html">Winter spill &amp; year effects</a>
@@ -386,7 +392,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Results - Spill Days</h1>
+<h1 class="title toc-ignore">Winter spill and year effects</h1>
 <h4 class="author">Markus Min</h4>
 <h4 class="date">2024-08-27</h4>
 
@@ -395,180 +401,150 @@ div.tocify {
 
 <div id="description" class="section level2">
 <h2>Description</h2>
-<p>This page contains the results for the effects of spill (as the days
-of spill in winter) on key movements. Days of winter spill are
-calculated as the total number of days in January, February, and March
-that had any amount of spill. As a reminder for how spill (days of
-winter spill) is included in the model, spill (as the number of days of
-winter spill) affects only post-overshoot fallback movements. The same
-parameter is shared by all fish of the same DPS/rear type combination
-for which the movement represents post-overshoot fallback. On this page,
-I will focus only on how spill (days of winter spill) affects
-post-overshoot fallback.</p>
-<div id="calculation" class="section level3">
-<h3>Calculation</h3>
-<p>For each dataset (combination of DPS and rear type), the following
-steps were run:</p>
+<p>On this page, I describe how the effect of winter spill is confounded
+with the random effect of year, and how this is causing poor fits of the
+model to the winter spill data.</p>
+<p><br></p>
+<div id="model-setup" class="section level3">
+<h3>Model setup</h3>
+<p>As a reminder, winter spill is modeled as an effect on post-overshoot
+fallback movements that may have occurred during the winter months
+(January, February, March). It is an effect that is shared between all
+natal origins within a DPS for which that movement is a post-overshoot
+fallback movement. The random effect of year is an origin-specific
+random effect, where only movements that are within a fish’s DPS
+boundaries receive a random effect of year. The random effect of year is
+modeled using the matt trick, wherein the effect of year for each
+individual year is drawn from a standard normal, and all year effects
+for a particular movement are scaled by a scale parameter that is
+estimated separately for each movement.</p>
+<p>This model setup means that sometimes, the effect of winter spill
+days and the random effect of year affect the same post-overshoot
+fallback movement. The issue is that these two effects are tightly
+connected, as each year has both a unique number of spill days and a
+unique year effect. This creates a situation where these two effects are
+confounded, and allows the model to explain year-to-year variation in
+post-overshoot fallback rates as some combination of these two
+effects.</p>
+<p><br></p>
+</div>
+<div id="poor-fits-to-data" class="section level3">
+<h3>Poor fits to data</h3>
+<p>The clearest example of poor fits to the winter spill data caused by
+year effects is the fallback movement for Tucannon River fish over Lower
+Granite Dam. The fit to the winter spill days data for hatchery fish is
+especially poor:</p>
+<div class="float">
+<img
+src="site_figures/fit_to_data/spilldays/TUC_compare_fallback_LGR_spilldays.png"
+style="width:100.0%"
+alt="Effect of days of winter spill on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead" />
+<div class="figcaption">Effect of days of winter spill on post-overshoot
+fallback at Lower Granite Dam for Tucannon River Steelhead</div>
+</div>
+<p><br></p>
+<p>Another example is post-overshoot fallabck at Wells Dam for Wenatchee
+River hatchery fish:</p>
+<div class="float">
+<img
+src="site_figures/fit_to_data/spilldays/WEN_compare_fallback_WEL_spilldays.png"
+style="width:100.0%"
+alt="Effect of days of winter spill on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead" />
+<div class="figcaption">Effect of days of winter spill on post-overshoot
+fallback at Wells Dam for Wenatchee River Steelhead</div>
+</div>
+<p><br></p>
+</div>
+<div id="year-effects" class="section level3">
+<h3>Year effects</h3>
+<p>If we then examine the year effects for the Snake River hatchery
+model, it is revealed that some of the largest year effect estimates are
+for this specific movement. Other movements with strong year effects are
+primarily for movements into the Salmon, Grande Ronde, and Clearwater
+Rivers, which do not have detection efficiency corrections (and thus
+year effects are primarily reflecting changes in detection
+efficiency).</p>
+<p><br></p>
+<div class="float">
+<img src="site_figures/fit_to_data/spilldays/SRH_year_raw_plot.png"
+style="width:100.0%"
+alt="Raw (unscaled) parameter estimates for the effect of year on post-overshoot fallback at Lower Granite Dam for Snake River Hatchery fish." />
+<div class="figcaption">Raw (unscaled) parameter estimates for the
+effect of year on post-overshoot fallback at Lower Granite Dam for Snake
+River Hatchery fish.</div>
+</div>
+<p><br></p>
+<div class="float">
+<img src="site_figures/fit_to_data/spilldays/SRH_year_scale_plot.png"
+style="width:100.0%"
+alt="Scale parameter estimates for the effect of year on post-overshoot fallback at Lower Granite Dam for Snake River Hatchery fish." />
+<div class="figcaption">Scale parameter estimates for the effect of year
+on post-overshoot fallback at Lower Granite Dam for Snake River Hatchery
+fish.</div>
+</div>
+<p><br></p>
+<p>If we look at the year effects for individual years vs. the winter
+spill values in that year, it is very clear that these two are
+confounded.</p>
+<div class="float">
+<img
+src="site_figures/fit_to_data/spilldays/TUC_year_v_winterspill_9_8_plot.png"
+style="width:100.0%"
+alt="Year effect vs. winter spill values, Tucannon River hatchery fish fallback at Lower Granite Dam." />
+<div class="figcaption">Year effect vs. winter spill values, Tucannon
+River hatchery fish fallback at Lower Granite Dam.</div>
+</div>
+<p><br></p>
+<p>A very similar story can be seen for Wenatchee River hatchery fish at
+Wells Dam:</p>
+<p><br></p>
+<div class="float">
+<img src="site_figures/fit_to_data/spilldays/UCH_year_raw_plot.png"
+style="width:100.0%"
+alt="Raw (unscaled) parameter estimates for the effect of year on post-overshoot fallback at Wells Dam for Upper Columbia hatchery fish." />
+<div class="figcaption">Raw (unscaled) parameter estimates for the
+effect of year on post-overshoot fallback at Wells Dam for Upper
+Columbia hatchery fish.</div>
+</div>
+<p><br></p>
+<div class="float">
+<img src="site_figures/fit_to_data/spilldays/UCH_year_scale_plot.png"
+style="width:100.0%"
+alt="Scale parameter estimates for the effect of year on post-overshoot fallback at Wells Dam for Upper Columbia hatchery fish." />
+<div class="figcaption">Scale parameter estimates for the effect of year
+on post-overshoot fallback at Wells Dam for Upper Columbia hatchery
+fish.</div>
+</div>
+<p><br></p>
+<div class="float">
+<img
+src="site_figures/fit_to_data/spilldays/TUC_year_v_winterspill_9_8_plot.png"
+style="width:100.0%"
+alt="Year effect vs. winter spill values, Tucannon River hatchery fish fallback at Lower Granite Dam." />
+<div class="figcaption">Year effect vs. winter spill values, Tucannon
+River hatchery fish fallback at Lower Granite Dam.</div>
+</div>
+<p><br></p>
+</div>
+<div id="potential-solutions" class="section level3">
+<h3>Potential solutions</h3>
+<p>Given that one of our primary interests is in the effects of winter
+spill, this model behavior is not desirable. Here are some potential
+solutions:</p>
 <ol style="list-style-type: decimal">
-<li>Extract the median covariate values experienced by all fish in the
-dataset (for volume of spill and temperature). These median values are
-used to estimate the probability of movement.</li>
-<li>Create a sequence of days of spill from 0 to the maximimum value
-experience by fish in the dataset.</li>
-<li>Evaluate the probability of movement at each of those spill
-values.</li>
+<li>If we tightened the priors on the scaling parameter for the year
+effect, it would in effect force the model to explain more of the
+year-to-year variation in fallback rates as a function of year-to-year
+variability in spill. Currently, we are using the matt trick approach,
+wherein we the random effect of year is modeled as the product of a
+standard normal (normal(0,1)) and a half Cauchy (Cauchy(0,1) with a
+lower bound of zero). We could reduce the scale parameter of the Cauchy
+prior.</li>
+<li>Remove the random effect of year entirely for any movements for
+which there is an effect of winter spill</li>
+<li>Index the model so that if a fish receives the effect of winter
+spill, it does not also receive a random year effect</li>
 </ol>
-<p>If a tributary has both a hatchery and natural origin population,
-they are shown on the same plot. The rug plot (lines in the margins)
-indicate the number of observations at each number of winter spill days,
-where the fish was also in the upstream state during the winter
-months.</p>
-<div id="middle-columbia" class="section level4">
-<h4>Middle Columbia</h4>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/DES_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Deschutes River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Deschutes River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<p><img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for John Day River Steelhead." />
-<br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for John Day River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<p><img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead." />
-<br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/FIF_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Fifteenmile Creek Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/YAK_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Yakima River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/YAK_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Yakima River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WAWA_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Walla Walla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Walla Walla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
-<div id="upper-columbia" class="section level4">
-<h4>Upper Columbia</h4>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WEN_compare_fallback_RRE_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Rocky Reach Dam for Wenatchee River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WEN_compare_fallback_WEL_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Wells Dam for Wenatchee River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/ENT_compare_fallback_WEL_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Wells Dam for Entiat River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Wells Dam for Entiat River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
-<div id="snake-river" class="section level4">
-<h4>Snake River</h4>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/TUC_compare_fallback_LGR_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Lower Granite Dam for Tucannon River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
 </div>
 </div>
 

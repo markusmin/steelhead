@@ -26,7 +26,15 @@ navbar:
       - text: "Final fates and covariates"
         href: results-final-fates-covariates.html    
     - text: "Outstanding issues"
-      href: issues.html    
+      menu:  
+      - text: "2024-08-09"
+        href: issues-2024-08-09.html 
+      # - text: "2024-08-14"
+      #   href: issues-2024-08-14.html
+    # - text: "Winter spill - v2"
+    #   href: winter-spill-investigation.html
+    - text: "Winter spill & year effects"
+      href: winter-spill-year.html
 output:
   html_document:
     theme: flatly

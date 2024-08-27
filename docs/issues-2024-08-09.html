@@ -11,9 +11,9 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-08-27" />
+<meta name="date" content="2024-08-09" />
 
-<title>Results - Spill Days</title>
+<title>Outstanding issues</title>
 
 <script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -386,190 +386,138 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Results - Spill Days</h1>
+<h1 class="title toc-ignore">Outstanding issues</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-08-27</h4>
+<h4 class="date">2024-08-09</h4>
 
 </div>
 
 
 <div id="description" class="section level2">
 <h2>Description</h2>
-<p>This page contains the results for the effects of spill (as the days
-of spill in winter) on key movements. Days of winter spill are
-calculated as the total number of days in January, February, and March
-that had any amount of spill. As a reminder for how spill (days of
-winter spill) is included in the model, spill (as the number of days of
-winter spill) affects only post-overshoot fallback movements. The same
-parameter is shared by all fish of the same DPS/rear type combination
-for which the movement represents post-overshoot fallback. On this page,
-I will focus only on how spill (days of winter spill) affects
-post-overshoot fallback.</p>
-<div id="calculation" class="section level3">
-<h3>Calculation</h3>
-<p>For each dataset (combination of DPS and rear type), the following
-steps were run:</p>
-<ol style="list-style-type: decimal">
-<li>Extract the median covariate values experienced by all fish in the
-dataset (for volume of spill and temperature). These median values are
-used to estimate the probability of movement.</li>
-<li>Create a sequence of days of spill from 0 to the maximimum value
-experience by fish in the dataset.</li>
-<li>Evaluate the probability of movement at each of those spill
-values.</li>
-</ol>
-<p>If a tributary has both a hatchery and natural origin population,
-they are shown on the same plot. The rug plot (lines in the margins)
-indicate the number of observations at each number of winter spill days,
-where the fish was also in the upstream state during the winter
-months.</p>
-<div id="middle-columbia" class="section level4">
-<h4>Middle Columbia</h4>
+<p>This page is where I document outstanding issues with either the
+model itself, or the code used to generate derived quantities.
+Currently, the primary issue that I see is that movement probabilities
+into the Deschutes River appear to be too high, particularly at high
+temperature values. This manifests itself in final fates in the
+Deschutes River that appear to be too high for many Middle Columbia
+populations.</p>
+<div id="deschutes-river-movement-probabilities" class="section level3">
+<h3>Deschutes River movement probabilities</h3>
+<p>To sanity check the final fates results, I have been comparing the
+simulated final fates of fish using our model estimated parameters to
+what is seen in the data. When visualizing final fates directly from the
+data, I have been looking at the final fates from years where the home
+tributary had the ability to estimate detection efficiency, as this is
+more representative of the data that the model is fitting than the years
+without the ability to estimate detection efficiency.</p>
+<p>Below are the final fates from data compared to our
+simulation-generated values (this is the same plot as on the Final Fates
+tab). If you compare these figures to the final fates estimated by the
+model, the overestimation of straying into the Deschutes River is
+apparent for Middle Columbia populations, especially for Fifteenmile
+Creek and Umatilla River (hatchery) Steelhead.</p>
+<div class="float">
+<img src="site_figures/final_fates/FF_sim_data_comp_plot.png"
+style="width:100.0%" alt="Final fates, from the model vs. the data." />
+<div class="figcaption">Final fates, from the model vs. the data.</div>
+</div>
 <p><br> <br></p>
+<p>I went back to some of the old results from previous (and much
+simpler) versions of the model and discovered that this issue doesn’t
+appear to only be related to including covariates in the model. Here are
+plots of the final fates from back when the model was an intercept-only
+model, and Fifteenmile Creek and the Umatilla River still have final
+fates in the Deschutes River overestimated:</p>
+<div class="float">
+<img src="site_figures/FIF_2022_FF.png" style="width:100.0%"
+alt="Final fates for Fifteenmile Creek fish, from the 2022 report which included the results from an intercept-only model." />
+<div class="figcaption">Final fates for Fifteenmile Creek fish, from the
+2022 report which included the results from an intercept-only
+model.</div>
+</div>
+<p><br></p>
+<div class="float">
+<img src="site_figures/UMA_2022_FF.png" style="width:100.0%"
+alt="Final fates for Umatilla River fish, from the 2022 report which included the results from an intercept-only model." />
+<div class="figcaption">Final fates for Umatilla River fish, from the
+2022 report which included the results from an intercept-only
+model.</div>
+</div>
+<p><br> <br></p>
+<p>Comparing our current final fates results to those derived from the
+intercept-only model, it appears that we’ve actually closer to fitting
+the data with a more complicated model. There’s something weird going on
+that still requires investigation. Below are some fairly disjointed
+thoughts and things I’ve looked into but none of them have revealed a
+root cause…</p>
+</div>
+</div>
+<div id="investigations" class="section level2">
+<h2>Investigations</h2>
+<p>A note on detection efficiency: Detection efficiency in the Deschutes
+River was one of the first things I thought of that might explain this
+pattern - but I don’t think it is. Detection probability is shared
+across all populations within a DPS/rear type combination (that’s how
+the model is set up), so if it was just a detection efficiency issue, it
+should affect all populations within the same DPS/rear type. But it’s
+not - some origins look just fine, whereas others look severely
+overestimated.</p>
+<p><br></p>
+<p>I decided to plot all of the parameter values for all movements out
+of the BON to MCN state across all Middle Columbia populations. This
+plot is quite busy, but there are a few interesting patterns that
+emerge.</p>
+<div class="float">
+<img src="site_figures/MC_state_2_param_plot.png" style="width:100.0%"
+alt="Median parameter estimates for movments from BON to MCN to the other connecting states, for the effect of origin (this is the intercept), temp0 (the effect of temperature during the winter/spring), and temp1 (the effect of temperature during the summer/fall)." />
+<div class="figcaption">Median parameter estimates for movments from BON
+to MCN to the other connecting states, for the effect of origin (this is
+the intercept), temp0 (the effect of temperature during the
+winter/spring), and temp1 (the effect of temperature during the
+summer/fall).</div>
+</div>
+<ul>
+<li>Fifteenmile Creek fish have the highest intercept for movements into
+the Deschutes River (see the left panel, orange dots for Fifteenmile
+Creek). This is a bit odd, but it’s also worth remembering that movement
+probabilities are always governed by the relative values of the
+parameters. For example, Deschutes River fish have a negative intercept
+for movements into the Deschutes (their home state!), but of all of the
+intercept parameters, it’s the highest - and the final fates for the
+Deschutes look fine.</li>
+</ul>
+<p><br> <br></p>
+<p>If we then examine movement probabilities into the Deschutes River
+and compare them with the data, we observe that the estimated
+probability of movement into the Deschutes is not reflective of the
+data. For example, here is the plot of movement probability into the
+Deschutes for Umatilla Hatchery Steelhead, by temperature:</p>
 <div class="float">
 <img
-src="site_figures/covariate_effects/spilldays/DES_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Deschutes River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Deschutes River Steelhead.</div>
+src="site_figures/covariate_effects/temperature/UMA_compare_move_deschutes_temp.png"
+style="width:70.0%"
+alt="Probability of moving into the Deschutes River by temperature, for Umatilla River Hatchery Steelhead (model estimated)." />
+<div class="figcaption">Probability of moving into the Deschutes River
+by temperature, for Umatilla River Hatchery Steelhead (model
+estimated).</div>
 </div>
-<p><br> <br></p>
-<p><img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for John Day River Steelhead." />
-<br> <br></p>
+<p><br></p>
+<p>And here is the plot of the data for that same movement, showing
+movement choices by temperature:</p>
 <div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for John Day River Steelhead.</div>
+<img src="site_figures/data_plots/UMA_H_temp_move_plot.png"
+style="width:70.0%"
+alt="Movement choices of Umatilla River Hatchery Steelhead, by temperature (from data)." />
+<div class="figcaption">Movement choices of Umatilla River Hatchery
+Steelhead, by temperature (from data).</div>
 </div>
-<p><br> <br></p>
-<p><img
-src="site_figures/covariate_effects/spilldays/JDR_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead." />
-<br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/FIF_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Fifteenmile Creek Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_MCN_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at McNary Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at McNary Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/UMA_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Umatilla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/YAK_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Yakima River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/YAK_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Yakima River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WAWA_compare_fallback_PRA_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Priest Rapids Dam for Walla Walla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WAWA_compare_fallback_ICH_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Ice Harbor Dam for Walla Walla River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
-<div id="upper-columbia" class="section level4">
-<h4>Upper Columbia</h4>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WEN_compare_fallback_RRE_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Rocky Reach Dam for Wenatchee River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/WEN_compare_fallback_WEL_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Wells Dam for Wenatchee River Steelhead.</div>
-</div>
-<p><br> <br></p>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/ENT_compare_fallback_WEL_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Wells Dam for Entiat River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Wells Dam for Entiat River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
-<div id="snake-river" class="section level4">
-<h4>Snake River</h4>
-<div class="float">
-<img
-src="site_figures/covariate_effects/spilldays/TUC_compare_fallback_LGR_spilldays.png"
-style="width:50.0%"
-alt="Effect of days of winter spill on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead." />
-<div class="figcaption">Effect of days of winter spill on post-overshoot
-fallback at Lower Granite Dam for Tucannon River Steelhead.</div>
-</div>
-<p><br> <br></p>
-</div>
-</div>
+<p><br></p>
+<p>As seen in the figure, movements into the Deschutes are not common at
+any of the observed temperatures, yet the model is estimating that the
+movement is quite likely at the upper range of temperatures. I haven’t
+yet gotten to the bottom of why the model is not fitting this particular
+movement well.</p>
 </div>
 
 
