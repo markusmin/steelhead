@@ -1,0 +1,13 @@
+# Update website
+
+rmarkdown::render(here::here("docs", "index.Rmd"))
+rmarkdown::render(here::here("docs", "diagnostics.Rmd"))
+rmarkdown::render(here::here("docs", "issues-2024-08-09.Rmd"))
+rmarkdown::render(here::here("docs", "results-detection-efficiency.Rmd"))
+rmarkdown::render(here::here("docs", "results-final-fates-covariates.Rmd"))
+rmarkdown::render(here::here("docs", "results-final-fates.Rmd"))
+rmarkdown::render(here::here("docs", "results-spill-days.Rmd"))
+rmarkdown::render(here::here("docs", "results-spill-window.Rmd"))
+rmarkdown::render(here::here("docs", "results-temperature.Rmd"))
+rmarkdown::render(here::here("docs", "results-year.Rmd"))
+rmarkdown::render(here::here("docs", "winter-spill-year.Rmd"))

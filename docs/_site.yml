@@ -3,8 +3,6 @@ output_dir: "."
 navbar:
   title: "Steelhead Movement"
   left:
-    - text: "Home"
-      href: index.html
     - text: "Structure"
       href: structure.html    
     - text: "Diagnostics"
