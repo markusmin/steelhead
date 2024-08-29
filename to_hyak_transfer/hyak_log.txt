@@ -7155,6 +7155,7 @@ spill file to read in
 
 # the stan model won't change at all - all we need to do is change the input model_data.rda file
 to pull in march spill days and only allow for post_overshoot fallback for march only
+- I always forget how long it takes to run the data prep scripts... takes a long long time
 
 # created a new folder: reparameterization_v2_marchspilldays
 # In this folder, I copied over the input files from the normal reparameterization_v2 file,
@@ -7179,17 +7180,204 @@ input data files
 (base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v2_marchspilldays % scp ./snake_river_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/snake_river_wild
 
 
+# Move our runs from gscratch/stf to gscratch/scrubbed so we can work on them
+
+# Middle Columbia, hatchery and wild runs
+[mmin@klone-login03 reparameterization_v2_marchspilldays]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2_marchspilldays
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_wild/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_hatchery/ ./
+
+# Now, let's regenerate our winter spill plots using these latest runs
+copied scripts over to 11-model-spill-plots-march.R
+
+# whoops, made a mistake with the plots
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r covariate_effects/spilldays/ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/
+
+### 2024-08-21 ###
+
+Let's plot the data vs. model predicted for all covariates
+- To quantify goodness of fit, we could look at either distance from the model best estimate,
+or credible interval coverage
+
+Hm, it looks like I have a temperature affect for ascending BON but the data is a bunch of zeros. 
+It shouldn't matter? But that's probably not great...
+
+### 2024-08-22 ###
+
+Plotted fits, got goodness of fit statistics for a table
+
+So, the line rarely goes through the points exactly. That being said, there are plenty of things 
+that we are not accounting for in this way of visualizing our fit to data, namely:
+- No year effects (this might explain some of the deviations away from expectation)
+- Annual differences in DE (mainstem temp varied each year along with the tributary DE,
+so these two things are confounded)
+
+# I should plot all DPS data vs. the DPS-wide movements. It's very hard to examine fit to data
+when you're not directly comparing the data.
+
+### 2024-08-26 ###
+
+So, two Snake River Hatchery runs got to 97% and then hit time limit of 6 days. Other two runs finished. Obviously
+annoying but ok, we can use two chains for now
+- upped the time limit on all jobs to 7 days, then resubmitted the two that did not finish (chains 2 and 3)
+
+# March spill days runs almost all finished
+# Move our runs from gscratch/stf to gscratch/scrubbed so we can work on them
+
+# Middle Columbia, hatchery and wild runs
+[mmin@klone-login03 reparameterization_v2_marchspilldays]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v2_marchspilldays
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_wild/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/middle_columbia_hatchery/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/upper_columbia_wild/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/upper_columbia_hatchery/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/snake_river_wild/ ./
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v2_marchspilldays/snake_river_hatchery/ ./
+
+
+Okay, it looks like all of my packages got deleted again - sick!
+- Ran the 06 script to reinstall packages and everything was good again
+
+Back to goodness of fit:
+- DPS-wide fits... still aren't great? Why could this be?
+	- I don't think it's the model itself fitting the data poorly (at least, I sure hope not)
+	- More likely is that my way of depicting the data fit to model is not correct
+	- There is the issue of assuming median spill conditions; this is not entirely fair because
+	spill and temperature are a bit correlated; perhaps an alternative way to look at fit to data
+	would be to look at the average spill at each temperature? But that would be against
+	our goal of trying to isolate temperature on its own; perhaps more just a note to the reader
+	- I did also fix a typo with how spill was being indexed; that'll change things a bit
+	- we're also using the DPS-wide median conditions; we might consider looking at origin-specific
+	conditions? But also we're chasing margins here that I don't think that we need to
+	
+- Why is Tucannon River fitting winter spill related fallback so poorly?
+	- It shows a very strange pattern where it is most certain where there is no data
+	- ah, pretty sure it's related to year effects. makes sense
+
+### 2024-08-27 ###
+
+# Pull the fit to data plots:
+
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/fit_to_data/ ./
+
+# Re-fitting model with changes to year vs. winter spill
+- We are going to remove year effects selectively so that they don't interfere with the
+effect of winter spill.
+- Because our year effects are all origin-specific, we can remove these year effects for
+any movements that are post-overshoot fallback movements. It also means that in some cases,
+a fish will receive neither a year effect nor an effect of winter spill. But it will mean
+that those fish receive an effect of spill volume, since every fish gets either winter spill
+or spill volume effect.
+- For implementing this, the easiest approach is probably going to be to just selectively 
+fix those year parameters to zero. That will allow us to keep the indexing structure the same.
+- Going to run with winter spill again - not seeing a huge difference between March and winter,
+so let's stick with winter since that's the base model
+
+# Workflow - the most efficient way to disable this:
+- For every instance where there exists a bwinterspill parameter
+	- For every origin where this is a post-overshoot movement
+		- Fix this scaling parameter value for this movement to be zero
+			- This needs to be fixed:
+				- where priors are declared for parameters, comment out the prior
+				- where the parameter is declared for the first time, comment it out
+				- in a transformed data block, set it to zero
+				- based on option 3 in this link: https://discourse.mc-stan.org/t/three-different-ways-of-trying-to-fix-a-parameter-value-in-stan/29009
+
+# Okay, let's move MCW and MCH to hyak and see if it runs
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./middle_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+
+# Ok after some tweaks, we are now going! But we have to wait in the hyak queue... ugh
+
+# Let's get SRW and SRH up and running since those always take a long time
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./snake_river_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./snake_river_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+
+### 2024-08-28 ###
+
+Let's submit UCH on ckpt, because that will run in under four hours.
+Also, submit UCW on stf (12-24 hours)
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./upper_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3 % scp -r ./upper_columbia_wild/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/
+
+# Whoops, found a booboo and had to resubmit all model runs... hopefully that doesn't put
+us back too far in the queue
+
+# Okay, let's return to temperature issue
+
+So, somehow a plot I generated more recently shows a fine fit to the data for Umatilla into the Deschutes?
+- This plot looks fine: /Users/markusmin/Documents/CBR/steelhead/docs/site_figures/fit_to_data/temperature/Umatilla_2_to_10.png
+- This is the old plot, which doesn't: /Users/markusmin/Documents/CBR/steelhead/docs/site_figures/covariate_effects/temperature/UMA_compare_move_deschutes_temp_fit_to_data_DE.png
+
+- The model fits are the same in both plot. The difference is the data, where the new plot has considerably less.
+- The new plot is generated by 09-model-temperature-plots.R, starting on line 3164. It uses the function plot_GOF_compare_rear_temp_effect_fit_to_data_DE()
+- The old plot is generated by 09-model-temperature-plots.R, starting on line 2692. It uses the function plot_compare_rear_temp_effect_fit_to_data_DE()
+- So, what is the difference between these two functions?
+	- I re-ran both plotting functions with the same input data, and now they show the same thing.
+	So it looks like somehow the old input data was not good...?
+	- It might be the case that it had something to do with the extract_covariate_experiences() function, since that was updated...?
+
+Ok, let's look back at the final fates fit to data comp. I think there's an issue where we're
+joining tributary detection efficiency based on NATAL ORIGIN, not TRIBUTARY. That of course will throw
+things off.
+
+# ok, pull a new data plot
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/data_plots ./
+
+
+## Checking on new spill runs
+- So, UCH did not finish in 4 hours. I'm not sure why I thought it would, usually it takes 36-48 hours.
+UCW will finish in four hours, so let's submit that on CKPT
+
+# Okay, back to thinking about fits to data.
+
+SR_2_to_3 is not fitting the data great. But - I think that this once again might be due to
+DE issues. Currently, the data says that there are more observed transitions going upstream
+than the model is estimating. If we are not accounting for DE in the Deschutes when we're plotting
+the data, that could explain that - since it would think that there are more movements upstream
+(the eventual movement)
+
+When plotting fits to data, all movements into tributaries are DE corrected. All mainstem movements
+are not. But tributary DE does affect mainstem movements, though not directly.
+- The general pattern is that we are currently fitting the data better for movements into
+tributaries than we are for movements in the mainstem
+
+### 2024-08-29 ###
+
+Upper Columbia Wild runs finished using ckpt!
+- Ok, let's inspect. The best way might be to compare just the winter spill and
+see how that's different
+- first, move runs to gscratch/scrubbed so that I can work on them
+
+[mmin@klone-login03 reparameterization_v3]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v3
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/upper_columbia_wild/ ./
+
+Okay, the outputs do look slightly different, but none of the UCW origins were problematic to begin with.
+So it's too early to say if it worked, will need to see UCH or SRH to compare
+
+# Pull the fit to data plots again since they were updated
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/fit_to_data/ ./
+
+
+# Update on fits to data:
+- if I just swap out "covariate_effects" for "fit_to_data" in the path, it updates all plots to be the new ones with the bubbles
+- Well, that's not true unfortunately because I changed how the plot names are structured. So I'll have to do it manually
+
+Ok, so Wenatchee overshoot vs. temp is not fitting well, but just for hatchery. Why?
+- I wonder if it's a DE issue in the Wenatchee? Might be, it seems like hatchery has way more fish.
+
+Alright, what is the DE like for the Wenatchee?
 
 
 
 
-
-
-
-
-
-
-
-
-
+ 
 
