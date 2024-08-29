@@ -22,208 +22,238 @@ For each dataset (combination of DPS and rear type), the following steps were ru
 2. Create a sequence of volume of spill from 0 to the maximimum value experience by fish in the dataset.
 3. Evaluate the probability of movement at each of those spill values.
 
-If a tributary has both a hatchery and natural origin population, they are shown on the same plot. The number of observations of fish in the state are shown as a rug plot in the margins. However, please note that because spill parameters are shared between fish of the same DPS, the actual data used to estimate each of the parameters is more than is shown for any individual origin. This is also why specific origins will have an estimated effect of spill, even when there is little or no data from that specific origin. Individual origins do however have different movement probabilities, as the overall probability of movement is affected by the relative strength of the predictor compared to the predictors for other movements (which may have origin-specific parameters).
+If a tributary has both a hatchery and natural origin population, they are shown on the same plot. The proportion of fish that exhibited the movement at each spill volume (in 5 kcfs bins) is shown as bubble. However, please note that because spill parameters are shared between fish of the same DPS, the actual data used to estimate each of the parameters is more than is shown for any individual origin. This is also why specific origins will have an estimated effect of spill, even when there is little or no data from that specific origin. Individual origins do however have different movement probabilities, as the overall probability of movement is affected by the relative strength of the predictor compared to the predictors for other movements (which may have origin-specific parameters).
 
-#### Middle Columbia
+### Middle Columbia
 
 For the Middle Columbia, we only show plots for the effect of spill volume on fallback at Bonneville Dam.
 
-![Effect of spill volume on fallback at Bonneville Dam for Deschutes River Steelhead.](site_figures/covariate_effects/spillwindow/DES_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Deschutes River Steelhead.](site_figures/fit_to_data/spillwindow/DES_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for John Day River Steelhead.](site_figures/covariate_effects/spillwindow/JDR_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for John Day River Steelhead.](site_figures/fit_to_data/spillwindow/JDR_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Fifteenmile Creek Steelhead.](site_figures/covariate_effects/spillwindow/FIF_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Fifteenmile Creek Steelhead.](site_figures/fit_to_data/spillwindow/FIF_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Umatilla River Steelhead.](site_figures/covariate_effects/spillwindow/UMA_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Umatilla River Steelhead.](site_figures/fit_to_data/spillwindow/UMA_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Yakima River Steelhead.](site_figures/covariate_effects/spillwindow/YAK_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Yakima River Steelhead.](site_figures/fit_to_data/spillwindow/YAK_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/spillwindow/WAWA_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Walla Walla River Steelhead.](site_figures/fit_to_data/spillwindow/WAWA_compare_fallback_BON_spillwindow.png){width=50%}
 
+<br>
+<br>
 
-#### Upper Columbia
+### Upper Columbia
 
 For Upper Columbia Steelhead, we will show en-route fallback at Bonneville, McNary, Priest Rapids, and Rock Island Dams.
 
-##### Bonneville
+<br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_BON_spillwindow.png){width=50%}
+#### Bonneville
+
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Wenatchee River Steelhead.](site_figures/fit_to_data/spillwindow/WEN_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Entiat River Steelhead.](site_figures/fit_to_data/spillwindow/ENT_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Okanogan River Steelhead.](site_figures/fit_to_data/spillwindow/OKA_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Methow River Steelhead.](site_figures/fit_to_data/spillwindow/MET_compare_fallback_BON_spillwindow.png){width=50%}
 
-##### McNary
+<br>
 
-![Effect of spill volume on fallback at McNary Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_MCN_spillwindow.png){width=50%}
+#### McNary
+
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Wenatchee River Steelhead.](site_figures/fit_to_data/spillwindow/WEN_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Entiat River Steelhead.](site_figures/fit_to_data/spillwindow/ENT_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Okanogan River Steelhead.](site_figures/fit_to_data/spillwindow/OKA_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Methow River Steelhead.](site_figures/fit_to_data/spillwindow/MET_compare_fallback_MCN_spillwindow.png){width=50%}
 
-##### Priest Rapids
+<br>
 
-![Effect of spill volume on fallback at Priest Rapids Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_PRA_spillwindow.png){width=50%}
+#### Priest Rapids
+
+<br>
+
+![Effect of spill volume on fallback at Priest Rapids Dam for Wenatchee River Steelhead.](site_figures/fit_to_data/spillwindow/WEN_compare_fallback_PRA_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Priest Rapids Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_PRA_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Priest Rapids Dam for Entiat River Steelhead.](site_figures/fit_to_data/spillwindow/ENT_compare_fallback_PRA_spillwindow.png){width=50%}
 <br>
 <br>
 
-![Effect of spill volume on fallback at Priest Rapids Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_PRA_spillwindow.png){width=50%}
-
-<br>
-<br>
-
-![Effect of spill volume on fallback at Priest Rapids Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_PRA_spillwindow.png){width=50%}
-
-##### Rock Island
-
-![Effect of spill volume on fallback at Rock Island Dam for Wenatchee River Steelhead.](site_figures/covariate_effects/spillwindow/WEN_compare_fallback_RIS_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Priest Rapids Dam for Okanogan River Steelhead.](site_figures/fit_to_data/spillwindow/OKA_compare_fallback_PRA_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Rock Island Dam for Entiat River Steelhead.](site_figures/covariate_effects/spillwindow/ENT_compare_fallback_RIS_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Priest Rapids Dam for Methow River Steelhead.](site_figures/fit_to_data/spillwindow/MET_compare_fallback_PRA_spillwindow.png){width=50%}
+
+<br>
+
+#### Rock Island
+
+<br>
+
+![Effect of spill volume on fallback at Rock Island Dam for Wenatchee River Steelhead.](site_figures/fit_to_data/spillwindow/WEN_compare_fallback_RIS_spillwindow.png){width=50%}
+
 <br>
 <br>
 
-![Effect of spill volume on fallback at Rock Island Dam for Okanogan River Steelhead.](site_figures/covariate_effects/spillwindow/OKA_compare_fallback_RIS_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Rock Island Dam for Entiat River Steelhead.](site_figures/fit_to_data/spillwindow/ENT_compare_fallback_RIS_spillwindow.png){width=50%}
+<br>
+<br>
+
+![Effect of spill volume on fallback at Rock Island Dam for Okanogan River Steelhead.](site_figures/fit_to_data/spillwindow/OKA_compare_fallback_RIS_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Rock Island Dam for Methow River Steelhead.](site_figures/covariate_effects/spillwindow/MET_compare_fallback_RIS_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Rock Island Dam for Methow River Steelhead.](site_figures/fit_to_data/spillwindow/MET_compare_fallback_RIS_spillwindow.png){width=50%}
 
 
 
-#### Snake River
+### Snake River
 
 For Snake Steelhead, we will show en-route fallback at Bonneville, McNary, and Ice Harbor Dams.
 
-##### Bonneville
+<br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_BON_spillwindow.png){width=50%}
+#### Bonneville
+
+<br>
+
+![Effect of spill volume on fallback at Bonneville Dam for Tucannon River Steelhead.](site_figures/fit_to_data/spillwindow/TUC_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Asotin Creek Steelhead.](site_figures/fit_to_data/spillwindow/ASO_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Clearwater River Steelhead.](site_figures/fit_to_data/spillwindow/CLE_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Salmon River Steelhead.](site_figures/fit_to_data/spillwindow/SAL_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Grande Ronde River Steelhead.](site_figures/fit_to_data/spillwindow/GR_compare_fallback_BON_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Bonneville Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_BON_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Bonneville Dam for Imnaha River Steelhead.](site_figures/fit_to_data/spillwindow/IMN_compare_fallback_BON_spillwindow.png){width=50%}
 
-##### McNary
+<br>
 
-![Effect of spill volume on fallback at McNary Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_MCN_spillwindow.png){width=50%}
+#### McNary
+
+<br>
+
+![Effect of spill volume on fallback at McNary Dam for Tucannon River Steelhead.](site_figures/fit_to_data/spillwindow/TUC_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Asotin Creek Steelhead.](site_figures/fit_to_data/spillwindow/ASO_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Clearwater River Steelhead.](site_figures/fit_to_data/spillwindow/CLE_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Salmon River Steelhead.](site_figures/fit_to_data/spillwindow/SAL_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Grande Ronde River Steelhead.](site_figures/fit_to_data/spillwindow/GR_compare_fallback_MCN_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at McNary Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_MCN_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at McNary Dam for Imnaha River Steelhead.](site_figures/fit_to_data/spillwindow/IMN_compare_fallback_MCN_spillwindow.png){width=50%}
 
-##### Ice Harbor
+<br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Tucannon River Steelhead.](site_figures/covariate_effects/spillwindow/TUC_compare_fallback_ICH_spillwindow.png){width=50%}
+#### Ice Harbor
+
+<br>
+
+![Effect of spill volume on fallback at Ice Harbor Dam for Tucannon River Steelhead.](site_figures/fit_to_data/spillwindow/TUC_compare_fallback_ICH_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Asotin Creek Steelhead.](site_figures/covariate_effects/spillwindow/ASO_compare_fallback_ICH_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Ice Harbor Dam for Asotin Creek Steelhead.](site_figures/fit_to_data/spillwindow/ASO_compare_fallback_ICH_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Clearwater River Steelhead.](site_figures/covariate_effects/spillwindow/CLE_compare_fallback_ICH_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Ice Harbor Dam for Clearwater River Steelhead.](site_figures/fit_to_data/spillwindow/CLE_compare_fallback_ICH_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Salmon River Steelhead.](site_figures/covariate_effects/spillwindow/SAL_compare_fallback_ICH_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Ice Harbor Dam for Salmon River Steelhead.](site_figures/fit_to_data/spillwindow/SAL_compare_fallback_ICH_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Grande Ronde River Steelhead.](site_figures/covariate_effects/spillwindow/GR_compare_fallback_ICH_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Ice Harbor Dam for Grande Ronde River Steelhead.](site_figures/fit_to_data/spillwindow/GR_compare_fallback_ICH_spillwindow.png){width=50%}
 
 <br>
 <br>
 
-![Effect of spill volume on fallback at Ice Harbor Dam for Imnaha River Steelhead.](site_figures/covariate_effects/spillwindow/IMN_compare_fallback_ICH_spillwindow.png){width=50%}
+![Effect of spill volume on fallback at Ice Harbor Dam for Imnaha River Steelhead.](site_figures/fit_to_data/spillwindow/IMN_compare_fallback_ICH_spillwindow.png){width=50%}
 

@@ -11,9 +11,9 @@
 
 <meta name="author" content="Markus Min" />
 
-<meta name="date" content="2024-08-19" />
+<meta name="date" content="2024-08-29" />
 
-<title>Update on winter spill</title>
+<title>Spill days: Winter vs. March</title>
 
 <script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -321,9 +321,6 @@ div.tocify {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">Home</a>
-</li>
-<li>
   <a href="structure.html">Structure</a>
 </li>
 <li>
@@ -370,9 +367,15 @@ div.tocify {
       <a href="issues-2024-08-09.html">2024-08-09</a>
     </li>
     <li>
-      <a href="issues-2024-08-14.html">2024-08-14</a>
+      <a href="issues-2024-08-29.html">2024-08-29</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="winter-spill-investigation.html">Winter spill - March comparison</a>
+</li>
+<li>
+  <a href="winter-spill-year.html">Winter spill &amp; year effects</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -386,19 +389,234 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Update on winter spill</h1>
+<h1 class="title toc-ignore">Spill days: Winter vs. March</h1>
 <h4 class="author">Markus Min</h4>
-<h4 class="date">2024-08-19</h4>
+<h4 class="date">2024-08-29</h4>
 
 </div>
 
 
 <div id="description" class="section level2">
 <h2>Description</h2>
-<p>This page goes into the different ways that we could analyze winter
-spill (as days in March, vs. as total days from January-March).</p>
+<p>This page compares modeling post-overshoot fallback as a function of
+winter spill (Jan/Feb/Mar) vs. as a function of only March spill.
+Richins and Skalski (2018) examined the relationship between the number
+of days of spill during January, February, and March and fallback rates
+to natal tributaries and found no relationship between fallback rates
+with January or February spill, but did find a relationship between
+fallback rates to some tributaries and March spill.</p>
+<p><strong>NOTE: These are results where we still have both a random
+effect of year and an effect of winter spill days on post-overshoot
+fallback movements. I am currently running the updated models where we
+have dropped the random effect of year for these movements, and will
+update these results when they are ready. I am hoping this will fix the
+poor fits to data that we currently see for some movements.</strong></p>
+<div id="movement-timing-and-spill-patterns" class="section level3">
+<h3>Movement timing and spill patterns</h3>
+<p>To determine if modeling the effect of spill from different time
+periods makes sense, I first set out to answer two questions:</p>
+<ol style="list-style-type: decimal">
+<li><strong>What is the timing of movements for fish out of overshoot
+states?</strong> Examining movement timing allows us to estimate roughly
+when fish are moving, which could tell us what spill they are more
+likely to be experiencing (and what spill they are definitely not).</li>
+<li><strong>How much variability is there in spill in different periods
+of the year?</strong> If there is not enough variability in spill
+between different years, then it will not be a good predictor.</li>
+</ol>
+<p>In the plots below, I show movement timing out of the first
+post-overshoot state for different populations on the left, and the
+number of days of spill in different winter months on the right.
+Movement timing for these plots is shown as the month of next detection
+for fish, following overshoot. As I am only showing fish that were
+detected following overshoot, this necessarily excludes all fish that
+next moved to the loss state (as we cannot estimate timing of movement
+into the loss state). For all fallback movements, this typically means
+detection at a tributary site. As such, we do not know exact movement
+timing, but if we assume that fish do not typically hold in mainstem
+states during their fallback migration, we can assume that this is
+roughly when fallback is happening.</p>
+<p>My notes on the plots below:</p>
+<ul>
+<li>For all origins, post-overshoot fallback movements are typically
+happening in March or April. There is some post-overshoot fallback
+occurring in January and Februray, but it is typically less than in
+March or April (there is considerable variability between populations
+for the degree of this difference). There is a good amount of
+post-overshoot fallback also happening in the late summer/fall, but upon
+closer inspection of the data (not shown) most of these movements are
+actually followed by the re-ascension of the post-overshoot dam
+(although there is some fallback to the natal tributary during this
+time).</li>
+<li>Winter spill is distributed across months at the Columbia dams
+(McNary, Priest Rapids, Rocky Reach, and Wells). At the Snake River Dams
+(Ice Harbor and Lower Granite), most winter spill is happening in March,
+with a few exceptional years. For fallback movements on the Snake River,
+this indicates that modeling post-overshoot fallback as a function of
+all winter or only March spill won’t make a big difference, since
+they’re more or less the same.</li>
+<li>Given this, I chose to compare the effect of all winter vs. only
+March spill on post-overshoot fallback.</li>
+</ul>
 <p><br></p>
-<p><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-1.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-2.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-3.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-4.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-5.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-6.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-7.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-8.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-9.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-10.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-11.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-12.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-13.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-14.png" width="50%" height="50%" /></p>
+<p><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-1.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-2.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-3.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-4.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-5.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-6.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-7.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-8.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-9.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-10.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-11.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-12.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-13.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-14.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-15.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-16.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-17.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-18.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-19.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-20.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-21.png" width="50%" height="50%" /><img src="winter-spill-investigation_files/figure-html/plot_movement_timing-22.png" width="50%" height="50%" /></p>
+</div>
+<div id="winter-vs.-march-spill" class="section level3">
+<h3>Winter vs. March spill</h3>
+<p><br></p>
+<p>In each of the plots below, I show the results for the effect of
+spill days on post-overshoot fallback when spill days are modeled as
+winter (left) or March only (right).</p>
+<p>Overall, there doesn’t seem to be much of a difference between
+modeling spill as winter days vs. March only days.</p>
+<p><br></p>
+<div id="middle-columbia" class="section level4">
+<h4>Middle Columbia</h4>
+<p><br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/DES_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Deschutes River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/DES_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Deschutes River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at McNary Dam for Deschutes River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/JDR_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for John Day River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/JDR_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for John Day River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at McNary Dam for John Day River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/JDR_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/JDR_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Priest Rapids Dam for John Day River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/JDR_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/JDR_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/FIF_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/FIF_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/UMA_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Umatilla River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/UMA_compare_fallback_MCN_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at McNary Dam for Umatilla River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at McNary Dam for Umatilla River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/UMA_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/UMA_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/UMA_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/UMA_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Priest Rapids Dam for Umatilla River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/YAK_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/YAK_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/YAK_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/YAK_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/WAWA_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/WAWA_compare_fallback_PRA_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Priest Rapids Dam for Walla Walla River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/WAWA_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/WAWA_compare_fallback_ICH_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Ice Harbor Dam for Walla Walla River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+</div>
+<div id="upper-columbia" class="section level4">
+<h4>Upper Columbia</h4>
+<p><br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/WEN_compare_fallback_RRE_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/WEN_compare_fallback_RRE_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Rocky Reach Dam for Wenatchee River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/WEN_compare_fallback_WEL_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/WEN_compare_fallback_WEL_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Wells Dam for Wenatchee River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/ENT_compare_fallback_WEL_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Wells Dam for Entiat River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/ENT_compare_fallback_WEL_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Wells Dam for Entiat River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Wells Dam for Entiat River Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+</div>
+<div id="snake-river" class="section level4">
+<h4>Snake River</h4>
+<p><br></p>
+<div class="figure" style="text-align: left">
+<img src="site_figures/fit_to_data/spilldays/TUC_compare_fallback_LGR_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead." width="50%" height="50%" /><img src="site_figures/fit_to_data/spilldays_march/TUC_compare_fallback_LGR_spilldays.png" alt="Effect of days of winter spill (left) and March spill (right) on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead." width="50%" height="50%" />
+<p class="caption">
+Effect of days of winter spill (left) and March spill (right) on
+post-overshoot fallback at Lower Granite Dam for Tucannon River
+Steelhead.
+</p>
+</div>
+<p><br> <br></p>
+</div>
+</div>
 </div>
 
 

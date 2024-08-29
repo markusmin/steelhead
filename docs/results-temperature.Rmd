@@ -22,7 +22,13 @@ For each dataset (combination of DPS and rear type), the following steps were ru
 2. Create a sequence of temperature values from -2 SD to +2 SD around the mean
 3. Evaluate the probability of movement at each of those temperature values.
 
-If a tributary has both a hatchery and natural origin population, they are shown on the same plot. The rug plot (lines in the margins) indicate the number of observations at each temperature.
+If a tributary has both a hatchery and natural origin population, they are shown on the same plot. The bubble plots show the observed proportion of that movement at each temperature.
+
+**NOTE: You'll note that for overshoot movements, the data consistently seems to underestimate the proportion of fish that are overshooting for origins that are between Bonneville and McNary Dam. This is once again related to the issue of detection efficiency in the Deschutes. Many of the fish that appear to overshoot from the data are actually estimated to have dipped into the Deschutes River first by the model, which assumes that these detections were missed.**
+
+
+### Temperature vs. Overshoot
+
 
 #### Middle Columbia
 
@@ -30,57 +36,68 @@ If a tributary has both a hatchery and natural origin population, they are shown
 <br>
 
 
-![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/covariate_effects/temperature/DES_compare_overshoot_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/covariate_effects/temperature/DES_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Deschutes River Steelhead.](site_figures/fit_to_data/temperature/Deschutes_2_to_3.png){width=50%}
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/covariate_effects/temperature/JDR_compare_overshoot_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/covariate_effects/temperature/JDR_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for John Day River Steelhead.](site_figures/fit_to_data/temperature/John_2_to_3.png){width=50%}
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/covariate_effects/temperature/FIF_compare_overshoot_temp.png){width=50%}
-
-<br>
-<br>
-
-![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/covariate_effects/temperature/UMA_compare_overshoot_temp.png){width=50%}
-
-<br>
-<br>
-
-![Effect of temperature on overshoot of Priest Rapids Dam for Yakima River Steelhead.](site_figures/covariate_effects/temperature/YAK_compare_overshoot_PRA_temp.png){width=50%}
-
-<br>
-<br>
-
-![Effect of temperature on overshoot of Ice Harbor Dam for Yakima River Steelhead.](site_figures/covariate_effects/temperature/YAK_compare_overshoot_ICH_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/covariate_effects/temperature/FIF_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Fifteenmile Creek Steelhead.](site_figures/fit_to_data/temperature/Fifteenmile_2_to_3.png){width=50%}
 
 
 <br>
 <br>
 
+<!-- ![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/covariate_effects/temperature/UMA_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Umatilla River Steelhead.](site_figures/fit_to_data/temperature/Umatilla_2_to_3.png){width=50%}
 
-![Effect of temperature on overshoot of Priest Rapids Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/temperature/WAWA_compare_overshoot_PRA_temp.png){width=50%}
+<br>
+<br>
+
+<!-- ![Effect of temperature on overshoot of Priest Rapids Dam for Yakima River Steelhead.](site_figures/covariate_effects/temperature/YAK_compare_overshoot_PRA_temp.png){width=50%} -->
+![Effect of temperature on overshoot of Priest Rapids Dam for Yakima River Steelhead.](site_figures/fit_to_data/temperature/Yakima_3_to_4.png){width=50%}
+
+<br>
+<br>
+
+<!-- ![Effect of temperature on overshoot of Ice Harbor Dam for Yakima River Steelhead.](site_figures/covariate_effects/temperature/YAK_compare_overshoot_ICH_temp.png){width=50%} -->
+![Effect of temperature on overshoot of Ice Harbor Dam for Yakima River Steelhead.](site_figures/fit_to_data/temperature/Yakima_3_to_8.png){width=50%}
 
 <br>
 <br>
 
 
-![Effect of temperature on overshoot of Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/temperature/WAWA_compare_overshoot_ICH_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot of Priest Rapids Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/temperature/WAWA_compare_overshoot_PRA_temp.png){width=50%} -->
+
+![Effect of temperature on overshoot of Priest Rapids Dam for Walla Walla River Steelhead.](site_figures/fit_to_data/temperature/Walla_3_to_4.png){width=50%}
+
+<br>
+<br>
+
+
+<!-- ![Effect of temperature on overshoot of Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/covariate_effects/temperature/WAWA_compare_overshoot_ICH_temp.png){width=50%} -->
+![Effect of temperature on overshoot of Ice Harbor Dam for Walla Walla River Steelhead.](site_figures/fit_to_data/temperature/Walla_3_to_8.png){width=50%}
 
 <br>
 <br>
 
 #### Upper Columbia
 
-![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/covariate_effects/temperature/WEN_compare_overshoot_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/covariate_effects/temperature/WEN_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Wenatchee River Steelhead.](site_figures/fit_to_data/temperature/Wenatchee_5_to_6.png){width=50%}
 
 <br>
 <br>
 
-![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/covariate_effects/temperature/ENT_compare_overshoot_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/covariate_effects/temperature/ENT_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Entiat River Steelhead.](site_figures/fit_to_data/temperature/Entiat_6_to_7.png){width=50%}
 
 
 <br>
@@ -88,7 +105,66 @@ If a tributary has both a hatchery and natural origin population, they are shown
 
 #### Snake River
 
-![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/covariate_effects/temperature/TUC_compare_overshoot_temp.png){width=50%}
+<!-- ![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/covariate_effects/temperature/TUC_compare_overshoot_temp.png){width=50%} -->
+![Effect of temperature on overshoot for Tucannon River Steelhead.](site_figures/fit_to_data/temperature/Tucannon_8_to_9.png){width=50%}
 
 <br>
 <br>
+
+
+### Temperature vs. moving into the Deschutes
+
+<br>
+
+For all of these plots, I am showing the data only for years where the Deschutes River had a detection efficiency correction (run years 13/14 through 18/19). Remember that temperature responses are shared amongst fish from the same DPS when they are outside DPS boundaries, but are origin-specific within DPS boundaries - hence, why I show this movement for Snake River and Upper Columbia fish in the aggregate, and then for individual Middle Columbia origins. 
+
+<br>
+
+![Effect of temperature on moving into the Deschutes for Snake River DPS Steelhead.](site_figures/fit_to_data/temperature/SR_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Upper Columbia River DPS Steelhead.](site_figures/fit_to_data/temperature/UC_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Deschutes River DPS Steelhead.](site_figures/fit_to_data/temperature/Deschutes_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for John Day River DPS Steelhead.](site_figures/fit_to_data/temperature/John_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Fifteenmile Creek DPS Steelhead.](site_figures/fit_to_data/temperature/Fifteenmile_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Umatilla River DPS Steelhead.](site_figures/fit_to_data/temperature/Umatilla_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Yakima River DPS Steelhead.](site_figures/fit_to_data/temperature/Yakima_2_to_10.png){width=50%}
+
+<br>
+<br>
+
+![Effect of temperature on moving into the Deschutes for Walla Walla River DPS Steelhead.](site_figures/fit_to_data/temperature/Walla_2_to_10.png){width=50%}
+
+
+
+
+
+
+
+
+
+
+
+

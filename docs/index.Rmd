@@ -26,4 +26,5 @@ This website is divided into multiple sections, with an emphasis on preliminary 
 9. Results - final fates and covariates: This shows how different values of covariates (currently, spill days and spill volume) affect the final fates of fish (in particular, homing).
 10. Outstanding issues: Describes potential issues with the model itself or the code that is used to generate the derived quantities.
 11. Winter spill and year effects: Describes confounding between winter spill and the random effect of year.
+12. Winter spill - March comparison: Compares results from an alternative model that models post-overshoot fallback as a function only of March spill days vs. the base model, which uses winter spill days (Jan/Feb/March).
 
