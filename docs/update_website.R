@@ -2,6 +2,7 @@
 
 rmarkdown::render(here::here("docs", "index.Rmd"))
 rmarkdown::render(here::here("docs", "diagnostics.Rmd"))
+rmarkdown::render(here::here("docs", "structure.Rmd"))
 rmarkdown::render(here::here("docs", "issues-2024-08-09.Rmd"))
 rmarkdown::render(here::here("docs", "issues-2024-08-29.Rmd"))
 rmarkdown::render(here::here("docs", "results-detection-efficiency.Rmd"))
