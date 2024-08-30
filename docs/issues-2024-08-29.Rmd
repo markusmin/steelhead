@@ -56,14 +56,14 @@ What you can clearly see is that for Deschutes River fish entering the Deschutes
 
 <br>
 
-```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Final fates from data for Deschutes River fish, when all detections are considered (left) vs. only detections at upstream sites (right). Note the big difference in final fates in the mainstem vs. the Deschutes River due to imperfect detections at the river mouth site.",fig.show='hold',fig.align='left'}
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Final fates from data for Deschutes River fish, when all detections are considered (left) vs. only detections at the mouth site (right). Note the big difference in final fates in the mainstem vs. the Deschutes River due to imperfect detections at the river mouth site.",fig.show='hold',fig.align='left'}
 knitr::include_graphics(c("site_figures/final_fates_from_data/Deschutes_River_final_fates_from_data.png",
                           "site_figures/final_fates_from_data/Deschutes_River_final_fates_from_data_no_upstream_trib.png"))
 ``` 
 
 <br>
 
-```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Final fates from data for Fifteenmile Creek fish, when all detections are considered (left) vs. only detections at upstream sites (right). Note that these figures don't look much different.",fig.show='hold',fig.align='left'}
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Final fates from data for Fifteenmile Creek fish, when all detections are considered (left) vs. only detections at the mouth site (right). Note that these figures don't look much different.",fig.show='hold',fig.align='left'}
 knitr::include_graphics(c("site_figures/final_fates_from_data/Fifteenmile_Creek_final_fates_from_data.png",
                           "site_figures/final_fates_from_data/Fifteenmile_Creek_final_fates_from_data_no_upstream_trib.png"))
 ``` 
