@@ -27,6 +27,15 @@ If a tributary has both a hatchery and natural origin population, they are shown
 **NOTE: You'll note that for overshoot movements, the data consistently seems to underestimate the proportion of fish that are overshooting for origins that are between Bonneville and McNary Dam. This is once again related to the issue of detection efficiency in the Deschutes. Many of the fish that appear to overshoot from the data are actually estimated to have dipped into the Deschutes River first by the model, which assumes that these detections were missed.**
 
 
+### Temperature vs. all movements
+
+I am experimenting with plots that show not only overshoot, but also other important movements (homing, straying, and loss). Here is an example for the John Day River:
+
+![Effect of temperature on movements out of the mainstem for John Day River Steelhead.](site_figures/covariate_effects/temperature/JDR_compare_movements_temp.png){width=100%}
+
+
+
+
 ### Temperature vs. Overshoot
 
 
