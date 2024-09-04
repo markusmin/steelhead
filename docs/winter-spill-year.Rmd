@@ -1,7 +1,7 @@
 ---
 title: "Winter spill and year effects"
 author: "Markus Min"
-date: "`r Sys.Date()`"
+date: "2024-08-29"
 output:
   html_document:
     toc: true

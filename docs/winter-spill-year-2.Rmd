@@ -1,0 +1,152 @@
+---
+title: "Update on winter spill and year effects"
+author: "Markus Min"
+date: "2024-09-04"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+## Description
+
+On this page, I provide an update on post-overshoot fallback and winter spill. To try to resolve the issue where the winter spill effect was confounded with the year effect, I fit a new model where I eliminated the random effect of year for post-overshoot fallback movements. Below, I show the fit to the winter spill data for each post-overshoot fallback movement, for both the original and the updated model. Note that because the Snake River Hatchery model takes the longest to run, those runs were not yet available as of September 4 but should be ready in the next couple of days.
+
+My notes: For most movements, this doesn't seem to make a big difference. In some cases where the sample sizes are reasonably large (e.g., John Day Steelhead falling back at McNary Dam) the credible interval gets smaller in the updated version due to the lack of a year effect. The only spot so far where it appears to improve the fit to the data is for hatchery Wenatchee Steelhead falling back at Wells Dam, which was one of the movements identified as being problematic in the previous update.
+
+
+#### Middle Columbia
+
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at McNary Dam for Deschutes River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/DES_compare_fallback_MCN_spilldays.png", "site_figures/fit_to_data/spilldays_v3/DES_compare_fallback_MCN_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at McNary Dam for John Day River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/JDR_compare_fallback_MCN_spilldays.png", "site_figures/fit_to_data/spilldays_v3/JDR_compare_fallback_MCN_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Priest Rapids Dam for John Day River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/JDR_compare_fallback_PRA_spilldays.png", "site_figures/fit_to_data/spilldays_v3/JDR_compare_fallback_PRA_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Ice Harbor Dam for John Day River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/JDR_compare_fallback_ICH_spilldays.png", "site_figures/fit_to_data/spilldays_v3/JDR_compare_fallback_ICH_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at McNary Dam for Fifteenmile Creek Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/FIF_compare_fallback_MCN_spilldays.png", "site_figures/fit_to_data/spilldays_v3/FIF_compare_fallback_MCN_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at McNary Dam for Umatilla River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/UMA_compare_fallback_MCN_spilldays.png", "site_figures/fit_to_data/spilldays_v3/UMA_compare_fallback_MCN_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Ice Harbor Dam for Umatilla River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/UMA_compare_fallback_ICH_spilldays.png", "site_figures/fit_to_data/spilldays_v3/UMA_compare_fallback_ICH_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Priest Rapids Dam for Umatilla River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/UMA_compare_fallback_PRA_spilldays.png", "site_figures/fit_to_data/spilldays_v3/UMA_compare_fallback_PRA_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Priest Rapids Dam for Yakima River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/YAK_compare_fallback_PRA_spilldays.png", "site_figures/fit_to_data/spilldays_v3/YAK_compare_fallback_PRA_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Ice Harbor Dam for Yakima River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/YAK_compare_fallback_ICH_spilldays.png", "site_figures/fit_to_data/spilldays_v3/YAK_compare_fallback_ICH_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Priest Rapids Dam for Walla Walla River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/WAWA_compare_fallback_PRA_spilldays.png", "site_figures/fit_to_data/spilldays_v3/WAWA_compare_fallback_PRA_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Ice Harbor Dam for Walla Walla River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/WAWA_compare_fallback_ICH_spilldays.png", "site_figures/fit_to_data/spilldays_v3/WAWA_compare_fallback_ICH_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+#### Upper Columbia
+
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Rocky Reach Dam for Wenatchee River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/WEN_compare_fallback_RRE_spilldays.png", "site_figures/fit_to_data/spilldays_v3/WEN_compare_fallback_RRE_spilldays.png"))
+``` 
+
+
+<br>
+<br>
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Wells Dam for Wenatchee River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/WEN_compare_fallback_WEL_spilldays.png", "site_figures/fit_to_data/spilldays_v3/WEN_compare_fallback_WEL_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+
+```{r, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Wells Dam for Entiat River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/ENT_compare_fallback_WEL_spilldays.png", "site_figures/fit_to_data/spilldays_v3/ENT_compare_fallback_WEL_spilldays.png"))
+``` 
+
+<br>
+<br>
+
+#### Snake River
+
+<br>
+
+```{r, eval=FALSE, echo=FALSE,out.width="50%", out.height="50%",fig.cap="Effect of days of winter spill in the old model (left) and the updated model (right) on post-overshoot fallback at Lower Granite Dam for Tucannon River Steelhead.",fig.show='hold',fig.align='left'}
+knitr::include_graphics(c("site_figures/fit_to_data/spilldays/TUC_compare_fallback_LGR_spilldays.png", "site_figures/fit_to_data/spilldays_v3/TUC_compare_fallback_LGR_spilldays.png"))
+``` 
+
+
+<br>
+<br>

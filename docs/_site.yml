@@ -32,7 +32,11 @@ navbar:
     - text: "Winter spill - March comparison"
       href: winter-spill-investigation.html
     - text: "Winter spill & year effects"
-      href: winter-spill-year.html
+      menu:  
+      - text: "2024-08-29"
+        href: winter-spill-year.html
+      - text: "2024-09-04"
+        href: winter-spill-year-2.html
 output:
   html_document:
     theme: flatly
