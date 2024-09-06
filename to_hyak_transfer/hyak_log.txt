@@ -7376,8 +7376,96 @@ Ok, so Wenatchee overshoot vs. temp is not fitting well, but just for hatchery. 
 
 Alright, what is the DE like for the Wenatchee?
 
+# Let's run some FF cov on ckpt
+- old runs took 6:23. So we need to cut run time in half to get them to finish on ckpt
+- submitted a run for WAWA under coldest, normal, hottest conditions, and 0, 30, 60 days of spill at ICH
 
+### 2024-08-30 ###
 
+Another reason why comparing winter spill days to post-overshoot fallback might not be fair:
+- this movement can happen during times of year where this lever isn't being triggered. So
+when we look at the probability of fallback, the other factors (intercept for example) are still
+active, and are estimated using primarily (see the winter spill march comparison month plots)
+data that is not from the winter period.
+- That being said, those shouldn't affect the estimate of the winter spill effect
 
+# Alright, let's see how our FF and covariates for WAWA worked...
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+# final fates and covariates
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
  
+### 2024-09-03 ###
 
+All runs have completed except for UCH and SRH
+- UCH should finish sometime today; SRH should finish by end of tomorrow
+
+Ok, UCH finished around 4 pm. Let's take a look at these outputs...
+- First, moved the runs to gscratch/scrubbed
+
+[mmin@klone-login03 reparameterization_v3]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v3
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/ ./
+
+# Generated some plots, now pull and update the website
+
+(base) markusmin@Markuss-MacBook-Pro-2 fit_to_data % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures/fit_to_data/
+# spilldays, v3
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/fit_to_data/spilldays_v3/ ./
+
+### 2024-09-04 ###
+
+Submitting ckpt jobs for FF cov, under more extreme scenarios
+
+# move some temp plots
+(base) markusmin@Markuss-MacBook-Pro-2 covariate_effects % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures/covariate_effects/
+(base) markusmin@Markuss-MacBook-Pro-2 covariate_effects % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/covariate_effects/temperature/ ./
+
+# Move final fates and covariates plots
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates/ ./
+
+# Move the latest v3 run over
+
+[mmin@klone-login03 reparameterization_v3]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v3
+[mmin@klone-login03 reparameterization_v3]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/snake_river_hatchery/ ./
+
+### 2024-09-06 ###
+
+# All SRH runs have finished, let's move them all over and re-load plots
+
+[mmin@klone-login03 reparameterization_v3]$ pwd
+/gscratch/scrubbed/mmin/stan_actual/reparameterization_v3
+[mmin@klone-login03 reparameterization_v3]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/snake_river_hatchery/ ./
+
+# Okay, overall these plots look better. Should we move to using these model runs for all plots?
+
+# so, what populations to focus on?
+# John Day River (W), Umatilla River (H, W), Yakima River (W), Walla Walla River (H, W),
+# Wenatchee River (H, W), Entiat River (W), Tucannon River (H, W), Imnaha River (H, W)
+
+It's an awkward number (13), but let's plot for now. We'll probably change the selection
+after the BPA meeting anyway
+If we dropped the Imnaha, we would have 11 populations, giving us room for the legend as the 12th plot
+
+# resubmitting the FF and cov runs, now with v3 model runs
+
+# Okay, let's move our paper figures from gscratch/scrubbed down to our manuscripts folder
+(base) markusmin@Markuss-MacBook-Pro-2 manuscript % pwd
+/Users/markusmin/Documents/CBR/manuscript
+(base) markusmin@Markuss-MacBook-Pro-2 manuscript %  scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+
+
+combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_wild_compare_movement_spill, UMA_hatchery_compare_movement_spill,
+                                          YAK_wild_compare_movement_spill, WAWA_wild_compare_movement_spill, WAWA_hatchery_compare_movement_spill,
+                                          WEN_wild_compare_movement_spill, WEN_hatchery_compare_movement_spill, ENT_wild_compare_movement_spill,
+                                          TUC_wild_compare_movement_spill, TUC_hatchery_compare_movement_spill, 
+                                          spill_plot_legend_gg, nrow = 3, ncol = 4,
+                                          labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
+                                                     "(J)", "(K)"),
+                                          label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+                                          hjust = 0, vjust = 0)
