@@ -1,4 +1,4 @@
-# 11-model-spill-plots
+# 11-model-spill-plots - with reparam v3!
 
 # This script takes the output from the stan model runs in 05-stan-runs and
 # plots the effects of spill (window and winter days)
@@ -80,27 +80,27 @@ to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
 
 
 # get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
+UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild","UCW_transition_counts.csv"))
 UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
 UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
 
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
+UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery","UCH_transition_counts.csv"))
 UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
 UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
 
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
+MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild","MCW_transition_counts.csv"))
 MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
 MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
 
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
+MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery","MCH_transition_counts.csv"))
 MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
 MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
 
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
+SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "snake_river_wild","SRW_transition_counts.csv"))
 SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
 SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
 
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
+SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery","SRH_transition_counts.csv"))
 SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
 SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
 
@@ -115,17 +115,17 @@ MCW_envir <- new.env()
 MCH_envir <- new.env()
 SRW_envir <- new.env()
 SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "model_data.rda"),
      envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "model_data.rda"),
      envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "model_data.rda"),
      envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "model_data.rda"),
      envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "model_data.rda"),
      envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
+load(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "model_data.rda"),
      envir = SRH_envir)
 
 
@@ -142,81 +142,81 @@ bind4chains <- function(chain1, chain2, chain3, chain4){
 }
 
 ## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
+UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain1_UCW_reparam_v3_fit.rds"))
+UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain2_UCW_reparam_v3_fit.rds"))
+UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain3_UCW_reparam_v3_fit.rds"))
+UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain4_UCW_reparam_v3_fit.rds"))
 
 # bind chains together
 UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
 # thin2
 thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
-# summarise
+
 UCW_fit_summary <- summarise_draws(UCW_fit)
 
 ## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
+UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain1_UCH_reparam_v3_fit.rds"))
+UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain2_UCH_reparam_v3_fit.rds"))
+UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain3_UCH_reparam_v3_fit.rds"))
+UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain4_UCH_reparam_v3_fit.rds"))
 
 # bind chains together
 UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
 # thin2
 thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
-# summarise
+
 UCH_fit_summary <- summarise_draws(UCH_fit)
 
 ## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
+MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain1_MCW_reparam_v3_fit.rds"))
+MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain2_MCW_reparam_v3_fit.rds"))
+MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain3_MCW_reparam_v3_fit.rds"))
+MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain4_MCW_reparam_v3_fit.rds"))
 
 # bind chains together
 MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
 # thin2
 thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
-# summarise
+
 MCW_fit_summary <- summarise_draws(MCW_fit)
 
 ## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
+MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain1_MCH_reparam_v3_fit.rds"))
+MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain2_MCH_reparam_v3_fit.rds"))
+MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain3_MCH_reparam_v3_fit.rds"))
+MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain4_MCH_reparam_v3_fit.rds"))
 
 # bind chains together
 MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
 # thin2
 thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
-# summarise
+
 MCH_fit_summary <- summarise_draws(MCH_fit)
 
 ## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
+SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain1_SRW_reparam_v3_fit.rds"))
+SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain2_SRW_reparam_v3_fit.rds"))
+SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain3_SRW_reparam_v3_fit.rds"))
+SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain4_SRW_reparam_v3_fit.rds"))
 
 # bind chains together
 SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
 # thin2
 thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
-# summarise
+
 SRW_fit_summary <- summarise_draws(SRW_fit)
 
 ## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
+SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain1_SRH_reparam_v3_fit.rds"))
+SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain2_SRH_reparam_v3_fit.rds"))
+SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain3_SRH_reparam_v3_fit.rds"))
+SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain4_SRH_reparam_v3_fit.rds"))
 
 # bind chains together
 SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
 # thin2
 thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
-# summarise
+
 SRH_fit_summary <- summarise_draws(SRH_fit)
 
 #### Extract all parameter values from the model fit objects ####
@@ -437,6 +437,7 @@ extract_covariate_experiences <- function(envir, rear, origin_select){
   # add mainstem dam for each state
   dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
                           state = seq(2,9))
+  
   pop_states_dates %>% 
     left_join(., dam_index, by = "state") -> pop_states_dates
   
@@ -444,11 +445,13 @@ extract_covariate_experiences <- function(envir, rear, origin_select){
   # reformat covariates so that they can be joined
   as.data.frame(envir$data$spill_window_data) %>% 
     rownames_to_column("date") %>% 
+    dplyr::rename(LGR = LGR_quick, WEL = WEL_quick) %>% 
     mutate(date = as.numeric(date)) %>% 
     pivot_longer(cols = -c(date), names_to = "dam", values_to = "spill_window") -> spill_window_long
   
   as.data.frame(envir$data$temperature_data) %>% 
     rownames_to_column("date") %>% 
+    dplyr::rename(LGR = LGR_quick, WEL = WEL_quick) %>% 
     mutate(date = as.numeric(date)) %>% 
     pivot_longer(cols = -c(date), names_to = "dam", values_to = "temperature") -> temp_long
   
@@ -603,6 +606,7 @@ estimate_spillwindow_effect_UCW <- function(origin_select, movements){
   return(spill_move_prob_array)
   
 }
+
 estimate_spillwindow_effect_UCH <- function(origin_select, movements){
   
   # set up vectors to control which origin parameters are turned on
@@ -1215,7 +1219,7 @@ plot_compare_rear_spillwindow_effect <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -1245,7 +1249,7 @@ plot_compare_rear_spillwindow_effect <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -1274,7 +1278,7 @@ plot_compare_rear_spillwindow_effect <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -1287,7 +1291,7 @@ plot_compare_rear_spillwindow_effect <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -1347,463 +1351,463 @@ plot_compare_rear_spillwindow_effect <- function(origin_select,
 }
 
 
-#### Plot rear type comparison fallback spill window for all ####
-mainstem_fallback_movements <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
-  from = c(2,3,4,5,6,7,8,9), to = c(1,2,3,4,5,6,3,8))
-
-#### Upper Columbia ####
-UCH_spill_window_data <- UCH_envir$data$spill_window_data
-UCW_spill_window_data <- UCW_envir$data$spill_window_data
-UC_spill_window_data <- bind_rows(as.data.frame(UCH_spill_window_data), as.data.frame(UCW_spill_window_data))
-
-# Wenatchee - evaluate all fallback move probs
-WEN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
-WEN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
-
-# Wenatchee - get covariate experiences
-WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
-WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
-
-# Wenatchee - use a loop to plot all of them
-WEN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  WEN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Wenatchee River",
-                                                                        wild_move_prob_array = WEN_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = WEN_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = WEN_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Wenatchee - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("WEN_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         WEN_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Entiat - evaluate all fallback move probs
-# Only wild for entiat
-ENT_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Entiat River", movements = mainstem_fallback_movements)
-
-# Entiat - get covariate experiences
-ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
-
-# Entiat - use a loop to plot all of them
-ENT_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  ENT_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Entiat River",
-                                                                        wild_move_prob_array = ENT_wild_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = ENT_wild_covariate_experiences, 
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Entiat - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("ENT_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         ENT_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Methow - evaluate all fallback move probs
-MET_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Methow River", movements = mainstem_fallback_movements)
-MET_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Methow River", movements = mainstem_fallback_movements)
-
-# Methow - get covariate experiences
-MET_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Methow River")
-MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Methow River")
-
-# Methow - use a loop to plot all of them
-MET_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  MET_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Methow River",
-                                                                        wild_move_prob_array = MET_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = MET_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = MET_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = MET_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Methow - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("MET_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         MET_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Okanoagn - evaluate all fallback move probs
-# Only hatchery for Okanogan
-OKA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Okanogan River", movements = mainstem_fallback_movements)
-
-# Okanogan - get covariate experiences
-OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Okanogan River")
-
-# Okanogan - use a loop to plot all of them
-OKA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  OKA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Okanogan River",
-                                                                        hatchery_move_prob_array = OKA_hatchery_spillwindow_move_prob_array,
-                                                                        hatchery_covariate_experiences = OKA_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Okanogan - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("OKA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         OKA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-#### Middle Columbia ####
-MCH_spill_window_data <- MCH_envir$data$spill_window_data
-MCW_spill_window_data <- MCW_envir$data$spill_window_data
-MC_spill_window_data <- bind_rows(as.data.frame(MCH_spill_window_data), as.data.frame(MCW_spill_window_data))
-
-# Deschutes - evaluate all fallback move probs
-# Deschutes is wild only
-DES_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Deschutes River", movements = mainstem_fallback_movements)
-
-# Deschutes - get covariate experiences
-DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
-
-# Deschutes - use a loop to plot all of them
-DES_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  DES_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Deschutes River",
-                                                                        wild_move_prob_array = DES_wild_spillwindow_move_prob_array,
-                                                                        
-                                                                        wild_covariate_experiences = DES_wild_covariate_experiences, 
-                                                                        
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Deschutes - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("DES_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         DES_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# John Day - evaluate all fallback move probs
-# JDR is wild only
-JDR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "John Day River", movements = mainstem_fallback_movements)
-
-# John Day - get covariate experiences
-JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
-
-# John Day - use a loop to plot all of them
-JDR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  JDR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "John Day River",
-                                                                        wild_move_prob_array = JDR_wild_spillwindow_move_prob_array,
-                                                                        
-                                                                        wild_covariate_experiences = JDR_wild_covariate_experiences, 
-                                                                        
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("John Day - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("JDR_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         JDR_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-
-# Fifteenmile - evaluate all fallback move probs
-# Fifteenmile is wild only
-FIF_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Fifteenmile Creek", movements = mainstem_fallback_movements)
-
-# Fifteenmile - get covariate experiences
-FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
-
-# Fifteenmile - use a loop to plot all of them
-FIF_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  FIF_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Fifteenmile Creek",
-                                                                        wild_move_prob_array = FIF_wild_spillwindow_move_prob_array,
-                                                                        
-                                                                        wild_covariate_experiences = FIF_wild_covariate_experiences, 
-                                                                        
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Fifteenmile - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("FIF_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         FIF_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Umatilla - evaluate all fallback move probs
-UMA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
-UMA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
-
-# Umatilla - get covariate experiences
-UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
-UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
-
-# Umatilla - use a loop to plot all of them
-UMA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  UMA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Umatilla River",
-                                                                        wild_move_prob_array = UMA_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = UMA_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = UMA_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Umatilla - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("UMA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         UMA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Yakima - evaluate all fallback move probs
-# Yakima is wild only
-YAK_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Yakima River", movements = mainstem_fallback_movements)
-
-# Yakima - get covariate experiences
-YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
-
-# Yakima - use a loop to plot all of them
-YAK_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  YAK_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Yakima River",
-                                                                        wild_move_prob_array = YAK_wild_spillwindow_move_prob_array,
-                                                                        
-                                                                        wild_covariate_experiences = YAK_wild_covariate_experiences, 
-                                                                        
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Yakima - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("YAK_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         YAK_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Walla Walla - evaluate all fallback move probs
-WAWA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
-WAWA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
-
-# Walla Walla - get covariate experiences
-WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
-WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
-
-# Walla Walla - use a loop to plot all of them
-WAWA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  WAWA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Walla Walla River",
-                                                                         wild_move_prob_array = WAWA_wild_spillwindow_move_prob_array,
-                                                                         hatchery_move_prob_array = WAWA_hatchery_spillwindow_move_prob_array,
-                                                                         wild_covariate_experiences = WAWA_wild_covariate_experiences, 
-                                                                         hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
-                                                                         movements_evaluated = mainstem_fallback_movements,
-                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                         plot_title = paste0("Walla Walla - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("WAWA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         WAWA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-#### Snake River ####
-SRH_spill_window_data <- SRH_envir$data$spill_window_data
-SRW_spill_window_data <- SRW_envir$data$spill_window_data
-SR_spill_window_data <- bind_rows(as.data.frame(SRH_spill_window_data), as.data.frame(SRW_spill_window_data))
-
-# Asotin Creek - evaluate all fallback move probs
-# Asotin is wild only
-ASO_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Asotin Creek", movements = mainstem_fallback_movements)
-
-# Asotin Creek - get covariate experiences
-ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Asotin Creek")
-
-# Asotin Creek - use a loop to plot all of them
-ASO_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  ASO_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Asotin Creek",
-                                                                        wild_move_prob_array = ASO_wild_spillwindow_move_prob_array,
-                                                                        
-                                                                        wild_covariate_experiences = ASO_wild_covariate_experiences, 
-                                                                        
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Asotin Creek - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("ASO_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         ASO_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Clearwater River - evaluate all fallback move probs
-CLE_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
-CLE_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
-
-# Clearwater River - get covariate experiences
-CLE_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Clearwater River")
-CLE_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Clearwater River")
-
-# Clearwater River - use a loop to plot all of them
-CLE_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  CLE_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Clearwater River",
-                                                                        wild_move_prob_array = CLE_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = CLE_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = CLE_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = CLE_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Clearwater River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("CLE_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         CLE_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Grande Ronde River - evaluate all fallback move probs
-GR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
-GR_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
-
-# Grande Ronde River - get covariate experiences
-GR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Grande Ronde River")
-GR_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Grande Ronde River")
-
-# Grande Ronde River - use a loop to plot all of them
-GR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  GR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Grande Ronde River",
-                                                                       wild_move_prob_array = GR_wild_spillwindow_move_prob_array,
-                                                                       hatchery_move_prob_array = GR_hatchery_spillwindow_move_prob_array,
-                                                                       wild_covariate_experiences = GR_wild_covariate_experiences, 
-                                                                       hatchery_covariate_experiences = GR_hatchery_covariate_experiences,
-                                                                       movements_evaluated = mainstem_fallback_movements,
-                                                                       spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                       from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                       plot_title = paste0("Grande Ronde River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("GR_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         GR_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Imnaha River - evaluate all fallback move probs
-IMN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
-IMN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
-
-# Imnaha River - get covariate experiences
-IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
-IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
-
-# Imnaha River - use a loop to plot all of them
-IMN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  IMN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Imnaha River",
-                                                                        wild_move_prob_array = IMN_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = IMN_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = IMN_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Imnaha River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("IMN_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         IMN_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-# Salmon River - evaluate all fallback move probs
-SAL_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Salmon River", movements = mainstem_fallback_movements)
-SAL_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Salmon River", movements = mainstem_fallback_movements)
-
-# Salmon River - get covariate experiences
-SAL_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Salmon River")
-SAL_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Salmon River")
-
-# Salmon River - use a loop to plot all of them
-SAL_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  SAL_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Salmon River",
-                                                                        wild_move_prob_array = SAL_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = SAL_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = SAL_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = SAL_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Salmon River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("SAL_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         SAL_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-# Tucannon River - evaluate all fallback move probs
-TUC_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
-TUC_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
-
-# Tucannon River - get covariate experiences
-TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
-TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
-
-# Tucannon River - use a loop to plot all of them
-TUC_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  TUC_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Tucannon River",
-                                                                        wild_move_prob_array = TUC_wild_spillwindow_move_prob_array,
-                                                                        hatchery_move_prob_array = TUC_hatchery_spillwindow_move_prob_array,
-                                                                        wild_covariate_experiences = TUC_wild_covariate_experiences, 
-                                                                        hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
-                                                                        movements_evaluated = mainstem_fallback_movements,
-                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                        plot_title = paste0("Tucannon River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow", paste0("TUC_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         TUC_fallback_spillwindow_plots[[i]], height = 8, width = 8)
-  
-}
-
-
+# #### Plot rear type comparison fallback spill window for all ####
+# mainstem_fallback_movements <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
+#   from = c(2,3,4,5,6,7,8,9), to = c(1,2,3,4,5,6,3,8))
+# 
+# #### Upper Columbia ####
+# UCH_spill_window_data <- UCH_envir$data$spill_window_data
+# UCW_spill_window_data <- UCW_envir$data$spill_window_data
+# UC_spill_window_data <- bind_rows(as.data.frame(UCH_spill_window_data), as.data.frame(UCW_spill_window_data))
+# 
+# # Wenatchee - evaluate all fallback move probs
+# WEN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
+# WEN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
+# 
+# # Wenatchee - get covariate experiences
+# WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+# WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+# 
+# # Wenatchee - use a loop to plot all of them
+# WEN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   WEN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Wenatchee River",
+#                                                                         wild_move_prob_array = WEN_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = WEN_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = WEN_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Wenatchee - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("WEN_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          WEN_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Entiat - evaluate all fallback move probs
+# # Only wild for entiat
+# ENT_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Entiat River", movements = mainstem_fallback_movements)
+# 
+# # Entiat - get covariate experiences
+# ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+# 
+# # Entiat - use a loop to plot all of them
+# ENT_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   ENT_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Entiat River",
+#                                                                         wild_move_prob_array = ENT_wild_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = ENT_wild_covariate_experiences, 
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Entiat - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("ENT_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          ENT_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Methow - evaluate all fallback move probs
+# MET_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Methow River", movements = mainstem_fallback_movements)
+# MET_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Methow River", movements = mainstem_fallback_movements)
+# 
+# # Methow - get covariate experiences
+# MET_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Methow River")
+# MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Methow River")
+# 
+# # Methow - use a loop to plot all of them
+# MET_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   MET_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Methow River",
+#                                                                         wild_move_prob_array = MET_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = MET_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = MET_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = MET_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Methow - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("MET_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          MET_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Okanoagn - evaluate all fallback move probs
+# # Only hatchery for Okanogan
+# OKA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Okanogan River", movements = mainstem_fallback_movements)
+# 
+# # Okanogan - get covariate experiences
+# OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Okanogan River")
+# 
+# # Okanogan - use a loop to plot all of them
+# OKA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   OKA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Okanogan River",
+#                                                                         hatchery_move_prob_array = OKA_hatchery_spillwindow_move_prob_array,
+#                                                                         hatchery_covariate_experiences = OKA_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Okanogan - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("OKA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          OKA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# #### Middle Columbia ####
+# MCH_spill_window_data <- MCH_envir$data$spill_window_data
+# MCW_spill_window_data <- MCW_envir$data$spill_window_data
+# MC_spill_window_data <- bind_rows(as.data.frame(MCH_spill_window_data), as.data.frame(MCW_spill_window_data))
+# 
+# # Deschutes - evaluate all fallback move probs
+# # Deschutes is wild only
+# DES_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Deschutes River", movements = mainstem_fallback_movements)
+# 
+# # Deschutes - get covariate experiences
+# DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
+# 
+# # Deschutes - use a loop to plot all of them
+# DES_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   DES_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Deschutes River",
+#                                                                         wild_move_prob_array = DES_wild_spillwindow_move_prob_array,
+#                                                                         
+#                                                                         wild_covariate_experiences = DES_wild_covariate_experiences, 
+#                                                                         
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Deschutes - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("DES_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          DES_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # John Day - evaluate all fallback move probs
+# # JDR is wild only
+# JDR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "John Day River", movements = mainstem_fallback_movements)
+# 
+# # John Day - get covariate experiences
+# JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+# 
+# # John Day - use a loop to plot all of them
+# JDR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   JDR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "John Day River",
+#                                                                         wild_move_prob_array = JDR_wild_spillwindow_move_prob_array,
+#                                                                         
+#                                                                         wild_covariate_experiences = JDR_wild_covariate_experiences, 
+#                                                                         
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("John Day - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("JDR_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          JDR_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# 
+# # Fifteenmile - evaluate all fallback move probs
+# # Fifteenmile is wild only
+# FIF_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Fifteenmile Creek", movements = mainstem_fallback_movements)
+# 
+# # Fifteenmile - get covariate experiences
+# FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
+# 
+# # Fifteenmile - use a loop to plot all of them
+# FIF_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   FIF_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Fifteenmile Creek",
+#                                                                         wild_move_prob_array = FIF_wild_spillwindow_move_prob_array,
+#                                                                         
+#                                                                         wild_covariate_experiences = FIF_wild_covariate_experiences, 
+#                                                                         
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Fifteenmile - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("FIF_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          FIF_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Umatilla - evaluate all fallback move probs
+# UMA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
+# UMA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
+# 
+# # Umatilla - get covariate experiences
+# UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+# UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+# 
+# # Umatilla - use a loop to plot all of them
+# UMA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   UMA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Umatilla River",
+#                                                                         wild_move_prob_array = UMA_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = UMA_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = UMA_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Umatilla - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("UMA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          UMA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Yakima - evaluate all fallback move probs
+# # Yakima is wild only
+# YAK_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Yakima River", movements = mainstem_fallback_movements)
+# 
+# # Yakima - get covariate experiences
+# YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+# 
+# # Yakima - use a loop to plot all of them
+# YAK_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   YAK_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Yakima River",
+#                                                                         wild_move_prob_array = YAK_wild_spillwindow_move_prob_array,
+#                                                                         
+#                                                                         wild_covariate_experiences = YAK_wild_covariate_experiences, 
+#                                                                         
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Yakima - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("YAK_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          YAK_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Walla Walla - evaluate all fallback move probs
+# WAWA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
+# WAWA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
+# 
+# # Walla Walla - get covariate experiences
+# WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+# WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+# 
+# # Walla Walla - use a loop to plot all of them
+# WAWA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   WAWA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Walla Walla River",
+#                                                                          wild_move_prob_array = WAWA_wild_spillwindow_move_prob_array,
+#                                                                          hatchery_move_prob_array = WAWA_hatchery_spillwindow_move_prob_array,
+#                                                                          wild_covariate_experiences = WAWA_wild_covariate_experiences, 
+#                                                                          hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
+#                                                                          movements_evaluated = mainstem_fallback_movements,
+#                                                                          spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                          from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                          plot_title = paste0("Walla Walla - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("WAWA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          WAWA_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# #### Snake River ####
+# SRH_spill_window_data <- SRH_envir$data$spill_window_data
+# SRW_spill_window_data <- SRW_envir$data$spill_window_data
+# SR_spill_window_data <- bind_rows(as.data.frame(SRH_spill_window_data), as.data.frame(SRW_spill_window_data))
+# 
+# # Asotin Creek - evaluate all fallback move probs
+# # Asotin is wild only
+# ASO_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Asotin Creek", movements = mainstem_fallback_movements)
+# 
+# # Asotin Creek - get covariate experiences
+# ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Asotin Creek")
+# 
+# # Asotin Creek - use a loop to plot all of them
+# ASO_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   ASO_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Asotin Creek",
+#                                                                         wild_move_prob_array = ASO_wild_spillwindow_move_prob_array,
+#                                                                         
+#                                                                         wild_covariate_experiences = ASO_wild_covariate_experiences, 
+#                                                                         
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Asotin Creek - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("ASO_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          ASO_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Clearwater River - evaluate all fallback move probs
+# CLE_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
+# CLE_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
+# 
+# # Clearwater River - get covariate experiences
+# CLE_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Clearwater River")
+# CLE_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Clearwater River")
+# 
+# # Clearwater River - use a loop to plot all of them
+# CLE_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   CLE_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Clearwater River",
+#                                                                         wild_move_prob_array = CLE_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = CLE_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = CLE_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = CLE_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Clearwater River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("CLE_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          CLE_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Grande Ronde River - evaluate all fallback move probs
+# GR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
+# GR_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
+# 
+# # Grande Ronde River - get covariate experiences
+# GR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Grande Ronde River")
+# GR_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Grande Ronde River")
+# 
+# # Grande Ronde River - use a loop to plot all of them
+# GR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   GR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Grande Ronde River",
+#                                                                        wild_move_prob_array = GR_wild_spillwindow_move_prob_array,
+#                                                                        hatchery_move_prob_array = GR_hatchery_spillwindow_move_prob_array,
+#                                                                        wild_covariate_experiences = GR_wild_covariate_experiences, 
+#                                                                        hatchery_covariate_experiences = GR_hatchery_covariate_experiences,
+#                                                                        movements_evaluated = mainstem_fallback_movements,
+#                                                                        spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                        from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                        plot_title = paste0("Grande Ronde River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("GR_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          GR_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Imnaha River - evaluate all fallback move probs
+# IMN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
+# IMN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
+# 
+# # Imnaha River - get covariate experiences
+# IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
+# IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
+# 
+# # Imnaha River - use a loop to plot all of them
+# IMN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   IMN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Imnaha River",
+#                                                                         wild_move_prob_array = IMN_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = IMN_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = IMN_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Imnaha River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("IMN_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          IMN_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# # Salmon River - evaluate all fallback move probs
+# SAL_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Salmon River", movements = mainstem_fallback_movements)
+# SAL_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Salmon River", movements = mainstem_fallback_movements)
+# 
+# # Salmon River - get covariate experiences
+# SAL_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Salmon River")
+# SAL_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Salmon River")
+# 
+# # Salmon River - use a loop to plot all of them
+# SAL_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   SAL_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Salmon River",
+#                                                                         wild_move_prob_array = SAL_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = SAL_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = SAL_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = SAL_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Salmon River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("SAL_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          SAL_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# # Tucannon River - evaluate all fallback move probs
+# TUC_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
+# TUC_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
+# 
+# # Tucannon River - get covariate experiences
+# TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+# TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+# 
+# # Tucannon River - use a loop to plot all of them
+# TUC_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   TUC_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect(origin_select = "Tucannon River",
+#                                                                         wild_move_prob_array = TUC_wild_spillwindow_move_prob_array,
+#                                                                         hatchery_move_prob_array = TUC_hatchery_spillwindow_move_prob_array,
+#                                                                         wild_covariate_experiences = TUC_wild_covariate_experiences, 
+#                                                                         hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
+#                                                                         movements_evaluated = mainstem_fallback_movements,
+#                                                                         spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                         from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                         plot_title = paste0("Tucannon River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spillwindow_v3", paste0("TUC_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          TUC_fallback_spillwindow_plots[[i]], height = 8, width = 8)
+#   
+# }
+# 
+# 
 
 #### Spill days movement probability function ####
 estimate_spilldays_effect_UCW <- function(origin_select, movements){
@@ -2571,7 +2575,7 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -2601,7 +2605,7 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -2631,7 +2635,7 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -2644,7 +2648,7 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -2694,356 +2698,356 @@ plot_compare_rear_spilldays_effect <- function(origin_select,
 
 
 
-#### Plot rear type comparison fallback spill days for post-overshot fallback movements ####
-UC_postovershoot_fallback_movements <- data.frame(dam = c("RRE", "WEL"),
-                                          from = c(6,7), to = c(5,6))
-
-MC_postovershoot_fallback_movements <- data.frame(dam = c("MCN", "PRA", "ICH"),
-                                                  from = c(3,4,8), to = c(2,3,3))
-
-SR_postovershoot_fallback_movements <- data.frame(dam = c("LGR"),
-                                                  from = c(9), to = c(8))
-
-#### Upper Columbia ####
-# only Entiat and Wenatchee
-
-UCH_spill_days_data <- UCH_envir$data$winter_spill_days_data
-UCW_spill_days_data <- UCW_envir$data$winter_spill_days_data
-UC_spill_days_data <- bind_rows(as.data.frame(UCH_spill_days_data), as.data.frame(UCW_spill_days_data))
-
-# Wenatchee - evaluate all fallback move probs
-WEN_wild_spilldays_move_prob_array <- estimate_spilldays_effect_UCW(origin_select= "Wenatchee River", movements = UC_postovershoot_fallback_movements)
-WEN_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_UCH(origin_select= "Wenatchee River", movements = UC_postovershoot_fallback_movements)
-
-# Wenatchee - get covariate experiences
-WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
-WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
-
-# Wenatchee - use a loop to plot all of them
-WEN_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
-for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(WEN_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> WEN_data_to_plot
-  
-  if(nrow(WEN_data_to_plot)>0){
-    WEN_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Wenatchee River",
-                                                                          wild_move_prob_array = WEN_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = WEN_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = WEN_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
-                                                                          movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Wenatchee - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
-    
-    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("WEN_compare_fallback_", 
-                                                                                        UC_postovershoot_fallback_movements$dam[i],
-                                                                                          "_spilldays.png")),
-           WEN_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-  
-}
-
-# Entiat - evaluate all fallback move probs
-# Only wild for entiat
-ENT_wild_spilldays_move_prob_array <- estimate_spilldays_effect_UCW(origin_select= "Entiat River", movements = UC_postovershoot_fallback_movements)
-
-# Entiat - get covariate experiences
-ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
-
-# Entiat - use a loop to plot all of them
-ENT_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
-for (i in 1:nrow(UC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(ENT_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> ENT_data_to_plot
-  
-  if(nrow(ENT_data_to_plot)>0){
-    
-    ENT_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Entiat River",
-                                                                            wild_move_prob_array = ENT_wild_spilldays_move_prob_array,
-                                                                            wild_covariate_experiences = ENT_wild_covariate_experiences, 
-                                                                            movements_evaluated = UC_postovershoot_fallback_movements,
-                                                                            spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                            from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
-                                                                            plot_title = paste0("Entiat - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
-    
-    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("ENT_compare_fallback_", 
-                                                                                        UC_postovershoot_fallback_movements$dam[i],
-                                                                                        "_spilldays.png")),
-           ENT_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-
-
-#### Middle Columbia ####
-MCH_spill_days_data <- MCH_envir$data$winter_spill_days_data
-MCW_spill_days_data <- MCW_envir$data$winter_spill_days_data
-MC_spill_days_data <- bind_rows(as.data.frame(MCH_spill_days_data), as.data.frame(MCW_spill_days_data))
-
-# Deschutes - evaluate all fallback move probs
-# Deschutes is wild only
-DES_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Deschutes River", movements = MC_postovershoot_fallback_movements)
-
-# Deschutes - get covariate experiences
-DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
-
-# Deschutes - use a loop to plot all of them
-DES_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(DES_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> DES_data_to_plot
-  
-  if(nrow(DES_data_to_plot)>0){
-    DES_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Deschutes River",
-                                                                            wild_move_prob_array = DES_wild_spilldays_move_prob_array,
-                                                                            
-                                                                            wild_covariate_experiences = DES_wild_covariate_experiences, 
-                                                                            
-                                                                            movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                            spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                            from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                            plot_title = paste0("Deschutes - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-    
-    ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("DES_compare_fallback_", 
-                                                                                        MC_postovershoot_fallback_movements$dam[i],
-                                                                                        "_spilldays.png")),
-           DES_fallback_spilldays_plots[[i]], height = 8, width = 8)
-    
-  } else {
-    # if it is zero, do nothing
-    
-  }
-  
-
-  
-}
-
-# John Day - evaluate all fallback move probs
-# JDR is wild only
-JDR_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "John Day River", movements = MC_postovershoot_fallback_movements)
-
-# John Day - get covariate experiences
-JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
-
-# John Day - use a loop to plot all of them
-JDR_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(JDR_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> JDR_data_to_plot
-  
-  if(nrow(JDR_data_to_plot)>0){
-  JDR_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "John Day River",
-                                                                          wild_move_prob_array = JDR_wild_spilldays_move_prob_array,
-                                                                          
-                                                                          wild_covariate_experiences = JDR_wild_covariate_experiences, 
-                                                                          
-                                                                          movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("John Day - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("JDR_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         JDR_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-
-# Fifteenmile - evaluate all fallback move probs
-# Fifteenmile is wild only
-FIF_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Fifteenmile Creek", movements = MC_postovershoot_fallback_movements)
-
-# Fifteenmile - get covariate experiences
-FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
-
-# Fifteenmile - use a loop to plot all of them
-FIF_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(FIF_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> FIF_data_to_plot
-  
-  if(nrow(FIF_data_to_plot)>0){
-  FIF_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Fifteenmile Creek",
-                                                                          wild_move_prob_array = FIF_wild_spilldays_move_prob_array,
-                                                                          
-                                                                          wild_covariate_experiences = FIF_wild_covariate_experiences, 
-                                                                          
-                                                                          movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Fifteenmile - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("FIF_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         FIF_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-# Umatilla - evaluate all fallback move probs
-UMA_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Umatilla River", movements = MC_postovershoot_fallback_movements)
-UMA_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_MCH(origin_select= "Umatilla River", movements = MC_postovershoot_fallback_movements)
-
-# Umatilla - get covariate experiences
-UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
-UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
-
-# Umatilla - use a loop to plot all of them
-UMA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(UMA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_wild_data_to_plot
-  filter(UMA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_hatchery_data_to_plot
-  
-  if(nrow(UMA_wild_data_to_plot)>0 | nrow(UMA_hatchery_data_to_plot)>0){
-  UMA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Umatilla River",
-                                                                          wild_move_prob_array = UMA_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = UMA_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = UMA_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
-                                                                          movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Umatilla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("UMA_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         UMA_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-# Yakima - evaluate all fallback move probs
-# Yakima is wild only
-YAK_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Yakima River", movements = MC_postovershoot_fallback_movements)
-
-# Yakima - get covariate experiences
-YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
-
-# Yakima - use a loop to plot all of them
-YAK_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(YAK_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> YAK_data_to_plot
-  
-  if(nrow(YAK_data_to_plot)>0){
-  YAK_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Yakima River",
-                                                                          wild_move_prob_array = YAK_wild_spilldays_move_prob_array,
-                                                                          
-                                                                          wild_covariate_experiences = YAK_wild_covariate_experiences, 
-                                                                          
-                                                                          movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Yakima - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("YAK_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         YAK_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-# Walla Walla - evaluate all fallback move probs
-WAWA_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Walla Walla River", movements = MC_postovershoot_fallback_movements)
-WAWA_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_MCH(origin_select= "Walla Walla River", movements = MC_postovershoot_fallback_movements)
-
-# Walla Walla - get covariate experiences
-WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
-WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
-
-# Walla Walla - use a loop to plot all of them
-WAWA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
-for (i in 1:nrow(MC_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(WAWA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_wild_data_to_plot
-  filter(WAWA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_hatchery_data_to_plot
-  
-  if(nrow(WAWA_wild_data_to_plot)>0 | nrow(WAWA_hatchery_data_to_plot)>0){
-  WAWA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Walla Walla River",
-                                                                           wild_move_prob_array = WAWA_wild_spilldays_move_prob_array,
-                                                                           hatchery_move_prob_array = WAWA_hatchery_spilldays_move_prob_array,
-                                                                           wild_covariate_experiences = WAWA_wild_covariate_experiences, 
-                                                                           hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
-                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
-                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
-                                                                           plot_title = paste0("Walla Walla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("WAWA_compare_fallback_", 
-                                                                                      MC_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         WAWA_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
-
-#### Snake River ####
-# only one post-overshoot fallback: Tucannon
-
-SRH_spill_days_data <- SRH_envir$data$winter_spill_days_data
-SRW_spill_days_data <- SRW_envir$data$winter_spill_days_data
-SR_spill_days_data <- bind_rows(as.data.frame(SRH_spill_days_data), as.data.frame(SRW_spill_days_data))
-
-# Tucannon River - evaluate all fallback move probs
-TUC_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
-TUC_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
-
-# Tucannon River - get covariate experiences
-TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
-TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
-
-# Tucannon River - use a loop to plot all of them
-TUC_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
-for (i in 1:nrow(SR_postovershoot_fallback_movements)){
-  # if a movement doesn't have any data, don't plot it
-  filter(TUC_wild_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_wild_data_to_plot
-  filter(TUC_hatchery_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_hatchery_data_to_plot
-  
-  if(nrow(TUC_wild_data_to_plot)>0 | nrow(TUC_hatchery_data_to_plot)>0){
-  TUC_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Tucannon River",
-                                                                          wild_move_prob_array = TUC_wild_spilldays_move_prob_array,
-                                                                          hatchery_move_prob_array = TUC_hatchery_spilldays_move_prob_array,
-                                                                          wild_covariate_experiences = TUC_wild_covariate_experiences, 
-                                                                          hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
-                                                                          movements_evaluated = SR_postovershoot_fallback_movements,
-                                                                          spill_predict = seq(0, max(SR_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
-                                                                          from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
-                                                                          plot_title = paste0("Tucannon River - post-overshoot fallback at ", SR_postovershoot_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", paste0("TUC_compare_fallback_", 
-                                                                                      SR_postovershoot_fallback_movements$dam[i],
-                                                                                      "_spilldays.png")),
-         TUC_fallback_spilldays_plots[[i]], height = 8, width = 8)
-  } else {
-    # if it is zero, do nothing
-    
-  }
-}
-
+# #### Plot rear type comparison fallback spill days for post-overshot fallback movements ####
+# UC_postovershoot_fallback_movements <- data.frame(dam = c("RRE", "WEL"),
+#                                           from = c(6,7), to = c(5,6))
+# 
+# MC_postovershoot_fallback_movements <- data.frame(dam = c("MCN", "PRA", "ICH"),
+#                                                   from = c(3,4,8), to = c(2,3,3))
+# 
+# SR_postovershoot_fallback_movements <- data.frame(dam = c("LGR"),
+#                                                   from = c(9), to = c(8))
+# 
+# #### Upper Columbia ####
+# # only Entiat and Wenatchee
+# 
+# UCH_spill_days_data <- UCH_envir$data$winter_spill_days_data
+# UCW_spill_days_data <- UCW_envir$data$winter_spill_days_data
+# UC_spill_days_data <- bind_rows(as.data.frame(UCH_spill_days_data), as.data.frame(UCW_spill_days_data))
+# 
+# # Wenatchee - evaluate all fallback move probs
+# WEN_wild_spilldays_move_prob_array <- estimate_spilldays_effect_UCW(origin_select= "Wenatchee River", movements = UC_postovershoot_fallback_movements)
+# WEN_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_UCH(origin_select= "Wenatchee River", movements = UC_postovershoot_fallback_movements)
+# 
+# # Wenatchee - get covariate experiences
+# WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+# WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+# 
+# # Wenatchee - use a loop to plot all of them
+# WEN_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
+# for (i in 1:nrow(UC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(WEN_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> WEN_data_to_plot
+#   
+#   if(nrow(WEN_data_to_plot)>0){
+#     WEN_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Wenatchee River",
+#                                                                           wild_move_prob_array = WEN_wild_spilldays_move_prob_array,
+#                                                                           hatchery_move_prob_array = WEN_hatchery_spilldays_move_prob_array,
+#                                                                           wild_covariate_experiences = WEN_wild_covariate_experiences, 
+#                                                                           hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+#                                                                           movements_evaluated = UC_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("Wenatchee - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+#     
+#     ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("WEN_compare_fallback_", 
+#                                                                                         UC_postovershoot_fallback_movements$dam[i],
+#                                                                                           "_spilldays.png")),
+#            WEN_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+#   
+# }
+# 
+# # Entiat - evaluate all fallback move probs
+# # Only wild for entiat
+# ENT_wild_spilldays_move_prob_array <- estimate_spilldays_effect_UCW(origin_select= "Entiat River", movements = UC_postovershoot_fallback_movements)
+# 
+# # Entiat - get covariate experiences
+# ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+# 
+# # Entiat - use a loop to plot all of them
+# ENT_fallback_spilldays_plots <- vector(mode = "list", length = nrow(UC_postovershoot_fallback_movements))
+# for (i in 1:nrow(UC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(ENT_wild_covariate_experiences, state == UC_postovershoot_fallback_movements$from[i]) -> ENT_data_to_plot
+#   
+#   if(nrow(ENT_data_to_plot)>0){
+#     
+#     ENT_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Entiat River",
+#                                                                             wild_move_prob_array = ENT_wild_spilldays_move_prob_array,
+#                                                                             wild_covariate_experiences = ENT_wild_covariate_experiences, 
+#                                                                             movements_evaluated = UC_postovershoot_fallback_movements,
+#                                                                             spill_predict = seq(0, max(UC_spill_days_data[,UC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                             from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
+#                                                                             plot_title = paste0("Entiat - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
+#     
+#     ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("ENT_compare_fallback_", 
+#                                                                                         UC_postovershoot_fallback_movements$dam[i],
+#                                                                                         "_spilldays.png")),
+#            ENT_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# 
+# 
+# #### Middle Columbia ####
+# MCH_spill_days_data <- MCH_envir$data$winter_spill_days_data
+# MCW_spill_days_data <- MCW_envir$data$winter_spill_days_data
+# MC_spill_days_data <- bind_rows(as.data.frame(MCH_spill_days_data), as.data.frame(MCW_spill_days_data))
+# 
+# # Deschutes - evaluate all fallback move probs
+# # Deschutes is wild only
+# DES_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Deschutes River", movements = MC_postovershoot_fallback_movements)
+# 
+# # Deschutes - get covariate experiences
+# DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
+# 
+# # Deschutes - use a loop to plot all of them
+# DES_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(DES_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> DES_data_to_plot
+#   
+#   if(nrow(DES_data_to_plot)>0){
+#     DES_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Deschutes River",
+#                                                                             wild_move_prob_array = DES_wild_spilldays_move_prob_array,
+#                                                                             
+#                                                                             wild_covariate_experiences = DES_wild_covariate_experiences, 
+#                                                                             
+#                                                                             movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                             spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                             plot_title = paste0("Deschutes - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#     
+#     ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("DES_compare_fallback_", 
+#                                                                                         MC_postovershoot_fallback_movements$dam[i],
+#                                                                                         "_spilldays.png")),
+#            DES_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#     
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+#   
+# 
+#   
+# }
+# 
+# # John Day - evaluate all fallback move probs
+# # JDR is wild only
+# JDR_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "John Day River", movements = MC_postovershoot_fallback_movements)
+# 
+# # John Day - get covariate experiences
+# JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+# 
+# # John Day - use a loop to plot all of them
+# JDR_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(JDR_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> JDR_data_to_plot
+#   
+#   if(nrow(JDR_data_to_plot)>0){
+#   JDR_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "John Day River",
+#                                                                           wild_move_prob_array = JDR_wild_spilldays_move_prob_array,
+#                                                                           
+#                                                                           wild_covariate_experiences = JDR_wild_covariate_experiences, 
+#                                                                           
+#                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("John Day - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("JDR_compare_fallback_", 
+#                                                                                       MC_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          JDR_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# 
+# # Fifteenmile - evaluate all fallback move probs
+# # Fifteenmile is wild only
+# FIF_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Fifteenmile Creek", movements = MC_postovershoot_fallback_movements)
+# 
+# # Fifteenmile - get covariate experiences
+# FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
+# 
+# # Fifteenmile - use a loop to plot all of them
+# FIF_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(FIF_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> FIF_data_to_plot
+#   
+#   if(nrow(FIF_data_to_plot)>0){
+#   FIF_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Fifteenmile Creek",
+#                                                                           wild_move_prob_array = FIF_wild_spilldays_move_prob_array,
+#                                                                           
+#                                                                           wild_covariate_experiences = FIF_wild_covariate_experiences, 
+#                                                                           
+#                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("Fifteenmile - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("FIF_compare_fallback_", 
+#                                                                                       MC_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          FIF_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# # Umatilla - evaluate all fallback move probs
+# UMA_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Umatilla River", movements = MC_postovershoot_fallback_movements)
+# UMA_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_MCH(origin_select= "Umatilla River", movements = MC_postovershoot_fallback_movements)
+# 
+# # Umatilla - get covariate experiences
+# UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+# UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+# 
+# # Umatilla - use a loop to plot all of them
+# UMA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(UMA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_wild_data_to_plot
+#   filter(UMA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> UMA_hatchery_data_to_plot
+#   
+#   if(nrow(UMA_wild_data_to_plot)>0 | nrow(UMA_hatchery_data_to_plot)>0){
+#   UMA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Umatilla River",
+#                                                                           wild_move_prob_array = UMA_wild_spilldays_move_prob_array,
+#                                                                           hatchery_move_prob_array = UMA_hatchery_spilldays_move_prob_array,
+#                                                                           wild_covariate_experiences = UMA_wild_covariate_experiences, 
+#                                                                           hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
+#                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("Umatilla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("UMA_compare_fallback_", 
+#                                                                                       MC_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          UMA_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# # Yakima - evaluate all fallback move probs
+# # Yakima is wild only
+# YAK_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Yakima River", movements = MC_postovershoot_fallback_movements)
+# 
+# # Yakima - get covariate experiences
+# YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+# 
+# # Yakima - use a loop to plot all of them
+# YAK_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(YAK_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> YAK_data_to_plot
+#   
+#   if(nrow(YAK_data_to_plot)>0){
+#   YAK_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Yakima River",
+#                                                                           wild_move_prob_array = YAK_wild_spilldays_move_prob_array,
+#                                                                           
+#                                                                           wild_covariate_experiences = YAK_wild_covariate_experiences, 
+#                                                                           
+#                                                                           movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("Yakima - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("YAK_compare_fallback_", 
+#                                                                                       MC_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          YAK_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# # Walla Walla - evaluate all fallback move probs
+# WAWA_wild_spilldays_move_prob_array <- estimate_spilldays_effect_MCW(origin_select= "Walla Walla River", movements = MC_postovershoot_fallback_movements)
+# WAWA_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_MCH(origin_select= "Walla Walla River", movements = MC_postovershoot_fallback_movements)
+# 
+# # Walla Walla - get covariate experiences
+# WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+# WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+# 
+# # Walla Walla - use a loop to plot all of them
+# WAWA_fallback_spilldays_plots <- vector(mode = "list", length = nrow(MC_postovershoot_fallback_movements))
+# for (i in 1:nrow(MC_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(WAWA_wild_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_wild_data_to_plot
+#   filter(WAWA_hatchery_covariate_experiences, state == MC_postovershoot_fallback_movements$from[i]) -> WAWA_hatchery_data_to_plot
+#   
+#   if(nrow(WAWA_wild_data_to_plot)>0 | nrow(WAWA_hatchery_data_to_plot)>0){
+#   WAWA_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Walla Walla River",
+#                                                                            wild_move_prob_array = WAWA_wild_spilldays_move_prob_array,
+#                                                                            hatchery_move_prob_array = WAWA_hatchery_spilldays_move_prob_array,
+#                                                                            wild_covariate_experiences = WAWA_wild_covariate_experiences, 
+#                                                                            hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
+#                                                                            movements_evaluated = MC_postovershoot_fallback_movements,
+#                                                                            spill_predict = seq(0, max(MC_spill_days_data[,MC_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                            from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
+#                                                                            plot_title = paste0("Walla Walla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("WAWA_compare_fallback_", 
+#                                                                                       MC_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          WAWA_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
+# 
+# #### Snake River ####
+# # only one post-overshoot fallback: Tucannon
+# 
+# SRH_spill_days_data <- SRH_envir$data$winter_spill_days_data
+# SRW_spill_days_data <- SRW_envir$data$winter_spill_days_data
+# SR_spill_days_data <- bind_rows(as.data.frame(SRH_spill_days_data), as.data.frame(SRW_spill_days_data))
+# 
+# # Tucannon River - evaluate all fallback move probs
+# TUC_wild_spilldays_move_prob_array <- estimate_spilldays_effect_SRW(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
+# TUC_hatchery_spilldays_move_prob_array <- estimate_spilldays_effect_SRH(origin_select= "Tucannon River", movements = SR_postovershoot_fallback_movements)
+# 
+# # Tucannon River - get covariate experiences
+# TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+# TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+# 
+# # Tucannon River - use a loop to plot all of them
+# TUC_fallback_spilldays_plots <- vector(mode = "list", length = nrow(SR_postovershoot_fallback_movements))
+# for (i in 1:nrow(SR_postovershoot_fallback_movements)){
+#   # if a movement doesn't have any data, don't plot it
+#   filter(TUC_wild_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_wild_data_to_plot
+#   filter(TUC_hatchery_covariate_experiences, state == SR_postovershoot_fallback_movements$from[i]) -> TUC_hatchery_data_to_plot
+#   
+#   if(nrow(TUC_wild_data_to_plot)>0 | nrow(TUC_hatchery_data_to_plot)>0){
+#   TUC_fallback_spilldays_plots[[i]] <- plot_compare_rear_spilldays_effect(origin_select = "Tucannon River",
+#                                                                           wild_move_prob_array = TUC_wild_spilldays_move_prob_array,
+#                                                                           hatchery_move_prob_array = TUC_hatchery_spilldays_move_prob_array,
+#                                                                           wild_covariate_experiences = TUC_wild_covariate_experiences, 
+#                                                                           hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
+#                                                                           movements_evaluated = SR_postovershoot_fallback_movements,
+#                                                                           spill_predict = seq(0, max(SR_spill_days_data[,SR_postovershoot_fallback_movements$from[i]]),length = 100),
+#                                                                           from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
+#                                                                           plot_title = paste0("Tucannon River - post-overshoot fallback at ", SR_postovershoot_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays_v3", paste0("TUC_compare_fallback_", 
+#                                                                                       SR_postovershoot_fallback_movements$dam[i],
+#                                                                                       "_spilldays.png")),
+#          TUC_fallback_spilldays_plots[[i]], height = 8, width = 8)
+#   } else {
+#     # if it is zero, do nothing
+#     
+#   }
+# }
+# 
 #### Plot fit to data for spill window, get goodness of fit ####
 
 plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
@@ -3070,7 +3074,7 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -3102,7 +3106,7 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -3137,7 +3141,7 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -3150,7 +3154,7 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -3189,12 +3193,12 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
     covariate_experiences %>% 
       mutate(spill_round = round_any(spill_actual, 5)) %>% 
       group_by(spill_round, rear) %>% 
-      summarise(total = n()) -> spill_rear_total_counts
+      dplyr::summarise(total = n()) -> spill_rear_total_counts
     
     covariate_experiences %>% 
       mutate(spill_round = round_any(spill_actual, 5)) %>% 
       group_by(spill_round, rear, next_state) %>% 
-      summarise(count = n()) %>% 
+      dplyr::summarise(count = n()) %>% 
       ungroup() %>% 
       complete(spill_round, nesting(rear, next_state), fill = list(count = 0)) -> spill_rear_move_counts
     
@@ -3230,7 +3234,7 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
   
   rear_spill_move_prob_quantiles_CIcov %>% 
     group_by(rear) %>% 
-    summarise(points_within_CI = sum(CI_coverage_weight, na.rm = T),
+    dplyr::summarise(points_within_CI = sum(CI_coverage_weight, na.rm = T),
               total_bias = sum(bias_weight, na.rm = T),
               total = sum(total, na.rm = T),
               actual_movements = sum(count, na.rm = T),
@@ -3268,462 +3272,462 @@ plot_compare_rear_spillwindow_effect_fit_to_data <- function(origin_select,
 }
 
 
-#### Plot rear type comparison fallback spill window for all ####
-mainstem_fallback_movements <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
-                                          from = c(2,3,4,5,6,7,8,9), to = c(1,2,3,4,5,6,3,8))
-
-#### Upper Columbia ####
-UCH_spill_window_data <- UCH_envir$data$spill_window_data
-UCW_spill_window_data <- UCW_envir$data$spill_window_data
-UC_spill_window_data <- bind_rows(as.data.frame(UCH_spill_window_data), as.data.frame(UCW_spill_window_data))
-
-# Wenatchee - evaluate all fallback move probs
-WEN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
-WEN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
-
-# Wenatchee - get covariate experiences
-WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
-WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
-
-# Wenatchee - use a loop to plot all of them
-WEN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  WEN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Wenatchee River",
-                                                                              wild_move_prob_array = WEN_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = WEN_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = WEN_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Wenatchee - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("WEN_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         WEN_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Entiat - evaluate all fallback move probs
-# Only wild for entiat
-ENT_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Entiat River", movements = mainstem_fallback_movements)
-
-# Entiat - get covariate experiences
-ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
-
-# Entiat - use a loop to plot all of them
-ENT_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  ENT_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Entiat River",
-                                                                              wild_move_prob_array = ENT_wild_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = ENT_wild_covariate_experiences, 
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Entiat - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("ENT_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         ENT_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Methow - evaluate all fallback move probs
-MET_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Methow River", movements = mainstem_fallback_movements)
-MET_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Methow River", movements = mainstem_fallback_movements)
-
-# Methow - get covariate experiences
-MET_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Methow River")
-MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Methow River")
-
-# Methow - use a loop to plot all of them
-MET_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  MET_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Methow River",
-                                                                              wild_move_prob_array = MET_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = MET_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = MET_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = MET_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Methow - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("MET_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         MET_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Okanoagn - evaluate all fallback move probs
-# Only hatchery for Okanogan
-OKA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Okanogan River", movements = mainstem_fallback_movements)
-
-# Okanogan - get covariate experiences
-OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Okanogan River")
-
-# Okanogan - use a loop to plot all of them
-OKA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  OKA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Okanogan River",
-                                                                              hatchery_move_prob_array = OKA_hatchery_spillwindow_move_prob_array,
-                                                                              hatchery_covariate_experiences = OKA_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Okanogan - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("OKA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         OKA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-#### Middle Columbia ####
-MCH_spill_window_data <- MCH_envir$data$spill_window_data
-MCW_spill_window_data <- MCW_envir$data$spill_window_data
-MC_spill_window_data <- bind_rows(as.data.frame(MCH_spill_window_data), as.data.frame(MCW_spill_window_data))
-
-# Deschutes - evaluate all fallback move probs
-# Deschutes is wild only
-DES_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Deschutes River", movements = mainstem_fallback_movements)
-
-# Deschutes - get covariate experiences
-DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
-
-# Deschutes - use a loop to plot all of them
-DES_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  DES_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Deschutes River",
-                                                                              wild_move_prob_array = DES_wild_spillwindow_move_prob_array,
-                                                                              
-                                                                              wild_covariate_experiences = DES_wild_covariate_experiences, 
-                                                                              
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Deschutes - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("DES_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         DES_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# John Day - evaluate all fallback move probs
-# JDR is wild only
-JDR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "John Day River", movements = mainstem_fallback_movements)
-
-# John Day - get covariate experiences
-JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
-
-# John Day - use a loop to plot all of them
-JDR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  JDR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "John Day River",
-                                                                              wild_move_prob_array = JDR_wild_spillwindow_move_prob_array,
-                                                                              
-                                                                              wild_covariate_experiences = JDR_wild_covariate_experiences, 
-                                                                              
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("John Day - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("JDR_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         JDR_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-
-# Fifteenmile - evaluate all fallback move probs
-# Fifteenmile is wild only
-FIF_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Fifteenmile Creek", movements = mainstem_fallback_movements)
-
-# Fifteenmile - get covariate experiences
-FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
-
-# Fifteenmile - use a loop to plot all of them
-FIF_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  FIF_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Fifteenmile Creek",
-                                                                              wild_move_prob_array = FIF_wild_spillwindow_move_prob_array,
-                                                                              
-                                                                              wild_covariate_experiences = FIF_wild_covariate_experiences, 
-                                                                              
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Fifteenmile - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("FIF_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         FIF_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Umatilla - evaluate all fallback move probs
-UMA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
-UMA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
-
-# Umatilla - get covariate experiences
-UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
-UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
-
-# Umatilla - use a loop to plot all of them
-UMA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  UMA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Umatilla River",
-                                                                              wild_move_prob_array = UMA_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = UMA_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = UMA_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Umatilla - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("UMA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         UMA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Yakima - evaluate all fallback move probs
-# Yakima is wild only
-YAK_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Yakima River", movements = mainstem_fallback_movements)
-
-# Yakima - get covariate experiences
-YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
-
-# Yakima - use a loop to plot all of them
-YAK_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  YAK_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Yakima River",
-                                                                              wild_move_prob_array = YAK_wild_spillwindow_move_prob_array,
-                                                                              
-                                                                              wild_covariate_experiences = YAK_wild_covariate_experiences, 
-                                                                              
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Yakima - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("YAK_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         YAK_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Walla Walla - evaluate all fallback move probs
-WAWA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
-WAWA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
-
-# Walla Walla - get covariate experiences
-WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
-WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
-
-# Walla Walla - use a loop to plot all of them
-WAWA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  WAWA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Walla Walla River",
-                                                                               wild_move_prob_array = WAWA_wild_spillwindow_move_prob_array,
-                                                                               hatchery_move_prob_array = WAWA_hatchery_spillwindow_move_prob_array,
-                                                                               wild_covariate_experiences = WAWA_wild_covariate_experiences, 
-                                                                               hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
-                                                                               movements_evaluated = mainstem_fallback_movements,
-                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                               plot_title = paste0("Walla Walla - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("WAWA_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         WAWA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-#### Snake River ####
-SRH_spill_window_data <- SRH_envir$data$spill_window_data
-SRW_spill_window_data <- SRW_envir$data$spill_window_data
-SR_spill_window_data <- bind_rows(as.data.frame(SRH_spill_window_data), as.data.frame(SRW_spill_window_data))
-
-# Asotin Creek - evaluate all fallback move probs
-# Asotin is wild only
-ASO_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Asotin Creek", movements = mainstem_fallback_movements)
-
-# Asotin Creek - get covariate experiences
-ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Asotin Creek")
-
-# Asotin Creek - use a loop to plot all of them
-ASO_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  ASO_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Asotin Creek",
-                                                                              wild_move_prob_array = ASO_wild_spillwindow_move_prob_array,
-                                                                              
-                                                                              wild_covariate_experiences = ASO_wild_covariate_experiences, 
-                                                                              
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Asotin Creek - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("ASO_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         ASO_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Clearwater River - evaluate all fallback move probs
-CLE_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
-CLE_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
-
-# Clearwater River - get covariate experiences
-CLE_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Clearwater River")
-CLE_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Clearwater River")
-
-# Clearwater River - use a loop to plot all of them
-CLE_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  CLE_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Clearwater River",
-                                                                              wild_move_prob_array = CLE_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = CLE_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = CLE_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = CLE_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Clearwater River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("CLE_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         CLE_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Grande Ronde River - evaluate all fallback move probs
-GR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
-GR_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
-
-# Grande Ronde River - get covariate experiences
-GR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Grande Ronde River")
-GR_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Grande Ronde River")
-
-# Grande Ronde River - use a loop to plot all of them
-GR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  GR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Grande Ronde River",
-                                                                             wild_move_prob_array = GR_wild_spillwindow_move_prob_array,
-                                                                             hatchery_move_prob_array = GR_hatchery_spillwindow_move_prob_array,
-                                                                             wild_covariate_experiences = GR_wild_covariate_experiences, 
-                                                                             hatchery_covariate_experiences = GR_hatchery_covariate_experiences,
-                                                                             movements_evaluated = mainstem_fallback_movements,
-                                                                             spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                             from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                             plot_title = paste0("Grande Ronde River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("GR_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         GR_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Imnaha River - evaluate all fallback move probs
-IMN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
-IMN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
-
-# Imnaha River - get covariate experiences
-IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
-IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
-
-# Imnaha River - use a loop to plot all of them
-IMN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  IMN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Imnaha River",
-                                                                              wild_move_prob_array = IMN_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = IMN_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = IMN_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Imnaha River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("IMN_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         IMN_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
-# Salmon River - evaluate all fallback move probs
-SAL_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Salmon River", movements = mainstem_fallback_movements)
-SAL_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Salmon River", movements = mainstem_fallback_movements)
-
-# Salmon River - get covariate experiences
-SAL_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Salmon River")
-SAL_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Salmon River")
-
-# Salmon River - use a loop to plot all of them
-SAL_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  SAL_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Salmon River",
-                                                                              wild_move_prob_array = SAL_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = SAL_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = SAL_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = SAL_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Salmon River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("SAL_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         SAL_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-# Tucannon River - evaluate all fallback move probs
-TUC_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
-TUC_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
-
-# Tucannon River - get covariate experiences
-TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
-TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
-
-# Tucannon River - use a loop to plot all of them
-TUC_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
-for (i in 1:nrow(mainstem_fallback_movements)){
-  TUC_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Tucannon River",
-                                                                              wild_move_prob_array = TUC_wild_spillwindow_move_prob_array,
-                                                                              hatchery_move_prob_array = TUC_hatchery_spillwindow_move_prob_array,
-                                                                              wild_covariate_experiences = TUC_wild_covariate_experiences, 
-                                                                              hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
-                                                                              movements_evaluated = mainstem_fallback_movements,
-                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
-                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
-                                                                              plot_title = paste0("Tucannon River - fallback at ", mainstem_fallback_movements$dam[i]))
-  
-  ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow", paste0("TUC_compare_fallback_", 
-                                                                                        mainstem_fallback_movements$dam[i],
-                                                                                        "_spillwindow.png")),
-         TUC_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
-  
-}
-
+# #### Plot rear type comparison fallback spill window for all ####
+# mainstem_fallback_movements <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
+#                                           from = c(2,3,4,5,6,7,8,9), to = c(1,2,3,4,5,6,3,8))
+# 
+# #### Upper Columbia ####
+# UCH_spill_window_data <- UCH_envir$data$spill_window_data
+# UCW_spill_window_data <- UCW_envir$data$spill_window_data
+# UC_spill_window_data <- bind_rows(as.data.frame(UCH_spill_window_data), as.data.frame(UCW_spill_window_data))
+# 
+# # Wenatchee - evaluate all fallback move probs
+# WEN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
+# WEN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Wenatchee River", movements = mainstem_fallback_movements)
+# 
+# # Wenatchee - get covariate experiences
+# WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+# WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+# 
+# # Wenatchee - use a loop to plot all of them
+# WEN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   WEN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Wenatchee River",
+#                                                                               wild_move_prob_array = WEN_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = WEN_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = WEN_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Wenatchee - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("WEN_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          WEN_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Entiat - evaluate all fallback move probs
+# # Only wild for entiat
+# ENT_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Entiat River", movements = mainstem_fallback_movements)
+# 
+# # Entiat - get covariate experiences
+# ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+# 
+# # Entiat - use a loop to plot all of them
+# ENT_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   ENT_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Entiat River",
+#                                                                               wild_move_prob_array = ENT_wild_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = ENT_wild_covariate_experiences, 
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Entiat - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("ENT_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          ENT_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Methow - evaluate all fallback move probs
+# MET_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCW(origin_select= "Methow River", movements = mainstem_fallback_movements)
+# MET_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Methow River", movements = mainstem_fallback_movements)
+# 
+# # Methow - get covariate experiences
+# MET_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Methow River")
+# MET_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Methow River")
+# 
+# # Methow - use a loop to plot all of them
+# MET_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   MET_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Methow River",
+#                                                                               wild_move_prob_array = MET_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = MET_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = MET_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = MET_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Methow - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("MET_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          MET_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Okanoagn - evaluate all fallback move probs
+# # Only hatchery for Okanogan
+# OKA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_UCH(origin_select= "Okanogan River", movements = mainstem_fallback_movements)
+# 
+# # Okanogan - get covariate experiences
+# OKA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Okanogan River")
+# 
+# # Okanogan - use a loop to plot all of them
+# OKA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   OKA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Okanogan River",
+#                                                                               hatchery_move_prob_array = OKA_hatchery_spillwindow_move_prob_array,
+#                                                                               hatchery_covariate_experiences = OKA_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(UC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Okanogan - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("OKA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          OKA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# #### Middle Columbia ####
+# MCH_spill_window_data <- MCH_envir$data$spill_window_data
+# MCW_spill_window_data <- MCW_envir$data$spill_window_data
+# MC_spill_window_data <- bind_rows(as.data.frame(MCH_spill_window_data), as.data.frame(MCW_spill_window_data))
+# 
+# # Deschutes - evaluate all fallback move probs
+# # Deschutes is wild only
+# DES_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Deschutes River", movements = mainstem_fallback_movements)
+# 
+# # Deschutes - get covariate experiences
+# DES_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Deschutes River")
+# 
+# # Deschutes - use a loop to plot all of them
+# DES_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   DES_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Deschutes River",
+#                                                                               wild_move_prob_array = DES_wild_spillwindow_move_prob_array,
+#                                                                               
+#                                                                               wild_covariate_experiences = DES_wild_covariate_experiences, 
+#                                                                               
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Deschutes - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("DES_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          DES_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # John Day - evaluate all fallback move probs
+# # JDR is wild only
+# JDR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "John Day River", movements = mainstem_fallback_movements)
+# 
+# # John Day - get covariate experiences
+# JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+# 
+# # John Day - use a loop to plot all of them
+# JDR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   JDR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "John Day River",
+#                                                                               wild_move_prob_array = JDR_wild_spillwindow_move_prob_array,
+#                                                                               
+#                                                                               wild_covariate_experiences = JDR_wild_covariate_experiences, 
+#                                                                               
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("John Day - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("JDR_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          JDR_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# 
+# # Fifteenmile - evaluate all fallback move probs
+# # Fifteenmile is wild only
+# FIF_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Fifteenmile Creek", movements = mainstem_fallback_movements)
+# 
+# # Fifteenmile - get covariate experiences
+# FIF_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Fifteenmile Creek")
+# 
+# # Fifteenmile - use a loop to plot all of them
+# FIF_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   FIF_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Fifteenmile Creek",
+#                                                                               wild_move_prob_array = FIF_wild_spillwindow_move_prob_array,
+#                                                                               
+#                                                                               wild_covariate_experiences = FIF_wild_covariate_experiences, 
+#                                                                               
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Fifteenmile - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("FIF_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          FIF_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Umatilla - evaluate all fallback move probs
+# UMA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
+# UMA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Umatilla River", movements = mainstem_fallback_movements)
+# 
+# # Umatilla - get covariate experiences
+# UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+# UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+# 
+# # Umatilla - use a loop to plot all of them
+# UMA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   UMA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Umatilla River",
+#                                                                               wild_move_prob_array = UMA_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = UMA_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = UMA_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Umatilla - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("UMA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          UMA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Yakima - evaluate all fallback move probs
+# # Yakima is wild only
+# YAK_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Yakima River", movements = mainstem_fallback_movements)
+# 
+# # Yakima - get covariate experiences
+# YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+# 
+# # Yakima - use a loop to plot all of them
+# YAK_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   YAK_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Yakima River",
+#                                                                               wild_move_prob_array = YAK_wild_spillwindow_move_prob_array,
+#                                                                               
+#                                                                               wild_covariate_experiences = YAK_wild_covariate_experiences, 
+#                                                                               
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Yakima - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("YAK_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          YAK_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Walla Walla - evaluate all fallback move probs
+# WAWA_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCW(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
+# WAWA_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_MCH(origin_select= "Walla Walla River", movements = mainstem_fallback_movements)
+# 
+# # Walla Walla - get covariate experiences
+# WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+# WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+# 
+# # Walla Walla - use a loop to plot all of them
+# WAWA_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   WAWA_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Walla Walla River",
+#                                                                                wild_move_prob_array = WAWA_wild_spillwindow_move_prob_array,
+#                                                                                hatchery_move_prob_array = WAWA_hatchery_spillwindow_move_prob_array,
+#                                                                                wild_covariate_experiences = WAWA_wild_covariate_experiences, 
+#                                                                                hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
+#                                                                                movements_evaluated = mainstem_fallback_movements,
+#                                                                                spill_predict = seq(0, max(MC_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                                from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                                plot_title = paste0("Walla Walla - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("WAWA_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          WAWA_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# #### Snake River ####
+# SRH_spill_window_data <- SRH_envir$data$spill_window_data
+# SRW_spill_window_data <- SRW_envir$data$spill_window_data
+# SR_spill_window_data <- bind_rows(as.data.frame(SRH_spill_window_data), as.data.frame(SRW_spill_window_data))
+# 
+# # Asotin Creek - evaluate all fallback move probs
+# # Asotin is wild only
+# ASO_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Asotin Creek", movements = mainstem_fallback_movements)
+# 
+# # Asotin Creek - get covariate experiences
+# ASO_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Asotin Creek")
+# 
+# # Asotin Creek - use a loop to plot all of them
+# ASO_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   ASO_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Asotin Creek",
+#                                                                               wild_move_prob_array = ASO_wild_spillwindow_move_prob_array,
+#                                                                               
+#                                                                               wild_covariate_experiences = ASO_wild_covariate_experiences, 
+#                                                                               
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Asotin Creek - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("ASO_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          ASO_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Clearwater River - evaluate all fallback move probs
+# CLE_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
+# CLE_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Clearwater River", movements = mainstem_fallback_movements)
+# 
+# # Clearwater River - get covariate experiences
+# CLE_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Clearwater River")
+# CLE_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Clearwater River")
+# 
+# # Clearwater River - use a loop to plot all of them
+# CLE_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   CLE_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Clearwater River",
+#                                                                               wild_move_prob_array = CLE_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = CLE_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = CLE_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = CLE_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Clearwater River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("CLE_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          CLE_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Grande Ronde River - evaluate all fallback move probs
+# GR_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
+# GR_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Grande Ronde River", movements = mainstem_fallback_movements)
+# 
+# # Grande Ronde River - get covariate experiences
+# GR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Grande Ronde River")
+# GR_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Grande Ronde River")
+# 
+# # Grande Ronde River - use a loop to plot all of them
+# GR_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   GR_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Grande Ronde River",
+#                                                                              wild_move_prob_array = GR_wild_spillwindow_move_prob_array,
+#                                                                              hatchery_move_prob_array = GR_hatchery_spillwindow_move_prob_array,
+#                                                                              wild_covariate_experiences = GR_wild_covariate_experiences, 
+#                                                                              hatchery_covariate_experiences = GR_hatchery_covariate_experiences,
+#                                                                              movements_evaluated = mainstem_fallback_movements,
+#                                                                              spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                              from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                              plot_title = paste0("Grande Ronde River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("GR_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          GR_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Imnaha River - evaluate all fallback move probs
+# IMN_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
+# IMN_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Imnaha River", movements = mainstem_fallback_movements)
+# 
+# # Imnaha River - get covariate experiences
+# IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
+# IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
+# 
+# # Imnaha River - use a loop to plot all of them
+# IMN_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   IMN_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Imnaha River",
+#                                                                               wild_move_prob_array = IMN_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = IMN_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = IMN_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Imnaha River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("IMN_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          IMN_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
+# # Salmon River - evaluate all fallback move probs
+# SAL_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Salmon River", movements = mainstem_fallback_movements)
+# SAL_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Salmon River", movements = mainstem_fallback_movements)
+# 
+# # Salmon River - get covariate experiences
+# SAL_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Salmon River")
+# SAL_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Salmon River")
+# 
+# # Salmon River - use a loop to plot all of them
+# SAL_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   SAL_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Salmon River",
+#                                                                               wild_move_prob_array = SAL_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = SAL_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = SAL_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = SAL_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Salmon River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("SAL_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          SAL_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# # Tucannon River - evaluate all fallback move probs
+# TUC_wild_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRW(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
+# TUC_hatchery_spillwindow_move_prob_array <- estimate_spillwindow_effect_SRH(origin_select= "Tucannon River", movements = mainstem_fallback_movements)
+# 
+# # Tucannon River - get covariate experiences
+# TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+# TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+# 
+# # Tucannon River - use a loop to plot all of them
+# TUC_fallback_spillwindow_plots <- vector(mode = "list", length = nrow(mainstem_fallback_movements))
+# for (i in 1:nrow(mainstem_fallback_movements)){
+#   TUC_fallback_spillwindow_plots[[i]] <- plot_compare_rear_spillwindow_effect_fit_to_data(origin_select = "Tucannon River",
+#                                                                               wild_move_prob_array = TUC_wild_spillwindow_move_prob_array,
+#                                                                               hatchery_move_prob_array = TUC_hatchery_spillwindow_move_prob_array,
+#                                                                               wild_covariate_experiences = TUC_wild_covariate_experiences, 
+#                                                                               hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
+#                                                                               movements_evaluated = mainstem_fallback_movements,
+#                                                                               spill_predict = seq(0, max(SR_spill_window_data[,mainstem_fallback_movements$from[i]]),length = 100),
+#                                                                               from = mainstem_fallback_movements$from[i], to = mainstem_fallback_movements$to[i], 
+#                                                                               plot_title = paste0("Tucannon River - fallback at ", mainstem_fallback_movements$dam[i]))
+#   
+#   ggsave(here::here("stan_actual", "output", "fit_to_data", "spillwindow_v3", paste0("TUC_compare_fallback_", 
+#                                                                                         mainstem_fallback_movements$dam[i],
+#                                                                                         "_spillwindow.png")),
+#          TUC_fallback_spillwindow_plots[[i]]$plot, height = 8, width = 8)
+#   
+# }
+# 
 
 #### Plot fit to data for spill days, get goodness of fit #### 
 
@@ -3751,7 +3755,7 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -3783,7 +3787,7 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -3819,7 +3823,7 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
     wild_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "wild") -> wild_spill_move_prob_quantiles
     
@@ -3832,7 +3836,7 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
     hatchery_spill_move_prob %>% 
       pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
       group_by(spill) %>% 
-      summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+      dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
       mutate(rear = "hatchery") -> hatchery_spill_move_prob_quantiles
     
@@ -3872,11 +3876,11 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
     # create a new DF to show bubbles of points
     covariate_experiences %>% 
       group_by(spill_actual, rear) %>% 
-      summarise(total = n()) -> spill_rear_total_counts
+      dplyr::summarise(total = n()) -> spill_rear_total_counts
     
     covariate_experiences %>% 
       group_by(spill_actual, rear, next_state) %>% 
-      summarise(count = n()) %>% 
+      dplyr::summarise(count = n()) %>% 
       ungroup() %>% 
       complete(spill_actual, nesting(rear, next_state), fill = list(count = 0)) -> spill_rear_move_counts
     
@@ -3906,7 +3910,7 @@ plot_compare_rear_spilldays_effect_fit_to_data <- function(origin_select,
   
   rear_spill_move_prob_quantiles_CIcov %>% 
     group_by(rear) %>% 
-    summarise(points_within_CI = sum(CI_coverage_weight, na.rm = T),
+    dplyr::summarise(points_within_CI = sum(CI_coverage_weight, na.rm = T),
               total_bias = sum(bias_weight, na.rm = T),
               total = sum(total, na.rm = T),
               actual_movements = sum(count, na.rm = T),
@@ -3985,7 +3989,7 @@ for (i in 1:nrow(UC_postovershoot_fallback_movements)){
                                                                             from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Wenatchee - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("WEN_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("WEN_compare_fallback_", 
                                                                                         UC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            WEN_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4019,9 +4023,9 @@ for (i in 1:nrow(UC_postovershoot_fallback_movements)){
                                                                             from = UC_postovershoot_fallback_movements$from[i], to = UC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Entiat - post-overshoot fallback at ", UC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("ENT_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("ENT_compare_fallback_", 
                                                                                         UC_postovershoot_fallback_movements$dam[i],
-                                                                                        "_spilldays.png")),
+                                                                                        "_spilldays_v3.png")),
            ENT_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
   } else {
     # if it is zero, do nothing
@@ -4060,7 +4064,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Deschutes - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("DES_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("DES_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            DES_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4098,7 +4102,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("John Day - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("JDR_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("JDR_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            JDR_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4133,7 +4137,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Fifteenmile - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("FIF_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("FIF_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            FIF_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4169,7 +4173,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Umatilla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("UMA_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("UMA_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            UMA_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4203,7 +4207,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                             from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Yakima - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("YAK_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("YAK_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            YAK_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4239,7 +4243,7 @@ for (i in 1:nrow(MC_postovershoot_fallback_movements)){
                                                                              from = MC_postovershoot_fallback_movements$from[i], to = MC_postovershoot_fallback_movements$to[i], 
                                                                              plot_title = paste0("Walla Walla - post-overshoot fallback at ", MC_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("WAWA_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("WAWA_compare_fallback_", 
                                                                                         MC_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            WAWA_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4284,7 +4288,7 @@ for (i in 1:nrow(SR_postovershoot_fallback_movements)){
                                                                             from = SR_postovershoot_fallback_movements$from[i], to = SR_postovershoot_fallback_movements$to[i], 
                                                                             plot_title = paste0("Tucannon River - post-overshoot fallback at ", SR_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("TUC_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("TUC_compare_fallback_", 
                                                                                         SR_postovershoot_fallback_movements$dam[i],
                                                                                         "_spilldays.png")),
            TUC_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4326,7 +4330,7 @@ for (i in 1:nrow(SR_columbia_postovershoot_fallback_movements)){
                                                                                         from = SR_columbia_postovershoot_fallback_movements$from[i], to = SR_columbia_postovershoot_fallback_movements$to[i], 
                                                                                         plot_title = paste0("Imnaha River - post-overshoot fallback at ", SR_columbia_postovershoot_fallback_movements$dam[i]))
     
-    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", paste0("IMN_compare_fallback_", 
+    ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", paste0("IMN_compare_fallback_", 
                                                                                   SR_columbia_postovershoot_fallback_movements$dam[i],
                                                                                   "_spilldays.png")),
            IMN_fallback_spilldays_plots[[i]]$plot, height = 8, width = 8)
@@ -4374,7 +4378,7 @@ SRH_year_raw_plot <- ggplot(SRH_all_year_raw_variables_summary, aes(x = variable
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "SRH_year_raw_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "SRH_year_raw_plot.png"),
        SRH_year_raw_plot, 
        height = 8, width = 8)
 
@@ -4399,7 +4403,7 @@ SRH_year_scale_plot <- ggplot(SRH_all_year_sigma_variables_summary, aes(x = vari
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "SRH_year_scale_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "SRH_year_scale_plot.png"),
        SRH_year_scale_plot, 
        height = 8, width = 8)
 
@@ -4423,7 +4427,7 @@ TUC_year_v_winterspill_9_8_plot <- ggplot(SRH_9_8_raw_year_variables_summary_spi
   ylab("Year effect, median parameter estimate") +
   ggtitle("Winter spill days vs. year effect for that year")
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "TUC_year_v_winterspill_9_8_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "TUC_year_v_winterspill_9_8_plot.png"),
        TUC_year_v_winterspill_9_8_plot, 
        height = 8, width = 8)
 
@@ -4470,7 +4474,7 @@ UCH_year_raw_plot <- ggplot(UCH_all_year_raw_variables_summary, aes(x = variable
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "UCH_year_raw_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "UCH_year_raw_plot.png"),
        UCH_year_raw_plot, 
        height = 8, width = 8)
 
@@ -4494,7 +4498,7 @@ UCH_year_scale_plot <- ggplot(UCH_all_year_sigma_variables_summary, aes(x = vari
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "UCH_year_scale_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "UCH_year_scale_plot.png"),
        UCH_year_scale_plot, 
        height = 8, width = 8)
 
@@ -4518,8 +4522,502 @@ WEN_year_v_winterspill_7_6_plot <- ggplot(UCH_7_6_raw_year_variables_summary_spi
   ylab("Year effect, median parameter estimate") +
   ggtitle("Winter spill days vs. year effect for that year")
 
-ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays", "WEN_year_v_winterspill_7_6_plot.png"),
+ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "WEN_year_v_winterspill_7_6_plot.png"),
        WEN_year_v_winterspill_7_6_plot, 
        height = 8, width = 8)
 
 
+#### Multiple movements on same plot ####
+
+# For some origins, there are multiple interesting and deleterious movements - 
+# for example, Middle Columbia fish could go to loss, Deschutes, or overshoot
+
+# plotting function
+plot_compare_rear_spill_effect_multiple_movements <- function(origin_select,
+                                                              wild_move_prob_array = NULL, hatchery_move_prob_array = NULL,
+                                                              wild_covariate_experiences = NULL, hatchery_covariate_experiences = NULL,
+                                                              movements_evaluated, spill_predict,
+                                                              plot_title = NULL, plot_legend = FALSE){
+  
+  # create df to index to right dam spill joining; here we need to change names of 
+  # WEL and LGR because we have slow v fast there
+  dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL_quick", "ICH", "LGR_quick"),
+                          state = seq(2,9))
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # Initialize a df to store every movement, then loop through each movement and bind
+  # rear_spill_move_prob_quantiles <- data.frame(spill_actual = NA, `0.025` = NA, `0.5` = NA, `0.975` = NA,
+  #                                             rear = NA, from = NA, to = NA)
+  rear_spill_move_prob_quantiles <- data.frame()
+  for (i in 1:nrow(movements_evaluated)){
+    # First, determine if this origin has both a hatchery and a wild population
+    
+    # If hatchery is NA, run wild only
+    if (is.null(hatchery_covariate_experiences)){
+      wild_spill_move_prob <- as.data.frame(wild_move_prob_array[,,i])
+      
+      colnames(wild_spill_move_prob) <- paste0("iter", 1:niter) 
+      wild_spill_move_prob$spill <- spill_predict
+      
+      # Add a column with the actual spilldays
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        wild_spill_move_prob %>% 
+          mutate(spill_actual = spill*100)  -> wild_spill_move_prob
+      } else {
+        wild_spill_move_prob %>% 
+          mutate(spill_actual = 1) -> wild_spill_move_prob
+      }
+      
+      
+      
+      
+      wild_spill_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(spill_actual) %>% 
+        dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "wild") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> wild_spill_move_prob_quantiles
+      
+      # get data organized for rug plot
+      wild_covariate_experiences %>% 
+        mutate(rear = "wild") -> wild_covariate_experiences
+      
+      wild_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> covariate_experiences
+      
+      rear_spill_move_prob_quantiles %>% 
+        bind_rows(., wild_spill_move_prob_quantiles) -> rear_spill_move_prob_quantiles
+      
+    } 
+    # If wild is NA, run hatchery only
+    else if (is.null(wild_covariate_experiences)){
+      hatchery_spill_move_prob <- as.data.frame(hatchery_move_prob_array[,,i])
+      
+      colnames(hatchery_spill_move_prob) <- paste0("iter", 1:niter)
+      hatchery_spill_move_prob$spill <- spill_predict
+      
+      # Add a column with the actual spilldays
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        hatchery_spill_move_prob %>% 
+          mutate(spill_actual = spill*100) -> hatchery_spill_move_prob
+      } else {
+        hatchery_spill_move_prob %>% 
+          mutate(spill_actual = 1) -> hatchery_spill_move_prob
+      }
+      
+      
+      
+      
+      hatchery_spill_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(spill_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "hatchery") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> hatchery_spill_move_prob_quantiles
+      
+      # get data organized for rug plot
+      hatchery_covariate_experiences %>% 
+        mutate(rear = "hatchery") -> hatchery_covariate_experiences
+      
+      hatchery_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> covariate_experiences
+      
+      # combine wild and hatchery
+      rear_spill_move_prob_quantiles %>% 
+        bind_rows(., hatchery_spill_move_prob_quantiles) -> rear_spill_move_prob_quantiles
+      
+    } 
+    # else run both
+    else {
+      wild_spill_move_prob <- as.data.frame(wild_move_prob_array[,,i])
+      
+      colnames(wild_spill_move_prob) <- paste0("iter", 1:niter) 
+      wild_spill_move_prob$spill <- spill_predict
+      
+      # Add a column with the actual spilldays
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        wild_spill_move_prob %>% 
+          mutate(spill_actual = spill*100) -> wild_spill_move_prob
+      } else {
+        wild_spill_move_prob %>% 
+          mutate(spill_actual = 1) -> wild_spill_move_prob
+      }
+      
+      
+      wild_spill_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(spill_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "wild") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> wild_spill_move_prob_quantiles
+      
+      # get data organized for rug plot
+      wild_covariate_experiences %>% 
+        mutate(rear = "wild") -> wild_covariate_experiences
+      
+      wild_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> wild_covariate_experiences
+      
+      hatchery_spill_move_prob <- as.data.frame(hatchery_move_prob_array[,,i])
+      
+      colnames(hatchery_spill_move_prob) <- paste0("iter", 1:niter) 
+      hatchery_spill_move_prob$spill <- spill_predict
+      
+      # Add a column with the actual spilldays
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        hatchery_spill_move_prob %>% 
+          mutate(spill_actual = spill*100) -> hatchery_spill_move_prob
+      } else {
+        hatchery_spill_move_prob %>% 
+          mutate(spill_actual = 1) -> hatchery_spill_move_prob
+      }
+      
+      hatchery_spill_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(spill_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "hatchery") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> hatchery_spill_move_prob_quantiles
+      
+      # get data organized for rug plot
+      hatchery_covariate_experiences %>% 
+        mutate(rear = "hatchery") -> hatchery_covariate_experiences
+      
+      hatchery_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> hatchery_covariate_experiences
+      
+      # combine wild and hatchery
+      rear_spill_move_prob_quantiles %>% 
+        bind_rows(., wild_spill_move_prob_quantiles) %>% 
+        bind_rows(., hatchery_spill_move_prob_quantiles) -> rear_spill_move_prob_quantiles
+      
+      wild_covariate_experiences %>% 
+        bind_rows(., hatchery_covariate_experiences) -> covariate_experiences
+      
+    }
+    
+  }
+  
+  
+  
+  
+  # convert spill to spill_actual in covariate experiences
+  if (movements_evaluated$from[i] %in% c(1:9)){
+    covariate_experiences %>% 
+      mutate(spill_actual = winter_spill*100) -> covariate_experiences
+  } else {
+    covariate_experiences %>% 
+      mutate(spill_actual = 1) -> covariate_experiences
+  }
+  
+  
+  # Remove any instances for rug plot of fish that would have received spill0 covariate
+  covariate_experiences %>% 
+    dplyr::rename(date_numeric = date) %>% 
+    # keep only jan/feb/mar 
+    mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+    mutate(month = month(date)) %>% 
+    filter(!(month %in% c(1,2,3,4,5))) -> covariate_experiences
+  
+  # rear_spill_move_prob_quantiles$to <- as.character(rear_spill_move_prob_quantiles$to)
+  
+  
+  movement_colors <- c("Fallback" = "#33a02c", "Overshoot - PRA" = "#ff7f00",
+                       "Overshoot - RIS" = "#ff7f00", "Overshoot - LGR" = "#ff7f00",
+                       "Overshoot - RRE" = "#ff7f00", "Overshoot - WEL" = "#ff7f00",
+                       "Overshoot - ICH" = "#ff7f00", "Overshoot" = "#ff7f00",
+                       "Additional Overshoot" = "#ff7f00",
+                       "Loss" = "#e31a1c")
+  
+  rear_spill_move_prob_quantiles %>% 
+    left_join(., movements_evaluated, by = "to") -> rear_spill_move_prob_quantiles
+  
+  if (plot_legend == TRUE){
+    rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
+                                                                            color = Movement, fill = Movement)) +
+      geom_line() +
+      geom_ribbon(alpha = 0.2, color = NA) +
+      geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      scale_color_manual(values = movement_colors) +
+      scale_fill_manual(values =  movement_colors) +
+      xlab("Winter spill days") +
+      ylab("Movement probability") +
+      coord_cartesian(clip = "off")
+  } else {
+    # suppress common legend - for combined plot
+    rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
+                                                                            color = Movement, fill = Movement)) +
+      geom_line() +
+      geom_ribbon(alpha = 0.2, color = NA) +
+      geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      scale_color_manual(values = movement_colors) +
+      scale_fill_manual(values =  movement_colors) +
+      xlab("Winter spill days") +
+      ylab("Movement probability") +
+      coord_cartesian(clip = "off") +
+      theme(legend.position = "none")
+  }
+  
+  
+  
+  
+  
+  return(rear_spill_move_prob_plot)
+}
+
+#### Create figures for individual origins:
+
+# John Day River (W), Umatilla River (H, W), Yakima River (W), Walla Walla River (H, W),
+# Wenatchee River (H, W), Entiat River (W), Tucannon River (H, W), Imnaha River (H, W)
+
+
+### John Day River ###
+JDR_spilldays_movements <- data.frame(from = c(3, 3, 3, 3), to = c(2, 4, 8, 43),
+                            Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
+                                         "Loss"))
+JDR_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "John Day River", movements = JDR_spilldays_movements)
+JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+JDR_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "John Day River",
+                                                                                     wild_move_prob_array = JDR_wild_spill_move_prob_array,
+                                                                                     wild_covariate_experiences = JDR_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = JDR_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "JDR_wild_compare_movement_spill.png"), JDR_wild_compare_movement_spill, height = 8, width = 8)
+
+### Umatilla River ###
+UMA_spilldays_movements <- data.frame(from = c(3, 3, 3, 3), to = c(2, 4, 8, 43),
+                            Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
+                                         "Loss"))
+UMA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
+UMA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
+UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+
+
+# UMA wild plot
+UMA_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Umatilla River",
+                                                                                     wild_move_prob_array = UMA_wild_spill_move_prob_array,
+                                                                                     wild_covariate_experiences = UMA_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = UMA_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "UMA_wild_compare_movement_spill.png"), UMA_wild_compare_movement_spill, height = 8, width = 8)
+
+# UMA hatchery plot
+UMA_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Umatilla River",
+                                                                                         hatchery_move_prob_array = UMA_hatchery_spill_move_prob_array,
+                                                                                         hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
+                                                                                         spill_predict = seq(0, 0.90, length = 100), 
+                                                                                         movements_evaluated = UMA_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "UMA_hatchery_compare_movement_spill.png"), UMA_hatchery_compare_movement_spill, height = 8, width = 8)
+
+### Yakima River ###
+YAK_spilldays_movements <- data.frame(from = c(4,4,4), to = c(3,5,43),
+                            Movement = c("Fallback",
+                                         "Additional Overshoot", "Loss"))
+
+YAK_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Yakima River", movements = YAK_spilldays_movements)
+YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+YAK_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Yakima River",
+                                                                                     wild_move_prob_array = YAK_wild_spill_move_prob_array,
+                                                                                     
+                                                                                     wild_covariate_experiences = YAK_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = YAK_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "YAK_wild_compare_movement_spill.png"), YAK_wild_compare_movement_spill, height = 8, width = 8)
+
+
+
+### Walla Walla River ###
+WAWA_spilldays_movements <- data.frame(from = c(8,8,8), to = c(3, 9, 43),
+                             Movement = c("Fallback", "Overshoot - LGR", 
+                                          "Loss"))
+WAWA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
+WAWA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
+WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+
+
+# WAWA wild plot
+WAWA_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Walla Walla River",
+                                                                                      wild_move_prob_array = WAWA_wild_spill_move_prob_array,
+                                                                                      wild_covariate_experiences = WAWA_wild_covariate_experiences,
+                                                                                      spill_predict = seq(0, 0.90, length = 100), 
+                                                                                      movements_evaluated = WAWA_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WAWA_wild_compare_movement_spill.png"), WAWA_wild_compare_movement_spill, height = 8, width = 8)
+
+# WAWA hatchery plot
+WAWA_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Walla Walla River",
+                                                                                          hatchery_move_prob_array = WAWA_hatchery_spill_move_prob_array,
+                                                                                          hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
+                                                                                          spill_predict = seq(0, 0.90, length = 100), 
+                                                                                          movements_evaluated = WAWA_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WAWA_hatchery_compare_movement_spill.png"), WAWA_hatchery_compare_movement_spill, height = 8, width = 8)
+
+### Wenatchee River ###
+WEN_spilldays_movements <- data.frame(from = c(6,6,6), to = c(5, 7, 43),
+                            Movement = c("Fallback", "Overshoot - WEL", 
+                                         "Loss"))
+WEN_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
+WEN_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
+WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+
+
+# WEN wild plot
+WEN_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Wenatchee River",
+                                                                                     wild_move_prob_array = WEN_wild_spill_move_prob_array,
+                                                                                     wild_covariate_experiences = WEN_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = WEN_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WEN_wild_compare_movement_spill.png"), WEN_wild_compare_movement_spill, height = 8, width = 8)
+
+# WEN hatchery plot
+WEN_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Wenatchee River",
+                                                                                         hatchery_move_prob_array = WEN_hatchery_spill_move_prob_array,
+                                                                                         hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+                                                                                         spill_predict = seq(0, 0.90, length = 100), 
+                                                                                         movements_evaluated = WEN_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WEN_hatchery_compare_movement_spill.png"), WEN_hatchery_compare_movement_spill, height = 8, width = 8)
+
+### Entiat River ###
+ENT_spilldays_movements <- data.frame(from = c(7,7), to = c(6, 43),
+                            Movement = c("Fallback",
+                                         "Loss"))
+ENT_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Entiat River", movements = ENT_spilldays_movements)
+ENT_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Entiat River", movements = ENT_spilldays_movements)
+ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+ENT_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Entiat River")
+
+
+# ENT wild plot
+ENT_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Entiat River",
+                                                                                     wild_move_prob_array = ENT_wild_spill_move_prob_array,
+                                                                                     wild_covariate_experiences = ENT_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = ENT_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "ENT_wild_compare_movement_spill.png"), ENT_wild_compare_movement_spill, height = 8, width = 8)
+
+
+### Tucannon River ###
+TUC_spilldays_movements <- data.frame(from = c(9,9), to = c(8, 43),
+                  Movement = c("Fallback",
+                               "Loss"))
+TUC_wild_spill_move_prob_array <- estimate_spilldays_effect_SRW(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
+TUC_hatchery_spill_move_prob_array <- estimate_spilldays_effect_SRH(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
+TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+
+
+# TUC wild plot
+TUC_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Tucannon River",
+                                                                                     wild_move_prob_array = TUC_wild_spill_move_prob_array,
+                                                                                     wild_covariate_experiences = TUC_wild_covariate_experiences,
+                                                                                     spill_predict = seq(0, 0.90, length = 100), 
+                                                                                     movements_evaluated = TUC_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "TUC_wild_compare_movement_spill.png"), TUC_wild_compare_movement_spill, height = 8, width = 8)
+
+# TUC hatchery plot
+TUC_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Tucannon River",
+                                                                                         hatchery_move_prob_array = TUC_hatchery_spill_move_prob_array,
+                                                                                         hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
+                                                                                         spill_predict = seq(0, 0.90, length = 100), 
+                                                                                         movements_evaluated = TUC_spilldays_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "TUC_hatchery_compare_movement_spill.png"), TUC_hatchery_compare_movement_spill, height = 8, width = 8)
+
+# ### Imnaha River ###
+# IMN_spilldays_movements <- data.frame(from = c(9,9), to = c(8, 43),
+#                             Movement = c("Fallback",
+#                                          "Loss"))
+# IMN_wild_spill_move_prob_array <- estimate_spilldays_effect_SRW(origin_select = "Imnaha River", movements = IMN_spilldays_movements)
+# IMN_hatchery_spill_move_prob_array <- estimate_spilldays_effect_SRH(origin_select = "Imnaha River", movements = IMN_spilldays_movements)
+# IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
+# IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
+# 
+# 
+# # IMN wild plot
+# IMN_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Imnaha River",
+#                                                                                      wild_move_prob_array = IMN_wild_spill_move_prob_array,
+#                                                                                      wild_covariate_experiences = IMN_wild_covariate_experiences,
+#                                                                                      spill_predict = seq(0, 0.90, length = 100), 
+#                                                                                      movements_evaluated = IMN_spilldays_movements)
+# 
+# ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "IMN_wild_compare_movement_spill.png"), IMN_wild_compare_movement_spill, height = 8, width = 8)
+# 
+# # IMN hatchery plot
+# IMN_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Imnaha River",
+#                                                                                          hatchery_move_prob_array = IMN_hatchery_spill_move_prob_array,
+#                                                                                          hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
+#                                                                                          spill_predict = seq(0, 0.90, length = 100), 
+#                                                                                          movements_evaluated = IMN_spilldays_movements)
+# 
+# ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "IMN_hatchery_compare_movement_spill.png"), IMN_hatchery_compare_movement_spill, height = 8, width = 8)
+
+
+# Create the legend figure by itself
+spill_plot_for_legend <-  plot_compare_rear_spill_effect_multiple_movements(origin_select = "Yakima River",
+                                                                      wild_move_prob_array = YAK_wild_spill_move_prob_array,
+                                                                      
+                                                                      wild_covariate_experiences = YAK_wild_covariate_experiences,
+                                                                      spill_predict = seq(0, 0.90, length = 100), 
+                                                                      movements_evaluated = YAK_spilldays_movements,
+                                                                      plot_legend= TRUE)
+spill_legend <- ggpubr::get_legend(spill_plot_for_legend)
+spill_plot_legend_gg <- as_ggplot(spill_legend) + theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+
+
+#### Generate the figure for the paper ####
+
+# combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_wild_compare_movement_spill, UMA_hatchery_compare_movement_spill,
+#                                           YAK_wild_compare_movement_spill, WAWA_wild_compare_movement_spill, WAWA_hatchery_compare_movement_spill,
+#                                           WEN_wild_compare_movement_spill, WEN_hatchery_compare_movement_spill, ENT_wild_compare_movement_spill,
+#                                           TUC_wild_compare_movement_spill, TUC_hatchery_compare_movement_spill, IMN_wild_compare_movement_spill, 
+#                                           IMN_hatchery_compare_movement_spill, plot_legend_gg, nrow = 4, ncol = 4,
+#                                           labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
+#                                                      "(J)", "(K)", "(L)", "(M)"),
+#                                           label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+#                                           hjust = 0, vjust = 0)
+# 
+# ggsave(here::here("stan_actual", "output", "paper_figures", "combined_movement_spill_plot_v1.png"), combined_movement_spill_plot, height = 12, width = 16)
+
+# drop imnaha
+combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_wild_compare_movement_spill, UMA_hatchery_compare_movement_spill,
+                                          YAK_wild_compare_movement_spill, WAWA_wild_compare_movement_spill, WAWA_hatchery_compare_movement_spill,
+                                          WEN_wild_compare_movement_spill, WEN_hatchery_compare_movement_spill, ENT_wild_compare_movement_spill,
+                                          TUC_wild_compare_movement_spill, TUC_hatchery_compare_movement_spill, 
+                                          spill_plot_legend_gg, nrow = 3, ncol = 4,
+                                          labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
+                                                     "(J)", "(K)"),
+                                          label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+                                          hjust = 0, vjust = 0)
+
+ggsave(here::here("stan_actual", "output", "paper_figures", "combined_movement_spill_plot_v2.png"), combined_movement_spill_plot, height = 12, width = 16)

@@ -1259,6 +1259,54 @@ UMA_H_temp_move_plot <- ggplot(UMA_H_out2, aes(x = temp_actual, fill = state)) +
 ggsave(here::here("stan_actual", "output", "data_plots", "UMA_H_temp_move_plot.png"), UMA_H_temp_move_plot, height = 8, width = 8)
 
 
+
+
+
+
+# try umatilla again - but now, only keep the years where we have DE ability in the Deschutes
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_numeric = seq(4, 22, 1)
+run_year_index = 1:19
+run_year_df <- data.frame(run_year,run_year_numeric, run_year_index)
+
+UMA_H_transitions_temps %>% 
+  mutate(run_year_index = ceiling(entry_date/365.25)+1) %>% 
+  left_join(., run_year_df, by = "run_year_index") %>% 
+  filter(run_year %in% c("13/14", "14/15", "15/16", "16/17", "17/18", "18/19")) -> UMA_H_transitions_temps_Deschutes_DE_years
+
+subset(UMA_H_transitions_temps_Deschutes_DE_years, from == 2) -> UMA_H_out2_Deschutes_DE
+
+# Do a very rough boxplot
+
+model_states_for_join <- data.frame(to = 1:length(model_states),
+                                    state = model_states)
+
+UMA_H_out2_Deschutes_DE %>% 
+  left_join(., model_states_for_join, by = "to") -> UMA_H_out2_Deschutes_DE
+
+ggplot(UMA_H_out2_Deschutes_DE, aes(x = from_temp, color = state)) +
+  geom_boxplot() +
+  scale_color_tableau(palette = "Tableau 10")
+
+# now, change response so that 1 = Deschutes, 0 = not Deschutes
+
+UMA_H_out2_Deschutes_DE %>% 
+  mutate(DES = ifelse(state == "Deschutes River Mouth", 1, 0)) %>% 
+  mutate(temp_actual = from_temp*window_temp_summary$BON_sd + window_temp_summary$BON_mean) -> UMA_H_out2_Deschutes_DE
+
+UMA_H_temp_move_plot_Deschutes_DE <- ggplot(UMA_H_out2_Deschutes_DE, aes(x = temp_actual, fill = state)) + 
+  # geom_bar(position = "stack", stat = "identity") +
+  geom_bar(stat = "count") +
+  scale_x_binned(breaks = 0.5:22.5, lim = c(0,25)) +
+  ggtitle("Umatilla Hatchery: Movements out of BON to MCN by temperature") +
+  theme(axis.text.x = element_text(angle = 45))
+
+ggsave(here::here("stan_actual", "output", "data_plots", "UMA_H_temp_move_plot_Deschutes_DE.png"), UMA_H_temp_move_plot_Deschutes_DE, height = 8, width = 8)
+
+
+
+
+
 FIF_W_transitions_temps <- get_origin_states_transitions_temperature(envir = MCW_envir, origin_select = "Fifteenmile Creek", rear = "wild")
 
 subset(FIF_W_transitions_temps, from == 2) -> FIF_W_out2

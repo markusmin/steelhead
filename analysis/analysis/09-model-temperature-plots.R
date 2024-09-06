@@ -17,6 +17,7 @@ library(rlang)
 library(tibble)
 library(forcats)
 library(lubridate)
+library(ggthemes)
 
 # Load the temperature summary
 window_temp_summary <- read.csv(here::here("stan_actual", "window_temps_summary.csv"), row.names = 1)
@@ -131,9 +132,16 @@ load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "mod
 load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
      envir = SRH_envir)
 
-
-
-
+# how many total individuals?
+UCW_envir$data$n_ind + UCH_envir$data$n_ind + MCH_envir$data$n_ind + MCW_envir$data$n_ind + SRW_envir$data$n_ind + SRH_envir$data$n_ind
+table(UCW_envir$data$transition_run_years)
+table(UCH_envir$data$transition_run_years)
+table(MCW_envir$data$transition_run_years)
+table(MCH_envir$data$transition_run_years)
+table(SRW_envir$data$transition_run_years)
+table(SRH_envir$data$transition_run_years)
+(2004:2021)[2]
+(2004:2021)[18]
 
 # Function to bind four chains together
 bind4chains <- function(chain1, chain2, chain3, chain4){
@@ -512,8 +520,10 @@ extract_covariate_experiences <- function(envir, rear, origin_select = NULL){
   
   
   # add mainstem dam for each state
+  # WEL and LGR because we have slow v fast there
   dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL", "ICH", "LGR"),
                           state = seq(2,9))
+  
   pop_states_dates %>% 
     left_join(., dam_index, by = "state") -> pop_states_dates
   
@@ -521,11 +531,13 @@ extract_covariate_experiences <- function(envir, rear, origin_select = NULL){
   # reformat covariates so that they can be joined
   as.data.frame(envir$data$spill_window_data) %>% 
     rownames_to_column("date") %>% 
+    dplyr::rename(LGR = LGR_quick, WEL = WEL_quick) %>% 
     mutate(date = as.numeric(date)) %>% 
     pivot_longer(cols = -c(date), names_to = "dam", values_to = "spill_window") -> spill_window_long
   
   as.data.frame(envir$data$temperature_data) %>% 
     rownames_to_column("date") %>% 
+    dplyr::rename(LGR = LGR_quick, WEL = WEL_quick) %>% 
     mutate(date = as.numeric(date)) %>% 
     pivot_longer(cols = -c(date), names_to = "dam", values_to = "temperature") -> temp_long
   
@@ -724,13 +736,13 @@ estimate_temp_effect_UCH <- function(origin_select, movements){
     
     if (from %in% c(1:9)){
       # get median winter spill for this state
-      UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
-                                     date = as.vector(UCW_envir$data$transition_dates))
-      spillwindow_data <- UCW_envir$data$spill_window_data
-      med_spillwindow <- median(spillwindow_data[subset(UCW_states_dates, state == from)$date,from])
+      UCH_states_dates <- data.frame(state = as.vector(UCH_envir$data$y),
+                                     date = as.vector(UCH_envir$data$transition_dates))
+      spillwindow_data <- UCH_envir$data$spill_window_data
+      med_spillwindow <- median(spillwindow_data[subset(UCH_states_dates, state == from)$date,from])
       
       # get median spill window for this state
-      winterspill_data <- UCW_envir$data$winter_spill_days_data
+      winterspill_data <- UCH_envir$data$winter_spill_days_data
       med_winterspill <- median(winterspill_data[,from])      
       
     } else {
@@ -1059,13 +1071,13 @@ estimate_temp_effect_SRW <- function(origin_select, movements){
     
     if (from %in% c(1:9)){
       # get median winter spill for this state
-      UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
-                                     date = as.vector(UCW_envir$data$transition_dates))
-      spillwindow_data <- UCW_envir$data$spill_window_data
-      med_spillwindow <- median(spillwindow_data[subset(UCW_states_dates, state == from)$date,from])
+      SRW_states_dates <- data.frame(state = as.vector(SRW_envir$data$y),
+                                     date = as.vector(SRW_envir$data$transition_dates))
+      spillwindow_data <- SRW_envir$data$spill_window_data
+      med_spillwindow <- median(spillwindow_data[subset(SRW_states_dates, state == from)$date,from])
       
       # get median spill window for this state
-      winterspill_data <- UCW_envir$data$winter_spill_days_data
+      winterspill_data <- SRW_envir$data$winter_spill_days_data
       med_winterspill <- median(winterspill_data[,from])      
       
     } else {
@@ -1185,13 +1197,13 @@ estimate_temp_effect_SRH <- function(origin_select, movements){
     
     if (from %in% c(1:9)){
       # get median winter spill for this state
-      UCW_states_dates <- data.frame(state = as.vector(UCW_envir$data$y),
-                                     date = as.vector(UCW_envir$data$transition_dates))
-      spillwindow_data <- UCW_envir$data$spill_window_data
-      med_spillwindow <- median(spillwindow_data[subset(UCW_states_dates, state == from)$date,from])
+      SRH_states_dates <- data.frame(state = as.vector(SRH_envir$data$y),
+                                     date = as.vector(SRH_envir$data$transition_dates))
+      spillwindow_data <- SRH_envir$data$spill_window_data
+      med_spillwindow <- median(spillwindow_data[subset(SRH_states_dates, state == from)$date,from])
       
       # get median spill window for this state
-      winterspill_data <- UCW_envir$data$winter_spill_days_data
+      winterspill_data <- SRH_envir$data$winter_spill_days_data
       med_winterspill <- median(winterspill_data[,from])      
       
     } else {
@@ -3035,10 +3047,10 @@ plot_GOF_compare_rear_temp_effect_fit_to_data_DE <- function(origin_select,
     geom_ribbon(data = subset(rear_temp_move_prob_quantiles_long, `Model Fit` == "observed"), aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
                                                                 color = rear, fill = rear, lty = `Model Fit`), color = NA, inherit.aes = FALSE, alpha = 0.2) +
     geom_point(data = subset(temp_move_props, next_state == to & rear == "wild"),
-               aes(x = temp_round, y = prop, color = rear, size = total, alpha = 0.5),
+               aes(x = temp_round, y = prop, color = rear, size = total), alpha = 0.5,
                inherit.aes = FALSE) +
     geom_point(data = subset(temp_move_props, next_state == to & rear == "hatchery"),
-               aes(x = temp_round, y = prop, color = rear, size = total, alpha = 0.5),
+               aes(x = temp_round, y = prop, color = rear, size = total), alpha = 0.5,
                inherit.aes = FALSE) +
     scale_y_continuous(lim = c(-0.01,1.01), expand = c(0,0),
                        sec.axis = sec_axis(~ ., name = "Proportion of movements")) +
@@ -3168,7 +3180,10 @@ MC_origin_rear <- data.frame(origin = c("Deschutes River", "John Day River", "Fi
                  wild = rep(1, 6))
 
 # Initialize the goodness of fit table
-MC_GOF_table <- data.frame()
+MC_temp_GOF_table <- data.frame()
+
+i <- 4
+j <- which(MC_temp_movements$col == 10)
 
 # for each origin
 for (i in 1:nrow(MC_origin_rear)){
@@ -3278,8 +3293,8 @@ for (i in 1:nrow(MC_origin_rear)){
                                                                                   movement$to, ".png")), output$plot, height = 8, width = 8)
   
   # rbind the table
-  MC_GOF_table %>% 
-    bind_rows(., output$goodness_of_fit) -> MC_GOF_table
+  MC_temp_GOF_table %>% 
+    bind_rows(., output$goodness_of_fit) -> MC_temp_GOF_table
   }
 }
 
@@ -3299,46 +3314,39 @@ for (j in 1:nrow(MC_DPS_temp_movements)){
   wild_trib_average_DE <- NULL
   if (MC_DPS_temp_movements$col[j] %in% grep("Mouth", model_states)) {
     tributary_name <- tolower(word(model_states[MC_DPS_temp_movements$col[j]],1))
-    if(MC_origin_rear[i,"hatchery"] == 1){
       # this transition also must be observed
       if(nrow(subset(MC_hatchery_covariate_experiences, state == movement$to)) > 0){
         hatchery_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = MCH_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = MCH_envir$data$tributary_design_matrices_array,
                                                           covariate_experiences = MC_hatchery_covariate_experiences)
       }
-    }
-    
-    if(MC_origin_rear[i,"wild"] == 1){
+
       if (nrow(subset(MC_wild_covariate_experiences, state == movement$to)) > 0){
         # this transition also must be observed
         wild_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = MCW_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = MCW_envir$data$tributary_design_matrices_array,
                                                       covariate_experiences = MC_wild_covariate_experiences)
       }
-    }
     
     # drop the non-DE years from the data for a fair comparison
-    if(MC_origin_rear[i,"hatchery"] == 1){
       # this transition also must be observed
       if(nrow(subset(MC_hatchery_covariate_experiences, state == movement$to)) > 0){
         MC_hatchery_covariate_experiences %>% 
-          mutate(natal_origin = MC_origin_rear$origin[i]) %>% 
+          mutate(natal_origin = "Middle Columbia") %>% 
           filter(year %in% subset(hatchery_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> MC_hatchery_covariate_experiences_movement_specific
       }  else {
         # this needs to happen so that we don't keep overwriting
         MC_hatchery_covariate_experiences -> MC_hatchery_covariate_experiences_movement_specific
       }
-    } 
+
     
-    if(MC_origin_rear[i,"wild"] == 1){
       # this transition also must be observed
       if(nrow(subset(MC_wild_covariate_experiences, state == movement$to)) > 0){
         MC_wild_covariate_experiences %>% 
-          mutate(natal_origin = MC_origin_rear$origin[i]) %>% 
+          mutate(natal_origin = "Middle Columbia") %>% 
           filter(year %in% subset(wild_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> MC_wild_covariate_experiences_movement_specific
       }  else {
         # this needs to happen so that we don't keep overwriting
         MC_wild_covariate_experiences -> MC_wild_covariate_experiences_movement_specific
       }
-    } 
     
     
     
@@ -3350,19 +3358,10 @@ for (j in 1:nrow(MC_DPS_temp_movements)){
   
   # get movement probabilities
   # Note that because these are DPS-wide, you can pick any origin (since it doesn't matter)
-  if(MC_origin_rear[i,"hatchery"] == 1){
     hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = MC_origin_rear$origin[1], movements = movement)
-  } else {
-    hatchery_temp_move_prob_array <- NULL
-  }
-  
-  if(MC_origin_rear[i,"wild"] == 1){
     wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = MC_origin_rear$origin[1], movements = movement)
-  } else {
-    wild_temp_move_prob_array <- NULL
-  }
   
-  output <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Snake River",
+  output <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Middle Columbia",
                                                              wild_move_prob_array = wild_temp_move_prob_array,
                                                              hatchery_move_prob_array = hatchery_temp_move_prob_array,
                                                              wild_covariate_experiences = MC_wild_covariate_experiences_movement_specific,
@@ -3370,7 +3369,7 @@ for (j in 1:nrow(MC_DPS_temp_movements)){
                                                              wild_DE_correction = wild_trib_average_DE,
                                                              hatchery_DE_correction = hatchery_trib_average_DE,
                                                              movements_evaluated = movement,
-                                                             from = movement$from, to = movement$to, plot_title = paste0("Snake River fish: ",
+                                                             from = movement$from, to = movement$to, plot_title = paste0("Middle Columbia fish: ",
                                                                                                                          model_states[movement$from], " to ",
                                                                                                                          model_states[movement$to]))
   # save the plot
@@ -3379,12 +3378,12 @@ for (j in 1:nrow(MC_DPS_temp_movements)){
                                                                                   movement$to, ".png")), output$plot, height = 8, width = 8)
   
   # rbind the table
-  MC_GOF_table %>% 
-    bind_rows(., output$goodness_of_fit) -> MC_GOF_table
+  MC_temp_GOF_table %>% 
+    bind_rows(., output$goodness_of_fit) -> MC_temp_GOF_table
 }
 
 # save this table
-write.csv(MC_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "MC_GOF_table.csv")) 
+write.csv(MC_temp_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "MC_temp_GOF_table.csv")) 
 
 
 
@@ -3404,7 +3403,7 @@ UC_origin_rear <- data.frame(origin = c("Wenatchee River", "Entiat River",
                              wild = c(1, 1, 0, 1))
 
 # Initialize the goodness of fit table
-UC_GOF_table <- data.frame()
+UC_temp_GOF_table <- data.frame()
 
 # for each origin
 for (i in 1:nrow(UC_origin_rear)){
@@ -3514,8 +3513,8 @@ for (i in 1:nrow(UC_origin_rear)){
                                                                                     movement$to, ".png")), output$plot, height = 8, width = 8)
     
     # rbind the table
-    UC_GOF_table %>% 
-      bind_rows(., output$goodness_of_fit) -> UC_GOF_table
+    UC_temp_GOF_table %>% 
+      bind_rows(., output$goodness_of_fit) -> UC_temp_GOF_table
   }
 }
 
@@ -3535,46 +3534,39 @@ for (j in 1:nrow(UC_DPS_temp_movements)){
   wild_trib_average_DE <- NULL
   if (UC_DPS_temp_movements$col[j] %in% grep("Mouth", model_states)) {
     tributary_name <- tolower(word(model_states[UC_DPS_temp_movements$col[j]],1))
-    if(UC_origin_rear[i,"hatchery"] == 1){
       # this transition also must be observed
       if(nrow(subset(UC_hatchery_covariate_experiences, state == movement$to)) > 0){
         hatchery_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = UCH_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = UCH_envir$data$tributary_design_matrices_array,
                                                           covariate_experiences = UC_hatchery_covariate_experiences)
       }
-    }
     
-    if(UC_origin_rear[i,"wild"] == 1){
       if (nrow(subset(UC_wild_covariate_experiences, state == movement$to)) > 0){
         # this transition also must be observed
         wild_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = UCW_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = UCW_envir$data$tributary_design_matrices_array,
                                                       covariate_experiences = UC_wild_covariate_experiences)
       }
-    }
+
     
     # drop the non-DE years from the data for a fair comparison
-    if(UC_origin_rear[i,"hatchery"] == 1){
       # this transition also must be observed
       if(nrow(subset(UC_hatchery_covariate_experiences, state == movement$to)) > 0){
         UC_hatchery_covariate_experiences %>% 
-          mutate(natal_origin = UC_origin_rear$origin[i]) %>% 
+          mutate(natal_origin = "Upper Columbia") %>% 
           filter(year %in% subset(hatchery_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> UC_hatchery_covariate_experiences_movement_specific
       }  else {
         # this needs to happen so that we don't keep overwriting
         UC_hatchery_covariate_experiences -> UC_hatchery_covariate_experiences_movement_specific
       }
-    } 
     
-    if(UC_origin_rear[i,"wild"] == 1){
       # this transition also must be observed
       if(nrow(subset(UC_wild_covariate_experiences, state == movement$to)) > 0){
         UC_wild_covariate_experiences %>% 
-          mutate(natal_origin = UC_origin_rear$origin[i]) %>% 
+          mutate(natal_origin = "Upper Columbia") %>% 
           filter(year %in% subset(wild_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> UC_wild_covariate_experiences_movement_specific
       }  else {
         # this needs to happen so that we don't keep overwriting
         UC_wild_covariate_experiences -> UC_wild_covariate_experiences_movement_specific
       }
-    } 
     
     
     
@@ -3586,19 +3578,10 @@ for (j in 1:nrow(UC_DPS_temp_movements)){
   
   # get movement probabilities
   # Note that because these are DPS-wide, you can pick any origin (since it doesn't matter)
-  if(UC_origin_rear[i,"hatchery"] == 1){
     hatchery_temp_move_prob_array <- estimate_temp_effect_UCH(origin_select = UC_origin_rear$origin[1], movements = movement)
-  } else {
-    hatchery_temp_move_prob_array <- NULL
-  }
-  
-  if(UC_origin_rear[i,"wild"] == 1){
     wild_temp_move_prob_array <- estimate_temp_effect_UCW(origin_select = UC_origin_rear$origin[1], movements = movement)
-  } else {
-    wild_temp_move_prob_array <- NULL
-  }
   
-  output <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Snake River",
+  output <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Upper Columbia",
                                                              wild_move_prob_array = wild_temp_move_prob_array,
                                                              hatchery_move_prob_array = hatchery_temp_move_prob_array,
                                                              wild_covariate_experiences = UC_wild_covariate_experiences_movement_specific,
@@ -3606,7 +3589,7 @@ for (j in 1:nrow(UC_DPS_temp_movements)){
                                                              wild_DE_correction = wild_trib_average_DE,
                                                              hatchery_DE_correction = hatchery_trib_average_DE,
                                                              movements_evaluated = movement,
-                                                             from = movement$from, to = movement$to, plot_title = paste0("Snake River fish: ",
+                                                             from = movement$from, to = movement$to, plot_title = paste0("Upper Columbia fish: ",
                                                                                                                          model_states[movement$from], " to ",
                                                                                                                          model_states[movement$to]))
   # save the plot
@@ -3615,12 +3598,12 @@ for (j in 1:nrow(UC_DPS_temp_movements)){
                                                                                   movement$to, ".png")), output$plot, height = 8, width = 8)
   
   # rbind the table
-  UC_GOF_table %>% 
-    bind_rows(., output$goodness_of_fit) -> UC_GOF_table
+  UC_temp_GOF_table %>% 
+    bind_rows(., output$goodness_of_fit) -> UC_temp_GOF_table
 }
 
 # save this table
-write.csv(UC_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "UC_GOF_table.csv")) 
+write.csv(UC_temp_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "UC_temp_GOF_table.csv")) 
 
 
 
@@ -3641,7 +3624,7 @@ SR_origin_rear <- data.frame(origin = c("Tucannon River", "Asotin Creek",
                              wild = rep(1, 6))
 
 # Initialize the goodness of fit table
-SR_GOF_table <- data.frame()
+SR_temp_GOF_table <- data.frame()
 
 # for each origin
 for (i in 1:nrow(SR_origin_rear)){
@@ -3751,8 +3734,8 @@ for (i in 1:nrow(SR_origin_rear)){
                                                                                     movement$to, ".png")), output$plot, height = 8, width = 8)
     
     # rbind the table
-    SR_GOF_table %>% 
-      bind_rows(., output$goodness_of_fit) -> SR_GOF_table
+    SR_temp_GOF_table %>% 
+      bind_rows(., output$goodness_of_fit) -> SR_temp_GOF_table
   }
 }
 
@@ -3775,46 +3758,38 @@ SR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir
     wild_trib_average_DE <- NULL
     if (SR_DPS_temp_movements$col[j] %in% grep("Mouth", model_states)) {
       tributary_name <- tolower(word(model_states[SR_DPS_temp_movements$col[j]],1))
-      if(SR_origin_rear[i,"hatchery"] == 1){
         # this transition also must be observed
         if(nrow(subset(SR_hatchery_covariate_experiences, state == movement$to)) > 0){
           hatchery_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = SRH_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = SRH_envir$data$tributary_design_matrices_array,
                                                             covariate_experiences = SR_hatchery_covariate_experiences)
         }
-      }
       
-      if(SR_origin_rear[i,"wild"] == 1){
         if (nrow(subset(SR_wild_covariate_experiences, state == movement$to)) > 0){
           # this transition also must be observed
           wild_trib_average_DE <- calculate_weighted_DE(DE_param_matrix = SRW_DE_param_matrix, tributary = tributary_name, tributary_design_matrices_array = SRW_envir$data$tributary_design_matrices_array,
                                                         covariate_experiences = SR_wild_covariate_experiences)
         }
-      }
       
       # drop the non-DE years from the data for a fair comparison
-      if(SR_origin_rear[i,"hatchery"] == 1){
         # this transition also must be observed
         if(nrow(subset(SR_hatchery_covariate_experiences, state == movement$to)) > 0){
           SR_hatchery_covariate_experiences %>% 
-            mutate(natal_origin = SR_origin_rear$origin[i]) %>% 
+            mutate(natal_origin = "Snake River") %>% 
             filter(year %in% subset(hatchery_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> SR_hatchery_covariate_experiences_movement_specific
         }  else {
           # this needs to happen so that we don't keep overwriting
           SR_hatchery_covariate_experiences -> SR_hatchery_covariate_experiences_movement_specific
         }
-      } 
       
-      if(SR_origin_rear[i,"wild"] == 1){
         # this transition also must be observed
         if(nrow(subset(SR_wild_covariate_experiences, state == movement$to)) > 0){
           SR_wild_covariate_experiences %>% 
-            mutate(natal_origin = SR_origin_rear$origin[i]) %>% 
+            mutate(natal_origin = "Snake River") %>% 
             filter(year %in% subset(wild_trib_average_DE$DE_by_year, !(is.na(`0.5`)))$year) -> SR_wild_covariate_experiences_movement_specific
         }  else {
           # this needs to happen so that we don't keep overwriting
           SR_wild_covariate_experiences -> SR_wild_covariate_experiences_movement_specific
         }
-      } 
       
       
       
@@ -3826,17 +3801,8 @@ SR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir
     
     # get movement probabilities
     # Note that because these are DPS-wide, you can pick any origin (since it doesn't matter)
-    if(SR_origin_rear[i,"hatchery"] == 1){
       hatchery_temp_move_prob_array <- estimate_temp_effect_SRH(origin_select = SR_origin_rear$origin[1], movements = movement)
-    } else {
-      hatchery_temp_move_prob_array <- NULL
-    }
-    
-    if(SR_origin_rear[i,"wild"] == 1){
       wild_temp_move_prob_array <- estimate_temp_effect_SRW(origin_select = SR_origin_rear$origin[1], movements = movement)
-    } else {
-      wild_temp_move_prob_array <- NULL
-    }
     
     output <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Snake River",
                                                                wild_move_prob_array = wild_temp_move_prob_array,
@@ -3855,11 +3821,586 @@ SR_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir
                                                                                     movement$to, ".png")), output$plot, height = 8, width = 8)
     
     # rbind the table
-    SR_GOF_table %>% 
-      bind_rows(., output$goodness_of_fit) -> SR_GOF_table
+    SR_temp_GOF_table %>% 
+      bind_rows(., output$goodness_of_fit) -> SR_temp_GOF_table
   }
 
 # save this table
-write.csv(SR_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "SR_GOF_table.csv")) 
+write.csv(SR_temp_GOF_table, file = here::here("stan_actual", "output", "fit_to_data", "temperature", "SR_temp_GOF_table.csv")) 
 
+#### Alternative plots for 2-3, Deschutes focus ####
+
+# hm, I don't think this is worth the effort, because really you'd have to also 
+# correct for DE into the Deschutes, not just select specific years
+
+# Needs to be run for all origins (MC) and DPS-wide (UC and SR)
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_numeric = seq(4, 22, 1)
+run_year_index = 1:19
+run_year_df <- data.frame(run_year,run_year_numeric, run_year_index)
+
+UMA_H_transitions_temps %>% 
+  mutate(run_year_index = ceiling(entry_date/365.25)+1) %>% 
+  left_join(., run_year_df, by = "run_year_index") %>% 
+  filter(run_year %in% c("13/14", "14/15", "15/16", "16/17", "17/18", "18/19")) -> UMA_H_transitions_temps_Deschutes_DE_years
+
+### Snake River
+
+movement <- data.frame(from = 2,
+                       to = 3)
+
+print(paste0("Movement: ", movement$from, " to ", movement$to))
+
+# Drop non-DE years for Deschutes
+SR_hatchery_covariate_experiences %>% 
+  mutate(run_year_index = ceiling(date/365.25)+1) %>% 
+  left_join(., run_year_df, by = "run_year_index") %>% 
+  filter(run_year %in% c("13/14", "14/15", "15/16", "16/17", "17/18", "18/19")) -> SR_hatchery_covariate_experiences_Deschutes_DE
+
+SR_wild_covariate_experiences %>% 
+  mutate(run_year_index = ceiling(date/365.25)+1) %>% 
+  left_join(., run_year_df, by = "run_year_index") %>% 
+  filter(run_year %in% c("13/14", "14/15", "15/16", "16/17", "17/18", "18/19")) -> SR_wild_covariate_experiences_Deschutes_DE
+
+
+# get movement probabilities
+# Note that because these are DPS-wide, you can pick any origin (since it doesn't matter)
+hatchery_temp_move_prob_array <- estimate_temp_effect_SRH(origin_select = SR_origin_rear$origin[1], movements = movement)
+wild_temp_move_prob_array <- estimate_temp_effect_SRW(origin_select = SR_origin_rear$origin[1], movements = movement)
+
+output_SR_2_3_Deschutes_DE <- plot_GOF_compare_rear_temp_effect_fit_to_data_DE(origin_select = "Snake River",
+                                                           wild_move_prob_array = wild_temp_move_prob_array,
+                                                           hatchery_move_prob_array = hatchery_temp_move_prob_array,
+                                                           wild_covariate_experiences = SR_wild_covariate_experiences_Deschutes_DE,
+                                                           hatchery_covariate_experiences = SR_hatchery_covariate_experiences_Deschutes_DE,
+                                                           wild_DE_correction = wild_trib_average_DE,
+                                                           hatchery_DE_correction = hatchery_trib_average_DE,
+                                                           movements_evaluated = movement,
+                                                           from = movement$from, to = movement$to, plot_title = paste0("Snake River fish: ",
+                                                                                                                       model_states[movement$from], " to ",
+                                                                                                                       model_states[movement$to]))
+# save the plot
+ggsave(here::here("stan_actual", "output", "fit_to_data", "temperature", "SR_2_3_Deschutes_DE_years.png"), 
+                  output_SR_2_3_Deschutes_DE$plot, height = 8, width = 8)
+
+
+
+
+
+
+
+
+#### Temperature vs. year ####
+
+### Inspect year vs. temperature effects - Umatilla Hatchery for example
+
+# select the right origin
+subset(origin_param_map, natal_origin == "Umatilla River")
+# origin1
+
+# get the temperature effect
+UMA_2_10_temp1 <- MCH_fit_summary$variable[grep("btemp1xorigin1_matrix_2_10_DE", MCH_fit_summary$variable)]
+subset(MCH_fit_summary, variable %in% UMA_2_10_temp1)
+
+# get the year effects - raw and matt trick scaling
+UMA_2_10_raw_year_variables <- MCH_fit_summary$variable[grep("byearxorigin1_raw_vector_2_10", MCH_fit_summary$variable)]
+subset(MCH_fit_summary, variable %in% UMA_2_10_raw_year_variables) -> UMA_2_10_raw_year_variables_summary
+UMA_2_10_scale_year_variables <- MCH_fit_summary$variable[grep("sigma_yearxorigin1_vector_2_10", MCH_fit_summary$variable)]
+subset(MCH_fit_summary, variable %in% UMA_2_10_scale_year_variables)
+
+# Ok, so we don't see a huge year effect here. The effects for individual years are centered around 0.
+
+# So what else could it be?
+UMA_2_10_params <- MCH_fit_summary$variable[grep("2_10", MCH_fit_summary$variable)]
+UMA_2_10_params <- UMA_2_10_params[!(grepl("origin2", UMA_2_10_params))]
+
+
+#### Multiple movements on same plot ####
+
+# For some origins, there are multiple interesting and deleterious movements - 
+# for example, Middle Columbia fish could go to loss, Deschutes, or overshoot
+
+# plotting function
+plot_compare_rear_temp_effect_multiple_movements <- function(origin_select,
+                                          wild_move_prob_array = NULL, hatchery_move_prob_array = NULL,
+                                          wild_covariate_experiences = NULL, hatchery_covariate_experiences = NULL,
+                                          movements_evaluated,
+                                          plot_title = NULL, plot_legend = FALSE){
+  
+  # create df to index to right dam temp joining; here we need to change names of 
+  # WEL and LGR because we have slow v fast there
+  dam_index <- data.frame(dam = c("BON", "MCN", "PRA", "RIS", "RRE", "WEL_quick", "ICH", "LGR_quick"),
+                          state = seq(2,9))
+  
+  niter <- 4000 # this is the number of draws we have
+  
+  # Initialize a df to store every movement, then loop through each movement and bind
+  # rear_temp_move_prob_quantiles <- data.frame(temp_actual = NA, `0.025` = NA, `0.5` = NA, `0.975` = NA,
+  #                                             rear = NA, from = NA, to = NA)
+  rear_temp_move_prob_quantiles <- data.frame()
+  for (i in 1:nrow(movements_evaluated)){
+    # First, determine if this origin has both a hatchery and a wild population
+    
+    # If hatchery is NA, run wild only
+    if (is.null(hatchery_covariate_experiences)){
+      wild_temp_move_prob <- as.data.frame(wild_move_prob_array[,,i])
+      
+      colnames(wild_temp_move_prob) <- paste0("iter", 1:niter) 
+      temp_predict <- seq(-2,2,length = 100)
+      wild_temp_move_prob$temp <- temp_predict
+      
+      # Add a column with the actual temperatures
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        wild_temp_move_prob %>% 
+          mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_mean")] + 
+                   window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_sd")]*temp) -> wild_temp_move_prob
+      } else {
+        wild_temp_move_prob %>% 
+          mutate(temp_actual = 1) -> wild_temp_move_prob
+      }
+      
+      
+      
+      
+      wild_temp_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(temp_actual) %>% 
+        dplyr::summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "wild") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> wild_temp_move_prob_quantiles
+      
+      # get data organized for rug plot
+      wild_covariate_experiences %>% 
+        mutate(rear = "wild") -> wild_covariate_experiences
+      
+      wild_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> covariate_experiences
+      
+      rear_temp_move_prob_quantiles %>% 
+        bind_rows(., wild_temp_move_prob_quantiles) -> rear_temp_move_prob_quantiles
+      
+    } 
+    # If wild is NA, run hatchery only
+    else if (is.null(wild_covariate_experiences)){
+      hatchery_temp_move_prob <- as.data.frame(hatchery_move_prob_array[,,i])
+      
+      colnames(hatchery_temp_move_prob) <- paste0("iter", 1:niter) 
+      hatchery_temp_move_prob$temp <- temp_predict
+      
+      # Add a column with the actual temperatures
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        hatchery_temp_move_prob %>% 
+          mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_mean")] + 
+                   window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_sd")]*temp) -> hatchery_temp_move_prob
+      } else {
+        hatchery_temp_move_prob %>% 
+          mutate(temp_actual = 1) -> hatchery_temp_move_prob
+      }
+      
+      
+      
+      
+      hatchery_temp_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(temp_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "hatchery") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> hatchery_temp_move_prob_quantiles
+      
+      # get data organized for rug plot
+      hatchery_covariate_experiences %>% 
+        mutate(rear = "hatchery") -> hatchery_covariate_experiences
+      
+      hatchery_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> covariate_experiences
+      
+      # combine wild and hatchery
+      rear_temp_move_prob_quantiles %>% 
+        bind_rows(., hatchery_temp_move_prob_quantiles) -> rear_temp_move_prob_quantiles
+      
+    } 
+    # else run both
+    else {
+      wild_temp_move_prob <- as.data.frame(wild_move_prob_array[,,i])
+      
+      colnames(wild_temp_move_prob) <- paste0("iter", 1:niter) 
+      temp_predict <- seq(-2,2,length = 100)
+      wild_temp_move_prob$temp <- temp_predict
+      
+      # Add a column with the actual temperatures
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        wild_temp_move_prob %>% 
+          mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_mean")] + 
+                   window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_sd")]*temp) -> wild_temp_move_prob
+      } else {
+        wild_temp_move_prob %>% 
+          mutate(temp_actual = 1) -> wild_temp_move_prob
+      }
+      
+      
+      wild_temp_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(temp_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "wild") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> wild_temp_move_prob_quantiles
+      
+      # get data organized for rug plot
+      wild_covariate_experiences %>% 
+        mutate(rear = "wild") -> wild_covariate_experiences
+      
+      wild_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> wild_covariate_experiences
+      
+      hatchery_temp_move_prob <- as.data.frame(hatchery_move_prob_array[,,i])
+      
+      colnames(hatchery_temp_move_prob) <- paste0("iter", 1:niter) 
+      hatchery_temp_move_prob$temp <- temp_predict
+      
+      # Add a column with the actual temperatures
+      if (movements_evaluated$from[i] %in% c(1:9)){
+        hatchery_temp_move_prob %>% 
+          mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_mean")] + 
+                   window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_sd")]*temp) -> hatchery_temp_move_prob
+      } else {
+        hatchery_temp_move_prob %>% 
+          mutate(temp_actual = 1) -> hatchery_temp_move_prob
+      }
+      
+      hatchery_temp_move_prob %>% 
+        pivot_longer(cols = starts_with("iter"), names_to = "iter", values_to = "move_prob") %>% 
+        group_by(temp_actual) %>% 
+        summarise(prob = quantile(move_prob, c(0.025, 0.5, 0.975)), q = c(0.025, 0.5, 0.975)) %>% 
+        pivot_wider(names_from = q, values_from = prob) %>% 
+        mutate(rear = "hatchery") %>% 
+        mutate(from = movements_evaluated$from[i],
+               to = movements_evaluated$to[i]) -> hatchery_temp_move_prob_quantiles
+      
+      # get data organized for rug plot
+      hatchery_covariate_experiences %>% 
+        mutate(rear = "hatchery") -> hatchery_covariate_experiences
+      
+      hatchery_covariate_experiences %>% 
+        # keep only the state that is our from state
+        filter(state == movements_evaluated$from[i]) -> hatchery_covariate_experiences
+      
+      # combine wild and hatchery
+      rear_temp_move_prob_quantiles %>% 
+        bind_rows(., wild_temp_move_prob_quantiles) %>% 
+        bind_rows(., hatchery_temp_move_prob_quantiles) -> rear_temp_move_prob_quantiles
+      
+      wild_covariate_experiences %>% 
+        bind_rows(., hatchery_covariate_experiences) -> covariate_experiences
+      
+    }
+    
+  }
+  
+  
+
+  
+  # convert temp to temp_actual in covariate experiences
+  if (movements_evaluated$from[i] %in% c(1:9)){
+    covariate_experiences %>% 
+      mutate(temp_actual = window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_mean")] + 
+               window_temp_summary[, paste0(subset(dam_index, state == movements_evaluated$from[i])$dam, "_sd")]*temperature) -> covariate_experiences
+  } else {
+    covariate_experiences %>% 
+      mutate(temp_actual = 1) -> covariate_experiences
+  }
+  
+  
+  # Remove any instances for rug plot of fish that would have received temp0 covariate
+  covariate_experiences %>% 
+    dplyr::rename(date_numeric = date) %>% 
+    # keep only jan/feb/mar 
+    mutate(date = ymd("2005-05-31") + days(date_numeric)) %>% 
+    mutate(month = month(date)) %>% 
+    filter(!(month %in% c(1,2,3,4,5))) -> covariate_experiences
+  
+  # rear_temp_move_prob_quantiles$to <- as.character(rear_temp_move_prob_quantiles$to)
+  
+  
+  movement_colors <- c("Overshoot" = "#ff7f00", "Overshoot - ICH" = "#ff7f00",
+                       "Overshoot - PRA" = "#ff7f00",
+                       "Deschutes River" = "#1f78b4",
+                       "Home" = "#33a02c", "Loss" = "#e31a1c")
+  
+  rear_temp_move_prob_quantiles %>% 
+    left_join(., movements_evaluated, by = "to") -> rear_temp_move_prob_quantiles
+  
+  if (plot_legend == TRUE){
+    rear_temp_move_prob_plot <- ggplot(rear_temp_move_prob_quantiles, aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
+                                                                          color = Movement, fill = Movement)) +
+      geom_line() +
+      geom_ribbon(alpha = 0.2, color = NA) +
+      geom_rug(data = covariate_experiences, aes(x = temp_actual), inherit.aes = FALSE,
+               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      scale_color_manual(values = movement_colors) +
+      scale_fill_manual(values =  movement_colors) +
+      xlab(expression(~"Temperature" ~ ("°C"))) +
+      ylab("Movement probability") +
+      coord_cartesian(clip = "off")
+  } else {
+    # suppress common legend - for combined plot
+    rear_temp_move_prob_plot <- ggplot(rear_temp_move_prob_quantiles, aes(x = temp_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
+                                                                          color = Movement, fill = Movement)) +
+      geom_line() +
+      geom_ribbon(alpha = 0.2, color = NA) +
+      geom_rug(data = covariate_experiences, aes(x = temp_actual), inherit.aes = FALSE,
+               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      scale_color_manual(values = movement_colors) +
+      scale_fill_manual(values =  movement_colors) +
+      xlab(expression(~"Temperature" ~ ("°C"))) +
+      ylab("Movement probability") +
+      coord_cartesian(clip = "off") +
+      theme(legend.position = "none")
+  }
+
+  
+
+  
+  
+  return(rear_temp_move_prob_plot)
+}
+
+#### Create figures for individual origins:
+
+# John Day River (W), Umatilla River (H, W), Yakima River (W), Walla Walla River (H, W),
+# Wenatchee River (H, W), Entiat River (W), Tucannon River (H, W), Imnaha River (H, W)
+
+
+### John Day River ###
+JDR_movements <- data.frame(from = c(2, 2, 2, 2), to = c(3, 10, 12, 43),
+                            Movement = c("Overshoot", "Deschutes River",
+                                         "Home", "Loss"))
+JDR_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "John Day River", movements = JDR_movements)
+JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+JDR_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "John Day River",
+                                                            wild_move_prob_array = JDR_wild_temp_move_prob_array,
+                                                            
+                                                            wild_covariate_experiences = JDR_wild_covariate_experiences,
+                                                            
+                                                            movements_evaluated = JDR_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "JDR_wild_compare_movement_temp.png"), JDR_wild_compare_movement_temp, height = 8, width = 8)
+
+### Umatilla River ###
+UMA_movements <- data.frame(from = c(2,2,2,2), to = c(3, 10, 18, 43),
+                            Movement = c("Overshoot", "Deschutes River",
+                                         "Home", "Loss"))
+UMA_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Umatilla River", movements = UMA_movements)
+UMA_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Umatilla River", movements = UMA_movements)
+UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+
+
+# UMA wild plot
+UMA_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Umatilla River",
+                                                                                   wild_move_prob_array = UMA_wild_temp_move_prob_array,
+                                                                                   wild_covariate_experiences = UMA_wild_covariate_experiences,
+                                                                                   movements_evaluated = UMA_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "UMA_wild_compare_movement_temp.png"), UMA_wild_compare_movement_temp, height = 8, width = 8)
+
+# UMA hatchery plot
+UMA_hatchery_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Umatilla River",
+                                                                                       hatchery_move_prob_array = UMA_hatchery_temp_move_prob_array,
+                                                                                       hatchery_covariate_experiences = UMA_hatchery_covariate_experiences,
+                                                                                       movements_evaluated = UMA_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "UMA_hatchery_compare_movement_temp.png"), UMA_hatchery_compare_movement_temp, height = 8, width = 8)
+
+### Yakima River ###
+YAK_movements <- data.frame(from = c(3,3,3,3), to = c(8, 4, 20, 43),
+                            Movement = c("Overshoot - ICH", "Overshoot - PRA",
+                                         "Home", "Loss"))
+
+YAK_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Yakima River", movements = YAK_movements)
+YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+YAK_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Yakima River",
+                                                                                   wild_move_prob_array = YAK_wild_temp_move_prob_array,
+                                                                                   
+                                                                                   wild_covariate_experiences = YAK_wild_covariate_experiences,
+                                                                                   
+                                                                                   movements_evaluated = YAK_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "YAK_wild_compare_movement_temp.png"), YAK_wild_compare_movement_temp, height = 8, width = 8)
+
+
+
+### Walla Walla River ###
+WAWA_movements <- data.frame(from = c(3,3,3,3), to = c(8, 4, 22, 43),
+                            Movement = c("Overshoot - ICH", "Overshoot - PRA",
+                                         "Home", "Loss"))
+WAWA_wild_temp_move_prob_array <- estimate_temp_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_movements)
+WAWA_hatchery_temp_move_prob_array <- estimate_temp_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_movements)
+WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+
+
+# WAWA wild plot
+WAWA_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Walla Walla River",
+                                                                               wild_move_prob_array = WAWA_wild_temp_move_prob_array,
+                                                                               wild_covariate_experiences = WAWA_wild_covariate_experiences,
+                                                                               movements_evaluated = WAWA_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "WAWA_wild_compare_movement_temp.png"), WAWA_wild_compare_movement_temp, height = 8, width = 8)
+
+# WAWA hatchery plot
+WAWA_hatchery_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Walla Walla River",
+                                                                               hatchery_move_prob_array = WAWA_hatchery_temp_move_prob_array,
+                                                                               hatchery_covariate_experiences = WAWA_hatchery_covariate_experiences,
+                                                                               movements_evaluated = WAWA_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "WAWA_hatchery_compare_movement_temp.png"), WAWA_hatchery_compare_movement_temp, height = 8, width = 8)
+
+### Wenatchee River ###
+WEN_movements <- data.frame(from = c(5,5,5), to = c(6, 24, 43),
+                            Movement = c("Overshoot",
+                                         "Home", "Loss"))
+WEN_wild_temp_move_prob_array <- estimate_temp_effect_UCW(origin_select = "Wenatchee River", movements = WEN_movements)
+WEN_hatchery_temp_move_prob_array <- estimate_temp_effect_UCH(origin_select = "Wenatchee River", movements = WEN_movements)
+WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+
+
+# WEN wild plot
+WEN_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Wenatchee River",
+                                                                                   wild_move_prob_array = WEN_wild_temp_move_prob_array,
+                                                                                   wild_covariate_experiences = WEN_wild_covariate_experiences,
+                                                                                   movements_evaluated = WEN_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "WEN_wild_compare_movement_temp.png"), WEN_wild_compare_movement_temp, height = 8, width = 8)
+
+# WEN hatchery plot
+WEN_hatchery_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Wenatchee River",
+                                                                                       hatchery_move_prob_array = WEN_hatchery_temp_move_prob_array,
+                                                                                       hatchery_covariate_experiences = WEN_hatchery_covariate_experiences,
+                                                                                       movements_evaluated = WEN_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "WEN_hatchery_compare_movement_temp.png"), WEN_hatchery_compare_movement_temp, height = 8, width = 8)
+
+### Entiat River ###
+ENT_movements <- data.frame(from = c(6,6,6), to = c(7, 26, 43),
+                            Movement = c("Overshoot",
+                                         "Home", "Loss"))
+ENT_wild_temp_move_prob_array <- estimate_temp_effect_UCW(origin_select = "Entiat River", movements = ENT_movements)
+ENT_hatchery_temp_move_prob_array <- estimate_temp_effect_UCH(origin_select = "Entiat River", movements = ENT_movements)
+ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+ENT_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Entiat River")
+
+
+# ENT wild plot
+ENT_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Entiat River",
+                                                                                   wild_move_prob_array = ENT_wild_temp_move_prob_array,
+                                                                                   wild_covariate_experiences = ENT_wild_covariate_experiences,
+                                                                                   movements_evaluated = ENT_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "ENT_wild_compare_movement_temp.png"), ENT_wild_compare_movement_temp, height = 8, width = 8)
+
+
+### Tucannon River ###
+TUC_movements <- data.frame(from = c(8,8,8), to = c(9, 32, 43),
+                            Movement = c("Overshoot", 
+                                         "Home", "Loss"))
+TUC_wild_temp_move_prob_array <- estimate_temp_effect_SRW(origin_select = "Tucannon River", movements = TUC_movements)
+TUC_hatchery_temp_move_prob_array <- estimate_temp_effect_SRH(origin_select = "Tucannon River", movements = TUC_movements)
+TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+
+
+# TUC wild plot
+TUC_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Tucannon River",
+                                                                                   wild_move_prob_array = TUC_wild_temp_move_prob_array,
+                                                                                   wild_covariate_experiences = TUC_wild_covariate_experiences,
+                                                                                   movements_evaluated = TUC_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "TUC_wild_compare_movement_temp.png"), TUC_wild_compare_movement_temp, height = 8, width = 8)
+
+# TUC hatchery plot
+TUC_hatchery_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Tucannon River",
+                                                                                       hatchery_move_prob_array = TUC_hatchery_temp_move_prob_array,
+                                                                                       hatchery_covariate_experiences = TUC_hatchery_covariate_experiences,
+                                                                                       movements_evaluated = TUC_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "TUC_hatchery_compare_movement_temp.png"), TUC_hatchery_compare_movement_temp, height = 8, width = 8)
+
+### Imnaha River ###
+IMN_movements <- data.frame(from = c(9,9), to = c(39, 43),
+                            Movement = c("Home", "Loss"))
+IMN_wild_temp_move_prob_array <- estimate_temp_effect_SRW(origin_select = "Imnaha River", movements = IMN_movements)
+IMN_hatchery_temp_move_prob_array <- estimate_temp_effect_SRH(origin_select = "Imnaha River", movements = IMN_movements)
+IMN_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Imnaha River")
+IMN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Imnaha River")
+
+
+# IMN wild plot
+IMN_wild_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Imnaha River",
+                                                                                   wild_move_prob_array = IMN_wild_temp_move_prob_array,
+                                                                                   wild_covariate_experiences = IMN_wild_covariate_experiences,
+                                                                                   movements_evaluated = IMN_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "IMN_wild_compare_movement_temp.png"), IMN_wild_compare_movement_temp, height = 8, width = 8)
+
+# IMN hatchery plot
+IMN_hatchery_compare_movement_temp <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "Imnaha River",
+                                                                                       hatchery_move_prob_array = IMN_hatchery_temp_move_prob_array,
+                                                                                       hatchery_covariate_experiences = IMN_hatchery_covariate_experiences,
+                                                                                       movements_evaluated = IMN_movements)
+
+ggsave(here::here("stan_actual", "output", "covariate_effects", "temperature", "IMN_hatchery_compare_movement_temp.png"), IMN_hatchery_compare_movement_temp, height = 8, width = 8)
+
+
+# Create the legend figure by itself
+temp_plot_for_legend <- plot_compare_rear_temp_effect_multiple_movements(origin_select = "John Day River",
+                                                                   wild_move_prob_array = JDR_wild_temp_move_prob_array,
+                                                                   
+                                                                   wild_covariate_experiences = JDR_wild_covariate_experiences,
+                                                                   
+                                                                   movements_evaluated = JDR_movements,
+                                                                   plot_legend= TRUE)
+temp_legend <- ggpubr::get_legend(temp_plot_for_legend)
+temp_plot_legend_gg <- as_ggplot(temp_legend) + theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+
+
+#### Generate the figure for the paper ####
+
+# combined_movement_temp_plot <- ggarrange(JDR_wild_compare_movement_temp, UMA_wild_compare_movement_temp, UMA_hatchery_compare_movement_temp,
+#           YAK_wild_compare_movement_temp, WAWA_wild_compare_movement_temp, WAWA_hatchery_compare_movement_temp,
+#           WEN_wild_compare_movement_temp, WEN_hatchery_compare_movement_temp, ENT_wild_compare_movement_temp,
+#           TUC_wild_compare_movement_temp, TUC_hatchery_compare_movement_temp, IMN_wild_compare_movement_temp, 
+#           IMN_hatchery_compare_movement_temp, plot_legend_gg, nrow = 4, ncol = 4,
+#           labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
+#                      "(J)", "(K)", "(L)", "(M)"),
+#           label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+#           hjust = 0, vjust = 0)
+# 
+# ggsave(here::here("stan_actual", "output", "paper_figures", "combined_movement_temp_plot_v1.png"), combined_movement_temp_plot, height = 12, width = 16)
+
+# without imnaha
+combined_movement_temp_plot <- ggarrange(JDR_wild_compare_movement_temp, UMA_wild_compare_movement_temp, UMA_hatchery_compare_movement_temp,
+                                         YAK_wild_compare_movement_temp, WAWA_wild_compare_movement_temp, WAWA_hatchery_compare_movement_temp,
+                                         WEN_wild_compare_movement_temp, WEN_hatchery_compare_movement_temp, ENT_wild_compare_movement_temp,
+                                         TUC_wild_compare_movement_temp, TUC_hatchery_compare_movement_temp,
+                                         temp_plot_legend_gg, nrow = 3, ncol = 4,
+                                         labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
+                                                    "(J)", "(K)"),
+                                         label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+                                         hjust = 0, vjust = 0)
+
+ggsave(here::here("stan_actual", "output", "paper_figures", "combined_movement_temp_plot_v2.png"), combined_movement_temp_plot, height = 12, width = 16)
 

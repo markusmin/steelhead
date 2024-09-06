@@ -1,0 +1,1926 @@
+This is cmdstanr version 0.8.1.9000
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /opt/cmdstan-2.33.0
+- CmdStan version: 2.33.0
+
+A newer version of CmdStan is available. See ?install_cmdstan() to install it.
+To disable this check set option or environment variable cmdstanr_no_ver_check=TRUE.
+Loading required package: StanHeaders
+
+rstan version 2.35.0.9000 (Stan version 2.35.0)
+
+For execution on a local, multicore CPU with excess RAM we recommend calling
+options(mc.cores = parallel::detectCores()).
+To avoid recompilation of unchanged Stan programs, we recommend calling
+rstan_options(auto_write = TRUE)
+For within-chain threading using `reduce_sum()` or `map_rect()` Stan functions,
+change `threads_per_chain` option:
+rstan_options(threads_per_chain = 1)
+
+This is bayesplot version 1.11.1
+- Online documentation and vignettes at mc-stan.org/bayesplot
+- bayesplot theme set to bayesplot::theme_default()
+   * Does _not_ affect other ggplot2 plots
+   * See ?bayesplot_theme_set for details on theme setting
+This is posterior version 1.6.0
+
+Attaching package: ‘posterior’
+
+The following object is masked from ‘package:bayesplot’:
+
+    rhat
+
+The following objects are masked from ‘package:rstan’:
+
+    ess_bulk, ess_tail
+
+The following objects are masked from ‘package:stats’:
+
+    mad, sd, var
+
+The following objects are masked from ‘package:base’:
+
+    %in%, match
+
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+
+Attaching package: ‘tidyr’
+
+The following object is masked from ‘package:rstan’:
+
+    extract
+
+Loading required package: ggplot2
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+here() starts at /gscratch/scrubbed/mmin
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+New names:
+• `count` -> `count...2`
+• `count` -> `count...3`
+New names:
+• `count` -> `count...4`
+New names:
+• `count` -> `count...5`
+New names:
+• `count` -> `count...6`
+New names:
+• `count` -> `count...7`
+New names:
+• `count` -> `count...8`
+New names:
+• `count` -> `count...9`
+New names:
+• `count` -> `count...10`
+New names:
+• `count` -> `count...11`
+New names:
+• `count` -> `count...12`
+New names:
+• `count` -> `count...13`
+New names:
+• `count` -> `count...14`
+New names:
+• `count` -> `count...15`
+New names:
+• `count` -> `count...16`
+New names:
+• `count` -> `count...17`
+New names:
+• `count` -> `count...18`
+New names:
+• `count` -> `count...19`
+New names:
+• `count` -> `count...20`
+New names:
+• `count` -> `count...21`
+New names:
+• `count` -> `count...22`
+New names:
+• `count` -> `count...23`
+New names:
+• `count` -> `count...24`
+New names:
+• `count` -> `count...25`
+New names:
+• `count` -> `count...26`
+New names:
+• `count` -> `count...27`
+New names:
+• `count` -> `count...28`
+New names:
+• `count` -> `count...29`
+New names:
+• `count` -> `count...30`
+New names:
+• `count` -> `count...31`
+New names:
+• `count` -> `count...32`
+New names:
+• `count` -> `count...33`
+New names:
+• `count` -> `count...34`
+New names:
+• `count` -> `count...35`
+New names:
+• `count` -> `count...36`
+New names:
+• `count` -> `count...37`
+New names:
+• `count` -> `count...38`
+New names:
+• `count` -> `count...39`
+New names:
+• `count` -> `count...40`
+New names:
+• `count` -> `count...41`
+New names:
+• `count` -> `count...42`
+New names:
+• `count` -> `count...43`
+New names:
+• `count` -> `count...44`
+New names:
+• `count` -> `count...45`
+New names:
+• `count` -> `count...46`
+New names:
+• `count` -> `count...47`
+New names:
+• `count` -> `count...48`
+New names:
+• `count` -> `count...49`
+New names:
+• `count` -> `count...50`
+New names:
+• `count` -> `count...51`
+New names:
+• `count` -> `count...52`
+New names:
+• `count` -> `count...53`
+New names:
+• `count` -> `count...54`
+New names:
+• `count` -> `count...55`
+New names:
+• `count` -> `count...56`
+New names:
+• `count` -> `count...57`
+New names:
+• `count` -> `count...58`
+New names:
+• `count` -> `count...59`
+New names:
+• `count` -> `count...60`
+New names:
+• `count` -> `count...61`
+New names:
+• `count` -> `count...62`
+New names:
+• `count` -> `count...63`
+New names:
+• `count` -> `count...64`
+New names:
+• `count` -> `count...65`
+New names:
+• `count` -> `count...66`
+New names:
+• `count` -> `count...67`
+New names:
+• `count` -> `count...68`
+New names:
+• `count` -> `count...69`
+New names:
+• `count` -> `count...70`
+New names:
+• `count` -> `count...71`
+New names:
+• `count` -> `count...72`
+New names:
+• `count` -> `count...73`
+New names:
+• `count` -> `count...74`
+New names:
+• `count` -> `count...75`
+New names:
+• `count` -> `count...76`
+New names:
+• `count` -> `count...77`
+New names:
+• `count` -> `count...78`
+New names:
+• `count` -> `count...79`
+New names:
+• `count` -> `count...80`
+New names:
+• `count` -> `count...81`
+New names:
+• `count` -> `count...82`
+New names:
+• `count` -> `count...83`
+New names:
+• `count` -> `count...84`
+New names:
+• `count` -> `count...85`
+New names:
+• `count` -> `count...86`
+New names:
+• `count` -> `count...87`
+New names:
+• `count` -> `count...88`
+New names:
+• `count` -> `count...89`
+New names:
+• `count` -> `count...90`
+New names:
+• `count` -> `count...91`
+New names:
+• `count` -> `count...92`
+New names:
+• `count` -> `count...93`
+New names:
+• `count` -> `count...94`
+New names:
+• `count` -> `count...95`
+New names:
+• `count` -> `count...96`
+New names:
+• `count` -> `count...97`
+New names:
+• `count` -> `count...98`
+New names:
+• `count` -> `count...99`
+New names:
+• `count` -> `count...100`
+New names:
+• `count` -> `count...101`
+`summarise()` has grouped output by 'state'. You can override using the
+`.groups` argument.
+Warning messages:
+1: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+2: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+3: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+4: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+5: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+6: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+7: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+8: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
+9: Returning more (or less) than 1 row per `summarise()` group was deprecated in
+dplyr 1.1.0.
+ℹ Please use `reframe()` instead.
+ℹ When switching from `summarise()` to `reframe()`, remember that `reframe()`
+  always returns an ungrouped data frame and adjust accordingly. 
