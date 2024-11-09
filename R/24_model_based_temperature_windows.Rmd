@@ -322,6 +322,7 @@ write.csv(LGR_slow_window_temp, here::here("covariate_data", "for_model", "temp"
 
 #### export in the format needed for stan
 ```{r}
+# Trim to only the run years we're modeling: 05/06-21/22
 dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_temp) %>% 
   left_join(dplyr::rename(dplyr::select(MCN_window_temp, date, window_temp), MCN = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(PRA_window_temp, date, window_temp), PRA = window_temp), by = "date") %>% 
@@ -332,6 +333,7 @@ dplyr::rename(dplyr::select(BON_window_temp, date, window_temp), BON = window_te
   left_join(dplyr::rename(dplyr::select(LGR_quick_window_temp, date, window_temp), LGR_quick = window_temp), by = "date") %>% 
   left_join(dplyr::rename(dplyr::select(WEL_slow_window_temp, date, window_temp), WEL_slow = window_temp), by = "date") %>%
   left_join(dplyr::rename(dplyr::select(LGR_slow_window_temp, date, window_temp), LGR_slow = window_temp), by = "date") %>%
+  filter(date <= ymd("2022-05-31")) %>% 
   mutate(index = row_number()) %>% 
   relocate(index) %>% 
   dplyr::select(-date) %>% 
@@ -383,10 +385,83 @@ window_temps %>%
   mutate(MOUTH = 0) %>% 
   relocate(MOUTH) -> window_temps
   
-  
+# add rows of -999s for all of the dates that we aren't modeling to keep the dimensions the same
+# for all the other data
+extra_days <- data.frame(MOUTH = rep(-999, 6423-nrow(window_temps)),
+                         BON = rep(-999, 6423-nrow(window_temps)),
+                         MCN = rep(-999, 6423-nrow(window_temps)),
+                         PRA = rep(-999, 6423-nrow(window_temps)),
+                         RIS = rep(-999, 6423-nrow(window_temps)),
+                         RRE = rep(-999, 6423-nrow(window_temps)),
+                         WEL_quick = rep(-999, 6423-nrow(window_temps)),
+                         ICH = rep(-999, 6423-nrow(window_temps)),
+                         LGR_quick = rep(-999, 6423-nrow(window_temps)),
+                         WEL_slow = rep(-999, 6423-nrow(window_temps)),
+                         LGR_slow = rep(-999, 6423-nrow(window_temps)))
+
+window_temps %>% 
+  bind_rows(., extra_days) -> window_temps
+
 
 write.csv(window_temps, here::here("covariate_data", "for_model", "window_temps_for_stan.csv"))
 write.csv(window_temps_summary, here::here("covariate_data", "for_model", "window_temps_summary.csv"))
 write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/rear_temp/upper_columbia/window_temps_for_stan.csv")
 
+# export all of these files in the folders where the v3 model runs are
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/upper_columbia_wild/window_temps_for_stan.csv")
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/upper_columbia_hatchery/window_temps_for_stan.csv")
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/middle_columbia_wild/window_temps_for_stan.csv")
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/middle_columbia_hatchery/window_temps_for_stan.csv")
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/snake_river_wild/window_temps_for_stan.csv")
+write.csv(window_temps, "/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/snake_river_hatchery/window_temps_for_stan.csv")
+
 ```
+
+Let's look at the medians by year here to see the distribution of years is also centered around zero.
+
+```{r year-specific}
+temp_ts <- window_temps[!(window_temps$MOUTH == -999),]
+dates <- seq(ymd("2005-06-01"), ymd("2022-05-31"), by = "days")
+years <- year(dates)
+temp_ts$date <- dates
+temp_ts$year <- years
+
+run_year <- c("04/05", "05/06", "06/07", "07/08", "08/09", "09/10", "10/11", "11/12", "12/13", "13/14", "14/15", "15/16", "16/17", "17/18", "18/19", "19/20", "20/21","21/22", "22/23")
+run_year_start <- seq(ymd("2004-06-01"), ymd("2022-06-01"), by = "years")
+run_year_end <- seq(ymd("2005-05-31"), ymd("2023-05-31"), by = "years")
+run_year_numeric = seq(4, 22, 1)
+
+run_year_df <- data.frame(run_year, run_year_start, run_year_end, run_year_numeric)
+
+
+temp_ts %>% 
+  rowwise() %>%
+  dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date & run_year_end >= date)$run_year) %>% 
+  group_by(run_year) %>% 
+  summarise_all(median) %>% 
+  arrange(BON) -> annual_temp_medians
+
+temp_ts %>% 
+  rowwise() %>%
+  dplyr::mutate(run_year = subset(run_year_df, run_year_start <= date & run_year_end >= date)$run_year) %>% 
+  group_by(run_year) %>% 
+  summarise_all(mean) %>% 
+  arrange(BON) -> annual_temp_means
+
+
+summary(annual_temp_medians$BON)
+summary(annual_temp_means$BON)
+summary(temp_ts$BON)
+
+# so yeah, the year medians are slightly negative; the full dataset is centered, and the year means are essentially centered. That makes more sense
+
+median_temp_by_run_year_BON <- ggplot(annual_temp_medians, aes(x = year, y = BON, label = run_year)) +
+  geom_point() +
+  ylab("Z-scored basin temperature") +
+  geom_text(aes(y = BON + 0.01))
+
+ggsave(here::here("docs", "site_figures", "data_plots", "median_temp_by_run_year_BON.png"), median_temp_by_run_year_BON, height = 8, width = 8)
+```
+
+
+

@@ -5,6 +5,8 @@ date: "2023-05-16"
 output: html_document
 ---
 
+NOTE THAT THIS IS NO LONGER USED - SEE SCRIPTS 23 AND 24 FOR MODEL-BASED APPROACH
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 

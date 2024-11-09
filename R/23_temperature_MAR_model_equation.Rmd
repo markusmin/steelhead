@@ -1,0 +1,56 @@
+---
+title: "temp_MARSS_model"
+author: "Markus Min"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+The model in MARSS:
+```{r}
+a <- matrix(data = as.list(rep(0, 16)),
+            nrow = 16, ncol = 1)
+a[3:16] <- c("a_MCN", "a_MCN", "a_PRA", "a_PRA", "a_RIS", "a_RIS",
+       "a_RRE", "a_RRE", "a_ICH", "a_ICH", "a_WEL", "a_WEL", "a_LGR", "a_LGR")
+A <- a
+
+# no bias term for Columbia river temp
+U <- "zero"
+
+# just one process and no interactions
+B <- matrix(1)
+
+# Z is sixteen observations of the same process
+Z <- matrix(1, 16, 1)
+
+# we need eight elements to correspond to the 
+# eight dams, and each element will be represented twice (once for forebay and once for tailrace)
+r <- matrix(data = as.list(rep(0, 256)), nrow = 16, ncol = 16)
+diag(r) <- c("r_BON", "r_BON", "r_MCN", "r_MCN", "r_PRA", "r_PRA", "r_RIS", "r_RIS",
+             "r_RRE", "r_RRE", "r_ICH", "r_ICH", "r_WEL", "r_WEL", "r_LGR", "r_LGR")
+# R <- r
+# variance among dams is probably the same, given all the same equipment
+R <- "diagonal and equal"
+Q <- matrix("q") # this matrix is a 1x1 matrix, because there's only one trend we're estimating
+model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R)
+
+model.list
+```
+
+
+
+
+
+The model is structured as follows:
+$$
+x_t = x_{t-1} + w_t \\
+\mathbf{y}_t = \mathbf{Z}x_t + \mathbf{a}_t + \mathbf{v}_t
+$$
+
+The terms have the following definitions:
+
+* $x$ is the basin-scale temperature
+* $w$ is the process error, where $w_t \sim \text{normal}(0, Q)$ and where $Q$ is an estimated parameter
+* $\mathbf{y}$ is a 16x1 column vector that contains 16 observations of the temperature: 8 dams x 2 observations at each dam (forebay and tailrace)
+* $\mathbf{Z}$ is a 16x1 column vector containing only 1s that maps the process (the basin-scale temperature) to the observations (forebay and tailrace temperatures at each dam)
+* $\mathbf{a}$ is a 16x1 column vector that contains 8 different offset terms each repeated twice (for the forebay and tailrace temperatures at each dam)
+* $\mathbf{v}$ is a 16x1 column vector of the observation errors, where $v_t \sim \text{MVN}(0, R)$ and where $R$ is an estimated parameter
