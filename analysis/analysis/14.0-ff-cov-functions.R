@@ -10910,5 +10910,5 @@ plot_final_fate_rear_type <- function(ff_comp, natal_origin){
 }
 
 #### Set conditions for simulations ####
-ff_iter <- 100
-ff_nsim <- 100
+ff_iter <- 1000
+ff_nsim <- 1000

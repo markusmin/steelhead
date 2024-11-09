@@ -71,17 +71,21 @@ WAWA_ICH_winterspill_homing %>%
 save(WAWA_ICH_winterspill_homing, file = here::here("stan_actual", "output", "final_fates_covariates", "WAWA_ICH_winterspill_homing.rda"))
 
 rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
-WAWA_ICH_winterspill_homing_plot <- ggplot(WAWA_ICH_winterspill_homing, aes(x = ICH_winterspill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, color = rear_type,
-                                                                            shape = conditions)) +
+rear_shapes <- c(17, 19)
+WAWA_ICH_winterspill_homing$conditions <- factor(WAWA_ICH_winterspill_homing$conditions, levels = c("coldest", "average", "warmest"))
+condition_colors <- c("coldest" = "#2c7bb6", "average" = "#ffffbf", "warmest" = "#d7191c")
+
+WAWA_ICH_winterspill_homing_plot <- ggplot(WAWA_ICH_winterspill_homing, aes(x = ICH_winterspill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, color = conditions,
+                                                                            shape = rear_type)) +
   geom_point(size = 3.5, position=position_dodge(width=3)) +
   geom_linerange(position=position_dodge(width=3)) +
-  scale_shape_manual(values = c(15,16,17)) +
   ylab("Homing Probability") +
   xlab("Days of Winter Spill at Ice Harbor Dam") +
   # ggtitle(" ") +
   # Create a scale common to all
   scale_y_continuous(lim = c(0, 1), breaks = seq(0, 1, 0.25)) +
-  scale_color_manual(values = rear_colors) +
+  scale_shape_manual(values = rear_shapes) +
+  scale_color_manual(values = condition_colors) +
   theme(plot.title = element_text(size = 12),
         # axis.text.y = element_text(color = rev(state_significance_colors)),
         axis.title = element_text(size = 14),
