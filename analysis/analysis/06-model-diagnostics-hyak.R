@@ -62,8 +62,6 @@ install.packages("plyr")
 install.packages("ggthemes")
 install.packages("timechange")
 install.packages("lubridate")
-
-
 # # install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")), dependencies = TRUE)
 # # alternatively: remotes::install_github("stan-dev/cmdstanr")
 # alternatively: renv::install("stan-dev/cmdstanr") # this ended up working
@@ -73,6 +71,7 @@ install.packages("rstan", repos = c('https://stan-dev.r-universe.dev', getOption
 install.packages("bayesplot")
 install.packages("here")
 install.packages("ggpubr")
+install.packages("Formula")
 
 #### Load libraries, state information ####
 library(cmdstanr)
