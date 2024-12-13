@@ -7454,10 +7454,10 @@ If we dropped the Imnaha, we would have 11 populations, giving us room for the l
 
 # resubmitting the FF and cov runs, now with v3 model runs
 
-# Okay, let's move our paper figures from gscratch/scrubbed down to our manuscripts folder
-(base) markusmin@Markuss-MacBook-Pro-2 manuscript % pwd
-/Users/markusmin/Documents/CBR/manuscript
-(base) markusmin@Markuss-MacBook-Pro-2 manuscript %  scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+# Okay, let's move our paper figures from gscratch/scrubbed down to our local R project (linked to github as well)
+(base) markusmin@Markuss-MacBook-Pro-2 figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/
+(base) markusmin@Markuss-MacBook-Pro-2 figures %  scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
 
 
 combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_wild_compare_movement_spill, UMA_hatchery_compare_movement_spill,
@@ -7469,3 +7469,351 @@ combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_w
                                                      "(J)", "(K)"),
                                           label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
                                           hjust = 0, vjust = 0)
+
+
+### 2024-09-07 ###
+
+NEED to pull the FF and cov runs and data files to local in order to make the plots
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates/ ./
+
+
+### 2024-10-03 ###
+
+Access has been restored to STF. Everything got deleted off of gscratch/scrubbed (to be expected), so we will have to move things
+back over there!
+
+# let's move the analysis folder back over
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./analysis/ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/
+
+# let's move the stan runs back over
+[mmin@klone-login03 stan_actual]$ pwd
+/gscratch/scrubbed/mmin/stan_actual
+[mmin@klone-login03 stan_actual]$ scp -r mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/ ./
+
+# let's re-download all of our packages by running the 06 script
+
+
+### 2024-10-14 ###
+
+Ok, let's re-run all models but with the updated z-scored temperature data.
+- I trimmed it down to only the years we care about, but in order to keep the dimensionality
+the same I'm going to add a bunch of -999s preceding the time period that we care about
+
+All we have to do is update the temperature data within the model_data.rda file that each stan model
+is running based on
+- I moved the updated temperature data into the reparameterization_v3 folders
+- I updated the model_data.rda file to change just this input
+
+Move the new model_data.rda files to hyak
+
+# run the same thing basically for all six models
+(base) markusmin@Markuss-MacBook-Pro-2 upper_columbia_wild % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3/upper_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 upper_columbia_wild % scp ./model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3/snake_river_wild/
+
+Also need to amend the stan scripts 
+
+
+# then submit all the jobs on hyak
+
+### 2024-10-15 ###
+
+Hm, some runs completed but most failed with this familiar error:
+Running MCMC with 1 chain, with 28 thread(s) per chain...
+
+Chain 1 Rejecting initial value:
+Chain 1   Log probability evaluates to log(0), i.e. negative infinity.
+Chain 1   Stan can't start sampling from this initial value.
+Chain 1 Rejecting initial value:
+
+So, I wonder if our temperature treatment/indexing and using a bunch of -999s are
+somehow getting indexed and leading to basically zeros in the numerator?
+- These -999s are only supposed to be in places where we don't have data though
+- So one of our assumptions is apparently wrong
+
+Okay, so here's the code in the data prep script:
+
+  # # We'll use 2005-05-31 as day 0, so that day 1 is 2005-06-01, which is the first day in run year 05/06 (first run year in our dataset)
+  date_numeric <- function(x, na.rm = FALSE) as.numeric(ymd(date(x)) - ymd("2005-05-31"))
+  
+  So, day 1 is 2005-06-01
+  
+I think that the way I prepped the data is just wrong. I should have added
+those -999s to the end of the data, not appended them before the start of the data
+
+So let's change that, then re-upload those to the correct folders (as before, but now using
+a script), then resubmit our runs
+  
+Apparently if I ever load the .rda file to local R immediately aborts. Super dope
+But it also aborts randomly other times as well
+- Followed this advice on Reddit to reset R's internal state: https://www.reddit.com/r/rprogramming/comments/1cbmysa/i_keep_getting_r_session_aborted_in_rstudio_when/
+- Used this link: https://support.posit.co/hc/en-us/articles/200534577-Resetting-RStudio-Desktop-s-State
+
+Alright, resubmitted all those jobs. Fingers crossed that they work...
+
+### 2024-10-22 ###
+
+So, runs all completed! SRH only took about six days. 
+
+I submitted all of the jobs to run the FF cov jobs with 1000 iter/1000 sim; also wrote
+a bash script to submit those jobs together ("submit_FF_cov.sh")
+
+Temperature plots
+- we need to upload a file so that we can turn z-scored values back to their actual values
+
+(base) markusmin@Markuss-MacBook-Pro-2 for_model % pwd
+/Users/markusmin/Documents/CBR/steelhead/covariate_data/for_model
+
+(base) markusmin@Markuss-MacBook-Pro-2 for_model %  scp ./window_temps_summary.csv mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/
+
+### 2024-10-25 ###
+
+The cov-ff jobs are stuck in the queue, maybe because I requested ten days for each.
+Let's work on some of the other results figures
+
+Ok, my analysis scripts got wiped off of hyak. Let's put them back!
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./analysis/ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/
+
+Also a good reminder to always pull your analysis scripts...
+Somehow my connection to hyak has gotten wayyyy slower... not sure why
+
+# okay, we also need to move our outputs back on hyak
+
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures
+(base) markusmin@Markuss-MacBook-Pro-2 site_figures % scp -r ./final_fates/ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/
+
+### 2024-10-26 ###
+
+My FF-cov runs finished - suspiciously quickly..
+Let's pull them and inspect
+(base) markusmin@Markuss-MacBook-Pro-2 final_fates_covariates_fullruns % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures/final_fates_covariates_fullruns
+(base) markusmin@Markuss-MacBook-Pro-2 final_fates_covariates_fullruns % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
+
+Yeah, definitely wrong. Time to resubmit!
+
+# pull scripts from gscratch/scrubbed
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis %  scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/ ./
+
+# Made changes - fixed the plotting code and also changed to run 1000 nsim and 1000 niter
+
+# push the scripts back
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r ./analysis/ mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/
+
+### 2024-10-28 ###
+
+Looks like some of the FF cov runs are already finished, that's pretty fast!
+Pull the ones that finished and inspect
+(base) markusmin@Markuss-MacBook-Pro-2 final_fates_covariates_fullruns % pwd
+/Users/markusmin/Documents/CBR/steelhead/docs/site_figures/final_fates_covariates_fullruns
+(base) markusmin@Markuss-MacBook-Pro-2 final_fates_covariates_fullruns % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
+
+
+
+
+
+To change the one state movement probs functions:
+- UCW to UCH
+- Change the origin_params vector to the right length; rename to either hatchery of wild
+- change origin_param_map subset from wild to hatchery
+- change j loop to have the right number of origins
+
+For overshoot movement probabilities:
+- it's interesting to note that when we are plotting the overshoot probabilities by temperature,
+the temperature ranges tend to expand considerably past the median. Like the median is more like
+15 C, but we're plotting past 20. Perhaps in the rug plots we should actually change that to a density?
+Or a raincloud?
+
+
+### 2024-10-29 ###
+
+Ok, so all FF-cov runs finished except Wenatchee, which timed out because apparently the time
+limit I set was 48 hours (I could have sworn I upped this to 240??)
+- let's change that one to 120 hours and resubmit.
+
+RStudio keeps crashing. I think I'm hitting my memory limit of 20G. Maybe we can up this on all of our jobs and see if that improves things
+- okay, changed all jobs to 100 G memory
+- Okay this seemed to have solved our issues
+
+# I think we might have to re-submit our FF jobs
+- ok, I did that
+
+
+# Pull the figure 4 that we're working on
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+
+
+### 2024-10-30 ###
+
+Uh oh, FF-cov run didn't finish in 12 hours. Let's go and check that slurm output
+
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd 
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/slurm-21741603.out ./
+
+Ok it ran for quite a while but didn't quite finish. Resubmitted with 72 hours
+
+### 2024-11-07 ###
+
+I keep getting the bomb again with the Steelhead project. Load of crap
+- seems to be okay again
+
+### 2024-11-08 ###
+
+Let's update some figures!
+# Pull the updated figure 4
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+
+
+# Pull all the analysis scripts
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd                          
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/ ./
+
+### 2024-11-09 ###
+
+# moved some scripts to github
+
+# running the entirety of 09-model-temperature-plots.R
+- updating all of my analysis scripts to source a script first that loads the model runs
+
+### 2024-11-11 ###
+
+Pull updated figures 5 and 6
+
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+
+# download the FF-cov runs for hyak so that we can generate the figure locally
+
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 final_fates_covariates_fullruns % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
+
+# Looking at these, something looks off. I think that maybe I accidentally overwrote 
+some of the jobs that I meant to submit? Because I know I wanted to run the models
+under the hottest and coldest conditions, and it doesn't look like that's what actually ran.
+That must be what happened, because these don't look right.
+
+BE CAREFUL WHEN MOVING SCRIPTS TO AND FROM HYAK, YOU WILL OVERWRITE THINGS
+- To fix this issue, let's try editing scripts only on hyak that are in the analysis folder.
+And then we can pull from that folder.
+
+The annoying thing is that I can't even submit these new jobs until Wednesday... But that should mean that
+we can update this plot next Monday. Consolation prize. And they only take a couple of days anyway,
+so not like there's a lot of wasted time.
+
+### 2024-11-27 ###
+
+Making a bunch of figure edits.
+
+# Pull figures:
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/paper_figures/ ./
+
+# Pull scripts:
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % pwd
+/Users/markusmin/Documents/CBR/steelhead/analysis
+(base) markusmin@Markuss-MacBook-Pro-2 analysis % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/analysis/analysis/ ./
+
+### 2024-12-04 ###
+
+Let's inspect those final fates and covariates simulated runs.
+# We can overwrite in the paper_figures folder locally
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures
+(base) markusmin@Markuss-MacBook-Pro-2 paper_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates_covariates ./
+
+### 2024-12-05 ###
+
+Fixed a weird background issue with the temperature and spill plots, redownloaded.
+
+There are a few small discrepancies with the new sample size table (generated directly from
+data that went into the model, so I'm confident in the numbers) vs. the old one. They're a few thousand
+fish different, and I believe it's because in some previous versions of the table, there are some run years
+that I just excluded because they were in years where the tributary array wasn't yet active. But
+because our model accounts for that (in DE vs. non-DE years), I'm not worried about it.
+
+### 2024-12-12 ###
+
+Need to resubmit the March spill reparam_v3 runs.
+
+From line 7150: Made sure to both change the winter spill days to refer to only march
+and for the winter_post_overshoot_vector to only allow fish that could have experienced march spill
+to get the covariate. Did this in the data prep script. Exported these all in a new
+folder called reparameterization_v3_marchspilldays
+
+Unfortunately the path of just loading the old model data then just changing a couple
+of things doesn't work here, because you need the processed state data in order to
+generate the winter_post_overshoot_vector
+
+
+
+Also noticed a typo in the v3 script where they set the working directory to v2 to pull
+files before exporting them to v3. Shouldn't matter though. Didn't fix it
+
+
+# move the new input model_data.rda files to hyak
+
+(base) markusmin@Markuss-MacBook-Pro-2 stan_actual % pwd
+/Users/markusmin/Documents/CBR/steelhead/stan_actual/reparameterization_v3_marchspilldays
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./middle_columbia_hatchery/ mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/middle_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./middle_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/middle_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./upper_columbia_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/upper_columbia_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./upper_columbia_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/upper_columbia_wild
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./snake_river_hatchery/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/snake_river_hatchery
+(base) markusmin@Markuss-MacBook-Pro-2 reparameterization_v3_marchspilldays % scp ./snake_river_wild/model_data.rda mmin@klone.hyak.uw.edu:/gscratch/stf/mmin/stan_runs/reparameterization_v3_marchspilldays/snake_river_wild
+
+
+# Let's also re-plot detection efficiency in a way that we can include in the supplements
+Looking at this script: 13-model-detection-efficiency-plots.R
+- made a couple of aesthetic edits to the detection efficiency plots
+
+# Okay, let's pull them:
+
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures/supplemental_figures
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/detection_efficiency ./
+
+# Let's regenerate model diagnostics plots
+- SRH and SRW look a bit concerning. There are some parameters with a very low ESS (<500)
+- Well, not something I can fix right now. Let's just put them in the supplements
+
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures/supplemental_figures
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/diagnostics ./
+
+# Let's pull those median final fates figures
+
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % pwd
+/Users/markusmin/Documents/CBR/steelhead/figures/paper_figures/supplemental_figures
+(base) markusmin@Markuss-MacBook-Pro-2 supplemental_figures % scp -r mmin@klone.hyak.uw.edu:/gscratch/scrubbed/mmin/stan_actual/output/final_fates ./
+
+
+
+
+
+
+
+
+
+
