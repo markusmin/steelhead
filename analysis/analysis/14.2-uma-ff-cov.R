@@ -25,19 +25,15 @@ source(here::here("analysis", "analysis", "14.0-ff-cov-functions.R"))
 
 #### Winter spill days comparison ####
 
-### Umatilla River ###
 
-# Umatilla River Steelhead: compare how homing changes based on winter spill days at McNary Dam
-# compare homing at 0, 20, 30, 50 winter spill days
-MCN_winter_spill_values <- c(0, 0.10, 0.20,0.30, 0.40, 0.50)
-
-fix_run_years <- rep_years$fix_run_year[2:4]
+# compare at the hottest, coldest, and average conditions
+fix_run_years <- rep_years$fix_run_year[c(1,3,5)]
 
 ### Umatilla River ###
 
 # Umatilla River Steelhead: compare how homing changes based on winter spill days at McNary Dam
-# compare homing at 0, 20, 30, 50 winter spill days
-MCN_winter_spill_values <- c(0, 0.10, 0.20,0.30, 0.40, 0.50)
+# compare homing at 0, 30, 60, 90 winter spill days
+MCN_winter_spill_values <- c(0, 0.30, 0.60, 0.90)
 
 UMA_MCN_winterspill_homing <- data.frame()
 

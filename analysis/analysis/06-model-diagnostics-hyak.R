@@ -72,213 +72,61 @@ install.packages("bayesplot")
 install.packages("here")
 install.packages("ggpubr")
 install.packages("Formula")
-
-#### Load libraries, state information ####
-library(cmdstanr)
-library(rstan)
-library(bayesplot)
-library(posterior)
-library(dplyr)
-library(here)
-library(ggpubr)
-library(stringr)
-
-# get the model states into a df, to help with interpretation
-model_states = c(
-  # Mainstem states (9)
-  "mainstem, mouth to BON",
-  "mainstem, BON to MCN",
-  "mainstem, MCN to ICH or PRA",
-  "mainstem, PRA to RIS",
-  "mainstem, RIS to RRE",
-  "mainstem, RRE to WEL",
-  "mainstem, upstream of WEL",
-  "mainstem, ICH to LGR",
-  "mainstem, upstream of LGR",
-  
-  # Tributary states ()
-  # With detection efficiencies in the model, we now have more tributary states,
-  # since we have an upstream and a river mouth state
-  
-  # "Deschutes River", 
-  "Deschutes River Mouth", "Deschutes River Upstream",
-  # "John Day River", 
-  "John Day River Mouth", "John Day River Upstream",
-  # "Hood River",
-  "Hood River Mouth", "Hood River Upstream",
-  # "Fifteenmile Creek", 
-  "Fifteenmile Creek Mouth", "Fifteenmile Creek Upstream",
-  # "Umatilla River",
-  "Umatilla River Mouth", "Umatilla River Upstream",
-  # "Yakima River",
-  "Yakima River Mouth", "Yakima River Upstream",
-  # "Walla Walla River",
-  "Walla Walla River Mouth", "Walla Walla River Upstream",
-  # "Wenatchee River", 
-  "Wenatchee River Mouth", "Wenatchee River Upstream",
-  # "Entiat River", 
-  "Entiat River Mouth", "Entiat River Upstream",
-  # "Okanogan River", 
-  "Okanogan River Mouth", "Okanogan River Upstream",
-  # "Methow River", 
-  "Methow River Mouth", "Methow River Upstream",
-  # "Tucannon River",
-  "Tucannon River Mouth", "Tucannon River Upstream",
-  # "Asotin Creek", 
-  "Asotin Creek Mouth", "Asotin Creek Upstream",
-  "Clearwater River",
-  "Salmon River",
-  "Grande Ronde River",
-  # "Imnaha River",
-  "Imnaha River Mouth", "Imnaha River Upstream",
-  "BON to MCN other tributaries",
-  "Upstream WEL other tributaries",
-  
-  # Loss
-  "loss"
-)
-
-# create a list that maps origin numbers (params) to what they actually are
-natal_origins <- gsub(" Mouth| Upstream", "", model_states)
-natal_origins <- natal_origins[!(duplicated(natal_origins))]
-natal_origins <- natal_origins[!(grepl("mainstem", natal_origins))]
-natal_origins <- natal_origins[!(grepl("other tributaries", natal_origins))]
-natal_origins <- natal_origins[!(natal_origins == "loss")]
-
-# Use the parameter map to index the right effects
-origin_param_map <- data.frame(
-  natal_origin = natal_origins,
-  hatchery = c(NA, NA, NA, NA, 1, NA, 2, # MC
-               1,NA,2,3, # UC
-               5,NA,1,4,2,3), # SR,
-  wild = c(1,3,NA,2,4,6,5, # MC
-           1,2,NA,3, # UC
-           6,1,2,5,3,4)) # SR
-
-# Get info about state names and numbers
-from_state_number_names <- data.frame(from = seq(1,43,1), from_name = model_states)
-to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
+install.packages("htmltools")
+install.packages("digest")
+install.packages("fastmap")
+install.packages("miniUI")
+install.packages("httpuv")
+install.packages("shiny")
+install.packages("later")
+install.packages("xtable")
+install.packages("promises")
+install.packages("ggExtra")
+install.packages("mime")
+install.packages("patchwork")
 
 
-# get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
-UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
-UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
-
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
-UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
-UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
-
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
-MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
-MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
-
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
-MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
-MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
-
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
-SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
-SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
-
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
-SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
-SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
-
-
-##### Load the model runs #####
-
-# Function to bind four chains together
-bind4chains <- function(chain1, chain2, chain3, chain4){
-  bound_draws <- bind_draws(chain1$draws(),
-                            chain2$draws(),
-                            chain3$draws(),
-                            chain4$draws(), along = "chain")
-  
-  return(bound_draws)
-}
-
-## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
-
-# bind chains together
-UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
-# thin2
-thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
-# summarise
-UCW_fit_summary <- summarise_draws(UCW_fit)
-
-## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
-
-# bind chains together
-UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
-# thin2
-thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
-# summarise
-UCH_fit_summary <- summarise_draws(UCH_fit)
-
-## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
-
-# bind chains together
-MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
-# thin2
-thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
-# summarise
-MCW_fit_summary <- summarise_draws(MCW_fit)
-
-## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
-
-# bind chains together
-MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
-# thin2
-thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
-# summarise
-MCH_fit_summary <- summarise_draws(MCH_fit)
-
-## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
-
-# bind chains together
-SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
-# thin2
-thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
-# summarise
-SRW_fit_summary <- summarise_draws(SRW_fit)
-
-## Snake River, Hatchery
-# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-# temporary - chain1 didn't finish so read chain 4 twice
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
-
-# bind chains together
-SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
-# thin2
-thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
-# summarise
-SRH_fit_summary <- summarise_draws(SRH_fit)
+# First, need to load in all of the model runs and all of the packages.
+source("analysis/analysis/00-load-model-runs.R")
 
 ##### Run diagnostic summaries #####
+
+# A first summary: how many parameters are we estimating?
+# we can drop duplicated parameters that have the exact same estimates, because
+# we often have parameters stored in multiple places
+# we should alo plot these parameters
+UCW_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> UCW_unique_parameters_fit_summary
+
+UCH_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> UCH_unique_parameters_fit_summary
+
+MCW_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> MCW_unique_parameters_fit_summary
+
+MCH_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> MCH_unique_parameters_fit_summary
+
+SRW_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> SRW_unique_parameters_fit_summary
+
+SRH_fit_summary %>% 
+  filter(!(duplicated(median) & duplicated(mean))) %>% 
+  filter(!(variable == "lp__")) -> SRH_unique_parameters_fit_summary
+
+dim(UCW_unique_parameters_fit_summary)
+dim(UCH_unique_parameters_fit_summary)
+dim(MCW_unique_parameters_fit_summary)
+dim(MCH_unique_parameters_fit_summary)
+dim(SRW_unique_parameters_fit_summary)
+dim(SRH_unique_parameters_fit_summary)
+
+
 
 # Create six-panel diagnostic plots for rhat, ess_bulk, and ess_tail
 
@@ -301,7 +149,8 @@ create_ess_bulk_hist <- function(fit_summary, population){
     # annotate("text", label = round(range(fit_summary$ess_bulk, na.rm = T),3)[1], x = max(fit_summary$ess_bulk, na.rm = T), y = 550,hjust = 1) +
     # annotate("text", label = paste0(" - ", round(range(fit_summary$ess_bulk, na.rm = T),3)[2]), x = max(fit_summary$ess_bulk, na.rm = T), y = 500, hjust = 1) +
     ylab("N parameters") +
-    ggtitle(population)
+    ggtitle(population) +
+    scale_x_continuous(lim = c(0, 4200))
   
   return(ess_bulk_plot)
 }
@@ -313,32 +162,33 @@ create_ess_tail_hist <- function(fit_summary, population){
     # annotate("text", label = round(range(fit_summary$ess_tail, na.rm = T),3)[1], x = max(fit_summary$ess_tail, na.rm = T), y = 550,hjust = 1) +
     # annotate("text", label = paste0(" - ", round(range(fit_summary$ess_tail, na.rm = T),3)[2]), x = max(fit_summary$ess_tail, na.rm = T), y = 500, hjust = 1) +
     ylab("N parameters") +
-    ggtitle(population)
+    ggtitle(population) +
+    scale_x_continuous(lim = c(0, 4200))
   
   return(ess_tail_plot)
 }
 
 # Run functions for all populations
-UCW_rhat_plot <- create_rhat_hist(fit_summary = UCW_fit_summary, population = "UCW")
-UCH_rhat_plot <- create_rhat_hist(fit_summary = UCH_fit_summary, population = "UCH")
-MCW_rhat_plot <- create_rhat_hist(fit_summary = MCW_fit_summary, population = "MCW")
-MCH_rhat_plot <- create_rhat_hist(fit_summary = MCH_fit_summary, population = "MCH")
-SRW_rhat_plot <- create_rhat_hist(fit_summary = SRW_fit_summary, population = "SRW")
-SRH_rhat_plot <- create_rhat_hist(fit_summary = SRH_fit_summary, population = "SRH")
+UCW_rhat_plot <- create_rhat_hist(fit_summary = UCW_unique_parameters_fit_summary, population = "UCW")
+UCH_rhat_plot <- create_rhat_hist(fit_summary = UCH_unique_parameters_fit_summary, population = "UCH")
+MCW_rhat_plot <- create_rhat_hist(fit_summary = MCW_unique_parameters_fit_summary, population = "MCW")
+MCH_rhat_plot <- create_rhat_hist(fit_summary = MCH_unique_parameters_fit_summary, population = "MCH")
+SRW_rhat_plot <- create_rhat_hist(fit_summary = SRW_unique_parameters_fit_summary, population = "SRW")
+SRH_rhat_plot <- create_rhat_hist(fit_summary = SRH_unique_parameters_fit_summary, population = "SRH")
 
-UCW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = UCW_fit_summary, population = "UCW")
-UCH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = UCH_fit_summary, population = "UCH")
-MCW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = MCW_fit_summary, population = "MCW")
-MCH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = MCH_fit_summary, population = "MCH")
-SRW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = SRW_fit_summary, population = "SRW")
-SRH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = SRH_fit_summary, population = "SRH")
+UCW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = UCW_unique_parameters_fit_summary, population = "UCW")
+UCH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = UCH_unique_parameters_fit_summary, population = "UCH")
+MCW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = MCW_unique_parameters_fit_summary, population = "MCW")
+MCH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = MCH_unique_parameters_fit_summary, population = "MCH")
+SRW_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = SRW_unique_parameters_fit_summary, population = "SRW")
+SRH_ess_bulk_plot <- create_ess_bulk_hist(fit_summary = SRH_unique_parameters_fit_summary, population = "SRH")
 
-UCW_ess_tail_plot <- create_ess_tail_hist(fit_summary = UCW_fit_summary, population = "UCW")
-UCH_ess_tail_plot <- create_ess_tail_hist(fit_summary = UCH_fit_summary, population = "UCH")
-MCW_ess_tail_plot <- create_ess_tail_hist(fit_summary = MCW_fit_summary, population = "MCW")
-MCH_ess_tail_plot <- create_ess_tail_hist(fit_summary = MCH_fit_summary, population = "MCH")
-SRW_ess_tail_plot <- create_ess_tail_hist(fit_summary = SRW_fit_summary, population = "SRW")
-SRH_ess_tail_plot <- create_ess_tail_hist(fit_summary = SRH_fit_summary, population = "SRH")
+UCW_ess_tail_plot <- create_ess_tail_hist(fit_summary = UCW_unique_parameters_fit_summary, population = "UCW")
+UCH_ess_tail_plot <- create_ess_tail_hist(fit_summary = UCH_unique_parameters_fit_summary, population = "UCH")
+MCW_ess_tail_plot <- create_ess_tail_hist(fit_summary = MCW_unique_parameters_fit_summary, population = "MCW")
+MCH_ess_tail_plot <- create_ess_tail_hist(fit_summary = MCH_unique_parameters_fit_summary, population = "MCH")
+SRW_ess_tail_plot <- create_ess_tail_hist(fit_summary = SRW_unique_parameters_fit_summary, population = "SRW")
+SRH_ess_tail_plot <- create_ess_tail_hist(fit_summary = SRH_unique_parameters_fit_summary, population = "SRH")
 
 # arrange them
 rhat_comb_plots <- ggarrange(plotlist = list(UCW_rhat_plot, UCH_rhat_plot, MCW_rhat_plot, MCH_rhat_plot, SRW_rhat_plot, SRH_rhat_plot),
@@ -350,12 +200,24 @@ ess_bulk_comb_plots <- ggarrange(plotlist = list(UCW_ess_bulk_plot, UCH_ess_bulk
 ess_tail_comb_plots <- ggarrange(plotlist = list(UCW_ess_tail_plot, UCH_ess_tail_plot, MCW_ess_tail_plot, MCH_ess_tail_plot, SRW_ess_tail_plot, SRH_ess_tail_plot),
                                  ncol = 3, nrow = 2)
 
-ggsave(file = "stan_actual/output/conv_eff/rhat_comb_plots.png", plot = rhat_comb_plots,
+ggsave(file = "stan_actual/output/diagnostics/rhat_comb_plots.png", plot = rhat_comb_plots,
        height = 10, width = 10)
-ggsave(file = "stan_actual/output/conv_eff/ess_tail_comb_plots.png", plot = ess_tail_comb_plots,
+ggsave(file = "stan_actual/output/diagnostics/ess_tail_comb_plots.png", plot = ess_tail_comb_plots,
        height = 10, width = 10)
-ggsave(file = "stan_actual/output/conv_eff/ess_bulk_comb_plots.png", plot = ess_bulk_comb_plots,
+ggsave(file = "stan_actual/output/diagnostics/ess_bulk_comb_plots.png", plot = ess_bulk_comb_plots,
        height = 10, width = 10)
+
+# Ok, some SRH and SRW parameters look a bit iffy. 
+arrange(SRH_fit_summary, ess_tail)[1:100,] -> bad_ess_tail_SRH
+bad_ess_tail_SRH$variable
+# They're mostly yearxorigin parameters, but not exclusively...
+
+# Draw some traceplots
+subset_draws(SRH_fit, variable = c("btemp1xorigin4_matrix_9_39_DE")) -> SRH_fit_draws_to_plot
+mcmc_trace(SRH_fit_draws_to_plot, facet_args = list(ncol = 1, strip.position = "left")) -> SRH_traceplots
+# chain 1 jsut gets stuck in a weird parameter space before returning to reality
+
+
 
 
 #### Diagnostics: Traceplots for selected parameters ####

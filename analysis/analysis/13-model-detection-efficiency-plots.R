@@ -3,220 +3,8 @@
 # This script takes the output from the stan model runs in 05-stan-runs and
 # plots how detection efficiency varies through time
 
-#### Load libraries, state information ####
-library(cmdstanr)
-library(rstan)
-library(bayesplot)
-library(posterior)
-library(dplyr)
-library(tidyr)
-library(here)
-library(ggpubr)
-library(stringr)
-library(rlang)
-library(tibble)
-library(forcats)
-library(lubridate)
-
-# get the model states into a df, to help with interpretation
-model_states = c(
-  # Mainstem states (9)
-  "mainstem, mouth to BON",
-  "mainstem, BON to MCN",
-  "mainstem, MCN to ICH or PRA",
-  "mainstem, PRA to RIS",
-  "mainstem, RIS to RRE",
-  "mainstem, RRE to WEL",
-  "mainstem, upstream of WEL",
-  "mainstem, ICH to LGR",
-  "mainstem, upstream of LGR",
-  
-  # Tributary states ()
-  # With detection efficiencies in the model, we now have more tributary states,
-  # since we have an upstream and a river mouth state
-  
-  # "Deschutes River", 
-  "Deschutes River Mouth", "Deschutes River Upstream",
-  # "John Day River", 
-  "John Day River Mouth", "John Day River Upstream",
-  # "Hood River",
-  "Hood River Mouth", "Hood River Upstream",
-  # "Fifteenmile Creek", 
-  "Fifteenmile Creek Mouth", "Fifteenmile Creek Upstream",
-  # "Umatilla River",
-  "Umatilla River Mouth", "Umatilla River Upstream",
-  # "Yakima River",
-  "Yakima River Mouth", "Yakima River Upstream",
-  # "Walla Walla River",
-  "Walla Walla River Mouth", "Walla Walla River Upstream",
-  # "Wenatchee River", 
-  "Wenatchee River Mouth", "Wenatchee River Upstream",
-  # "Entiat River", 
-  "Entiat River Mouth", "Entiat River Upstream",
-  # "Okanogan River", 
-  "Okanogan River Mouth", "Okanogan River Upstream",
-  # "Methow River", 
-  "Methow River Mouth", "Methow River Upstream",
-  # "Tucannon River",
-  "Tucannon River Mouth", "Tucannon River Upstream",
-  # "Asotin Creek", 
-  "Asotin Creek Mouth", "Asotin Creek Upstream",
-  "Clearwater River",
-  "Salmon River",
-  "Grande Ronde River",
-  # "Imnaha River",
-  "Imnaha River Mouth", "Imnaha River Upstream",
-  "BON to MCN other tributaries",
-  "Upstream WEL other tributaries",
-  
-  # Loss
-  "loss"
-)
-
-# Get info about state names and numbers
-from_state_number_names <- data.frame(from = seq(1,43,1), from_name = model_states)
-to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
-
-
-# get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild","UCW_transition_counts.csv"))
-UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
-UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
-
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery","UCH_transition_counts.csv"))
-UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
-UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
-
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild","MCW_transition_counts.csv"))
-MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
-MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
-
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery","MCH_transition_counts.csv"))
-MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
-MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
-
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_wild","SRW_transition_counts.csv"))
-SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
-SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
-
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery","SRH_transition_counts.csv"))
-SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
-SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
-
-
-# #### Load the model runs #####
-# 
-# # Load the model data associated with each run (necessary to load covariates)
-# # Store these each in an environment, because most things share names
-# UCW_envir <- new.env()
-# UCH_envir <- new.env()
-# MCW_envir <- new.env()
-# MCH_envir <- new.env()
-# SRW_envir <- new.env()
-# SRH_envir <- new.env()
-# load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "model_data.rda"),
-#      envir = UCW_envir)
-# load(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "model_data.rda"),
-#      envir = UCH_envir)
-# load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "model_data.rda"),
-#      envir = MCW_envir)
-# load(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "model_data.rda"),
-#      envir = MCH_envir)
-# load(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "model_data.rda"),
-#      envir = SRW_envir)
-# load(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "model_data.rda"),
-#      envir = SRH_envir)
-# 
-# 
-# 
-# 
-# # Function to bind four chains together
-# bind4chains <- function(chain1, chain2, chain3, chain4){
-#   bound_draws <- bind_draws(chain1$draws(),
-#                             chain2$draws(),
-#                             chain3$draws(),
-#                             chain4$draws(), along = "chain")
-#   
-#   return(bound_draws)
-# }
-# 
-# ## Upper Columbia, Wild
-# UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain1_UCW_reparam_v2_fit.rds"))
-# UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain2_UCW_reparam_v2_fit.rds"))
-# UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain3_UCW_reparam_v2_fit.rds"))
-# UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_wild", "chain4_UCW_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
-# # thin2
-# thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
-# # summarise
-# UCW_fit_summary <- summarise_draws(UCW_fit)
-# 
-# ## Upper Columbia, Hatchery
-# UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain1_UCH_reparam_v2_fit.rds"))
-# UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain2_UCH_reparam_v2_fit.rds"))
-# UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain3_UCH_reparam_v2_fit.rds"))
-# UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "upper_columbia_hatchery", "chain4_UCH_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
-# # thin2
-# thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
-# # summarise
-# UCH_fit_summary <- summarise_draws(UCH_fit)
-# 
-# ## Middle Columbia, Wild
-# MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain1_MCW_reparam_v2_fit.rds"))
-# MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain2_MCW_reparam_v2_fit.rds"))
-# MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain3_MCW_reparam_v2_fit.rds"))
-# MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_wild", "chain4_MCW_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
-# # thin2
-# thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
-# # summarise
-# MCW_fit_summary <- summarise_draws(MCW_fit)
-# 
-# ## Middle Columbia, Hatchery
-# MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain1_MCH_reparam_v2_fit.rds"))
-# MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain2_MCH_reparam_v2_fit.rds"))
-# MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain3_MCH_reparam_v2_fit.rds"))
-# MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "middle_columbia_hatchery", "chain4_MCH_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
-# # thin2
-# thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
-# # summarise
-# MCH_fit_summary <- summarise_draws(MCH_fit)
-# 
-# ## Snake River, Wild
-# SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain1_SRW_reparam_v2_fit.rds"))
-# SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain2_SRW_reparam_v2_fit.rds"))
-# SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain3_SRW_reparam_v2_fit.rds"))
-# SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_wild", "chain4_SRW_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
-# # thin2
-# thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
-# # summarise
-# SRW_fit_summary <- summarise_draws(SRW_fit)
-# 
-# ## Snake River, Hatchery
-# SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain1_SRH_reparam_v2_fit.rds"))
-# SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain2_SRH_reparam_v2_fit.rds"))
-# SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain3_SRH_reparam_v2_fit.rds"))
-# SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v2", "snake_river_hatchery", "chain4_SRH_reparam_v2_fit.rds"))
-# 
-# # bind chains together
-# SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
-# # thin2
-# thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
-# # summarise
-# SRH_fit_summary <- summarise_draws(SRH_fit)
+# First, need to load in all of the model runs and all of the packages.
+source("analysis/analysis/00-load-model-runs.R")
 
 #### Extract all parameter values from the model fit objects ####
 
@@ -289,7 +77,7 @@ calculate_DE <- function(DE_param_matrix, tributary, tributary_design_matrices_a
 
 # function to plot DE plus credible intervals
 plot_DE_rear <- function(DE_by_year_wild = NULL, DE_by_year_hatchery = NULL, plot_title){
-  rear_colors <- c(hatchery = "#ff7f00", wild = "#33a02c")
+  rear_colors <- c(hatchery = "#ff7f00", natural = "#33a02c")
   
   if(is.null(DE_by_year_hatchery)){
     niter <- 4000
@@ -303,7 +91,7 @@ plot_DE_rear <- function(DE_by_year_wild = NULL, DE_by_year_hatchery = NULL, plo
       group_by(year) %>% 
       summarise(prob = quantile(detection_probability, c(0.025, 0.5, 0.975), na.rm = T), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
-      mutate(rear = "wild") -> DE_by_year_wild_long
+      mutate(rear = "natural") -> DE_by_year_wild_long
     
     DE_by_year_wild_long$year_actual <- 2004:2021
     
@@ -340,7 +128,7 @@ plot_DE_rear <- function(DE_by_year_wild = NULL, DE_by_year_hatchery = NULL, plo
       group_by(year) %>% 
       summarise(prob = quantile(detection_probability, c(0.025, 0.5, 0.975), na.rm = T), q = c(0.025, 0.5, 0.975)) %>% 
       pivot_wider(names_from = q, values_from = prob) %>% 
-      mutate(rear = "wild") -> DE_by_year_wild_long
+      mutate(rear = "natural") -> DE_by_year_wild_long
     
     DE_by_year_wild_long$year_actual <- 2004:2021
     
@@ -372,7 +160,13 @@ plot_DE_rear <- function(DE_by_year_wild = NULL, DE_by_year_hatchery = NULL, plo
     scale_x_continuous(lim = c(2003,2022), expand = c(0,0)) +
     xlab("Year") +
     ylab("Detection probability") +
-    ggtitle(plot_title)
+    ggtitle(plot_title) +
+    guides(color=guide_legend(title="Rearing Type"), fill=guide_legend(title="Rearing Type")) +
+    theme(panel.grid.major = element_line(color = "gray90"),
+          panel.background = element_rect(fill = "white", color = NA),
+          panel.border = element_rect(color = NA, fill=NA, linewidth=0.4),
+          # these plot margins are to leave space for the population name on the big figure
+          plot.margin = unit(c(0.2, 0.2, 0.2, 0.2),"cm"))
   
   return(DE_by_year_plot)
 }

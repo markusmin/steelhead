@@ -9,8 +9,6 @@
 # when the fish is coming from a downstream state (moving upstream)
 # This is the primary time that fish are actually overshooting
 
-
-
 # First, need to load in all of the model runs and all of the packages.
 source("analysis/analysis/00-load-model-runs.R")
 
@@ -2242,12 +2240,12 @@ FF_overshoot_comp_filter %>%
                                                         abbrev == "15M" & rear == "wild" |
                                                         abbrev == "WAWA" & rear == "wild", "bottomright", NA))))) %>% 
   # change the non-overshooting label positions to be just left or right
-  mutate(label_position = ifelse(abbrev == "IMN" & rear == "wild" |
-                                   abbrev == "ASO" & rear == "wild" |
-                                   abbrev == "MET" & rear == "hatchery", "left",
-         ifelse(abbrev == "MET" & rear == "wild" |
-                  abbrev == "OKA" & rear == "hatchery" |
-                  abbrev == "IMN" & rear == "hatchery", "right", label_position)))-> FF_overshoot_comp_filter
+  mutate(label_position = ifelse(abbrev == "MET" & rear == "wild" |
+                                   abbrev == "OKA" & rear == "hatchery", "left",
+         ifelse(abbrev == "IMN" & rear == "wild" |
+                  abbrev == "ASO" & rear == "wild" |
+                  abbrev == "IMN" & rear == "hatchery" |
+                  abbrev == "MET" & rear == "hatchery", "right", label_position)))-> FF_overshoot_comp_filter
 
 FF_overshoot_comp_filter$DPS <- factor(FF_overshoot_comp_filter$DPS, levels = c("Middle Columbia",
                                                                                 "Upper Columbia",
@@ -2255,6 +2253,9 @@ FF_overshoot_comp_filter$DPS <- factor(FF_overshoot_comp_filter$DPS, levels = c(
 
 FF_overshoot_comp_filter %>% 
   mutate(rear = ifelse(rear == "wild", "natural", rear)) -> FF_overshoot_comp_filter
+
+# export this as a CSV
+write.csv(FF_overshoot_comp_filter, here::here("stan_actual", "output", "paper_figures", "overshoot_probability_table.csv"))
 
 
 #### Split dataset into two: those that can overshoot and those that can't ####
@@ -2268,6 +2269,10 @@ FF_overshoot_comp_filter_no_overshoot %>%
   mutate(overshoot_median = ifelse(abbrev == "IMN" & rear == "natural" |
                                      abbrev == "ASO" & rear == "natural" |
                                      abbrev == "MET" & rear == "hatchery", -0.02, 0.02)) -> FF_overshoot_comp_filter_no_overshoot
+
+FF_overshoot_comp_filter_no_overshoot$overshoot_median <- seq(-0.06, 0.06, length.out = nrow(FF_overshoot_comp_filter_no_overshoot))
+
+
 # different approach: just make a new column
 # FF_overshoot_comp_filter_no_overshoot %>% 
 #   arrange(desc(homing_median)) -> FF_overshoot_comp_filter_no_overshoot
@@ -2276,28 +2281,40 @@ FF_overshoot_comp_filter_no_overshoot %>%
 FF_overshoot_comp_filter %>% 
   filter(!(is.na(overshoot_median))) -> FF_overshoot_comp_filter_yes_overshoot
 
+# add a new column: rear-DPS, which we can use to add fills
+FF_overshoot_comp_filter_no_overshoot %>% 
+  mutate(rear_DPS = paste(rear, DPS)) -> FF_overshoot_comp_filter_no_overshoot
+FF_overshoot_comp_filter_yes_overshoot %>% 
+  mutate(rear_DPS = paste(rear, DPS)) -> FF_overshoot_comp_filter_yes_overshoot
 
 #### Generate plot v2: two panels, one for overshooting and one for non-overshooting
 library(ggrepel)
 
 # create the plot
 rear_colors <- c(hatchery = "#ff7f00", natural = "#33a02c")
-DPS_colors <- c("#66c2a5", "#8da0cb", "#ffd92f")
-rear_shapes <- c(17, 19)
+DPS_colors <- c("Middle Columbia" = "#66c2a5", "Upper Columbia" = "#8da0cb", "Snake River" = "#fc8d62")
+rear_DPS_fills <- c("natural Upper Columbia" =  "#8da0cb",  "hatchery Upper Columbia" = "white",
+                    "natural Middle Columbia" = "#66c2a5",  "hatchery Middle Columbia" = "white",
+                    "natural Snake River" = "#fc8d62", "hatchery Snake River" = "white")
+rear_shapes <- c(21, 24)
 
-FF_non_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_no_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
-  geom_point(size = 2.5) +
-  geom_errorbar(aes(ymin = homing_lower, ymax = homing_upper), width = 0.05, show.legend=FALSE) +
-  geom_errorbar(aes(xmin = overshoot_lower, xmax = overshoot_upper), width = 0.05, show.legend=FALSE) +
+FF_non_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_no_overshoot, 
+                                              aes(x = overshoot_median, y = homing_median, shape = rear, 
+                                                  color = DPS, fill = rear_DPS, label = abbrev))  +
+  geom_errorbar(aes(ymin = homing_lower, ymax = homing_upper), width = 0, show.legend=FALSE) +
+  geom_errorbar(aes(xmin = overshoot_lower, xmax = overshoot_upper), width = 0, show.legend=FALSE) +
+  geom_point(aes(size = rear)) +
   # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
   geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "left"), aes(label = abbrev, x = overshoot_median-0.12, y = homing_median), 
             hjust = 0.5, show.legend=FALSE) +
   geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "right"), aes(label = abbrev, x = overshoot_median+0.12, y = homing_median), 
             hjust = 0.5, show.legend=FALSE) +
   scale_color_manual(values = DPS_colors) +
+  scale_fill_manual(values = rear_DPS_fills, guide = "none") +
+  scale_size_manual(values = c("hatchery" = 3, "natural" = 2.5), guide = "none") +
   scale_shape_manual(values = rear_shapes) +
   scale_y_continuous(lim = c(0, 1.0)) +
-  scale_x_continuous(lim = c(-0.2, 0.2),
+  scale_x_continuous(lim = c(-0.25, 0.25),
                      breaks = c(0),
                      labels = c("NA")) +
   xlab("Probability of Overshoot") +
@@ -2310,15 +2327,17 @@ FF_non_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_no_oversh
         axis.title.y = element_text(size = 10),
         # axis.text.x = element_text(color = "white"),
         axis.ticks.x = element_line(color = "white"),
-        # axis.title.x = element_text(color = "white"),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(color = "white"),
         legend.key = element_blank(),
-        plot.margin = unit(c(0.5, 0.1, 0.5, 0.5),"cm"))
+        plot.margin = unit(c(0.5, 0, 0.5, 0.5),"cm"))
 
-FF_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
-  geom_point(size = 2.5) +
-  geom_errorbar(aes(ymin = homing_lower, ymax = homing_upper), width = 0.02, show.legend=FALSE) +
-  geom_errorbar(aes(xmin = overshoot_lower, xmax = overshoot_upper), width = 0.02, show.legend=FALSE) +
+FF_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot, 
+                                          aes(x = overshoot_median, y = homing_median, 
+                                              shape = rear, color = DPS, fill = rear_DPS, 
+                                              label = abbrev))  +
+  geom_errorbar(aes(ymin = homing_lower, ymax = homing_upper), width = 0, show.legend=FALSE) +
+  geom_errorbar(aes(xmin = overshoot_lower, xmax = overshoot_upper), width = 0, show.legend=FALSE) +
+  geom_point(aes(size = rear)) +
   # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
   geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "topleft"), aes(label = abbrev, x = overshoot_median-0.01, y = homing_median+0.025), 
             hjust = 1, show.legend=FALSE) +
@@ -2330,6 +2349,8 @@ FF_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot
             hjust = 0, show.legend=FALSE) +
   scale_color_manual(values = DPS_colors) +
   scale_shape_manual(values = rear_shapes) +
+  scale_size_manual(values = c("hatchery" = 3, "natural" = 2.5), guide = "none") +
+  scale_fill_manual(values = rear_DPS_fills, guide = "none") +
   scale_y_continuous(lim = c(0, 1.0)) +
   scale_x_continuous(lim = c(0, 1.0), breaks = seq(0,1,0.2),
                      labels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)) +
@@ -2340,84 +2361,92 @@ FF_overshoot_comp_errorbar_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot
         # legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
         panel.background = element_rect(fill = "white", color = "black"),
         axis.text.y = element_blank(),
-        axis.title.x = element_blank(),
         axis.title.y = element_blank(),
+        axis.ticks.length.y = unit(0, "cm"),
+        axis.line.y.left = element_line(size = 2, colour = "gray80"),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         legend.key = element_blank(),
-        plot.margin = unit(c(0.5, 0.5, 0.5, 0),"cm"))
+        plot.margin = unit(c(0.5, 0.5, 0.5, 0),"cm")) +
+  guides(shape=guide_legend(title="Rearing Type", override.aes = list(fill = c("white", "black"),
+                                                                      size = c(3, 2.5))),
+         color = guide_legend(override.aes = list(size = 3)))
 
-fig4 <- annotate_figure(ggarrange(FF_non_overshoot_comp_errorbar_plot, FF_overshoot_comp_errorbar_plot, ncol = 2, nrow = 1,
-          widths = c(1.1,4)), 
-          bottom = text_grob("Probability of Overshoot", size = 10)) + bgcolor("white") + border(color = NA)
+# fig4 <- annotate_figure(ggarrange(FF_non_overshoot_comp_errorbar_plot, FF_overshoot_comp_errorbar_plot, ncol = 2, nrow = 1,
+#           widths = c(1.1,4)), 
+#           bottom = text_grob("Probability of Overshoot", size = 10)) + bgcolor("white") + border(color = NA)
+
+fig4 <- ggarrange(FF_non_overshoot_comp_errorbar_plot, FF_overshoot_comp_errorbar_plot, ncol = 2, nrow = 1,
+          widths = c(1.1,4)) + bgcolor("white") + border(color = NA)
 
 
 ggsave(here::here("stan_actual", "output", "paper_figures", "fig4_homing_v_overshoot_plot_errorbars.png"), fig4, height = 6, width = 8)
 
 
-FF_non_overshoot_comp_median_plot <- ggplot(FF_overshoot_comp_filter_no_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
-  geom_point(size = 2.5) +
-  # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "left"), aes(label = abbrev, x = overshoot_median-0.12, y = homing_median), 
-            hjust = 0.5, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "right"), aes(label = abbrev, x = overshoot_median+0.12, y = homing_median), 
-            hjust = 0.5, show.legend=FALSE) +
-  scale_color_manual(values = DPS_colors) +
-  scale_shape_manual(values = rear_shapes) +
-  scale_y_continuous(lim = c(0, 1.0)) +
-  scale_x_continuous(lim = c(-0.2, 0.2),
-                     breaks = c(0),
-                     labels = c("NA")) +
-  xlab("Probability of Overshoot") +
-  ylab("Probability of Homing") +
-  theme(legend.position = "none",
-        # legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
-        panel.background = element_rect(fill = "white", color = "black"),
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        axis.title.y = element_text(size = 10),
-        # axis.text.x = element_text(color = "white"),
-        axis.ticks.x = element_line(color = "white"),
-        # axis.title.x = element_text(color = "white"),
-        axis.title.x = element_blank(),
-        legend.key = element_blank(),
-        plot.margin = unit(c(0.5, 0.1, 0.5, 0.5),"cm"))
-
-FF_overshoot_comp_median_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
-  geom_point(size = 2.5) +
-  # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "topleft"), aes(label = abbrev, x = overshoot_median-0.01, y = homing_median+0.025), 
-            hjust = 1, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "topright"), aes(label = abbrev, x = overshoot_median+0.01, y = homing_median+0.025), 
-            hjust = 0, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "bottomleft"), aes(label = abbrev, x = overshoot_median-0.01, y = homing_median-0.025), 
-            hjust = 1, show.legend=FALSE) +
-  geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "bottomright"), aes(label = abbrev, x = overshoot_median+0.01, y = homing_median-0.025), 
-            hjust = 0, show.legend=FALSE) +
-  scale_color_manual(values = DPS_colors) +
-  scale_shape_manual(values = rear_shapes) +
-  scale_y_continuous(lim = c(0, 1.0)) +
-  scale_x_continuous(lim = c(0, 1.0), breaks = seq(0,1,0.2),
-                     labels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)) +
-  xlab("Probability of Overshoot") +
-  ylab("Probability of Homing") +
-  theme(legend.position = "inside",
-        legend.position.inside = c(0.83, 0.75),
-        # legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
-        panel.background = element_rect(fill = "white", color = "black"),
-        axis.text.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank(),
-        legend.key = element_blank(),
-        plot.margin = unit(c(0.5, 0.5, 0.5, 0),"cm"))
-
-fig4_median_only <- annotate_figure(ggarrange(FF_non_overshoot_comp_median_plot, FF_overshoot_comp_median_plot, ncol = 2, nrow = 1,
-                                  widths = c(1.1,4)), bottom = text_grob("Probability of Overshoot", size = 10)) + bgcolor("white")    + border(color = NA)
-
-
-ggsave(here::here("stan_actual", "output", "paper_figures", "fig4_homing_v_overshoot_plot_median.png"), fig4_median_only, height = 6, width = 8)
+# version without error bars: deprecated
+# FF_non_overshoot_comp_median_plot <- ggplot(FF_overshoot_comp_filter_no_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
+#   geom_point(size = 2.5) +
+#   # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "left"), aes(label = abbrev, x = overshoot_median-0.12, y = homing_median), 
+#             hjust = 0.5, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_no_overshoot, label_position == "right"), aes(label = abbrev, x = overshoot_median+0.12, y = homing_median), 
+#             hjust = 0.5, show.legend=FALSE) +
+#   scale_color_manual(values = DPS_colors) +
+#   scale_shape_manual(values = rear_shapes) +
+#   scale_y_continuous(lim = c(0, 1.0)) +
+#   scale_x_continuous(lim = c(-0.2, 0.2),
+#                      breaks = c(0),
+#                      labels = c("NA")) +
+#   xlab("Probability of Overshoot") +
+#   ylab("Probability of Homing") +
+#   theme(legend.position = "none",
+#         # legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
+#         panel.background = element_rect(fill = "white", color = "black"),
+#         panel.grid.minor = element_blank(),
+#         panel.grid.major = element_blank(),
+#         axis.title.y = element_text(size = 10),
+#         # axis.text.x = element_text(color = "white"),
+#         axis.ticks.x = element_line(color = "white"),
+#         # axis.title.x = element_text(color = "white"),
+#         axis.title.x = element_blank(),
+#         legend.key = element_blank(),
+#         plot.margin = unit(c(0.5, 0.1, 0.5, 0.5),"cm"))
+# 
+# FF_overshoot_comp_median_plot <- ggplot(FF_overshoot_comp_filter_yes_overshoot, aes(x = overshoot_median, y = homing_median, shape = rear, color = DPS, label = abbrev))  +
+#   geom_point(size = 2.5) +
+#   # geom_text_repel(max.overlaps = 100, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "topleft"), aes(label = abbrev, x = overshoot_median-0.01, y = homing_median+0.025), 
+#             hjust = 1, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "topright"), aes(label = abbrev, x = overshoot_median+0.01, y = homing_median+0.025), 
+#             hjust = 0, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "bottomleft"), aes(label = abbrev, x = overshoot_median-0.01, y = homing_median-0.025), 
+#             hjust = 1, show.legend=FALSE) +
+#   geom_text(data = subset(FF_overshoot_comp_filter_yes_overshoot, label_position == "bottomright"), aes(label = abbrev, x = overshoot_median+0.01, y = homing_median-0.025), 
+#             hjust = 0, show.legend=FALSE) +
+#   scale_color_manual(values = DPS_colors) +
+#   scale_shape_manual(values = rear_shapes) +
+#   scale_y_continuous(lim = c(0, 1.0)) +
+#   scale_x_continuous(lim = c(0, 1.0), breaks = seq(0,1,0.2),
+#                      labels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)) +
+#   xlab("Probability of Overshoot") +
+#   ylab("Probability of Homing") +
+#   theme(legend.position = "inside",
+#         legend.position.inside = c(0.83, 0.75),
+#         # legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
+#         panel.background = element_rect(fill = "white", color = "black"),
+#         axis.text.y = element_blank(),
+#         axis.title.x = element_blank(),
+#         axis.title.y = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         panel.grid.major = element_blank(),
+#         legend.key = element_blank(),
+#         plot.margin = unit(c(0.5, 0.5, 0.5, 0),"cm"))
+# 
+# fig4_median_only <- annotate_figure(ggarrange(FF_non_overshoot_comp_median_plot, FF_overshoot_comp_median_plot, ncol = 2, nrow = 1,
+#                                   widths = c(1.1,4)), bottom = text_grob("Probability of Overshoot", size = 10)) + bgcolor("white")    + border(color = NA)
+# 
+# 
+# ggsave(here::here("stan_actual", "output", "paper_figures", "fig4_homing_v_overshoot_plot_median.png"), fig4_median_only, height = 6, width = 8)
 
 
 

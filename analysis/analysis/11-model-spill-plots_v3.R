@@ -3,397 +3,8 @@
 # This script takes the output from the stan model runs in 05-stan-runs and
 # plots the effects of spill (window and winter days)
 
-#### Load libraries, state information ####
-library(plyr)
-library(cmdstanr)
-library(rstan)
-library(bayesplot)
-library(posterior)
-library(dplyr)
-library(tidyr)
-library(here)
-library(ggpubr)
-library(stringr)
-library(rlang)
-library(tibble)
-library(forcats)
-library(lubridate)
-
-# get the model states into a df, to help with interpretation
-model_states = c(
-  # Mainstem states (9)
-  "mainstem, mouth to BON",
-  "mainstem, BON to MCN",
-  "mainstem, MCN to ICH or PRA",
-  "mainstem, PRA to RIS",
-  "mainstem, RIS to RRE",
-  "mainstem, RRE to WEL",
-  "mainstem, upstream of WEL",
-  "mainstem, ICH to LGR",
-  "mainstem, upstream of LGR",
-  
-  # Tributary states ()
-  # With detection efficiencies in the model, we now have more tributary states,
-  # since we have an upstream and a river mouth state
-  
-  # "Deschutes River", 
-  "Deschutes River Mouth", "Deschutes River Upstream",
-  # "John Day River", 
-  "John Day River Mouth", "John Day River Upstream",
-  # "Hood River",
-  "Hood River Mouth", "Hood River Upstream",
-  # "Fifteenmile Creek", 
-  "Fifteenmile Creek Mouth", "Fifteenmile Creek Upstream",
-  # "Umatilla River",
-  "Umatilla River Mouth", "Umatilla River Upstream",
-  # "Yakima River",
-  "Yakima River Mouth", "Yakima River Upstream",
-  # "Walla Walla River",
-  "Walla Walla River Mouth", "Walla Walla River Upstream",
-  # "Wenatchee River", 
-  "Wenatchee River Mouth", "Wenatchee River Upstream",
-  # "Entiat River", 
-  "Entiat River Mouth", "Entiat River Upstream",
-  # "Okanogan River", 
-  "Okanogan River Mouth", "Okanogan River Upstream",
-  # "Methow River", 
-  "Methow River Mouth", "Methow River Upstream",
-  # "Tucannon River",
-  "Tucannon River Mouth", "Tucannon River Upstream",
-  # "Asotin Creek", 
-  "Asotin Creek Mouth", "Asotin Creek Upstream",
-  "Clearwater River",
-  "Salmon River",
-  "Grande Ronde River",
-  # "Imnaha River",
-  "Imnaha River Mouth", "Imnaha River Upstream",
-  "BON to MCN other tributaries",
-  "Upstream WEL other tributaries",
-  
-  # Loss
-  "loss"
-)
-
-# Get info about state names and numbers
-from_state_number_names <- data.frame(from = seq(1,43,1), from_name = model_states)
-to_state_number_names <- data.frame(to = seq(1,43,1), to_name = model_states)
-
-
-# get the info on transitions
-UCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild","UCW_transition_counts.csv"))
-UCW_movements <- paste0("_", UCW_transition_counts$from, "_", UCW_transition_counts$to)
-UCW_movements <- UCW_movements[!(grepl("NA", UCW_movements))]
-
-UCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery","UCH_transition_counts.csv"))
-UCH_movements <- paste0("_", UCH_transition_counts$from, "_", UCH_transition_counts$to)
-UCH_movements <- UCH_movements[!(grepl("NA", UCH_movements))]
-
-MCW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild","MCW_transition_counts.csv"))
-MCW_movements <- paste0("_", MCW_transition_counts$from, "_", MCW_transition_counts$to)
-MCW_movements <- MCW_movements[!(grepl("NA", MCW_movements))]
-
-MCH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery","MCH_transition_counts.csv"))
-MCH_movements <- paste0("_", MCH_transition_counts$from, "_", MCH_transition_counts$to)
-MCH_movements <- MCH_movements[!(grepl("NA", MCH_movements))]
-
-SRW_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "snake_river_wild","SRW_transition_counts.csv"))
-SRW_movements <- paste0("_", SRW_transition_counts$from, "_", SRW_transition_counts$to)
-SRW_movements <- SRW_movements[!(grepl("NA", SRW_movements))]
-
-SRH_transition_counts <- read.csv(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery","SRH_transition_counts.csv"))
-SRH_movements <- paste0("_", SRH_transition_counts$from, "_", SRH_transition_counts$to)
-SRH_movements <- SRH_movements[!(grepl("NA", SRH_movements))]
-
-
-##### Load the model runs #####
-
-# Load the model data associated with each run (necessary to load covariates)
-# Store these each in an environment, because most things share names
-UCW_envir <- new.env()
-UCH_envir <- new.env()
-MCW_envir <- new.env()
-MCH_envir <- new.env()
-SRW_envir <- new.env()
-SRH_envir <- new.env()
-load(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "model_data.rda"),
-     envir = UCW_envir)
-load(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "model_data.rda"),
-     envir = UCH_envir)
-load(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "model_data.rda"),
-     envir = MCW_envir)
-load(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "model_data.rda"),
-     envir = MCH_envir)
-load(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "model_data.rda"),
-     envir = SRW_envir)
-load(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "model_data.rda"),
-     envir = SRH_envir)
-
-
-
-
-# Function to bind four chains together
-bind4chains <- function(chain1, chain2, chain3, chain4){
-  bound_draws <- bind_draws(chain1$draws(),
-                            chain2$draws(),
-                            chain3$draws(),
-                            chain4$draws(), along = "chain")
-  
-  return(bound_draws)
-}
-
-## Upper Columbia, Wild
-UCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain1_UCW_reparam_v3_fit.rds"))
-UCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain2_UCW_reparam_v3_fit.rds"))
-UCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain3_UCW_reparam_v3_fit.rds"))
-UCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_wild", "chain4_UCW_reparam_v3_fit.rds"))
-
-# bind chains together
-UCW_fit_raw <- bind4chains(UCW_chain1, UCW_chain2, UCW_chain3, UCW_chain4)
-# thin2
-thin_draws(UCW_fit_raw, thin = 2) -> UCW_fit
-
-UCW_fit_summary <- summarise_draws(UCW_fit)
-
-## Upper Columbia, Hatchery
-UCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain1_UCH_reparam_v3_fit.rds"))
-UCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain2_UCH_reparam_v3_fit.rds"))
-UCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain3_UCH_reparam_v3_fit.rds"))
-UCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "upper_columbia_hatchery", "chain4_UCH_reparam_v3_fit.rds"))
-
-# bind chains together
-UCH_fit_raw <- bind4chains(UCH_chain1, UCH_chain2, UCH_chain3, UCH_chain4)
-# thin2
-thin_draws(UCH_fit_raw, thin = 2) -> UCH_fit
-
-UCH_fit_summary <- summarise_draws(UCH_fit)
-
-## Middle Columbia, Wild
-MCW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain1_MCW_reparam_v3_fit.rds"))
-MCW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain2_MCW_reparam_v3_fit.rds"))
-MCW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain3_MCW_reparam_v3_fit.rds"))
-MCW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_wild", "chain4_MCW_reparam_v3_fit.rds"))
-
-# bind chains together
-MCW_fit_raw <- bind4chains(MCW_chain1, MCW_chain2, MCW_chain3, MCW_chain4)
-# thin2
-thin_draws(MCW_fit_raw, thin = 2) -> MCW_fit
-
-MCW_fit_summary <- summarise_draws(MCW_fit)
-
-## Middle Columbia, Hatchery
-MCH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain1_MCH_reparam_v3_fit.rds"))
-MCH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain2_MCH_reparam_v3_fit.rds"))
-MCH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain3_MCH_reparam_v3_fit.rds"))
-MCH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "middle_columbia_hatchery", "chain4_MCH_reparam_v3_fit.rds"))
-
-# bind chains together
-MCH_fit_raw <- bind4chains(MCH_chain1, MCH_chain2, MCH_chain3, MCH_chain4)
-# thin2
-thin_draws(MCH_fit_raw, thin = 2) -> MCH_fit
-
-MCH_fit_summary <- summarise_draws(MCH_fit)
-
-## Snake River, Wild
-SRW_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain1_SRW_reparam_v3_fit.rds"))
-SRW_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain2_SRW_reparam_v3_fit.rds"))
-SRW_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain3_SRW_reparam_v3_fit.rds"))
-SRW_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_wild", "chain4_SRW_reparam_v3_fit.rds"))
-
-# bind chains together
-SRW_fit_raw <- bind4chains(SRW_chain1, SRW_chain2, SRW_chain3, SRW_chain4)
-# thin2
-thin_draws(SRW_fit_raw, thin = 2) -> SRW_fit
-
-SRW_fit_summary <- summarise_draws(SRW_fit)
-
-## Snake River, Hatchery
-SRH_chain1 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain1_SRH_reparam_v3_fit.rds"))
-SRH_chain2 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain2_SRH_reparam_v3_fit.rds"))
-SRH_chain3 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain3_SRH_reparam_v3_fit.rds"))
-SRH_chain4 <- readRDS(here::here("stan_actual", "reparameterization_v3", "snake_river_hatchery", "chain4_SRH_reparam_v3_fit.rds"))
-
-# bind chains together
-SRH_fit_raw <- bind4chains(SRH_chain1, SRH_chain2, SRH_chain3, SRH_chain4)
-# thin2
-thin_draws(SRH_fit_raw, thin = 2) -> SRH_fit
-
-SRH_fit_summary <- summarise_draws(SRH_fit)
-
-#### Extract all parameter values from the model fit objects ####
-
-# Here, you need to make sure to check the origin params, because those change by DPS
-
-# function to take a parameter type (fixed effect) and store all of them in an array
-make_parameter_draws_array <- function(parameter_prefix, fit, fit_summary){
-  # extract b0 as an array
-  parameters <- fit_summary$variable
-  parameters[grepl(paste0(parameter_prefix, "_"), parameters)] -> param_subset
-  param_subset[!(grepl("vector", param_subset))] -> param_subset
-  # drop the NDE parameters
-  param_subset <- param_subset[!(grepl("_NDE", param_subset))]
-  
-  
-  param_subset_from = as.numeric(sub("[^_]*_[^_]*_", "", str_extract(param_subset, "[^_]*_[^_]*_[^_]*")))
-  param_subset_to = as.numeric(str_extract(sub("[^_]*_[^_]*_[^_]*_", "", param_subset), "\\d+"))
-  
-  param_subset_indices <- data.frame(parameter = param_subset, from = param_subset_from, to = param_subset_to)
-  
-  
-  # arrange all parameter values into an array
-  param_array <- array(data = 0, dim = c(length(model_states), length(model_states),
-                                         length(as.matrix(fit[,,1]))))
-  
-  # 0 is meaningful for loss (this is what is used in the stan code)
-  # 0s for all other movements that are not overwritten will not be used
-  
-  
-  for(i in 1:nrow(param_subset_indices)){
-    param_array[param_subset_indices[i, "from"], param_subset_indices[i, "to"], ] <- as.matrix(fit[,,param_subset_indices[i, "parameter"]])
-  }
-  
-  return(param_array)
-}
-
-### UCW ###
-UCW_parameters <- UCW_fit_summary$variable
-UCW_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", UCW_parameters)] -> UCW_fixed_effects
-UCW_fixed_effects[!(grepl("vector", UCW_fixed_effects))] -> UCW_fixed_effects
-
-b0_array_UCW <- make_parameter_draws_array(parameter_prefix = "b0", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp0_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp1_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = UCW_fit, fit_summary = UCW_fit_summary)
-bspillwindow_array_UCW <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = UCW_fit, fit_summary = UCW_fit_summary)
-bwinterspill_array_UCW <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp0xorigin1_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp1xorigin1_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp0xorigin2_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp1xorigin2_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp0xorigin3_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin3", fit = UCW_fit, fit_summary = UCW_fit_summary)
-btemp1xorigin3_array_UCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin3", fit = UCW_fit, fit_summary = UCW_fit_summary)
-borigin1_array_UCW <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = UCW_fit, fit_summary = UCW_fit_summary)
-borigin2_array_UCW <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = UCW_fit, fit_summary = UCW_fit_summary)
-borigin3_array_UCW <- make_parameter_draws_array(parameter_prefix = "borigin3", fit = UCW_fit, fit_summary = UCW_fit_summary)
-
-### UCH ###
-UCH_parameters <- UCH_fit_summary$variable
-UCH_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", UCH_parameters)] -> UCH_fixed_effects
-UCH_fixed_effects[!(grepl("vector", UCH_fixed_effects))] -> UCH_fixed_effects
-
-b0_array_UCH <- make_parameter_draws_array(parameter_prefix = "b0", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp0_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp1_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = UCH_fit, fit_summary = UCH_fit_summary)
-bspillwindow_array_UCH <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = UCH_fit, fit_summary = UCH_fit_summary)
-bwinterspill_array_UCH <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp0xorigin1_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp1xorigin1_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp0xorigin2_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp1xorigin2_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp0xorigin3_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin3", fit = UCH_fit, fit_summary = UCH_fit_summary)
-btemp1xorigin3_array_UCH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin3", fit = UCH_fit, fit_summary = UCH_fit_summary)
-borigin1_array_UCH <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = UCH_fit, fit_summary = UCH_fit_summary)
-borigin2_array_UCH <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = UCH_fit, fit_summary = UCH_fit_summary)
-borigin3_array_UCH <- make_parameter_draws_array(parameter_prefix = "borigin3", fit = UCH_fit, fit_summary = UCH_fit_summary)
-
-### MCW ###
-MCW_parameters <- MCW_fit_summary$variable
-MCW_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", MCW_parameters)] -> MCW_fixed_effects
-MCW_fixed_effects[!(grepl("vector", MCW_fixed_effects))] -> MCW_fixed_effects
-
-b0_array_MCW <- make_parameter_draws_array(parameter_prefix = "b0", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = MCW_fit, fit_summary = MCW_fit_summary)
-bspillwindow_array_MCW <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = MCW_fit, fit_summary = MCW_fit_summary)
-bwinterspill_array_MCW <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin1_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin1_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin2_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin2_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin3_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin3", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin3_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin3", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin4_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin4", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin4_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin4", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin5_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin5", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin5_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin5", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp0xorigin6_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin6", fit = MCW_fit, fit_summary = MCW_fit_summary)
-btemp1xorigin6_array_MCW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin6", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin1_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin2_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin3_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin3", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin4_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin4", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin5_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin5", fit = MCW_fit, fit_summary = MCW_fit_summary)
-borigin6_array_MCW <- make_parameter_draws_array(parameter_prefix = "borigin6", fit = MCW_fit, fit_summary = MCW_fit_summary)
-
-### MCH ###
-MCH_parameters <- MCH_fit_summary$variable
-MCH_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", MCH_parameters)] -> MCH_fixed_effects
-MCH_fixed_effects[!(grepl("vector", MCH_fixed_effects))] -> MCH_fixed_effects
-
-b0_array_MCH <- make_parameter_draws_array(parameter_prefix = "b0", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp0_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp1_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = MCH_fit, fit_summary = MCH_fit_summary)
-bspillwindow_array_MCH <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = MCH_fit, fit_summary = MCH_fit_summary)
-bwinterspill_array_MCH <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp0xorigin1_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp1xorigin1_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp0xorigin2_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = MCH_fit, fit_summary = MCH_fit_summary)
-btemp1xorigin2_array_MCH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = MCH_fit, fit_summary = MCH_fit_summary)
-borigin1_array_MCH <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = MCH_fit, fit_summary = MCH_fit_summary)
-borigin2_array_MCH <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = MCH_fit, fit_summary = MCH_fit_summary)
-
-### SRW ###
-SRW_parameters <- SRW_fit_summary$variable
-SRW_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", SRW_parameters)] -> SRW_fixed_effects
-SRW_fixed_effects[!(grepl("vector", SRW_fixed_effects))] -> SRW_fixed_effects
-
-b0_array_SRW <- make_parameter_draws_array(parameter_prefix = "b0", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = SRW_fit, fit_summary = SRW_fit_summary)
-bspillwindow_array_SRW <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = SRW_fit, fit_summary = SRW_fit_summary)
-bwinterspill_array_SRW <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin1_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin1_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin2_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin2_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin3_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin3", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin3_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin3", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin4_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin4", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin4_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin4", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin5_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin5", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin5_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin5", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp0xorigin6_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin6", fit = SRW_fit, fit_summary = SRW_fit_summary)
-btemp1xorigin6_array_SRW <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin6", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin1_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin2_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin3_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin3", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin4_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin4", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin5_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin5", fit = SRW_fit, fit_summary = SRW_fit_summary)
-borigin6_array_SRW <- make_parameter_draws_array(parameter_prefix = "borigin6", fit = SRW_fit, fit_summary = SRW_fit_summary)
-
-### SRH ###
-SRH_parameters <- SRH_fit_summary$variable
-SRH_parameters[grepl("b0|btemp1|btemp0|bspillwindow|bwinterspill|borigin", SRH_parameters)] -> SRH_fixed_effects
-SRH_fixed_effects[!(grepl("vector", SRH_fixed_effects))] -> SRH_fixed_effects
-
-b0_array_SRH <- make_parameter_draws_array(parameter_prefix = "b0", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1", fit = SRH_fit, fit_summary = SRH_fit_summary)
-bspillwindow_array_SRH <- make_parameter_draws_array(parameter_prefix = "bspillwindow", fit = SRH_fit, fit_summary = SRH_fit_summary)
-bwinterspill_array_SRH <- make_parameter_draws_array(parameter_prefix = "bwinterspill", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0xorigin1_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin1", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1xorigin1_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin1", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0xorigin2_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin2", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1xorigin2_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin2", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0xorigin3_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin3", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1xorigin3_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin3", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0xorigin4_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin4", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1xorigin4_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin4", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp0xorigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp0xorigin5", fit = SRH_fit, fit_summary = SRH_fit_summary)
-btemp1xorigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "btemp1xorigin5", fit = SRH_fit, fit_summary = SRH_fit_summary)
-borigin1_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin1", fit = SRH_fit, fit_summary = SRH_fit_summary)
-borigin2_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin2", fit = SRH_fit, fit_summary = SRH_fit_summary)
-borigin3_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin3", fit = SRH_fit, fit_summary = SRH_fit_summary)
-borigin4_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin4", fit = SRH_fit, fit_summary = SRH_fit_summary)
-borigin5_array_SRH <- make_parameter_draws_array(parameter_prefix = "borigin5", fit = SRH_fit, fit_summary = SRH_fit_summary)
+# First, need to load in all of the model runs and all of the packages.
+source("analysis/analysis/00-load-model-runs.R")
 
 #### Extract transition data by spill for rug plot ####
 
@@ -4529,6 +4140,9 @@ ggsave(here::here("stan_actual", "output", "fit_to_data", "spilldays_v3", "WEN_y
 
 #### Multiple movements on same plot ####
 
+# John Day River (W), Umatilla River (H, W), Yakima River (W), Walla Walla River (H, W),
+# Wenatchee River (H, W), Entiat River (W), Tucannon River (H, W), Imnaha River (H, W)
+
 # For some origins, there are multiple interesting and deleterious movements - 
 # for example, Middle Columbia fish could go to loss, Deschutes, or overshoot
 
@@ -4735,7 +4349,7 @@ plot_compare_rear_spill_effect_multiple_movements <- function(origin_select,
   # rear_spill_move_prob_quantiles$to <- as.character(rear_spill_move_prob_quantiles$to)
   
   
-  movement_colors <- c("Fallback" = "#33a02c", "Overshoot - PRA" = "#ff7f00",
+  movement_colors <- c("Fallback" = "#6a3d9a", "Overshoot - PRA" = "#ff7f00",
                        "Overshoot - RIS" = "#ff7f00", "Overshoot - LGR" = "#ff7f00",
                        "Overshoot - RRE" = "#ff7f00", "Overshoot - WEL" = "#ff7f00",
                        "Overshoot - ICH" = "#ff7f00", "Overshoot" = "#ff7f00",
@@ -4745,57 +4359,219 @@ plot_compare_rear_spill_effect_multiple_movements <- function(origin_select,
   rear_spill_move_prob_quantiles %>% 
     left_join(., movements_evaluated, by = "to") -> rear_spill_move_prob_quantiles
   
+  # if (plot_legend == TRUE){
+  #   rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
+  #                                                                           color = Movement, fill = Movement)) +
+  #     geom_line() +
+  #     geom_ribbon(alpha = 0.2, color = NA) +
+  #     geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+  #              sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+  #     scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+  #     scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+  #     scale_color_manual(values = movement_colors) +
+  #     scale_fill_manual(values =  movement_colors) +
+  #     xlab("Winter spill days") +
+  #     ylab("Movement probability") +
+  #     coord_cartesian(clip = "off")
+  # } else {
+  #   # suppress common legend - for combined plot
+  #   rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
+  #                                                                           color = Movement, fill = Movement)) +
+  #     geom_line() +
+  #     geom_ribbon(alpha = 0.2, color = NA) +
+  #     geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+  #              sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+  #     scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
+  #     scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+  #     scale_color_manual(values = movement_colors) +
+  #     scale_fill_manual(values =  movement_colors) +
+  #     xlab("Winter spill days") +
+  #     ylab("Movement probability") +
+  #     coord_cartesian(clip = "off") +
+  #     theme(legend.position = "none")
+  # }
+  
   if (plot_legend == TRUE){
-    rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`,
-                                                                            color = Movement, fill = Movement)) +
-      geom_line() +
+    
+    combined_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
+                                                               color = Movement, fill = Movement)) +
+      geom_line(linewidth = 2.5) +
       geom_ribbon(alpha = 0.2, color = NA) +
-      geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
-               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      # geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+      #          sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
       scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
-      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      scale_x_continuous(lim = c(0,ceiling(max(covariate_experiences$spill_actual))), expand = c(0,0)) +
       scale_color_manual(values = movement_colors) +
       scale_fill_manual(values =  movement_colors) +
-      xlab("Winter spill days") +
+          xlab("Winter spill days") +
       ylab("Movement probability") +
-      coord_cartesian(clip = "off")
+      coord_cartesian(clip = "off") +
+      theme(panel.grid.major = element_line(color = "gray90"),
+            panel.background = element_rect(fill = "white", color = NA),
+            panel.border = element_rect(color = NA, fill=NA, linewidth=0.4),
+            legend.key.height = unit(1.25, "cm"),
+            legend.key.width = unit(1.25, "cm"),
+            legend.title = element_text(size = 25),
+            legend.text = element_text(size = 15),
+            # these plot margins are to leave space for the population name on the big figure
+            plot.margin = unit(c(0.2, 0.2, 0.2, 0.2),"cm"))
+    # for testing
+    spill_legend <- ggpubr::get_legend(combined_plot)
+
+    spill_plot_legend_gg <- as_ggplot(spill_legend)
+    
+    # for testing
+    # ggsave(here::here("stan_actual", "output", "paper_figures", "01_legend_test.png"), spill_plot_legend_gg, height = 4, width = 4)
+    
   } else {
     # suppress common legend - for combined plot
     rear_spill_move_prob_plot <- ggplot(rear_spill_move_prob_quantiles, aes(x = spill_actual, y = `0.5`, ymin = `0.025`, ymax = `0.975`, 
-                                                                            color = Movement, fill = Movement)) +
+                                                                          color = Movement, fill = Movement)) +
       geom_line() +
       geom_ribbon(alpha = 0.2, color = NA) +
-      geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
-               sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
+      # geom_rug(data = covariate_experiences, aes(x = spill_actual), inherit.aes = FALSE,
+      #          sides = "t", length = unit(0.3, "cm"), outside = TRUE) +
       scale_y_continuous(lim = c(0,1), expand = c(0,0)) +
-      scale_x_continuous(lim = c(0,NA), expand = c(0,0)) +
+      # common x-axis scale across all populations
+      coord_cartesian(xlim = c(0, 80), expand = FALSE) +
+      # scale_x_continuous(lim = c(0,ceiling(max(covariate_experiences$spill_actual))), expand = c(0,0)) +
       scale_color_manual(values = movement_colors) +
       scale_fill_manual(values =  movement_colors) +
-      xlab("Winter spill days") +
+          xlab("Winter spill days") +
       ylab("Movement probability") +
-      coord_cartesian(clip = "off") +
-      theme(legend.position = "none")
+      theme(legend.position = "none",
+            panel.grid.major = element_line(color = "gray90"),
+            panel.background = element_rect(fill = "white", color = "black"),
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=0.4),
+            # turn off the axis titles on each individual plot and just show one for whole plot
+            axis.title = element_blank(),
+            # these plot margins are to leave space for the population name on the big figure
+            plot.margin = unit(c(0, 0.2, 0.2, 0.2),"cm"))
+    
+    density_plot <- ggplot(data = covariate_experiences, aes(spill_actual))+
+      # geom_density(alpha = 0.1) +
+      # geom_rug(sides = "t", length = unit(0.2, "cm"), outside = FALSE) +
+      # geom_histogram(alpha = 0.5, bins = 60) +
+      geom_histogram(aes(y=..count../sum(..count..)), alpha = 0.5, bins = 60) +
+      ylab("Density") +
+      # scale_x_continuous(lim = c(floor(min(covariate_experiences$temp_actual)),ceiling(max(covariate_experiences$temp_actual))), expand = c(0,0)) +
+      # scale_x_continuous(lim = c(0, 23), expand = c(0,0)) +
+      # scale_y_continuous(lim = c(0,0.75), expand = c(0,0),
+      #                    breaks = c(0, 0.25, 0.50)) +
+      # these labels aren't real, they just need to be the same size as the labels from the temp effect plot
+      scale_y_continuous(n.breaks = 2, labels = c("0.00", "1.00")) +
+      xlim(0,80)+
+      # coord_cartesian(xlim = c(floor(min(covariate_experiences$temp_actual)),ceiling(max(covariate_experiences$temp_actual)))) +
+      # common x-axis scale across all populations
+      coord_cartesian(xlim = c(0, 80), expand = FALSE) +
+      theme(axis.text.x = element_blank(),
+            axis.text.y = element_text(color = "white"),
+            axis.ticks.x = element_blank(),
+            # axis.ticks.length.x=unit(.1, "cm"),
+            axis.ticks.length.x=unit(0, "cm"),
+            axis.ticks.y = element_line(color = "white"),
+            axis.title.x = element_blank(),
+            axis.title.y = element_text(color = "white"),
+            panel.background = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.grid.major = element_blank(),
+            # these plot margins are to leave space for the population name on the big figure
+            plot.margin = unit(c(1.0, 0.2, 0, 0.2),"cm"))
+    # testing theme
+    # theme(
+    #       # these plot margins are to leave space for the population name on the big figure
+    #       plot.margin = unit(c(0.2, 0.2, 0, 0.2),"cm"))
+    
+    combined_plot <- ggarrange(density_plot, rear_spill_move_prob_plot, nrow = 2, ncol = 1,
+                               heights = c(2,6))
+    
+    # for testing
+    # ggsave(here::here("stan_actual", "output", "paper_figures", "01_test.png"), combined_plot, height = 6, width = 6)
+    
+    
   }
   
   
   
   
   
-  return(rear_spill_move_prob_plot)
+  
+  return(combined_plot)
 }
 
-#### Create figures for individual origins:
-
-# John Day River (W), Umatilla River (H, W), Yakima River (W), Walla Walla River (H, W),
-# Wenatchee River (H, W), Entiat River (W), Tucannon River (H, W), Imnaha River (H, W)
-
+#### Prepare data to create figures for individual origins: ####
 
 ### John Day River ###
 JDR_spilldays_movements <- data.frame(from = c(3, 3, 3, 3), to = c(2, 4, 8, 43),
-                            Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
-                                         "Loss"))
+                                      Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
+                                                   "Loss"))
 JDR_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "John Day River", movements = JDR_spilldays_movements)
 JDR_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "John Day River")
+
+### Umatilla River ###
+UMA_spilldays_movements <- data.frame(from = c(3, 3, 3, 3), to = c(2, 4, 8, 43),
+                                      Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
+                                                   "Loss"))
+UMA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
+UMA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
+UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
+UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
+
+### Yakima River ###
+YAK_spilldays_movements <- data.frame(from = c(4,4,4), to = c(3,5,43),
+                                      Movement = c("Fallback",
+                                                   "Additional Overshoot", "Loss"))
+
+YAK_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Yakima River", movements = YAK_spilldays_movements)
+YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
+
+### Walla Walla River ###
+WAWA_spilldays_movements <- data.frame(from = c(8,8,8), to = c(3, 9, 43),
+                                       Movement = c("Fallback", "Overshoot - LGR", 
+                                                    "Loss"))
+WAWA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
+WAWA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
+WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
+WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
+
+### Wenatchee River ###
+WEN_spilldays_movements <- data.frame(from = c(6,6,6), to = c(5, 7, 43),
+                                      Movement = c("Fallback", "Overshoot - WEL", 
+                                                   "Loss"))
+WEN_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
+WEN_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
+WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
+WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
+
+### Entiat River ###
+ENT_spilldays_movements <- data.frame(from = c(7,7), to = c(6, 43),
+                                      Movement = c("Fallback",
+                                                   "Loss"))
+ENT_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Entiat River", movements = ENT_spilldays_movements)
+ENT_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Entiat River", movements = ENT_spilldays_movements)
+ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
+ENT_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Entiat River")
+
+### Tucannon River ###
+TUC_spilldays_movements <- data.frame(from = c(9,9), to = c(8, 43),
+                                      Movement = c("Fallback",
+                                                   "Loss"))
+TUC_wild_spill_move_prob_array <- estimate_spilldays_effect_SRW(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
+TUC_hatchery_spill_move_prob_array <- estimate_spilldays_effect_SRH(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
+TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
+TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
+
+
+
+
+
+#### Create figures for individual origins: ####
+
+
+
+
+### John Day River ###
+
 JDR_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "John Day River",
                                                                                      wild_move_prob_array = JDR_wild_spill_move_prob_array,
                                                                                      wild_covariate_experiences = JDR_wild_covariate_experiences,
@@ -4805,13 +4581,6 @@ JDR_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movem
 ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "JDR_wild_compare_movement_spill.png"), JDR_wild_compare_movement_spill, height = 8, width = 8)
 
 ### Umatilla River ###
-UMA_spilldays_movements <- data.frame(from = c(3, 3, 3, 3), to = c(2, 4, 8, 43),
-                            Movement = c("Fallback", "Overshoot - ICH", "Overshoot - PRA", 
-                                         "Loss"))
-UMA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
-UMA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Umatilla River", movements = UMA_spilldays_movements)
-UMA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Umatilla River")
-UMA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Umatilla River")
 
 
 # UMA wild plot
@@ -4833,12 +4602,7 @@ UMA_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_m
 ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "UMA_hatchery_compare_movement_spill.png"), UMA_hatchery_compare_movement_spill, height = 8, width = 8)
 
 ### Yakima River ###
-YAK_spilldays_movements <- data.frame(from = c(4,4,4), to = c(3,5,43),
-                            Movement = c("Fallback",
-                                         "Additional Overshoot", "Loss"))
 
-YAK_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Yakima River", movements = YAK_spilldays_movements)
-YAK_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Yakima River")
 YAK_wild_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_movements(origin_select = "Yakima River",
                                                                                      wild_move_prob_array = YAK_wild_spill_move_prob_array,
                                                                                      
@@ -4851,13 +4615,6 @@ ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "YA
 
 
 ### Walla Walla River ###
-WAWA_spilldays_movements <- data.frame(from = c(8,8,8), to = c(3, 9, 43),
-                             Movement = c("Fallback", "Overshoot - LGR", 
-                                          "Loss"))
-WAWA_wild_spill_move_prob_array <- estimate_spilldays_effect_MCW(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
-WAWA_hatchery_spill_move_prob_array <- estimate_spilldays_effect_MCH(origin_select = "Walla Walla River", movements = WAWA_spilldays_movements)
-WAWA_wild_covariate_experiences <- extract_covariate_experiences(envir = MCW_envir, rear = "wild", origin_select = "Walla Walla River")
-WAWA_hatchery_covariate_experiences <- extract_covariate_experiences(envir = MCH_envir, rear = "hatchery", origin_select = "Walla Walla River")
 
 
 # WAWA wild plot
@@ -4879,13 +4636,6 @@ WAWA_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_
 ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WAWA_hatchery_compare_movement_spill.png"), WAWA_hatchery_compare_movement_spill, height = 8, width = 8)
 
 ### Wenatchee River ###
-WEN_spilldays_movements <- data.frame(from = c(6,6,6), to = c(5, 7, 43),
-                            Movement = c("Fallback", "Overshoot - WEL", 
-                                         "Loss"))
-WEN_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
-WEN_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Wenatchee River", movements = WEN_spilldays_movements)
-WEN_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Wenatchee River")
-WEN_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Wenatchee River")
 
 
 # WEN wild plot
@@ -4907,13 +4657,6 @@ WEN_hatchery_compare_movement_spill <- plot_compare_rear_spill_effect_multiple_m
 ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "WEN_hatchery_compare_movement_spill.png"), WEN_hatchery_compare_movement_spill, height = 8, width = 8)
 
 ### Entiat River ###
-ENT_spilldays_movements <- data.frame(from = c(7,7), to = c(6, 43),
-                            Movement = c("Fallback",
-                                         "Loss"))
-ENT_wild_spill_move_prob_array <- estimate_spilldays_effect_UCW(origin_select = "Entiat River", movements = ENT_spilldays_movements)
-ENT_hatchery_spill_move_prob_array <- estimate_spilldays_effect_UCH(origin_select = "Entiat River", movements = ENT_spilldays_movements)
-ENT_wild_covariate_experiences <- extract_covariate_experiences(envir = UCW_envir, rear = "wild", origin_select = "Entiat River")
-ENT_hatchery_covariate_experiences <- extract_covariate_experiences(envir = UCH_envir, rear = "hatchery", origin_select = "Entiat River")
 
 
 # ENT wild plot
@@ -4927,13 +4670,6 @@ ggsave(here::here("stan_actual", "output", "covariate_effects", "spilldays", "EN
 
 
 ### Tucannon River ###
-TUC_spilldays_movements <- data.frame(from = c(9,9), to = c(8, 43),
-                  Movement = c("Fallback",
-                               "Loss"))
-TUC_wild_spill_move_prob_array <- estimate_spilldays_effect_SRW(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
-TUC_hatchery_spill_move_prob_array <- estimate_spilldays_effect_SRH(origin_select = "Tucannon River", movements = TUC_spilldays_movements)
-TUC_wild_covariate_experiences <- extract_covariate_experiences(envir = SRW_envir, rear = "wild", origin_select = "Tucannon River")
-TUC_hatchery_covariate_experiences <- extract_covariate_experiences(envir = SRH_envir, rear = "hatchery", origin_select = "Tucannon River")
 
 
 # TUC wild plot
@@ -4992,7 +4728,8 @@ spill_plot_for_legend <-  plot_compare_rear_spill_effect_multiple_movements(orig
                                                                       movements_evaluated = YAK_spilldays_movements,
                                                                       plot_legend= TRUE)
 spill_legend <- ggpubr::get_legend(spill_plot_for_legend)
-spill_plot_legend_gg <- as_ggplot(spill_legend) + theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+spill_plot_legend_gg <- as_ggplot(spill_legend) + theme(plot.margin=grid::unit(c(0,0,0,0), "mm"), 
+                                                        panel.background = element_rect(fill = "white", color = "white"))
 
 
 #### Generate the figure for the paper ####
@@ -5015,9 +4752,24 @@ combined_movement_spill_plot <- ggarrange(JDR_wild_compare_movement_spill, UMA_w
                                           WEN_wild_compare_movement_spill, WEN_hatchery_compare_movement_spill, ENT_wild_compare_movement_spill,
                                           TUC_wild_compare_movement_spill, TUC_hatchery_compare_movement_spill, 
                                           spill_plot_legend_gg, nrow = 3, ncol = 4,
-                                          labels = c("(A)", "(B)", "(C)", "(D)", "(E)", "(F)", "(G)", "(H)", "(I)",
-                                                     "(J)", "(K)"),
-                                          label.x = 0.00, label.y = 0.95, font.label = list(size = 10, face = "plain"),
+                                          labels = c("(A) JDR, Natural", "(B) UMA, Natural", 
+                                                     "(C) UMA, Hatchery", "(D) YAK, Natural", 
+                                                     "(E) WAWA, Natural", "(F) WAWA, Hatchery", 
+                                                     "(G) WEN, Natural", "(H) WEN, Hatchery", 
+                                                     "(I) ENT, Natural",
+                                                     "(J) TUC, Natural", "(K) TUC, Hatchery"),
+                                          label.x = 0.05, label.y = 0.925, font.label = list(size = 14, face = "plain"),
                                           hjust = 0, vjust = 0)
+
+# combined_movement_spill_plot <- annotate_figure(combined_movement_spill_plot,
+#                                                bottom = textGrob("Days of winter spill", gp = gpar(cex = 1.3)),
+#                                                left = textGrob("Movement probability", rot = 90, gp = gpar(cex = 1.3))) + bgcolor("white")
+
+# Let's try this again, this time using a cowplot solution since ggpubr is
+# struggling with the background color
+combined_movement_spill_plot <- cowplot::ggdraw(annotate_figure(combined_movement_spill_plot,
+                                                bottom = textGrob("Days of winter spill", gp = gpar(cex = 1.3)),
+                                                left = textGrob("Movement probability", rot = 90, gp = gpar(cex = 1.3)))) +
+  theme(plot.background = element_rect(fill="white", color = NA))
 
 ggsave(here::here("stan_actual", "output", "paper_figures", "combined_movement_spill_plot_v2.png"), combined_movement_spill_plot, height = 12, width = 16)
