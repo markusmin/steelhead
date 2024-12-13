@@ -69,11 +69,11 @@ mcnary_reservoir_points %>%
   dplyr::summarize(do_union=FALSE) %>% 
   st_cast("LINESTRING") -> mcnary_reservoir_linestring
 
-estuary_points <- data.frame(x = c(-123.184092, -123.228724, -123.257906, -123.326914,
+estuary_points <- data.frame(x = c(-122.876, -123.184092, -123.228724, -123.257906, -123.326914,
                                    -123.405878, -123.486216, -123.506472),
-                                      y = c(46.183222, 46.162063, 46.146128, 46.149458,
+                                      y = c(46.0707, 46.183222, 46.162063, 46.146128, 46.149458,
                                             46.187501, 46.250451, 46.258522),
-                                      NAMEEN = rep("Columbia River Estuary", 7))
+                                      NAMEEN = rep("Columbia River Estuary", 8))
 
 estuary_points %>% 
   st_as_sf(coords = c("x", "y"), crs = WGS_CRS) %>% 
@@ -281,14 +281,14 @@ CRB_streams_proj_subset <- subset(CRB_streams_proj_subset, !(HUCName == "Kachess
 #### Make an inset map ####
 
 inset_map <- ggplot(usa_spdf) +
-  geom_sf() +
-  geom_sf(data = one_CAN_spdf) +
+  geom_sf(fill = "gray96") +
+  geom_sf(data = one_CAN_spdf, fill = "gray96") +
+  # add the CRB layer
+  geom_sf(data = CRB_boundary_proj, color = "gray85", linewidth = 0.2, fill = "gray85") +
   # add the state outlines
-  geom_sf(data = us_states_proj) + 
+  geom_sf(data = us_states_proj, fill = "transparent") + 
   # add the major rivers layer
   # geom_sf(data = major_rivers_proj, color = "gray70", linewidth = 0.2, fill = "gray70") +
-  # add the CRB layer
-  geom_sf(data = CRB_boundary_proj, color = "#238b45", linewidth = 0.2, fill = NA) +
   coord_sf(ylim = c(36,56),  xlim = c(-132, -90)) +
   annotate(geom = "text", x = -105, y = 38, label = "United States of America",
            fontface = "italic") + 
@@ -298,7 +298,8 @@ inset_map <- ggplot(usa_spdf) +
   theme(axis.text = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
-        plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "cm"),
+        axis.ticks.length = unit(0, "pt"),
+        plot.margin = unit(c(0, 0, 0, 0), "cm"),
         plot.background = element_rect(fill = "white"),
         panel.background = element_rect(fill="white", color = "black"),
         panel.border = element_rect(colour = "black", fill=NA, linewidth=1),
@@ -308,19 +309,20 @@ inset_map <- ggplot(usa_spdf) +
   annotate(geom = "rect", ymin = 44.3, ymax = 48.45,  
            xmin = -125.15, xmax = -113.23, fill = NA, color = "black")
 
+ggsave(here::here("figures", "inset_map.png"), plot = inset_map, height = 5, width  = 8)
 ggsave(here::here("figures", "inset_map.pdf"), plot = inset_map, height = 5, width  = 8)
 
 
 ##### MAKE BASE MAP #####
 CRB_map <- ggplot(usa_spdf) +
-  geom_sf() +
-  geom_sf(data = BC_spdf) +
+  geom_sf(fill = "gray96") +
+  geom_sf(data = one_CAN_spdf, fill = "gray96") +
+  # add the CRB layer
+  geom_sf(data = CRB_boundary_proj, color = "gray90", linewidth = 0.2, fill = "gray90") +
   # add the state outlines
-  geom_sf(data = us_states_proj) + 
+  geom_sf(data = us_states_proj, fill = "transparent") + 
   ylab("Latitude")+
   xlab("Longitude")+
-  # add the CRB layer
-  geom_sf(data = CRB_boundary_proj, color = "#238b45", linewidth = 0.2, fill = NA) +
   # Lines for CRB streams
   geom_sf(data = CRB_streams_proj_subset,  color = "gray20", linewidth = 0.5, fill = "gray20") +
   # Lines for North American Rivers (includes Columbia and Snake, and major tribs)
@@ -340,16 +342,16 @@ CRB_map <- ggplot(usa_spdf) +
   annotate("text", x = -119.63, y = 44.92, label = "John Day R.", size = 3, fontface = 'italic', hjust = 1) + # John Day R.
   annotate("text", x = -118.98, y = 45.60, label = "Umatilla R.", size = 3, fontface = 'italic', hjust = 1) + # Umatilla R.
   annotate("text", x = -117.95, y = 46.15, label = "Walla Walla R.", size = 3, fontface = 'italic', hjust = 1) + # Walla Walla R.
-  annotate("text", x = -117.83, y = 46.366, label = "Tucannon R.", size = 3, fontface = 'italic', hjust = 1) + # Tucannon R.
+  annotate("text", x = -117.8, y = 46.366, label = "Tucannon R.", size = 3, fontface = 'italic', hjust = 1) + # Tucannon R.
   annotate("text", x = -118, y = 45.50, label = "Grande Ronde R.", size = 3, fontface = 'italic', hjust = 1) + # Grande Ronde R.
   annotate("text", x = -115.34, y = 46.475, label = "Clearwater R.", size = 3, fontface = 'italic', hjust = 1) + # Clearwater R.
   annotate("text", x = -116.92, y = 45.52, label = "Imnaha R.", size = 3, fontface = 'italic', hjust = 1) + # Imnaha R.
   annotate("text", x = -117.35, y = 44.6, label = "Snake\nRiver", size = 4, fontface = 'italic', hjust = 1) + # Snake R.
-  annotate("text", x = -115.6, y = 45.63, label = "Salmon R.", size = 3, fontface = 'italic', hjust = 1) + # Salmon R.
+  annotate("text", x = -115.6, y = 45.62, label = "Salmon R.", size = 3, fontface = 'italic', hjust = 1) + # Salmon R.
   annotate("text", x = -120.44, y = 46.40, label = "Yakima R.", size = 3, fontface = 'italic', hjust = 1) + # Yakima R.
-  annotate("text", x = -120.5, y = 47.40, label = "Wenatchee R.", size = 3, fontface = 'italic', hjust = 1) + # Wenatchee R.
+  annotate("text", x = -120.5, y = 47.42, label = "Wenatchee R.", size = 3, fontface = 'italic', hjust = 1) + # Wenatchee R.
   annotate("text", x = -120.6, y = 47.96, label = "Entiat R.", size = 3, fontface = 'italic', hjust = 1) + # Entiat R.
-  annotate("text", x = -120.283715, y = 48.341111, label = "Methow R.", size = 3, fontface = 'italic', hjust = 1) + # Methow R.
+  annotate("text", x = -120.263715, y = 48.341111, label = "Methow R.", size = 3, fontface = 'italic', hjust = 1) + # Methow R.
   annotate("text", x = -119.434335, y = 48.468745, label = "Okanogan R.", size = 3, fontface = 'italic', hjust = 0) + # Okanogan R.
   annotate("text", x = -117.038870, y = 46.159808, label = "Asotin Cr.", size = 3, fontface = 'italic', hjust = 1) + # Asotin Creek
   theme(plot.background = element_rect(fill = "white"),
@@ -362,7 +364,7 @@ CRB_map <- ggplot(usa_spdf) +
         legend.text = element_text(size = 12))+
   guides(fill = guide_legend(title = "Legend")) +
   # add a north arrow
-  annotate("text", x = -124.9, y = 45.12, label = "N", fontface = "bold", size = 10) +
+  annotate("text", x = -124.9, y = 45.14, label = "N", fontface = "bold", size = 8) +
   annotate(geom = "polygon", x = c(-125.1, -124.9, -124.9), y = c(44.6, 45, 44.7), 
            color = "black", fill = "gray50") +
   annotate(geom = "polygon", x = c(-124.9, -124.9, -124.7), y = c(44.7, 45, 44.6), 
@@ -375,10 +377,10 @@ ggsave(here::here("figures", "CRB_base_map.pdf"), plot = CRB_map, height = 7.5, 
 
 CRB_map +
   annotation_custom(grob = ggplotGrob(inset_map),
-                    xmin = -116.5, xmax = -113,
+                    xmin = -116.4, xmax = -113,
                     ymin = 46.7, ymax = 48.6) -> CRB_map_plus_inset
 
-
+coord_sf(ylim = c(36,56),  xlim = c(-132, -90))
 
 
 #### Add the dams on top of the base map ####
@@ -397,11 +399,11 @@ complete_event_det_counts %>%
 
 # Add the first dams that block fish passage: Chief Joseph on the Columbia and Hells Canyon on the Snake
 blocking_dams <- data.frame(dam_abbr = c("CJO", "HEC"),
-                            lat = c(48.02, 45.2),
-                            lon = c(-119.59, -116.70),
+                            lat = c(48.00, 45.17),
+                            lon = c(-119.6, -116.68),
                             dam_angle = c(0, 60),
-                            label_lat = c(47.8224, 45.27),
-                            label_lon = c(-119.344, -117.2))
+                            label_lat = c(47.8224, 44.97),
+                            label_lon = c(-119.424, -116.55))
 
 
 dam_data_for_plot <- data.frame(dam_abbr = c("BON", "TDA", "JDA", "MCN",
@@ -426,7 +428,7 @@ dam_data_for_plot[dam_data_for_plot$dam_abbr == "PRA", "label_lat"] <- dam_data_
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "RRE", "label_lat"] <- 47.541
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "RRE", "label_lon"] <- -119.9
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "WEL", "label_lat"] <- 47.964
-dam_data_for_plot[dam_data_for_plot$dam_abbr == "WEL", "label_lon"] <- -120.21
+dam_data_for_plot[dam_data_for_plot$dam_abbr == "WEL", "label_lon"] <- -120.23
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "LGR", "label_lon"] <- -117.3632
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "LMO", "label_lon"] <- dam_data_for_plot[dam_data_for_plot$dam_abbr == "LMO", "label_lon"]-0.05
 dam_data_for_plot[dam_data_for_plot$dam_abbr == "LGO", "label_lon"] <- dam_data_for_plot[dam_data_for_plot$dam_abbr == "LGO", "label_lon"] + 0.05
@@ -455,14 +457,15 @@ CRB_map_dams <- CRB_map_plus_inset +
              label = "|", fontface = "bold", size = 9, inherit.aes = FALSE) +
   geom_text(data = subset(dam_data_for_plot, !(dam_abbr %in% c("TDA", "JDA", "LGO", "LMO", "WAN"))), 
             aes(x = label_lon, y = label_lat, label = dam_abbr),
-            size = 6, inherit.aes = FALSE) +
+            size = 4.5, inherit.aes = FALSE) +
   # grey out TDA, JDA, LMO, and LGO
   geom_text(data = subset(dam_data_for_plot, dam_abbr %in% c("TDA", "JDA", "LGO", "LMO", "WAN")), 
              aes(x = event_site_longitude, y = event_site_latitude, angle = dam_angle), 
              label = "|", fontface = "bold", size = 9, color = "gray70", inherit.aes = FALSE) +
-  geom_text(data = subset(dam_data_for_plot, dam_abbr %in% c("TDA", "JDA", "LGO", "LMO", "WAN")), 
-            aes(x = label_lon, y = label_lat, label = dam_abbr),
-            size = 6, color = "gray70", inherit.aes = FALSE) +
+  # version of the plot without text labels for those dams
+  # geom_text(data = subset(dam_data_for_plot, dam_abbr %in% c("TDA", "JDA", "LGO", "LMO", "WAN")), 
+  #           aes(x = label_lon, y = label_lat, label = dam_abbr),
+  #           size = 4.5, color = "gray70", inherit.aes = FALSE) +
   # add Chief Joseph and Hells Canyon as blocking dams
   geom_text(data = blocking_dams,
             label = "|", fontface = "bold",
@@ -471,7 +474,7 @@ CRB_map_dams <- CRB_map_plus_inset +
              size = 9, color = "#800026", inherit.aes = FALSE) +
   geom_text(data = blocking_dams, 
             aes(x = label_lon, y = label_lat, label = dam_abbr),
-            size = 7, color = "#800026", inherit.aes = FALSE)
+            size = 4.5, color = "#800026", inherit.aes = FALSE)
   
   
   # geom_text(data = blocking_dams,
